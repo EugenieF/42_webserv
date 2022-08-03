@@ -1,0 +1,163 @@
+WEBSERV
+
+HTTP 1.1
+We need to read from RFC 7230 to RFC 7235 to implement basic workings of HTTP.
+The primary function of a web server is to store, process, and deliver web pages to clients.
+The communication between client and server takes place using the Hypertext Transfer Protocol (HTTP).
+
+If we want to implement HTTP server, we have to read their particular RFC which is RFC 7230, RFC 7231, RFC 7232, RFC 7233, RFC 7234, RFC 7235.
+
+Implementing TCP:
+First we need to implement the Transport Layer of HTTP which is TCP.
+To implement TCP, we have to learn TCP socket programming.
+What is socket ?
+A socket is the mechanism that most popular operating systems provide to give programs access to the network. It allows messages to be sent and received between applications (unrelated processes) on different networked machines.
+The sockets mechanism has been created to be independent of any specific type of network. IP, however, is by far the most dominant network and the most popular use of sockets.
+
+
+Programming with TCP/IP sockets :
+
+1. Create the socket
+A socket, server_fd, is created with the socket system call:
+int server_fd = socket(domain, type, protocol);
+But what are these arguments? They allow you to say what kind of socket you want (IPv4 or IPv6, stream or datagram, and TCP or UDP).
+
+
+2. Identify (= name) the socket
+When we talk about naming a socket, we are talking about assigning a transport address to the socket (a port number in IP networking). In sockets, this operation is called binding an address and the bind system call is used for this.
+The system call for bind is:
+int bind(int socket, const struct sockaddr *address, socklen_t address_len);
+The first parameter, socket, is the socket that was created with the socket system call.
+For IP networking, we use struct sockaddr_in, which is defined in the header netinet/in.h. This structure defines:
+```c
+struct sockaddr_in 
+{ 
+    __uint8_t         sin_len; 
+    sa_family_t       sin_family; 
+    in_port_t         sin_port; 
+    struct in_addr    sin_addr; 
+    char              sin_zero[8]; 
+};
+```
+
+The code to bind a socket looks like this:
+```c
+#include <sys/socket.h> 
+… 
+struct sockaddr_in address;
+const int PORT = 8080; //Where the clients can reach at
+/* htonl converts a long integer (e.g. address) to a network representation */ 
+/* htons converts a short integer (e.g. port) to a network representation */ 
+memset((char *)&address, 0, sizeof(address)); 
+address.sin_family = AF_INET; 
+address.sin_addr.s_addr = htonl(INADDR_ANY); 
+address.sin_port = htons(PORT); 
+if (bind(server_fd,(struct sockaddr *)&address,sizeof(address)) < 0) 
+{ 
+    perror(“bind failed”); 
+    return 0; 
+}
+```
+
+3. On the server, wait for an incoming connection
+Before a client can connect to a server, the server should have a socket that is prepared to accept the connections. The listen system call tells a socket that it should be capable of accepting incoming connections:
+```
+#include <sys/socket.h> 
+int listen(int socket, int backlog);
+```
+
+```
+The syntax of accept is:
+#include <sys/socket.h> 
+int accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
+```
+
+4. Send and receive messages
+The same read and write system calls that work on files also work on sockets.
+```
+char buffer[1024] = {0};
+int valread = read( new_socket , buffer, 1024); 
+printf(“%s\n”,buffer );
+if(valread < 0)
+{ 
+    printf("No bytes are there to read");
+}
+char *hello = "Hello from the server";//IMPORTANT! WE WILL GET TO IT
+write(new_socket , hello , strlen(hello));
+```
+
+5. Close the socket
+```c
+When we’re done communicating, the easiest thing to do is to close a socket with the close system call — the same close that is used for files.
+close(new_socket);
+```
+
+Now, run the TCP socket server-side code in one Terminal and TCP socket client-side code in another Terminal.
+The order is important here. First server-side code, then client-side code.
+
+-------
+
+HTTP
+1. Initially HTTP Client(i.e., web browser) sends a HTTP request to the HTTP Server.
+2. Server processes the request received and sends HTTP response to the HTTP client.
+
+HTTP Client (Web Browser):
+Client needs to connect to the server every time. Server can’t connect to the client.
+So, it is the duty of the client to initiate the connection.
+
+
+
+---------
+
+A socket is a way to speak to other programs using standard Unix file descriptors.
+
+TCP /IP :
+TCP = The Transmission Control Protocol
+-> TCP makes sure your data arrives sequentially and error-free
+IP = Internet Protocol
+-> IP deals primarily with Internet routing and is not generally responsible for data integrity
+
+Two Types of Internet Sockets:
+- Stream Sockets = SOCK_STREAM
+- Datagram Sockets = SOCK_DGRAM
+- Raw Sockets = SOCK_RAW
+
+Datagram sockets also use IP for routing, but they don’t use TCP; they use the “User Datagram Protocol”, or “UDP”. They're connectionless.
+
+A layered model consistent with Unix might be:
+- Application Layer (telnet, ftp, etc.)
+- Host-to-Host Transport Layer (TCP, UDP)
+- Internet Layer (IP and routing)
+- Network Access Layer (Ethernet, wi-fi, or whatever)
+
+To communicate through the socket, recv() and send() offer much greater control over your data transmission than read() and write().
+
+Port numbers : cat /etc/services
+
+Byte Order:
+Network Byte Order = Big-Endian
+Your computer stores numbers in Host Byte Order = can be Little-Endian or Big-Endian depending on your processor
+
+Function	Description
+htons()	    host to network short
+htonl() 	host to network long
+ntohs()	    network to host short
+ntohl()	    network to host long
+
+A socket descriptor is just a regular int.
+
+To deal with struct sockaddr, programmers created a parallel structure: struct sockaddr_in (“in” for “Internet”) to be used with IPv4.
+
+And this is the important bit: a pointer to a struct sockaddr_in can be cast to a pointer to a struct sockaddr and vice-versa.
+So even though connect() wants a struct sockaddr*, you can still use a struct sockaddr_in and cast it at the last minute!
+The sockaddr_in structure makes it easy to reference elements of the socket address.
+
+inet_pton(), inet_addr(), inet_aton() [the last 2 are obsolete] = to convert string IP addresses to their binary representations
+“pton” stands for “presentation to network” — you can call it “printable to network”.
+
+AF_INET (address family) = PF_INET (protocol family)
+The most correct thing to do is to use AF_INET in your struct sockaddr_in and PF_INET in your call to socket().
+
+socket() simply returns to you a socket descriptor that you can use in later system calls, or -1 on error.
+Once you have a socket, you might have to associate that socket with a port on your local machine.
+The port number is used by the kernel to match an incoming packet to a certain process’s socket descriptor.
