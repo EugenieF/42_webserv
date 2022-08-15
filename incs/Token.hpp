@@ -1,7 +1,14 @@
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
+# include <vector>
+# include <map>
+# include <utility>
 # include <string>
+# include <iostream>
+# include <fstream>
+
+# include <sys/stat.h>
 
 typedef enum e_tokenType
 {
@@ -26,6 +33,7 @@ typedef enum e_tokenType
 	NUMBER,
 	SIZE,
 	PATH,
+	IP_ADDRESS,
 	VALUE,
 }	t_tokenType;
 

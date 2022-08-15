@@ -4,7 +4,6 @@
 /* Cpp libraries */
 # include <cstdio>
 # include <iostream>
-# include <fstream>
 
 /* C libraries */
 # include <unistd.h>

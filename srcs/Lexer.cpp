@@ -45,6 +45,41 @@ bool	Lexer::tokenIsNumber(const std::string &token)
 	return (token.find_first_not_of("0123456789") == std::string::npos);
 }
 
+bool	Lexer::tokenIsSize(const std::string &token)
+{
+	size_t	found;
+	char	lastCharacter;
+
+	found = token.find_first_not_of("0123456789");
+	lastCharacter = token.back();
+	if (found != std::string::npos && found == token.size() - 1)
+		return (lastCharacter == 'k' || lastCharacter == 'K'
+			|| lastCharacter == 'm' ||  lastCharacter == 'M'
+			|| lastCharacter == 'g' || lastCharacter == 'G');
+	return (false);
+}
+
+bool	Lexer::tokenIsPath(const std::string &token)
+{
+	return (token.find("/") != std::string::npos);
+}
+
+bool	Lexer::tokenIsAddress(const std::string &token)
+{
+	size_t	found;
+	size_t	pos;
+
+	pos = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		found = token.find_first_not_of("0123456789", pos);
+		if (found == std::string::npos || token[found] != '.')
+			return (false);
+		pos = found + 1;
+	}
+	return (token.find_first_not_of("0123456789", found + 1) == std::string::npos);
+}
+
 void	Lexer::getValue(const std::string &token)
 {
 	t_tokenType	type;
@@ -52,6 +87,12 @@ void	Lexer::getValue(const std::string &token)
 	type = VALUE;
 	if (tokenIsNumber(token))
 		type = NUMBER;
+	else if (tokenIsSize(token))
+		type = SIZE;
+	else if (tokenIsPath(token))
+		type = PATH;
+	else if (tokenIsAddress(token))
+		type = IP_ADDRESS;
 	_tokens.insert(_tokens.end(), Token(type, token));
 }
 
@@ -66,7 +107,7 @@ void	Lexer::getToken(char character)
 	listOfTokenTypes::iterator	ite;
 
 	token = "";
-	while (!_file.eof() && !isspace(character) && !isDelimiter(character))
+	while (!reachedEndOfFile() && !isspace(character) && !isDelimiter(character) && character != '#')
 	{
 		token += getNextCharacter();
 		character = _file.peek();
@@ -95,9 +136,13 @@ char	Lexer::getNextCharacter()
 	return (_file.get());
 }
 
+bool	Lexer::reachedEndOfFile()
+{
+	return (_file.eof());
+}
 void	Lexer::ignoreComments(char character)
 {
-	while (!_file.eof() && character != '\n')
+	while (!reachedEndOfFile() && character != '\n')
 		character = getNextCharacter();
 }
 
@@ -117,7 +162,7 @@ void	Lexer::readFile()
 		else
 			getToken(character);
 	}
-	printTokens();
+	// printTokens();
 }
 
 bool	Lexer::checkFile(std::string configFile)
@@ -149,6 +194,10 @@ void	Lexer::closeFile()
 		_file.close();
 }
 
+const Lexer::listOfTokens&		Lexer::getTokens() const
+{
+	return (_tokens);
+}
 
 /**********************            PRINT            *********************/
 
@@ -156,7 +205,7 @@ void	Lexer::printTokens()
 {
 	listOfTokens::iterator	ite;
 
-	std::cout << std::endl  << "  >>> List of tokens <<< " << std::endl;
+	std::cout << std::endl  << "  >>> LEXER | List of tokens <<< " << std::endl;
 	for (ite = _tokens.begin(); ite != _tokens.end(); ite++)
 	{
 		std::cout << "[";
@@ -207,6 +256,8 @@ void	Lexer::printType(Token::tokenType type)
 		std::cout << "SIZE";
 	else if (type == PATH)
 		std::cout << "PATH";
+	else if (type == IP_ADDRESS)
+		std::cout <<  "IP_ADDRESS";
 	else
 		std::cout << "VALUE";
 }

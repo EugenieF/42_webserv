@@ -1,5 +1,5 @@
 #include "webserv.hpp"
-#include "Lexer.hpp"
+#include "Parser.hpp"
 
 bool	createSocket(int *socketFd, struct sockaddr_in socketAddress)
 {
@@ -114,7 +114,8 @@ int main(int argc, char **argv)
 	}
 	try
 	{
-		Lexer	lexer(argv[1]);
+		Parser	parser(argv[1]);
+		parser.parseTokens();
 		runServer();
 	}
 	catch(const std::exception& e)

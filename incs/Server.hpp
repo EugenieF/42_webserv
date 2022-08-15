@@ -5,54 +5,32 @@
 # include <string>
 # include <map>
 
-typedef enum e_method
-{
-	GET = 0,
-	POST,
-	DELETE,
-}	t_method;
+# include "IBlock.hpp"
+# include "Location.hpp"
 
-class	IBlock
+class	Server : public IBlock
 {
-	protected :
+	public :
+		typedef std::map<std::string, Location *>	listOfLocations;
+
+		Server();
+		~Server();
+
+		void				setServerName(const std::string &name);
+
+		void				setListeningPort(int port);
+		int					getListeningPort() const;
+
+		void				setListeningHost(const std::string &host);
+		const std::string&	getListeningHost() const;
+
+	private :
+		listOfLocations							_locations;
 		std::vector<std::string>				_serverName;
-		int										_listenPort;
-		std::string								_listenHost;
-		std::string								_root;
-		std::vector<std::string>				_indexList;
-		bool									_autoindex;
-		size_t									_bodyLimit;
-		std::map<std::string, std::string>		_cgi;
-		std::map<int, std::string>				_errorPage;
-		std::string								_redirectUri;
-		int										_redirectCode;
-		std::string								_uploadPath;
-
-	public :
-};
-
-class	ServerRules : public IBlock
-{
-	private :
-		std::map<std::string, LocationRules *>	_locations;
-
-	public :
+		int										_listeningPort;
+		std::string								_listeningHost;
 
 };
 
-class	LocationRules : public IBlock
-{
-	public :
-
-	private :
-};
-
-class	Server
-{
-	public :
-
-	private :
-
-};
 
 #endif

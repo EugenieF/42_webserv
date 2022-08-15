@@ -4,8 +4,11 @@ SRCS_DIR		= ./srcs
 
 SRCS			= main.cpp \
 				Token.cpp \
-				Lexer.cpp
-				# Server.cpp
+				Lexer.cpp \
+				Parser.cpp \
+				IBlock.cpp \
+				Location.cpp \
+				Server.cpp
 
 OBJS_DIR		= ./objs
 
