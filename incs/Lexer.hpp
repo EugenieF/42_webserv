@@ -5,6 +5,7 @@
 # include <map>
 # include <utility>
 # include <string>
+# include <iostream>
 
 # include <sys/stat.h>
 
@@ -27,10 +28,17 @@ class	Lexer
 		Lexer();
 		Lexer(std::string configFile);
 		~Lexer();
+
+	private:
 		void	openFile(std::string configFile);
 		bool	checkFile(std::string configFile);
 		void	readFile();
-		void	splitTokens(char character);
+		char	getNextCharacter();
+		void	getToken(char character);
+		void	getValue(const std::string &token);
+		bool	tokenIsNumber(const std::string &token);
+		void	ignoreComments(char character);
+		void	getDelimiter();
 		bool	isDelimiter(char character);
 		void	closeFile();
 		void	printTokens();

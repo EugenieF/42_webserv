@@ -40,50 +40,82 @@ void	Lexer::buildTokenTypeArray(void)
 	_tokenTypes["upload_path"] = KEYWORD_UPLOAD_PATH;
 }
 
+bool	Lexer::tokenIsNumber(const std::string &token)
+{
+	return (token.find_first_not_of("0123456789") == std::string::npos);
+}
+
+void	Lexer::getValue(const std::string &token)
+{
+	t_tokenType	type;
+
+	type = VALUE;
+	if (tokenIsNumber(token))
+		type = NUMBER;
+	_tokens.insert(_tokens.end(), Token(type, token));
+}
+
 bool	Lexer::isDelimiter(char character)
 {
 	return (character == ';' || character == '{' || character == '}' || character == ':');
 }
 
-void	Lexer::splitTokens(char character)
+void	Lexer::getToken(char character)
 {
 	std::string					token;
-	std::string					delimiter;
 	listOfTokenTypes::iterator	ite;
 
-	if (!isspace(character))
-		std::cout << "character : " << character << std::endl;
 	token = "";
-	delimiter = "";
-	while (!_file.eof() && !isspace(character))
+	while (!_file.eof() && !isspace(character) && !isDelimiter(character))
 	{
-		if (isDelimiter(character))
-		{
-			if (token != "")
-				std::cout << "token : " << token << std::endl;
-			delimiter += character;
-			_tokens.insert(_tokens.end(), Token(_tokenTypes[delimiter], delimiter));
-			break ;
-		}
-		token += character;
-		character = _file.get();
+		token += getNextCharacter();
+		character = _file.peek();
 	}
 	if (token != "")
 	{
-		std::cout << ">>> token : " << token << std::endl;
 		ite = _tokenTypes.find(token);
 		if (ite != _tokenTypes.end())
 			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token));
 		else
-			_tokens.insert(_tokens.end(), Token(VALUE, token));
+			getValue(token);
 	}
+}
+
+void	Lexer::getDelimiter()
+{
+	std::string		token;
+
+	token = "";
+	token += getNextCharacter();
+	_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token));
+}
+
+char	Lexer::getNextCharacter()
+{
+	return (_file.get());
+}
+
+void	Lexer::ignoreComments(char character)
+{
+	while (!_file.eof() && character != '\n')
+		character = getNextCharacter();
 }
 
 void	Lexer::readFile()
 {
+	char	character;
+
 	while (!_file.eof())
 	{
-		this->splitTokens(_file.get());
+		character = _file.peek();
+		if (character == '#')
+			ignoreComments(character);
+		else if (isspace(character))
+			getNextCharacter();
+		else if (isDelimiter(character))
+			getDelimiter();
+		else
+			getToken(character);
 	}
 	printTokens();
 }
