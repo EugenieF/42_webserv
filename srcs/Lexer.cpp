@@ -51,7 +51,7 @@ bool	Lexer::tokenIsSize(const std::string &token)
 	char	lastCharacter;
 
 	found = token.find_first_not_of("0123456789");
-	lastCharacter = token.back();
+	lastCharacter = token[token.size() - 1];
 	if (found != std::string::npos && found == token.size() - 1)
 		return (lastCharacter == 'k' || lastCharacter == 'K'
 			|| lastCharacter == 'm' ||  lastCharacter == 'M'
@@ -182,7 +182,7 @@ void	Lexer::openFile(std::string configFile)
 {
 	if (!checkFile(configFile))
 		throw(std::runtime_error("Cannot open file"));
-	_file.open(configFile);
+	_file.open(configFile.c_str());
 	if (!_file || !_file.is_open())
 		throw(std::runtime_error("Cannot open file"));
 	readFile();

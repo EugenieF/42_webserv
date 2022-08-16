@@ -1,40 +1,64 @@
 #include "Parser.hpp"
 
-Parser::Parser(std::string configFile): _lexer(configFile)
+Parser::Parser(std::string configFile):
+	_lexer(configFile),
+	_currentToken(_lexer.getTokens().begin())
 {
 	initArrayParsingFunctions();
-	printArrayParsingFunctions();
+	// printArrayParsingFunctions();
 	printTokens();
 }
 
 Parser::~Parser()
 {
-	listOfServers::const_iterator		ite;
+	deleteServers();
+}
 
-	for (ite = _servers.begin(); ite != _servers.end(); ite++)
-		delete (*ite); // Not sure about this
+void	Parser::deleteServers()
+{
+	for (_currentServer = _servers.begin(); _currentServer != _servers.end(); _currentServer++)
+		delete (*_currentServer); // Not sure about this
+}
+
+void	Parser::parseServer()
+{
+	Parser::listOfParsingFunctions::iterator	parseFunctIte;
+
+	_currentToken++;
+	while (!reachedEndOfTokens() && _currentToken->getType() != KEYWORD_SERVER)
+	{
+		parseFunctIte = _parsingFunct.find(_currentToken->getType());
+		if (parseFunctIte != _parsingFunct.end())
+		{
+			(this->*parseFunctIte->second)();
+		}
+		_currentToken++;
+	}
+}
+
+bool	Parser::getNextToken()
+{
+	if (!reachedEndOfTokens())
+		_currentToken++;
+	return (_currentToken != _lexer.getTokens().end());
+}
+
+bool	Parser::reachedEndOfTokens()
+{
+	return (_currentToken == _lexer.getTokens().end());
 }
 
 void	Parser::parseTokens()
 {
-	Lexer::listOfTokens::const_iterator				ite;
-	Parser::listOfParsingFunctions::iterator		searchFunct;
-
-	
-	for (ite = _lexer.getTokens().begin(); ite != _lexer.getTokens().end(); ite++)
+	for (; !reachedEndOfTokens(); _currentToken++)
 	{
-		_currentToken = *ite;
-		if (_currentToken.getType() == KEYWORD_SERVER)
+		if (_currentToken->getType() == KEYWORD_SERVER)
 		{
-			std::cout << "*** Server ***" << std::endl;
-			_servers.insert(_servers.end(), new Server());
-		}
-		searchFunct = _parsingFunct.find(_currentToken.getType());
-		if (searchFunct != _parsingFunct.end())
-		{
-			// std::cout << std::endl;
-			// _lexer.printType(searchFunct->first);
-			(this->*searchFunct->second)();
+			std::cout << "*** New Server ***" << std::endl;
+			_currentServer = _servers.insert(_servers.end(), new Server());
+			parseServer();
+			if (reachedEndOfTokens())
+				break ;
 		}
 	}
 }
@@ -59,9 +83,28 @@ void	Parser::parseIndexRule()
 	std::cout << "Parse Index" << std::endl;
 }
 
+void	Parser::checkSemicolon(std::string errorMsg)
+{
+	if (!getNextToken() || _currentToken->getType() != SEMICOLON)
+		throw (std::runtime_error(errorMsg));
+}
+
 void	Parser::parseAutoindexRule()
 {
+	
 	std::cout << "Parse Autoindex" << std::endl;
+	if (getNextToken() && _currentToken->getType() == VALUE)
+	{
+		if (_currentToken->getValue() == "on")
+			(*_currentServer)->setAutoindex(true);
+		else if (_currentToken->getValue() == "off")
+			(*_currentServer)->setAutoindex(false);
+		else
+			throw (std::runtime_error("Error rule autoindex"));
+		checkSemicolon("Error rule autoindex");
+	}
+	else
+		throw (std::runtime_error("Error rule autoindex"));
 }
 
 void	Parser::parseMaxBodySizeRule()
@@ -72,6 +115,26 @@ void	Parser::parseMaxBodySizeRule()
 void	Parser::parseCgiRule()
 {
 	std::cout << "Parse Cgi" << std::endl;
+}
+
+void	Parser::parseErrorPageRule()
+{
+	std::cout << "Parse ErrorPage" << std::endl;
+}
+
+void	Parser::parseRedirectRule()
+{
+	std::cout << "Parse Redirect" << std::endl;
+}
+
+void	Parser::parseAllowedMethodRule()
+{
+	std::cout << "Parse AllowedMethod" << std::endl;
+}
+
+void	Parser::parseUploadPathRule()
+{
+	std::cout << "Parse Upload Path" << std::endl;
 }
 
 void	Parser::printArrayParsingFunctions()
@@ -92,6 +155,10 @@ void	Parser::initArrayParsingFunctions()
 	_parsingFunct[KEYWORD_AUTOINDEX] = &Parser::parseAutoindexRule;
 	_parsingFunct[KEYWORD_BODY_LIMIT] = &Parser::parseMaxBodySizeRule;
 	_parsingFunct[KEYWORD_CGI] = &Parser::parseCgiRule;
+	_parsingFunct[KEYWORD_ERROR_PAGE] = &Parser::parseErrorPageRule;
+	_parsingFunct[KEYWORD_REDIRECT] = &Parser::parseRedirectRule;
+	_parsingFunct[KEYWORD_ALLOWED_METHOD] = &Parser::parseAllowedMethodRule;
+	_parsingFunct[KEYWORD_UPLOAD_PATH] = &Parser::parseUploadPathRule;
 }
 
 /****************         PRINT        *****************/

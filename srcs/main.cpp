@@ -114,7 +114,8 @@ int main(int argc, char **argv)
 	}
 	try
 	{
-		Parser	parser(argv[1]);
+		std::string configFile(argv[1]);
+		Parser	parser(configFile);
 		parser.parseTokens();
 		runServer();
 	}

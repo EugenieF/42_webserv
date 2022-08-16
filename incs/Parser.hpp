@@ -18,11 +18,18 @@ class Parser
 		void								printArrayParsingFunctions();
 
 	private:
-		Token								_currentToken;
 		Lexer								_lexer;
+		Lexer::listOfTokens::const_iterator	_currentToken;
 		listOfServers						_servers;
+		listOfServers::const_iterator		_currentServer;
 		listOfParsingFunctions				_parsingFunct;
 		
+		void								parseServer();
+		void								deleteServers();
+		bool								reachedEndOfTokens();
+		bool								getNextToken();
+		void								checkSemicolon(std::string errorMsg);
+
 		void								initArrayParsingFunctions();
 		void								parseServerNameRule();
 		void								parseListenRule();
@@ -31,6 +38,10 @@ class Parser
 		void								parseAutoindexRule();
 		void								parseMaxBodySizeRule();
 		void								parseCgiRule();
+		void								parseErrorPageRule();
+		void								parseRedirectRule();
+		void								parseAllowedMethodRule();
+		void								parseUploadPathRule();
 };
 
 #endif
