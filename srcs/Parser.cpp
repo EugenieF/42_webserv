@@ -3,6 +3,7 @@
 Parser::Parser(std::string configFile): _lexer(configFile)
 {
 	initArrayParsingFunctions();
+	printArrayParsingFunctions();
 	printTokens();
 }
 
@@ -17,7 +18,7 @@ Parser::~Parser()
 void	Parser::parseTokens()
 {
 	Lexer::listOfTokens::const_iterator				ite;
-	Parser::listOfParsingFunctions::iterator	searchFunct;
+	Parser::listOfParsingFunctions::iterator		searchFunct;
 
 	
 	for (ite = _lexer.getTokens().begin(); ite != _lexer.getTokens().end(); ite++)
@@ -31,11 +32,10 @@ void	Parser::parseTokens()
 		searchFunct = _parsingFunct.find(_currentToken.getType());
 		if (searchFunct != _parsingFunct.end())
 		{
-			std::cout << std::endl;
-			_lexer.printType(searchFunct->first);
-			(Parser::*)(searchFunct->second)();
+			// std::cout << std::endl;
+			// _lexer.printType(searchFunct->first);
+			(this->*searchFunct->second)();
 		}
-			// (*searchFunct).second();
 	}
 }
 
@@ -72,6 +72,15 @@ void	Parser::parseMaxBodySizeRule()
 void	Parser::parseCgiRule()
 {
 	std::cout << "Parse Cgi" << std::endl;
+}
+
+void	Parser::printArrayParsingFunctions()
+{
+	Parser::listOfParsingFunctions::iterator	ite;
+
+	std::cout << "Print array Parsing functions :" << std::endl;
+	for (ite = _parsingFunct.begin(); ite != _parsingFunct.end(); ite++)
+		(this->*ite->second)();
 }
 
 void	Parser::initArrayParsingFunctions()

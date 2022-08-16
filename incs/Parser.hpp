@@ -7,13 +7,15 @@
 class Parser
 {
 	public:
-		typedef std::vector<Server *>					listOfServers;
-		typedef std::map<Token::tokenType, void (Parser::*)()>	listOfParsingFunctions;
+		typedef std::vector<Server *>						listOfServers;
+		typedef void (Parser::*parsingFunction)();
+		typedef std::map<Token::tokenType, parsingFunction>	listOfParsingFunctions;
 	
 		Parser(std::string configFile);
 		~Parser();
 		void								parseTokens();
 		void								printTokens();
+		void								printArrayParsingFunctions();
 
 	private:
 		Token								_currentToken;
