@@ -2,6 +2,7 @@
 
 Parser::Parser(std::string configFile): _lexer(configFile)
 {
+	initArrayParsingFunctions();
 	printTokens();
 }
 
@@ -15,7 +16,9 @@ Parser::~Parser()
 
 void	Parser::parseTokens()
 {
-	Lexer::listOfTokens::const_iterator		ite;
+	Lexer::listOfTokens::const_iterator				ite;
+	Parser::listOfParsingFunctions::iterator	searchFunct;
+
 	
 	for (ite = _lexer.getTokens().begin(); ite != _lexer.getTokens().end(); ite++)
 	{
@@ -25,9 +28,62 @@ void	Parser::parseTokens()
 			std::cout << "*** Server ***" << std::endl;
 			_servers.insert(_servers.end(), new Server());
 		}
+		searchFunct = _parsingFunct.find(_currentToken.getType());
+		if (searchFunct != _parsingFunct.end())
+		{
+			std::cout << std::endl;
+			_lexer.printType(searchFunct->first);
+			(Parser::*)(searchFunct->second)();
+		}
+			// (*searchFunct).second();
 	}
 }
 
+void	Parser::parseServerNameRule()
+{
+	std::cout << "Parse Server Name" << std::endl;
+}
+
+void	Parser::parseListenRule()
+{
+	std::cout << "Parse Listen" << std::endl;
+}
+
+void	Parser::parseRootRule()
+{
+	std::cout << "Parse Root" << std::endl;
+}
+
+void	Parser::parseIndexRule()
+{
+	std::cout << "Parse Index" << std::endl;
+}
+
+void	Parser::parseAutoindexRule()
+{
+	std::cout << "Parse Autoindex" << std::endl;
+}
+
+void	Parser::parseMaxBodySizeRule()
+{
+	std::cout << "Parse MaxBodySize" << std::endl;
+}
+
+void	Parser::parseCgiRule()
+{
+	std::cout << "Parse Cgi" << std::endl;
+}
+
+void	Parser::initArrayParsingFunctions()
+{
+	_parsingFunct[KEYWORD_SERVER_NAME] = &Parser::parseServerNameRule;
+	_parsingFunct[KEYWORD_LISTEN] = &Parser::parseListenRule;
+	_parsingFunct[KEYWORD_ROOT] = &Parser::parseRootRule;
+	_parsingFunct[KEYWORD_INDEX] = &Parser::parseIndexRule;
+	_parsingFunct[KEYWORD_AUTOINDEX] = &Parser::parseAutoindexRule;
+	_parsingFunct[KEYWORD_BODY_LIMIT] = &Parser::parseMaxBodySizeRule;
+	_parsingFunct[KEYWORD_CGI] = &Parser::parseCgiRule;
+}
 
 /****************         PRINT        *****************/
 

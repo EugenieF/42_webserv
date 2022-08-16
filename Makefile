@@ -6,7 +6,7 @@ SRCS			= main.cpp \
 				Token.cpp \
 				Lexer.cpp \
 				Parser.cpp \
-				IBlock.cpp \
+				IRules.cpp \
 				Location.cpp \
 				Server.cpp
 

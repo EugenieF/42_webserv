@@ -1,7 +1,7 @@
 #ifndef LOCATION_HPP
 # define LOCATION_HPP
 
-# include "IBlock.hpp"
+# include "IRules.hpp"
 
 typedef enum e_method
 {
@@ -11,7 +11,7 @@ typedef enum e_method
 	ALLOWED_METHODS_COUNT,
 }	t_method;
 
-class	Location : public IBlock
+class	Location : public IRules
 {
 	public :
 		Location();

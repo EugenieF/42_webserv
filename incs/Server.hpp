@@ -5,13 +5,13 @@
 # include <string>
 # include <map>
 
-# include "IBlock.hpp"
+# include "IRules.hpp"
 # include "Location.hpp"
 
-class	Server : public IBlock
+class	Server : public IRules
 {
 	public :
-		typedef std::map<std::string, Location *>	listOfLocations;
+		typedef std::map<std::string, Location *>			listOfLocations;
 
 		Server();
 		~Server();

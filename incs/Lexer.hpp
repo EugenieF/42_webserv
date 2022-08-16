@@ -14,31 +14,31 @@ class	Lexer
 		Lexer();
 		Lexer(std::string configFile);
 		~Lexer();
-		const listOfTokens&		getTokens() const;
-		void					printTokens();
-		void					printType(Token::tokenType type);
+		const listOfTokens&					getTokens() const;
+		void								printTokens();
+		void								printType(Token::tokenType type);
 
 	private :
-		std::ifstream							_file;
-		listOfTokens							_tokens;
-		listOfTokenTypes						_tokenTypes;
+		std::ifstream						_file;
+		listOfTokens						_tokens;
+		listOfTokenTypes					_tokenTypes;
 
-		void	openFile(std::string configFile);
-		bool	checkFile(std::string configFile);
-		void	readFile();
-		char	getNextCharacter();
-		bool	reachedEndOfFile();
-		void	getToken(char character);
-		void	getValue(const std::string &token);
-		bool	tokenIsNumber(const std::string &token);
-		bool	tokenIsSize(const std::string &token);
-		bool	tokenIsPath(const std::string &token);
-		bool	tokenIsAddress(const std::string &token);
-		void	ignoreComments(char character);
-		void	getDelimiter();
-		bool	isDelimiter(char character);
-		void	closeFile();
-		void	buildTokenTypeArray();
+		void								openFile(std::string configFile);
+		bool								checkFile(std::string configFile);
+		void								readFile();
+		char								getNextCharacter();
+		bool								reachedEndOfFile();
+		void								getToken(char character);
+		void								getValue(const std::string &token);
+		bool								tokenIsNumber(const std::string &token);
+		bool								tokenIsSize(const std::string &token);
+		bool								tokenIsPath(const std::string &token);
+		bool								tokenIsAddress(const std::string &token);
+		void								ignoreComments(char character);
+		void								getDelimiter();
+		bool								isDelimiter(char character);
+		void								closeFile();
+		void								buildTokenTypeArray();
 
 		class CannotOpenFile: public std::exception
 		{

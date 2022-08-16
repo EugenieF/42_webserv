@@ -8,7 +8,7 @@
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
 # define DEFAULT_ROOT ""
 
-class	IBlock
+class	IRules
 {
 	protected :
 		std::string								_root;
@@ -22,8 +22,8 @@ class	IBlock
 		int										_redirectCode;
 
 	public :
-		IBlock();
-		~IBlock();
+		IRules();
+		~IRules();
 
 		void				setRoot(const std::string &root);
 		const std::string&	getRoot() const;
