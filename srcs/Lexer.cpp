@@ -3,7 +3,7 @@
 
 Lexer::Lexer() {}
 
-Lexer::Lexer(std::string configFile)
+Lexer::Lexer(std::string configFile): _lineCount(1)
 {
 	buildTokenTypeArray();
 	openFile(configFile);
@@ -12,32 +12,6 @@ Lexer::Lexer(std::string configFile)
 Lexer::~Lexer()
 {
 	this->closeFile();
-}
-
-const char	*Lexer::CannotOpenFile::what() const throw()
-{
-	return ("Cannot open file");
-}
-
-void	Lexer::buildTokenTypeArray(void)
-{
-	_tokenTypes["{"] = BLOCK_START;
-	_tokenTypes["}"] = BLOCK_END;
-	_tokenTypes[";"] = SEMICOLON;
-	_tokenTypes[":"] = COLON;
-	_tokenTypes["server"] = KEYWORD_SERVER;
-	_tokenTypes["location"] = KEYWORD_LOCATION;
-	_tokenTypes["server_name"] = KEYWORD_SERVER_NAME;
-	_tokenTypes["listen"] = KEYWORD_LISTEN;
-	_tokenTypes["root"] = KEYWORD_ROOT;
-	_tokenTypes["index"] = KEYWORD_INDEX;
-	_tokenTypes["autoindex"] = KEYWORD_AUTOINDEX;
-	_tokenTypes["cgi"] = KEYWORD_CGI;
-	_tokenTypes["error_page"] = KEYWORD_ERROR_PAGE;
-	_tokenTypes["redirect"] = KEYWORD_REDIRECT;
-	_tokenTypes["client_max_body_size"] = KEYWORD_BODY_LIMIT;
-	_tokenTypes["allowed_method"] = KEYWORD_ALLOWED_METHOD;
-	_tokenTypes["upload_path"] = KEYWORD_UPLOAD_PATH;
 }
 
 bool	Lexer::tokenIsNumber(const std::string &token)
@@ -93,7 +67,7 @@ void	Lexer::getValue(const std::string &token)
 		type = PATH;
 	else if (tokenIsAddress(token))
 		type = IP_ADDRESS;
-	_tokens.insert(_tokens.end(), Token(type, token));
+	_tokens.insert(_tokens.end(), Token(type, token, _lineCount));
 }
 
 bool	Lexer::isDelimiter(char character)
@@ -116,7 +90,7 @@ void	Lexer::getToken(char character)
 	{
 		ite = _tokenTypes.find(token);
 		if (ite != _tokenTypes.end())
-			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token));
+			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
 		else
 			getValue(token);
 	}
@@ -128,22 +102,7 @@ void	Lexer::getDelimiter()
 
 	token = "";
 	token += getNextCharacter();
-	_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token));
-}
-
-char	Lexer::getNextCharacter()
-{
-	return (_file.get());
-}
-
-bool	Lexer::reachedEndOfFile()
-{
-	return (_file.eof());
-}
-void	Lexer::ignoreComments(char character)
-{
-	while (!reachedEndOfFile() && character != '\n')
-		character = getNextCharacter();
+	_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
 }
 
 void	Lexer::readFile()
@@ -162,7 +121,7 @@ void	Lexer::readFile()
 		else
 			getToken(character);
 	}
-	// printTokens();
+	std::cout << "LINE COUNT = " << _lineCount << std::endl;
 }
 
 bool	Lexer::checkFile(std::string configFile)
@@ -199,7 +158,55 @@ const Lexer::listOfTokens&		Lexer::getTokens() const
 	return (_tokens);
 }
 
-/**********************            PRINT            *********************/
+/******************************************************************************/
+/*                                   UTILS                                    */
+/******************************************************************************/
+
+char	Lexer::getNextCharacter()
+{
+	char nextCharacter;
+	
+	nextCharacter = _file.get();
+	if (nextCharacter == '\n')
+		_lineCount++;
+	return (nextCharacter);
+}
+
+bool	Lexer::reachedEndOfFile()
+{
+	return (_file.eof());
+}
+
+void	Lexer::ignoreComments(char character)
+{
+	while (!reachedEndOfFile() && character != '\n')
+		character = getNextCharacter();
+}
+
+void	Lexer::buildTokenTypeArray(void)
+{
+	_tokenTypes["{"] = BLOCK_START;
+	_tokenTypes["}"] = BLOCK_END;
+	_tokenTypes[";"] = SEMICOLON;
+	_tokenTypes[":"] = COLON;
+	_tokenTypes["server"] = KEYWORD_SERVER;
+	_tokenTypes["location"] = KEYWORD_LOCATION;
+	_tokenTypes["server_name"] = KEYWORD_SERVER_NAME;
+	_tokenTypes["listen"] = KEYWORD_LISTEN;
+	_tokenTypes["root"] = KEYWORD_ROOT;
+	_tokenTypes["index"] = KEYWORD_INDEX;
+	_tokenTypes["autoindex"] = KEYWORD_AUTOINDEX;
+	_tokenTypes["cgi"] = KEYWORD_CGI;
+	_tokenTypes["error_page"] = KEYWORD_ERROR_PAGE;
+	_tokenTypes["redirect"] = KEYWORD_REDIRECT;
+	_tokenTypes["client_max_body_size"] = KEYWORD_BODY_LIMIT;
+	_tokenTypes["allowed_method"] = KEYWORD_ALLOWED_METHOD;
+	_tokenTypes["upload_path"] = KEYWORD_UPLOAD_PATH;
+}
+
+/******************************************************************************/
+/*                                   PRINT                                    */
+/******************************************************************************/
 
 void	Lexer::printTokens()
 {
@@ -214,50 +221,49 @@ void	Lexer::printTokens()
 	}
 }
 
-void	Lexer::printType(Token::tokenType type)
+std::string		Lexer::printType(Token::tokenType type)
 {
 	if (type == BLOCK_START)
-		std::cout << "BLOCK_START";
+		return ("BLOCK_START");
 	else if (type == BLOCK_END)
-		std::cout << "BLOCK_END";
+		return ("BLOCK_END");
 	else if (type == SEMICOLON)
-		std::cout << "SEMICOLON";
+		return ("SEMICOLON");
 	else if (type == COLON)
-		std::cout << "COLON";
+		return ("COLON");
 	else if (type == KEYWORD_SERVER)
-		std::cout << "KEYWORD_SERVER";
+		return ("KEYWORD_SERVER");
 	else if (type == KEYWORD_LOCATION)
-		std::cout << "KEYWORD_LOCATION";
+		return ("KEYWORD_LOCATION");
 	else if (type == KEYWORD_SERVER_NAME)
-		std::cout << "KEYWORD_SERVER_NAME";
+		return ("KEYWORD_SERVER_NAME");
 	else if (type == KEYWORD_LISTEN)
-		std::cout << "KEYWORD_LISTEN";
+		return ("KEYWORD_LISTEN");
 	else if (type == KEYWORD_ROOT)
-		std::cout << "KEYWORD_ROOT";
+		return ("KEYWORD_ROOT");
 	else if (type == KEYWORD_INDEX)
-		std::cout << "KEYWORD_INDEX";
+		return ("KEYWORD_INDEX");
 	else if (type == KEYWORD_AUTOINDEX)
-		std::cout << "KEYWORD_AUTOINDEX";
+		return ("KEYWORD_AUTOINDEX");
 	else if (type == KEYWORD_CGI)
-		std::cout << "KEYWORD_CGI";
+		return ("KEYWORD_CGI");
 	else if (type == KEYWORD_ERROR_PAGE)
-		std::cout << "KEYWORD_ERROR_PAGE";
+		return ("KEYWORD_ERROR_PAGE");
 	else if (type == KEYWORD_REDIRECT)
-		std::cout << "KEYWORD_REDIRECT";
+		return ("KEYWORD_REDIRECT");
 	else if (type == KEYWORD_BODY_LIMIT)
-		std::cout << "KEYWORD_BODY_LIMIT";
+		return ("KEYWORD_BODY_LIMIT");
 	else if (type == KEYWORD_ALLOWED_METHOD)
-		std::cout << "KEYWORD_ALLOWED_METHOD";
+		return ("KEYWORD_ALLOWED_METHOD");
 	else if (type == KEYWORD_UPLOAD_PATH)
-		std::cout << "KEYWORD_UPLOAD_PATH";
+		return ("KEYWORD_UPLOAD_PATH");
 	else if (type == NUMBER)
-		std::cout << "NUMBER";
+		return ("NUMBER");
 	else if (type == SIZE)
-		std::cout << "SIZE";
+		return ("SIZE");
 	else if (type == PATH)
-		std::cout << "PATH";
+		return("PATH");
 	else if (type == IP_ADDRESS)
-		std::cout <<  "IP_ADDRESS";
-	else
-		std::cout << "VALUE";
+		return ("IP_ADDRESS");
+	return ("VALUE");
 }

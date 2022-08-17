@@ -9,7 +9,7 @@ Server::~Server() {}
 
 void	Server::setServerName(const std::string &name)
 {
-	_serverName.insert(_serverName.end(), name);
+	_serverNames.insert(_serverNames.end(), name);
 }
 
 void	Server::setListeningPort(int port)

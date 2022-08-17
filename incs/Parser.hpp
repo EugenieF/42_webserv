@@ -3,6 +3,13 @@
 
 # include "Lexer.hpp"
 # include "Server.hpp"
+# include "webserv.hpp"
+
+typedef enum e_context
+{
+	SERVER		= 0,
+	LOCATION	= 1,
+}	t_context;
 
 class Parser
 {
@@ -14,8 +21,8 @@ class Parser
 		Parser(std::string configFile);
 		~Parser();
 		void								parseTokens();
-		void								printTokens();
-		void								printArrayParsingFunctions();
+
+		/**************************    VARIABLES    ****************************/
 
 	private:
 		Lexer								_lexer;
@@ -23,14 +30,19 @@ class Parser
 		listOfServers						_servers;
 		listOfServers::const_iterator		_currentServer;
 		listOfParsingFunctions				_parsingFunct;
+		t_context							_context;
+		std::string							_errorMsg;
 		
-		void								parseServer();
-		void								deleteServers();
-		bool								reachedEndOfTokens();
-		bool								getNextToken();
-		void								checkSemicolon(std::string errorMsg);
+		/**************************     PARSER     *****************************/
 
-		void								initArrayParsingFunctions();
+		void								parseServer();
+		void								parseLocation();
+		void								parseBlock(t_context blockContext);
+		void								parseRule();
+
+
+		/**************************  PARSING RULES  ***************************/
+
 		void								parseServerNameRule();
 		void								parseListenRule();
 		void								parseRootRule();
@@ -42,6 +54,22 @@ class Parser
 		void								parseRedirectRule();
 		void								parseAllowedMethodRule();
 		void								parseUploadPathRule();
+
+		/****************************     UTILS     ***************************/
+
+		bool								reachedEndOfTokens();
+		bool								getNextToken();
+		void								checkDelimiter(Token::tokenType tokenType, std::string errorMsg);
+		void								expectNextToken(Token::tokenType expectedType, std::string errorMsg);
+		void								initArrayParsingFunctions();
+		void								throwErrorParsing(std::string errorMsg);
+		void								deleteServers();
+
+		/****************************     PRINT     ***************************/
+
+		void								printCurrentToken();
+		void								printTokens();
+		void								printArrayParsingFunctions();
 };
 
 #endif

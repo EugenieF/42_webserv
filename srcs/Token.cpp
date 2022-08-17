@@ -1,8 +1,14 @@
 #include "Token.hpp"
 
-Token::Token(): _type(FILE_DONE), _value("") {}
+Token::Token():
+	_type(FILE_DONE),
+	_value(""),
+	_line(0) {}
 
-Token::Token(tokenType type, tokenValue value): _type(type), _value(value) {}
+Token::Token(tokenType type, tokenValue value, unsigned int line):
+	_type(type),
+	_value(value),
+	_line(line)	{}
 
 Token::Token(Token const &other)
 {
@@ -17,6 +23,7 @@ Token		&Token::operator=(const Token &other)
 	{
 		this->_type = other.getType();
 		this->_value = other.getValue();
+		this->_line = other.getLineNbr();
 	}
 	return (*this);
 }
@@ -29,4 +36,14 @@ Token::tokenType	Token::getType() const
 Token::tokenValue	Token::getValue() const
 {
 	return (this->_value);
+}
+
+unsigned int	Token::getLineNbr() const
+{
+	return (this->_line);
+}
+
+std::string		Token::getLineStr() const
+{
+	return (std::to_string(this->_line));
 }

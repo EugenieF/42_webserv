@@ -11,7 +11,7 @@
 class	Server : public IRules
 {
 	public :
-		typedef std::map<std::string, Location *>			listOfLocations;
+		typedef std::map<std::string, Location *>	listOfLocations;
 
 		Server();
 		~Server();
@@ -26,7 +26,7 @@ class	Server : public IRules
 
 	private :
 		listOfLocations							_locations;
-		std::vector<std::string>				_serverName;
+		std::vector<std::string>				_serverNames;
 		int										_listeningPort;
 		std::string								_listeningHost;
 

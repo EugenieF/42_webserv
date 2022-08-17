@@ -16,12 +16,13 @@ class	Lexer
 		~Lexer();
 		const listOfTokens&					getTokens() const;
 		void								printTokens();
-		void								printType(Token::tokenType type);
+		std::string							printType(Token::tokenType type);
 
 	private :
 		std::ifstream						_file;
 		listOfTokens						_tokens;
 		listOfTokenTypes					_tokenTypes;
+		unsigned int						_lineCount;
 
 		void								openFile(std::string configFile);
 		bool								checkFile(std::string configFile);
@@ -39,12 +40,6 @@ class	Lexer
 		bool								isDelimiter(char character);
 		void								closeFile();
 		void								buildTokenTypeArray();
-
-		class CannotOpenFile: public std::exception
-		{
-			public:
-				virtual const char *what() const throw();
-		};
 
 };
 

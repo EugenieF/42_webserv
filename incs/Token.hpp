@@ -12,10 +12,10 @@
 
 typedef enum e_tokenType
 {
-	FILE_DONE	= 0,
-	BLOCK_START,
-	BLOCK_END,
-	SEMICOLON,
+	FILE_DONE			= 0,
+	BLOCK_START			= 1,
+	BLOCK_END			= 2,
+	SEMICOLON			= 3,
 	COLON,
 	KEYWORD_SERVER,
 	KEYWORD_LOCATION,
@@ -46,15 +46,18 @@ class	Token
 	private :
 		tokenType				_type;
 		tokenValue				_value;
+		unsigned int			_line;
 
 	public :
 		Token();
-		Token(tokenType type, tokenValue value);
+		Token(tokenType type, tokenValue value, unsigned int line);
 		Token(const Token &other);
 		~Token();
 		Token 					&operator=(const Token &other);
 		tokenType				getType() const;
 		tokenValue				getValue() const;
+		unsigned int			getLineNbr() const;
+		std::string				getLineStr() const;
 };
 
 #endif
