@@ -66,6 +66,7 @@ class Parser
 		void								initArrayParsingFunctions();
 		void								deleteServers();
 		std::string							getConfigFile() const;
+		std::string							getDirective() const;
 
 		/****************************     ERROR     ***************************/
 

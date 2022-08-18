@@ -8,6 +8,14 @@
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
 # define DEFAULT_ROOT ""
 
+typedef enum e_method
+{
+	GET	= 0,
+	POST,
+	DELETE,
+	ALLOWED_METHODS_COUNT,
+}	t_method;
+
 class	IRules
 {
 	protected :
@@ -20,6 +28,9 @@ class	IRules
 		std::map<int, std::string>				_errorPages;
 		std::string								_redirectUri;
 		int										_redirectCode;
+		bool									_methods[ALLOWED_METHODS_COUNT];
+		std::string								_allowedMethods[ALLOWED_METHODS_COUNT];
+		std::string								_uploadPath;
 
 	public :
 		IRules();
@@ -40,7 +51,17 @@ class	IRules
 
 		void				setErrorPage(int code, const std::string &page);
 
-		void				setRedirection(const std::string &uri, int code);
+		void				setRedirection(int code, const std::string &uri);
+
+		void				setUploadPath(const std::string &path);
+		const std::string	&getUploadPath() const;
+
+		void				setMethod(t_method method);
+		bool				isAllowedMethod(std::string str);
+
+	private:
+		void				initAllowedMethods();
+
 };
 
 #endif

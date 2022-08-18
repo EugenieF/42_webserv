@@ -3,10 +3,22 @@
 IRules::IRules():
 	_root(DEFAULT_ROOT),
 	_autoindex(false),
-	_clientBodyLimit(DEFAULT_CLIENT_BODY_LIMIT)
-{}
+	_clientBodyLimit(DEFAULT_CLIENT_BODY_LIMIT),
+	_uploadPath("")
+{
+	initAllowedMethods();
+	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
+		_methods[i] = false;
+}
 
 IRules::~IRules() {}
+
+void	IRules::initAllowedMethods()
+{
+	_allowedMethods[GET] = "GET";
+	_allowedMethods[POST] = "POST";
+	_allowedMethods[DELETE] = "DELETE";
+}
 
 void	IRules::setRoot(const std::string &root)
 {
@@ -54,8 +66,33 @@ void	IRules::setErrorPage(int code, const std::string &page)
 	_errorPages[code] = page;
 }
 
-void	IRules::setRedirection(const std::string &uri, int code)
+void	IRules::setRedirection(int code, const std::string &uri)
 {
 	_redirectCode = code;
 	_redirectUri = uri;
+}
+
+void	IRules::setUploadPath(const std::string &path)
+{
+	_uploadPath = path;
+}
+
+const std::string	&IRules::getUploadPath() const
+{
+	return (_uploadPath);
+}
+
+void	IRules::setMethod(t_method method)
+{
+	_methods[method] = true;
+}
+
+bool	IRules::isAllowedMethod(std::string str)
+{
+	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
+	{
+		if (str == _allowedMethods[i])
+			return (true);
+	}
+	return (false);
 }
