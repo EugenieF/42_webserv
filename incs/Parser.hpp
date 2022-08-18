@@ -25,13 +25,14 @@ class Parser
 		/**************************    VARIABLES    ****************************/
 
 	private:
+		std::string							_configFile;
 		Lexer								_lexer;
 		Lexer::listOfTokens::const_iterator	_currentToken;
 		listOfServers						_servers;
 		listOfServers::const_iterator		_currentServer;
 		listOfParsingFunctions				_parsingFunct;
 		t_context							_context;
-		std::string							_errorMsg;
+		std::string							_directive;
 		
 		/**************************     PARSER     *****************************/
 
@@ -61,9 +62,14 @@ class Parser
 		bool								getNextToken();
 		void								checkDelimiter(Token::tokenType tokenType, std::string errorMsg);
 		void								expectNextToken(Token::tokenType expectedType, std::string errorMsg);
+		void								expectToken(Token::tokenType expectedType, std::string errorMsg);
 		void								initArrayParsingFunctions();
-		void								throwErrorParsing(std::string errorMsg);
 		void								deleteServers();
+		std::string							getConfigFile() const;
+
+		/****************************     ERROR     ***************************/
+
+		void								throwErrorParsing(std::string errorMsg);
 
 		/****************************     PRINT     ***************************/
 

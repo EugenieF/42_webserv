@@ -4,6 +4,7 @@
 # include <vector>
 # include <string>
 # include <map>
+# include <unistd.h>
 
 # include "IRules.hpp"
 # include "Location.hpp"
@@ -16,19 +17,19 @@ class	Server : public IRules
 		Server();
 		~Server();
 
-		void				setServerName(const std::string &name);
+		void				setName(const std::string &name);
 
-		void				setListeningPort(int port);
-		int					getListeningPort() const;
+		void				setPort(int port);
+		int					getPort() const;
 
-		void				setListeningHost(const std::string &host);
-		const std::string&	getListeningHost() const;
+		void				setHost(const std::string &host);
+		const std::string&	getHost() const;
 
 	private :
 		listOfLocations							_locations;
-		std::vector<std::string>				_serverNames;
-		int										_listeningPort;
-		std::string								_listeningHost;
+		std::vector<std::string>				_names;
+		int										_port;
+		std::string								_host;
 
 };
 

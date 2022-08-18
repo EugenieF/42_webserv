@@ -1,33 +1,36 @@
 # include "Server.hpp"
 
 Server::Server():
-	_listeningPort(8000),
-	_listeningHost("0.0.0.0")
-{}
+	_port(8000),
+	_host("0.0.0.0")
+{
+	if (!getuid())
+		setPort(80);
+}
 
 Server::~Server() {}
 
-void	Server::setServerName(const std::string &name)
+void	Server::setName(const std::string &name)
 {
-	_serverNames.insert(_serverNames.end(), name);
+	_names.insert(_names.end(), name);
 }
 
-void	Server::setListeningPort(int port)
+void	Server::setPort(int port)
 {
-	_listeningPort = port;
+	_port = port;
 }
 
-int		Server::getListeningPort() const
+int		Server::getPort() const
 {
-	return (_listeningPort);
+	return (_port);
 }
 
-void	Server::setListeningHost(const std::string &host)
+void	Server::setHost(const std::string &host)
 {
-	_listeningHost = host;
+	_host = host;
 }
 
-const std::string&	Server::getListeningHost() const
+const std::string&	Server::getHost() const
 {
-	return (_listeningHost);
+	return (_host);
 }

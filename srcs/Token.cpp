@@ -45,5 +45,8 @@ unsigned int	Token::getLineNbr() const
 
 std::string		Token::getLineStr() const
 {
-	return (std::to_string(this->_line));
+	std::stringstream	ss;
+
+	ss << _line;
+	return (ss.str());
 }

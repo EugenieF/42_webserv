@@ -14,9 +14,6 @@ class	Lexer
 		Lexer();
 		Lexer(std::string configFile);
 		~Lexer();
-		const listOfTokens&					getTokens() const;
-		void								printTokens();
-		std::string							printType(Token::tokenType type);
 
 	private :
 		std::ifstream						_file;
@@ -24,23 +21,41 @@ class	Lexer
 		listOfTokenTypes					_tokenTypes;
 		unsigned int						_lineCount;
 
-		void								openFile(std::string configFile);
-		bool								checkFile(std::string configFile);
+		/****************************     LEXER      ***************************/
+
 		void								readFile();
-		char								getNextCharacter();
-		bool								reachedEndOfFile();
 		void								getToken(char character);
 		void								getValue(const std::string &token);
+		void								getDelimiter();
+
+		/****************************   TOKEN TYPE   ***************************/
+
 		bool								tokenIsNumber(const std::string &token);
 		bool								tokenIsSize(const std::string &token);
 		bool								tokenIsPath(const std::string &token);
 		bool								tokenIsAddress(const std::string &token);
-		void								ignoreComments(char character);
-		void								getDelimiter();
-		bool								isDelimiter(char character);
+
+		/****************************     FILE      ***************************/
+
+		bool								checkFile(std::string configFile);
+		void								openFile(std::string configFile);
 		void								closeFile();
+
+		/****************************     UTILS     ***************************/
+
+		char								getNextCharacter();
+		bool								reachedEndOfFile();
+		void								ignoreComments(char character);
+		bool								isDelimiter(char character);
 		void								buildTokenTypeArray();
 
+	public :
+		const listOfTokens&					getTokens() const;
+
+		/****************************     PRINT     ***************************/
+
+		void								printTokens();
+		std::string							printType(Token::tokenType type);
 };
 
 #endif

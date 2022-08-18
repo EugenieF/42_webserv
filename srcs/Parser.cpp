@@ -1,6 +1,7 @@
 #include "Parser.hpp"
 
 Parser::Parser(std::string configFile):
+	_configFile(configFile),
 	_lexer(configFile),
 	_currentToken(_lexer.getTokens().begin()),
 	_context(SERVER)
@@ -82,6 +83,8 @@ void	Parser::parseTokens()
 void	Parser::parseServerNameRule()
 {
 	std::cout << "Parse Server Name" << std::endl;
+
+	_directive = "server name";
 	while (getNextToken() && _currentToken->getType() != SEMICOLON)
 	{
 		if (_currentToken->getType() != VALUE)
@@ -93,13 +96,37 @@ void	Parser::parseServerNameRule()
 void	Parser::parseListenRule()
 {
 	std::cout << "Parse Listen" << std::endl;
-	while (!reachedEndOfTokens() && _currentToken->getType() != SEMICOLON)
-		getNextToken();
+
+	int	port;
+	
+	_directive = "listen";
+	if (!getNextToken())
+		throwErrorParsing("listen rule");
+	if (_currentToken->getType() == IP_ADDRESS || _currentToken->getType() == VALUE)
+	{
+		(*_currentServer)->setHost(_currentToken->getValue());
+		if (getNextToken() && _currentToken->getType() == SEMICOLON)
+			return ;	
+		expectToken(COLON, "listen rule");
+		expectNextToken(NUMBER, "listen rule");
+	}
+	else if (_currentToken->getType() == COLON || _currentToken->getType() == NUMBER)
+	{
+		if (_currentToken->getType() == COLON)
+			expectNextToken(NUMBER, "listen rule");
+		port = atoi(_currentToken->getValue().c_str());
+		(*_currentServer)->setPort(port);
+	}
+	else
+		throwErrorParsing("listen rule");
+	expectNextToken(SEMICOLON, "listen rule");
 }
 
 void	Parser::parseRootRule()
 {
 	std::cout << "Parse Root" << std::endl;
+
+	_directive = "root";
 	expectNextToken(PATH, "root rule");
 	(*_currentServer)->setRoot(_currentToken->getValue());
 	expectNextToken(SEMICOLON, "root rule");
@@ -109,6 +136,7 @@ void	Parser::parseIndexRule()
 {
 	std::cout << "Parse Index" << std::endl;
 
+	_directive = "index";
 	while (getNextToken() && _currentToken->getType() != SEMICOLON)
 	{
 		if (_currentToken->getType() != VALUE)
@@ -121,6 +149,7 @@ void	Parser::parseAutoindexRule()
 {
 	std::cout << "Parse Autoindex" << std::endl;
 
+	_directive = "autoindex";
 	expectNextToken(VALUE, "autoindex rule");
 	if (_currentToken->getValue() == "on")
 		(*_currentServer)->setAutoindex(true);
@@ -134,6 +163,8 @@ void	Parser::parseAutoindexRule()
 void	Parser::parseMaxBodySizeRule()
 {
 	std::cout << "Parse MaxBodySize" << std::endl;
+
+	_directive = "client_max_body_size";
 	while (!reachedEndOfTokens() && _currentToken->getType() != SEMICOLON)
 		getNextToken();
 
@@ -147,15 +178,19 @@ void	Parser::parseMaxBodySizeRule()
 void	Parser::parseCgiRule()
 {
 	std::cout << "Parse Cgi" << std::endl;
+
+	_directive = "cgi";
 	while (!reachedEndOfTokens() && _currentToken->getType() != SEMICOLON)
 		getNextToken();
 }
 
 void	Parser::parseErrorPageRule()
 {
+	std::cout << "Parse ErrorPage" << std::endl;
+
 	int code;
 
-	std::cout << "Parse ErrorPage" << std::endl;
+	_directive = "error_page";
 	expectNextToken(NUMBER, "error_page rule");
 	code = atoi(_currentToken->getValue().c_str());
 	expectNextToken(PATH, "error_page rule");
@@ -166,6 +201,8 @@ void	Parser::parseErrorPageRule()
 void	Parser::parseRedirectRule()
 {
 	std::cout << "Parse Redirect" << std::endl;
+
+	_directive = "redirect";
 	while (!reachedEndOfTokens() && _currentToken->getType() != SEMICOLON)
 		getNextToken();
 }
@@ -173,6 +210,8 @@ void	Parser::parseRedirectRule()
 void	Parser::parseAllowedMethodRule()
 {
 	std::cout << "Parse AllowedMethod" << std::endl;
+
+	_directive = "allowed_method";
 	while (!reachedEndOfTokens() && _currentToken->getType() != SEMICOLON)
 		getNextToken();
 }
@@ -180,6 +219,8 @@ void	Parser::parseAllowedMethodRule()
 void	Parser::parseUploadPathRule()
 {
 	std::cout << "Parse Upload Path" << std::endl;
+
+	_directive = "upload_path";
 	while (!reachedEndOfTokens() && _currentToken->getType() != SEMICOLON)
 		getNextToken();
 }
@@ -192,6 +233,12 @@ void	Parser::parseUploadPathRule()
 void	Parser::expectNextToken(Token::tokenType expectedType, std::string errorMsg)
 {
 	if (!getNextToken() || _currentToken->getType() != expectedType)
+		throwErrorParsing(errorMsg);
+}
+
+void	Parser::expectToken(Token::tokenType expectedType, std::string errorMsg)
+{
+	if (reachedEndOfTokens() || _currentToken->getType() != expectedType)
 		throwErrorParsing(errorMsg);
 }
 
@@ -218,17 +265,9 @@ void	Parser::deleteServers()
 {
 	for (_currentServer = _servers.begin(); _currentServer != _servers.end(); _currentServer++)
 	{
-		std::cout << RED << " xxx DELETE A SERVER xxx" << RESET << std::endl;
+		std::cout << RED << " xxx Delete a server xxx" << RESET << std::endl;
 		delete (*_currentServer);
 	}
-}
-
-void	Parser::throwErrorParsing(std::string errorMsg)
-{
-	std::string message;
-
-	message = "Error in config file: " + errorMsg + " at line " + _currentToken->getLineStr();
-	throw (std::runtime_error(message));
 }
 
 void	Parser::initArrayParsingFunctions()
@@ -247,6 +286,31 @@ void	Parser::initArrayParsingFunctions()
 	_parsingFunct[KEYWORD_LOCATION] = &Parser::parseLocation;
 }
 
+std::string		Parser::getConfigFile() const
+{
+	return (_configFile);
+}
+
+/******************************************************************************/
+/*                                   ERROR                                    */
+/******************************************************************************/
+
+// Should we display the first error only or all errors occured ???
+
+/* unknown directive "Root" in nginx.conf:8 */
+/* invalid number of arguments in "root" directive in nginx.conf:8 */
+/* "server" directive is not allowed here in nginx.conf:10 */
+/* invalid port in "0.0.0.0:" of the "listen" directive in nginx.conf:4 */
+/* invalid port in "8000000" of the "listen" directive in nginx.conf:4 */
+/* "client_max_body_size" directive invalid value in nginx.conf:10 */
+
+void	Parser::throwErrorParsing(std::string errorMsg)
+{
+	std::string message;
+
+	message = "Webserv error: " + errorMsg + " in " + getConfigFile() + ":" + _currentToken->getLineStr();
+	throw (std::runtime_error(message));
+}
 
 /******************************************************************************/
 /*                                   PRINT                                    */
@@ -276,6 +340,7 @@ void	Parser::printTokens()
 	for (ite = _lexer.getTokens().begin(); ite != _lexer.getTokens().end(); ite++)
 	{
 		std::cout << "[" << _lexer.printType(ite->getType());
-		std::cout << " : " << ite->getValue() << "]" << std::endl;
+		std::cout << " : " << ite->getValue() << "]";
+		std::cout << " : " << ite->getLineStr() << "]" << std::endl;
 	}
 }

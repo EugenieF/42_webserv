@@ -14,6 +14,84 @@ Lexer::~Lexer()
 	this->closeFile();
 }
 
+/******************************************************************************/
+/*                                   LEXER                                    */
+/******************************************************************************/
+
+void	Lexer::readFile()
+{
+	char	character;
+
+	while (!_file.eof())
+	{
+		character = _file.peek();
+		if (character == '#')
+			ignoreComments(character);
+		else if (isspace(character))
+			getNextCharacter();
+		else if (isDelimiter(character))
+			getDelimiter();
+		else
+			getToken(character);
+	}
+	std::cout << YELLOW << "Line count = " << _lineCount << RESET << std::endl;
+}
+
+void	Lexer::getToken(char character)
+{
+	std::string					token;
+	listOfTokenTypes::iterator	ite;
+
+	token = "";
+	while (!reachedEndOfFile() && !isspace(character) && !isDelimiter(character) && character != '#')
+	{
+		token += getNextCharacter();
+		character = _file.peek();
+	}
+	if (token != "")
+	{
+		ite = _tokenTypes.find(token);
+		if (ite != _tokenTypes.end())
+			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
+		else
+			getValue(token);
+	}
+}
+
+void	Lexer::getValue(const std::string &token)
+{
+	t_tokenType	type;
+
+	type = VALUE;
+	if (tokenIsNumber(token))
+		type = NUMBER;
+	else if (tokenIsSize(token))
+		type = SIZE;
+	else if (tokenIsPath(token))
+		type = PATH;
+	else if (tokenIsAddress(token))
+		type = IP_ADDRESS;
+	_tokens.insert(_tokens.end(), Token(type, token, _lineCount));
+}
+
+void	Lexer::getDelimiter()
+{
+	std::string		token;
+
+	token = "";
+	token += getNextCharacter();
+	_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
+}
+
+/******************************************************************************/
+/*                                TOKEN TYPE                                  */
+/******************************************************************************/
+
+bool	Lexer::isDelimiter(char character)
+{
+	return (character == ';' || character == '{' || character == '}' || character == ':');
+}
+
 bool	Lexer::tokenIsNumber(const std::string &token)
 {
 	return (token.find_first_not_of("0123456789") == std::string::npos);
@@ -54,75 +132,9 @@ bool	Lexer::tokenIsAddress(const std::string &token)
 	return (token.find_first_not_of("0123456789", found + 1) == std::string::npos);
 }
 
-void	Lexer::getValue(const std::string &token)
-{
-	t_tokenType	type;
-
-	type = VALUE;
-	if (tokenIsNumber(token))
-		type = NUMBER;
-	else if (tokenIsSize(token))
-		type = SIZE;
-	else if (tokenIsPath(token))
-		type = PATH;
-	else if (tokenIsAddress(token))
-		type = IP_ADDRESS;
-	_tokens.insert(_tokens.end(), Token(type, token, _lineCount));
-}
-
-bool	Lexer::isDelimiter(char character)
-{
-	return (character == ';' || character == '{' || character == '}' || character == ':');
-}
-
-void	Lexer::getToken(char character)
-{
-	std::string					token;
-	listOfTokenTypes::iterator	ite;
-
-	token = "";
-	while (!reachedEndOfFile() && !isspace(character) && !isDelimiter(character) && character != '#')
-	{
-		token += getNextCharacter();
-		character = _file.peek();
-	}
-	if (token != "")
-	{
-		ite = _tokenTypes.find(token);
-		if (ite != _tokenTypes.end())
-			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
-		else
-			getValue(token);
-	}
-}
-
-void	Lexer::getDelimiter()
-{
-	std::string		token;
-
-	token = "";
-	token += getNextCharacter();
-	_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
-}
-
-void	Lexer::readFile()
-{
-	char	character;
-
-	while (!_file.eof())
-	{
-		character = _file.peek();
-		if (character == '#')
-			ignoreComments(character);
-		else if (isspace(character))
-			getNextCharacter();
-		else if (isDelimiter(character))
-			getDelimiter();
-		else
-			getToken(character);
-	}
-	std::cout << "LINE COUNT = " << _lineCount << std::endl;
-}
+/******************************************************************************/
+/*                                    FILE                                    */
+/******************************************************************************/
 
 bool	Lexer::checkFile(std::string configFile)
 {
@@ -153,14 +165,15 @@ void	Lexer::closeFile()
 		_file.close();
 }
 
-const Lexer::listOfTokens&		Lexer::getTokens() const
-{
-	return (_tokens);
-}
 
 /******************************************************************************/
 /*                                   UTILS                                    */
 /******************************************************************************/
+
+const Lexer::listOfTokens&		Lexer::getTokens() const
+{
+	return (_tokens);
+}
 
 char	Lexer::getNextCharacter()
 {

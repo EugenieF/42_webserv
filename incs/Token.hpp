@@ -1,12 +1,14 @@
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
+# include <string>
+# include <cstdlib>
+# include <iostream>
+# include <fstream>
+# include <sstream>
 # include <vector>
 # include <map>
 # include <utility>
-# include <string>
-# include <iostream>
-# include <fstream>
 
 # include <sys/stat.h>
 
