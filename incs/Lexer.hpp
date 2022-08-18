@@ -37,12 +37,14 @@ class	Lexer
 
 		/****************************     FILE      ***************************/
 
-		bool								checkFile(std::string configFile);
 		void								openFile(std::string configFile);
 		void								closeFile();
+	public :
+		bool								checkFile(std::string configFile);
 
 		/****************************     UTILS     ***************************/
 
+	private :
 		char								getNextCharacter();
 		bool								reachedEndOfFile();
 		void								ignoreComments(char character);

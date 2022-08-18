@@ -50,7 +50,9 @@ void	Parser::parseLocation()
 
 	getNextToken();	
 	if (_context != SERVER || _currentToken->getType() != PATH)
-		throwErrorParsing("location rule");
+		throwErrorParsing("invalid value");
+	if (!(*_currentServer)->insertLocation(_currentToken->getValue()))
+		throwErrorParsing("duplicate location");
 	getNextToken();
 	parseBlock(LOCATION);
 	std::cout << BLUE << "  >>> End Location <<<" << RESET << std::endl << std::endl;
@@ -172,6 +174,8 @@ void	Parser::parseErrorPageRule()
 	expectNextToken(NUMBER, "invalid value");
 	code = atoi(_currentToken->getValue().c_str());
 	expectNextToken(PATH, "invalid value");
+	if (!_lexer.checkFile(_currentToken->getValue()))
+		throwErrorParsing("invalid value");
 	(*_currentServer)->setErrorPage(code, _currentToken->getValue());
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }

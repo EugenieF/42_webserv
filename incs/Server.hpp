@@ -8,6 +8,7 @@
 
 # include "IRules.hpp"
 # include "Location.hpp"
+# include "webserv.hpp"
 
 class	Server : public IRules
 {
@@ -17,19 +18,24 @@ class	Server : public IRules
 		Server();
 		~Server();
 
-		void				setName(const std::string &name);
+		void								setName(const std::string &name);
 
-		void				setPort(int port);
-		int					getPort() const;
+		void								setPort(int port);
+		int									getPort() const;
 
-		void				setHost(const std::string &host);
-		const std::string&	getHost() const;
+		void								setHost(const std::string &host);
+		const std::string&					getHost() const;
+
+		bool								insertLocation(std::string path);
 
 	private :
-		listOfLocations							_locations;
-		std::vector<std::string>				_names;
-		int										_port;
-		std::string								_host;
+		listOfLocations						_locations;
+		listOfLocations::const_iterator		_currentLocation;
+		std::vector<std::string>			_names;
+		int									_port;
+		std::string							_host;
+
+		void								deleteLocations();
 
 };
 

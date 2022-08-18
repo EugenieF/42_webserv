@@ -8,7 +8,19 @@ Server::Server():
 		setPort(80);
 }
 
-Server::~Server() {}
+Server::~Server()
+{
+	deleteLocations();
+}
+
+bool	Server::insertLocation(std::string path)
+{
+	std::pair<listOfLocations::const_iterator, bool>	pair;
+	
+	pair = _locations.insert(std::make_pair<std::string, Location *>(path, new Location()));
+	_currentLocation = pair.first;
+	return (pair.second);
+}
 
 void	Server::setName(const std::string &name)
 {
@@ -33,4 +45,13 @@ void	Server::setHost(const std::string &host)
 const std::string&	Server::getHost() const
 {
 	return (_host);
+}
+
+void	Server::deleteLocations()
+{
+	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
+	{
+		std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
+		delete (_currentLocation->second);
+	}
 }
