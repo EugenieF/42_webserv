@@ -55,3 +55,12 @@ void	Server::deleteLocations()
 		delete (_currentLocation->second);
 	}
 }
+
+void	Server::displayParams(int num)
+{
+	std::cout << std::endl << " SERVER " << num << ": " << std::endl;
+	std::cout << "  ‣ Names: ";
+	displayListOfStrings(_names);
+	std::cout << "  ‣ Port: " << getHost() << ":" << getPort() << std::endl;
+	displayRulesParams();
+}

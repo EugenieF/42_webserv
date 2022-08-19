@@ -77,6 +77,7 @@ class Parser
 		void								printCurrentToken();
 		void								printTokens();
 		void								printArrayParsingFunctions();
+		void								displayServerParams();
 };
 
 #endif

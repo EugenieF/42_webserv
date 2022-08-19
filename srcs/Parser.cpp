@@ -74,7 +74,7 @@ void	Parser::parseTokens()
 	}
 	if (!reachedEndOfTokens())
 		throwErrorParsing("server rule");
-	std::cout << std::endl << "----  END PARSING  ----" << std::endl;
+	displayServerParams();
 }
 
 
@@ -383,4 +383,16 @@ void	Parser::printTokens()
 		std::cout << " : " << ite->getValue() << "]";
 		std::cout << " : " << ite->getLineStr() << "]" << std::endl;
 	}
+}
+
+void	Parser::displayServerParams()
+{
+	listOfServers::const_iterator	currentServer;
+	int								count;
+
+	count = 1;
+	std::cout << GREY << std::endl << "................................";
+	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++, count++)
+		(*currentServer)->displayParams(count);
+	std::cout << "................................" << RESET << std::endl;
 }

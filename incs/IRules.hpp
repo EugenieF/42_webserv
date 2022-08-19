@@ -4,6 +4,8 @@
 # include <string>
 # include <vector>
 # include <map>
+# include <string>
+# include <iostream>
 
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
 # define DEFAULT_ROOT ""
@@ -18,12 +20,15 @@ typedef enum e_method
 
 class	IRules
 {
+	public:
+		typedef	std::vector<std::string>		listOfStrings;
+
 	protected :
 		std::string								_root;
-		std::vector<std::string>				_indexes;
+		listOfStrings							_indexes;
 		bool									_autoindex;
 		size_t									_clientBodyLimit;
-		std::string								_cgiExtension;
+		std::string								_cgiExt;
 		std::string								_cgiPath;
 		std::map<int, std::string>				_errorPages;
 		std::string								_redirectUri;
@@ -36,31 +41,41 @@ class	IRules
 		IRules();
 		~IRules();
 
-		void				setRoot(const std::string &root);
-		const std::string&	getRoot() const;
+		void						setRoot(const std::string &root);
+		const std::string&			getRoot() const;
 
-		void				setIndex(const std::string &index);
+		void						setIndex(const std::string &index);
+		listOfStrings&				getIndexes();
 
-		void				setAutoindex(bool value);
-		bool				getAutoindex() const;
+		void						setAutoindex(bool value);
+		bool						getAutoindex() const;
 
-		void				setClientBodyLimit(size_t maxSize);
-		size_t				getClientBodyLimit() const;
+		void						setClientBodyLimit(size_t maxSize);
+		size_t						getClientBodyLimit() const;
 
-		void				setCgi(const std::string &extension, const std::string &path);
+		void						setCgi(const std::string &extension, const std::string &path);
+		const std::string&			getCgiExt() const;
+		const std::string&			getCgiPath() const;
 
-		void				setErrorPage(int code, const std::string &page);
+		void						setErrorPage(int code, const std::string &page);
+		int							getErrorCode();
+		const std::string&			getErrorPage();
 
-		void				setRedirection(int code, const std::string &uri);
+		void						setRedirection(int code, const std::string &uri);
+		int							getRedirectCode();
+		const std::string&			getRedirectUri();
 
-		void				setUploadPath(const std::string &path);
-		const std::string	&getUploadPath() const;
+		void						setUploadPath(const std::string &path);
+		const std::string&			getUploadPath() const;
 
-		void				setMethod(t_method method);
-		bool				isAllowedMethod(std::string str);
+		void						setMethod(t_method method);
+		bool						isAllowedMethod(std::string str);
+
+		void						displayListOfStrings(listOfStrings list);
+		void						displayRulesParams();
 
 	private:
-		void				initAllowedMethods();
+		void						initAllowedMethods();
 
 };
 

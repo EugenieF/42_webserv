@@ -35,6 +35,11 @@ void	IRules::setIndex(const std::string &index)
 	_indexes.insert(_indexes.end(), index);
 }
 
+IRules::listOfStrings&	IRules::getIndexes()
+{
+	return (_indexes);
+}
+
 void	IRules::setAutoindex(bool value)
 {
 	_autoindex = value;
@@ -57,8 +62,18 @@ size_t	IRules::getClientBodyLimit() const
 
 void	IRules::setCgi(const std::string &extension, const std::string &path)
 {
-	_cgiExtension = extension;
+	_cgiExt = extension;
 	_cgiPath = path;
+}
+
+const std::string&	IRules::getCgiExt() const
+{
+	return (_cgiExt);
+}
+
+const std::string&	IRules::getCgiPath() const
+{
+	return (_cgiPath);
 }
 
 void	IRules::setErrorPage(int code, const std::string &page)
@@ -66,10 +81,30 @@ void	IRules::setErrorPage(int code, const std::string &page)
 	_errorPages[code] = page;
 }
 
+// int		IRules::getErrorCode()
+// {
+// 	return (_errorPages);
+// }
+
+// const std::string&	IRules::getErrorPage()
+// {
+
+// }
+
 void	IRules::setRedirection(int code, const std::string &uri)
 {
 	_redirectCode = code;
 	_redirectUri = uri;
+}
+
+int		IRules::getRedirectCode()
+{
+	return (_redirectCode);
+}
+
+const std::string&	IRules::getRedirectUri()
+{
+	return (_redirectUri);
 }
 
 void	IRules::setUploadPath(const std::string &path)
@@ -95,4 +130,27 @@ bool	IRules::isAllowedMethod(std::string str)
 			return (true);
 	}
 	return (false);
+}
+
+void	IRules::displayRulesParams()
+{
+	std::cout << "  ‣ Root: " << getRoot() << std::endl;
+	std::cout << "  ‣ Index: ";
+	displayListOfStrings(_indexes);
+	std::cout << "  ‣ Autoindex: " << getAutoindex() << std::endl;
+	std::cout << "  ‣ Body limit: " << getClientBodyLimit() << std::endl;
+	std::cout << "  ‣ Upload path: " << getUploadPath() << std::endl;
+	std::cout << "  ‣ Redirection: " << getRedirectCode() << " " << getRedirectUri() << std::endl;
+	std::cout << "  ‣ Cgi: " << getCgiExt() << " " << getCgiPath() << std::endl;
+	// std::cout << "  ‣ Error page: " << getErrorCode() << " " << getErrorPage() << std::endl;
+}
+
+void	IRules::displayListOfStrings(listOfStrings list)
+{
+	listOfStrings::const_iterator	ite;
+
+	for (ite = list.begin(); ite != list.end(); ite++)
+		std::cout << *ite << " ";
+	std::cout << std::endl;
+
 }

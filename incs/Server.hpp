@@ -28,6 +28,9 @@ class	Server : public IRules
 
 		bool								insertLocation(std::string path);
 
+		void								displayParams(int num);
+		void								displayServerNames();
+
 	private :
 		listOfLocations						_locations;
 		listOfLocations::const_iterator		_currentLocation;
