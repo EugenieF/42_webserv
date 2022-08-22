@@ -19,57 +19,48 @@ Parser::~Parser()
 /*                                   PARSER                                   */
 /******************************************************************************/
 
-template <class T>
-void	Parser::parseRule(T block)
+void	Parser::parseRule()
 {
 	Parser::listOfParsingFunctions::const_iterator	parseFunctIte;
-	Token::tokenType								tokenType;
+	Token::tokenType	tokenType;
 
 	tokenType = _currentToken->getType();
 	parseFunctIte = _parsingFunct.find(tokenType);
 	if (parseFunctIte == _parsingFunct.end())
 		throwErrorParsing("invalid rule");
-	(this->*parseFunctIte->second)(block);
+	(this->*parseFunctIte->second)();
 	if (tokenType != KEYWORD_LOCATION)
 		checkDelimiter(SEMICOLON, "invalid delimiter");
 }
 
-template <class T>
-void	Parser::parseBlock(T block)
+void	Parser::parseBlock(t_context blockContext)
 {
 	checkDelimiter(BLOCK_START, "server opening bracket");
 	while (!reachedEndOfTokens() && _currentToken->getType() != BLOCK_END)
-		parseRule(block);
+	{
+		_context = blockContext;
+		parseRule();
+	}
 	checkDelimiter(BLOCK_END, "server closing bracket");
 }
 
 void	Parser::parseLocation()
 {
 	std::cout << std::endl << BLUE << "  >>> New Location <<<" << RESET << std::endl;
-	
-	Location		*newLocation;
-	std::string		locationPath;
 
-	if (_context != SERVER)
-		throwErrorParsing("nested location");
-	expectNextToken(PATH, "invalid value");	
-	locationPath = _currentToken->getValue();
-	getNextToken();
-	_context = LOCATION;
-	newLocation = new Location;
-	parseBlock(newLocation, LOCATION);
-	if (!(*_currentServer)->insertLocation(, newLocation))
+	getNextToken();	
+	if (_context != SERVER || _currentToken->getType() != PATH)
+		throwErrorParsing("invalid value");
+	if (!(*_currentServer)->insertLocation(_currentToken->getValue()))
 		throwErrorParsing("duplicate location");
+	getNextToken();
+	parseBlock(LOCATION);
+	std::cout << BLUE << "  >>> End Location <<<" << RESET << std::endl << std::endl;
 }
 
 void	Parser::parseServer()
 {
-	Server	*newServer;
-
-	_context = SERVER;
-	newServer = new Server;
-	parseBlock(newServer, SERVER);
-	_currentServer = _servers.insert(_servers.end(), new Server());
+	parseBlock(SERVER);
 }
 
 void	Parser::parseTokens()
@@ -77,11 +68,13 @@ void	Parser::parseTokens()
 	while (!reachedEndOfTokens() && _currentToken->getType() == KEYWORD_SERVER)
 	{
 		std::cout << std::endl << GREEN << "  *** New Server ***" << RESET << std::endl;
+		_currentServer = _servers.insert(_servers.end(), new Server());
 		getNextToken();
 		parseServer();
 	}
 	if (!reachedEndOfTokens())
 		throwErrorParsing("server rule");
+	displayServerParams();
 }
 
 
@@ -92,7 +85,6 @@ void	Parser::parseTokens()
 /* Context: Server */
 void	Parser::parseServerNameRule()
 {
-	(void)block;
 	std::cout << "Parse Server Name" << std::endl;
 
 	_directive = "server name";
@@ -108,7 +100,6 @@ void	Parser::parseServerNameRule()
 /* Context: Server */
 void	Parser::parseListenRule()
 {
-	(void)block;
 	std::cout << "Parse Listen" << std::endl;
 
 	int	port;
@@ -116,7 +107,7 @@ void	Parser::parseListenRule()
 	_directive = "listen";
 	if (!getNextToken())
 		throwErrorParsing("invalid value");
-	if (_currentToken->getType() == VALUE)
+	if (_currentToken->getType() == IP_ADDRESS || _currentToken->getType() == VALUE)
 	{
 		(*_currentServer)->setHost(_currentToken->getValue());
 		if (getNextToken() && _currentToken->getType() == SEMICOLON)
@@ -139,7 +130,6 @@ void	Parser::parseListenRule()
 /* Context: Server, Location */
 void	Parser::parseRootRule()
 {
-	(void)block;
 	std::cout << "Parse Root" << std::endl;
 
 	_directive = "root";
@@ -151,20 +141,17 @@ void	Parser::parseRootRule()
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
-void	Parser::setDirective(void *IRules::setDirective(
-
-))
-{
-	if (_context == SERVER)
-		(*_currentServer)->setDirective(_currentToken->getValue());
-	else
-		(*_currentServer)->getCurrentLocation()->setDirective(_currentToken->getValue());
-}
+// void	Parser::setDirective(void *setDirective())
+// {
+// 	if (_context == SERVER)
+// 		(*_currentServer)->setDirective(_currentToken->getValue());
+// 	else
+// 		(*_currentServer)->getCurrentLocation()->setDirective(_currentToken->getValue());
+// }
  
 /* Context: Server, Location */
 void	Parser::parseIndexRule()
 {
-	(void)block;
 	std::cout << "Parse Index" << std::endl;
 
 	_directive = "index";
@@ -183,7 +170,6 @@ void	Parser::parseIndexRule()
 /* Context: Server, Location */
 void	Parser::parseAutoindexRule()
 {
-	(void)block;
 	std::cout << "Parse Autoindex" << std::endl;
 
 	_directive = "autoindex";
@@ -200,7 +186,6 @@ void	Parser::parseAutoindexRule()
 /* Context: Server, Location */
 void	Parser::parseErrorPageRule()
 {
-	(void)block;
 	std::cout << "Parse ErrorPage" << std::endl;
 
 	int code;
@@ -218,7 +203,6 @@ void	Parser::parseErrorPageRule()
 /* Context: Location, (Server ???) */
 void	Parser::parseRedirectRule()
 {
-	(void)block;
 	std::cout << "Parse Redirect" << std::endl;
 
 	int code;
@@ -234,7 +218,6 @@ void	Parser::parseRedirectRule()
 /* Context: Server, Location */
 void	Parser::parseMaxBodySizeRule()
 {
-	(void)block;
 	std::cout << "Parse MaxBodySize" << std::endl;
 
 	unsigned long	size;
@@ -249,7 +232,6 @@ void	Parser::parseMaxBodySizeRule()
 /* Context: Server, Location */
 void	Parser::parseCgiRule()
 {
-	(void)block;
 	std::cout << "Parse Cgi" << std::endl;
 
 	std::string	extension;
@@ -265,7 +247,6 @@ void	Parser::parseCgiRule()
 /* Context: Location */
 void	Parser::parseAllowedMethodRule()
 {
-	(void)block;
 	std::cout << "Parse AllowedMethod" << std::endl;
 
 	_directive = "allowed_method";
@@ -279,7 +260,6 @@ void	Parser::parseAllowedMethodRule()
 
 void	Parser::parseUploadPathRule()
 {
-	(void)block;
 	std::cout << "Parse Upload Path" << std::endl;
 
 	_directive = "upload_path";

@@ -33,9 +33,7 @@ typedef enum e_tokenType
 	KEYWORD_ALLOWED_METHOD,
 	KEYWORD_UPLOAD_PATH,
 	NUMBER,
-	SIZE,
 	PATH,
-	IP_ADDRESS,
 	VALUE,
 }	t_tokenType;
 

@@ -72,8 +72,6 @@ void	Lexer::getValue(std::string &token)
 	}
 	else if (tokenIsPath(token))
 		type = PATH;
-	else if (tokenIsAddress(token))
-		type = IP_ADDRESS;
 	_tokens.insert(_tokens.end(), Token(type, token, _lineCount));
 }
 
@@ -136,21 +134,21 @@ bool	Lexer::tokenIsPath(const std::string &token)
 	return (token.find("/") != std::string::npos);
 }
 
-bool	Lexer::tokenIsAddress(const std::string &token)
-{
-	size_t	found;
-	size_t	pos;
+// bool	Lexer::tokenIsAddress(const std::string &token)
+// {
+// 	size_t	found;
+// 	size_t	pos;
 
-	pos = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		found = token.find_first_not_of("0123456789", pos);
-		if (found == std::string::npos || token[found] != '.')
-			return (false);
-		pos = found + 1;
-	}
-	return (token.find_first_not_of("0123456789", found + 1) == std::string::npos);
-}
+// 	pos = 0;
+// 	for (int i = 0; i < 3; i++)
+// 	{
+// 		found = token.find_first_not_of("0123456789", pos);
+// 		if (found == std::string::npos || token[found] != '.')
+// 			return (false);
+// 		pos = found + 1;
+// 	}
+// 	return (token.find_first_not_of("0123456789", found + 1) == std::string::npos);
+// }
 
 /******************************************************************************/
 /*                                    FILE                                    */
@@ -292,11 +290,7 @@ std::string		Lexer::printType(Token::tokenType type)
 		return ("KEYWORD_UPLOAD_PATH");
 	else if (type == NUMBER)
 		return ("NUMBER");
-	else if (type == SIZE)
-		return ("SIZE");
 	else if (type == PATH)
 		return("PATH");
-	else if (type == IP_ADDRESS)
-		return ("IP_ADDRESS");
 	return ("VALUE");
 }

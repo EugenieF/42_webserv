@@ -1,6 +1,7 @@
 WEBSERV
 
 http://h-deb.clg.qc.ca/Liens/Client-Serveur--Liens.html
+https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
 
 HTTP 1.1
 We need to read from RFC 7230 to RFC 7235 to implement basic workings of HTTP.

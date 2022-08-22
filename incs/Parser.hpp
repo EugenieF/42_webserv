@@ -32,8 +32,10 @@ class Parser
 
 		void								parseServer();
 		void								parseLocation();
-		void								parseBlock(t_context blockContext);
-		void								parseRule();
+		template <class T>
+		void								parseBlock(T block);
+		template <class T>
+		void								parseRule(T block);
 
 
 		/**************************  PARSING RULES  ***************************/
@@ -50,7 +52,6 @@ class Parser
 		void								parseAllowedMethodRule();
 		void								parseUploadPathRule();
 
-		void								parseRuleGivenContext(void (Parser::*parsingFunction)());
 		void								setDirective(void *setDirective());
 
 

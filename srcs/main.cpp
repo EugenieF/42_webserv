@@ -117,6 +117,7 @@ int main(int argc, char **argv)
 		std::string configFile(argv[1]);
 		Parser	parser(configFile);
 		parser.parseTokens();
+		parser.displayServerParams();
 		runServer();
 	}
 	catch(const std::exception& e)
