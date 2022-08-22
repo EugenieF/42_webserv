@@ -5,12 +5,6 @@
 # include "Server.hpp"
 # include "webserv.hpp"
 
-typedef enum e_context
-{
-	SERVER		= 0,
-	LOCATION	= 1,
-}	t_context;
-
 class Parser
 {
 	public:

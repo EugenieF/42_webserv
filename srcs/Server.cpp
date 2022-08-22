@@ -58,9 +58,16 @@ void	Server::deleteLocations()
 
 void	Server::displayParams(int num)
 {
+	listOfLocations::const_iterator	ite;
+
 	std::cout << std::endl << " SERVER " << num << ": " << std::endl;
 	std::cout << "  ‣ Names: ";
 	displayListOfStrings(_names);
 	std::cout << "  ‣ Port: " << getHost() << ":" << getPort() << std::endl;
-	displayRulesParams();
+	displayRulesParams(SERVER);
+	for (ite = _locations.begin(); ite != _locations.end(); ite++)
+	{
+		std::cout << std::endl << "     Location " << ite->first << ": " << std::endl;
+		ite->second->displayRulesParams(LOCATION);
+	}
 }

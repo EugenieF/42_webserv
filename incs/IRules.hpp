@@ -18,6 +18,12 @@ typedef enum e_method
 	ALLOWED_METHODS_COUNT,
 }	t_method;
 
+typedef enum e_context
+{
+	SERVER		= 0,
+	LOCATION	= 1,
+}	t_context;
+
 class	IRules
 {
 	public:
@@ -72,7 +78,7 @@ class	IRules
 		bool						isAllowedMethod(std::string str);
 
 		void						displayListOfStrings(listOfStrings list);
-		void						displayRulesParams();
+		void						displayRulesParams(t_context context);
 
 	private:
 		void						initAllowedMethods();

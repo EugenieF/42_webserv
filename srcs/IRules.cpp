@@ -132,16 +132,19 @@ bool	IRules::isAllowedMethod(std::string str)
 	return (false);
 }
 
-void	IRules::displayRulesParams()
+void	IRules::displayRulesParams(t_context context)
 {
-	std::cout << "  ‣ Root: " << getRoot() << std::endl;
-	std::cout << "  ‣ Index: ";
+	std::string indent;
+
+	indent = (context == SERVER) ? "  " : "     "; 
+	std::cout << indent << "‣ Root: " << getRoot() << std::endl;
+	std::cout << indent << "‣ Index: ";
 	displayListOfStrings(_indexes);
-	std::cout << "  ‣ Autoindex: " << getAutoindex() << std::endl;
-	std::cout << "  ‣ Body limit: " << getClientBodyLimit() << std::endl;
-	std::cout << "  ‣ Upload path: " << getUploadPath() << std::endl;
-	std::cout << "  ‣ Redirection: " << getRedirectCode() << " " << getRedirectUri() << std::endl;
-	std::cout << "  ‣ Cgi: " << getCgiExt() << " " << getCgiPath() << std::endl;
+	std::cout << indent << "‣ Autoindex: " << getAutoindex() << std::endl;
+	std::cout << indent << "‣ Body limit: " << getClientBodyLimit() << std::endl;
+	std::cout << indent << "‣ Upload path: " << getUploadPath() << std::endl;
+	std::cout << indent << "‣ Redirection: " << getRedirectCode() << " " << getRedirectUri() << std::endl;
+	std::cout << indent << "‣ Cgi: " << getCgiExt() << " " << getCgiPath() << std::endl;
 	// std::cout << "  ‣ Error page: " << getErrorCode() << " " << getErrorPage() << std::endl;
 }
 
