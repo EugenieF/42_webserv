@@ -31,6 +31,8 @@ class	Server : public IRules
 		void								displayParams(int num);
 		void								displayServerNames();
 
+		Location							*getCurrentLocation();
+
 	private :
 		listOfLocations						_locations;
 		listOfLocations::const_iterator		_currentLocation;

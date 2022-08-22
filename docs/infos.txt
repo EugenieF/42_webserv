@@ -1,5 +1,7 @@
 WEBSERV
 
+http://h-deb.clg.qc.ca/Liens/Client-Serveur--Liens.html
+
 HTTP 1.1
 We need to read from RFC 7230 to RFC 7235 to implement basic workings of HTTP.
 The primary function of a web server is to store, process, and deliver web pages to clients.

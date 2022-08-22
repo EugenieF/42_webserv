@@ -30,10 +30,11 @@ class	IRules
 		typedef	std::vector<std::string>		listOfStrings;
 
 	protected :
+		t_context								_context;
 		std::string								_root;
 		listOfStrings							_indexes;
 		bool									_autoindex;
-		size_t									_clientBodyLimit;
+		unsigned long							_clientBodyLimit;
 		std::string								_cgiExt;
 		std::string								_cgiPath;
 		std::map<int, std::string>				_errorPages;
@@ -56,8 +57,8 @@ class	IRules
 		void						setAutoindex(bool value);
 		bool						getAutoindex() const;
 
-		void						setClientBodyLimit(size_t maxSize);
-		size_t						getClientBodyLimit() const;
+		void						setClientBodyLimit(unsigned long maxSize);
+		unsigned long				getClientBodyLimit() const;
 
 		void						setCgi(const std::string &extension, const std::string &path);
 		const std::string&			getCgiExt() const;

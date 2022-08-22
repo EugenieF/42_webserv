@@ -25,7 +25,7 @@ class	Lexer
 
 		void								readFile();
 		void								getToken(char character);
-		void								getValue(const std::string &token);
+		void								getValue(std::string &token);
 		void								getDelimiter();
 
 		/****************************   TOKEN TYPE   ***************************/
@@ -34,6 +34,7 @@ class	Lexer
 		bool								tokenIsSize(const std::string &token);
 		bool								tokenIsPath(const std::string &token);
 		bool								tokenIsAddress(const std::string &token);
+		std::string							handleSize(std::string &token);
 
 		/****************************     FILE      ***************************/
 

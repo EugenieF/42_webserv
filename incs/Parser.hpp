@@ -50,12 +50,17 @@ class Parser
 		void								parseAllowedMethodRule();
 		void								parseUploadPathRule();
 
+		void								parseRuleGivenContext(void (Parser::*parsingFunction)());
+		void								setDirective(void *setDirective());
+
+
 		/****************************     UTILS     ***************************/
 
 		bool								reachedEndOfTokens();
 		bool								getNextToken();
 		void								checkDelimiter(Token::tokenType tokenType, std::string errorMsg);
 		void								expectNextToken(Token::tokenType expectedType, std::string errorMsg);
+		void								expectNextToken2(Token::tokenType expectedType1, Token::tokenType expectedType2, std::string errorMsg);
 		void								expectToken(Token::tokenType expectedType, std::string errorMsg);
 		void								initArrayParsingFunctions();
 		void								deleteServers();

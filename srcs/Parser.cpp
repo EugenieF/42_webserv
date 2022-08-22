@@ -82,6 +82,7 @@ void	Parser::parseTokens()
 /*                                PARSING RULES                               */
 /******************************************************************************/
 
+/* Context: Server */
 void	Parser::parseServerNameRule()
 {
 	std::cout << "Parse Server Name" << std::endl;
@@ -96,6 +97,7 @@ void	Parser::parseServerNameRule()
 	expectToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Server */
 void	Parser::parseListenRule()
 {
 	std::cout << "Parse Listen" << std::endl;
@@ -125,16 +127,29 @@ void	Parser::parseListenRule()
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Server, Location */
 void	Parser::parseRootRule()
 {
 	std::cout << "Parse Root" << std::endl;
 
 	_directive = "root";
 	expectNextToken(PATH, "invalid value");
-	(*_currentServer)->setRoot(_currentToken->getValue());
+	if (_context == SERVER)
+		(*_currentServer)->setRoot(_currentToken->getValue());
+	else
+		(*_currentServer)->getCurrentLocation()->setRoot(_currentToken->getValue());
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
+// void	Parser::setDirective(void *setDirective())
+// {
+// 	if (_context == SERVER)
+// 		(*_currentServer)->setDirective(_currentToken->getValue());
+// 	else
+// 		(*_currentServer)->getCurrentLocation()->setDirective(_currentToken->getValue());
+// }
+ 
+/* Context: Server, Location */
 void	Parser::parseIndexRule()
 {
 	std::cout << "Parse Index" << std::endl;
@@ -144,11 +159,15 @@ void	Parser::parseIndexRule()
 	{
 		if (_currentToken->getType() != VALUE)
 			throwErrorParsing("invalid value");
-		(*_currentServer)->setIndex(_currentToken->getValue());
+		if (_context == SERVER)
+			(*_currentServer)->setIndex(_currentToken->getValue());
+		else
+			(*_currentServer)->getCurrentLocation()->setIndex(_currentToken->getValue());
 	}
 	expectToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Server, Location */
 void	Parser::parseAutoindexRule()
 {
 	std::cout << "Parse Autoindex" << std::endl;
@@ -164,6 +183,7 @@ void	Parser::parseAutoindexRule()
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Server, Location */
 void	Parser::parseErrorPageRule()
 {
 	std::cout << "Parse ErrorPage" << std::endl;
@@ -180,6 +200,7 @@ void	Parser::parseErrorPageRule()
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Location, (Server ???) */
 void	Parser::parseRedirectRule()
 {
 	std::cout << "Parse Redirect" << std::endl;
@@ -194,21 +215,21 @@ void	Parser::parseRedirectRule()
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Server, Location */
 void	Parser::parseMaxBodySizeRule()
 {
 	std::cout << "Parse MaxBodySize" << std::endl;
 
+	unsigned long	size;
+	
 	_directive = "client_max_body_size";
-	while (!reachedEndOfTokens() && _currentToken->getType() != SEMICOLON)
-		getNextToken();
-
-	// if (!getNextToken() || !(_currentToken->getType() == SIZE || _currentToken->getType() == NUMBER))
-	// 	throwErrorParsing("client_max_body_size rule");
-	// (*_currentServer)->setClientBodyLimit(_currentToken->getValue());
-	// if (!getNextToken() || _currentToken->getType() != SEMICOLON)
-	// 	throwErrorParsing("client_max_body_size rule");
+	expectNextToken(NUMBER, "invalid number of arguments in");
+	size = atoi(_currentToken->getValue().c_str());
+	(*_currentServer)->setClientBodyLimit(size);
+	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Server, Location */
 void	Parser::parseCgiRule()
 {
 	std::cout << "Parse Cgi" << std::endl;
@@ -223,6 +244,7 @@ void	Parser::parseCgiRule()
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
+/* Context: Location */
 void	Parser::parseAllowedMethodRule()
 {
 	std::cout << "Parse AllowedMethod" << std::endl;
@@ -246,11 +268,10 @@ void	Parser::parseUploadPathRule()
 	expectNextToken(SEMICOLON, "invalid number of arguments in");
 }
 
-		
+
 /******************************************************************************/
 /*                                   UTILS                                    */
 /******************************************************************************/
-
 
 // void	expectedTokens()
 // {
@@ -260,6 +281,13 @@ void	Parser::parseUploadPathRule()
 // 			throwErrorParsing("invalid argument");
 // 	}
 // }
+
+void	Parser::expectNextToken2(Token::tokenType expectedType1, Token::tokenType expectedType2, std::string errorMsg)
+{
+	(void)errorMsg;
+	if (!getNextToken() || !(_currentToken->getType() == expectedType1 || _currentToken->getType() == expectedType2))
+		throwErrorParsing("invalid value");
+}
 
 void	Parser::expectNextToken(Token::tokenType expectedType, std::string errorMsg)
 {

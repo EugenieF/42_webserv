@@ -56,6 +56,11 @@ void	Server::deleteLocations()
 	}
 }
 
+Location	*Server::getCurrentLocation()
+{
+	return (_currentLocation->second);
+}
+
 void	Server::displayParams(int num)
 {
 	listOfLocations::const_iterator	ite;

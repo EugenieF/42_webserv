@@ -58,7 +58,7 @@ void	Lexer::getToken(char character)
 	}
 }
 
-void	Lexer::getValue(const std::string &token)
+void	Lexer::getValue(std::string &token)
 {
 	t_tokenType	type;
 
@@ -66,7 +66,10 @@ void	Lexer::getValue(const std::string &token)
 	if (tokenIsNumber(token))
 		type = NUMBER;
 	else if (tokenIsSize(token))
-		type = SIZE;
+	{
+		token = handleSize(token);
+		type = NUMBER;
+	}
 	else if (tokenIsPath(token))
 		type = PATH;
 	else if (tokenIsAddress(token))
@@ -95,6 +98,23 @@ bool	Lexer::isDelimiter(char character)
 bool	Lexer::tokenIsNumber(const std::string &token)
 {
 	return (token.find_first_not_of("0123456789") == std::string::npos);
+}
+
+std::string		Lexer::handleSize(std::string &token)
+{
+	char			lastCharacter;
+	std::string		size;
+
+	lastCharacter = token[token.size() - 1];
+	size = token.substr(0, token.size() - 1);
+	if (lastCharacter == 'k' || lastCharacter == 'K')
+		size += "000";
+	if (lastCharacter == 'm' || lastCharacter == 'M')
+		size += "000000";
+	if (lastCharacter == 'g' || lastCharacter == 'G')
+		size += "000000000";
+	std::cout << "token = " << token << " | size = " << size << std::endl;
+	return (size);
 }
 
 bool	Lexer::tokenIsSize(const std::string &token)
