@@ -6,6 +6,7 @@ Lexer::Lexer() {}
 Lexer::Lexer(std::string configFile): _lineCount(1)
 {
 	buildTokenTypeArray();
+	_tokens.insert(_tokens.end(), Token(FILE_START, "", 0));
 	openFile(configFile);
 }
 
@@ -254,7 +255,9 @@ void	Lexer::printTokens()
 
 std::string		Lexer::printType(Token::tokenType type)
 {
-	if (type == BLOCK_START)
+	if (type == FILE_START)
+		return ("FILE_START");
+	else if (type == BLOCK_START)
 		return ("BLOCK_START");
 	else if (type == BLOCK_END)
 		return ("BLOCK_END");

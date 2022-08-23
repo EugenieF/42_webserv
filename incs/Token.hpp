@@ -14,7 +14,7 @@
 
 typedef enum e_tokenType
 {
-	FILE_DONE			= 0,
+	FILE_START			= 0,
 	BLOCK_START			= 1,
 	BLOCK_END			= 2,
 	SEMICOLON			= 3,

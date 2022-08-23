@@ -6,9 +6,7 @@ SRCS			= main.cpp \
 				Token.cpp \
 				Lexer.cpp \
 				Parser.cpp \
-				IRules.cpp \
-				Location.cpp \
-				Server.cpp
+				Block.cpp
 
 OBJS_DIR		= ./objs
 

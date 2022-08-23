@@ -2,13 +2,14 @@
 # define PARSER_HPP
 
 # include "Lexer.hpp"
-# include "Server.hpp"
+# include "Block.hpp"
 # include "webserv.hpp"
 
 class Parser
 {
 	public:
-		typedef std::vector<Server *>						listOfServers;
+		typedef std::vector<Block *>						listOfServers;
+		typedef	Block*										blockPtr;
 		typedef void (Parser::*parsingFunction)();
 		typedef std::map<Token::tokenType, parsingFunction>	listOfParsingFunctions;
 	
@@ -24,18 +25,17 @@ class Parser
 		Lexer::listOfTokens::const_iterator	_currentToken;
 		listOfServers						_servers;
 		listOfServers::const_iterator		_currentServer;
+		blockPtr							_currentBlock;
 		listOfParsingFunctions				_parsingFunct;
 		t_context							_context;
 		std::string							_directive;
 		
 		/**************************     PARSER     *****************************/
 
-		void								parseServer();
-		void								parseLocation();
-		template <class T>
-		void								parseBlock(T block);
-		template <class T>
-		void								parseRule(T block);
+		void								parseBlock();
+		blockPtr							createNewServer();
+		void								createNewLocation();
+		void								parseRule();
 
 
 		/**************************  PARSING RULES  ***************************/
@@ -52,14 +52,16 @@ class Parser
 		void								parseAllowedMethodRule();
 		void								parseUploadPathRule();
 
-		void								setDirective(void *setDirective());
-
 
 		/****************************     UTILS     ***************************/
 
+		void								updateContext(t_context currentContext, blockPtr currentBlock);
+		bool								currentBlockIsServer();
+		bool								currentBlockIsLocation();
 		bool								reachedEndOfTokens();
+		bool								reachedEndOfDirective();
+		bool								reachedEndOfBlock();
 		bool								getNextToken();
-		void								checkDelimiter(Token::tokenType tokenType, std::string errorMsg);
 		void								expectNextToken(Token::tokenType expectedType, std::string errorMsg);
 		void								expectNextToken2(Token::tokenType expectedType1, Token::tokenType expectedType2, std::string errorMsg);
 		void								expectToken(Token::tokenType expectedType, std::string errorMsg);
@@ -77,7 +79,11 @@ class Parser
 		void								printCurrentToken();
 		void								printTokens();
 		void								printArrayParsingFunctions();
+
+	public:
 		void								displayServerParams();
 };
 
 #endif
+
+		void								parseBlock();

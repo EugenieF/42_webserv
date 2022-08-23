@@ -1,7 +1,7 @@
 #include "Token.hpp"
 
 Token::Token():
-	_type(FILE_DONE),
+	_type(FILE_START),
 	_value(""),
 	_line(0) {}
 
