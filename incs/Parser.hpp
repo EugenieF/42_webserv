@@ -63,8 +63,6 @@ class Parser
 		bool								reachedEndOfBlock();
 		bool								getNextToken();
 		void								expectNextToken(Token::tokenType expectedType, std::string errorMsg);
-		void								expectNextToken2(Token::tokenType expectedType1, Token::tokenType expectedType2, std::string errorMsg);
-		void								expectToken(Token::tokenType expectedType, std::string errorMsg);
 		void								initArrayParsingFunctions();
 		void								deleteServers();
 		std::string							getConfigFile() const;

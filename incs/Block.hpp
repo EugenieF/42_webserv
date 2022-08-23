@@ -81,7 +81,7 @@ class	Block
 		const std::string&						getCgiExt() const;
 		const std::string&						getCgiPath() const;
 
-		void									setErrorPage(int code, const std::string &page);
+		void									setErrorPage(const std::string &codeStr, const std::string &page);
 		int										getErrorCode();
 		const std::string&						getErrorPage();
 
@@ -101,6 +101,7 @@ class	Block
 		void									setName(const std::string &name);
 
 		void									setPort(int port);
+		void									setPort(std::string port);
 		int										getPort() const;
 
 		void									setHost(const std::string &host);

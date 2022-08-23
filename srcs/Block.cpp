@@ -101,8 +101,11 @@ const std::string&	Block::getCgiPath() const
 	return (_cgiPath);
 }
 
-void	Block::setErrorPage(int code, const std::string &page)
+void	Block::setErrorPage(const std::string &codeStr, const std::string &page)
 {
+	int	code;
+
+	code = atoi(codeStr.c_str());
 	_errorPages[code] = page;
 }
 
@@ -198,6 +201,14 @@ void	Block::setName(const std::string &name)
 
 void	Block::setPort(int port)
 {
+	_port = port;
+}
+
+void	Block::setPort(std::string portStr)
+{
+	int	port;
+
+	port = atoi(portStr.c_str());
 	_port = port;
 }
 
