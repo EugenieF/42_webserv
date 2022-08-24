@@ -34,7 +34,7 @@ class Webserv
 	public:
 		Webserv(std::string configFile);
 		~Webserv();
-		void	displayServers();
+		void			displayServers();
 };
 
 #endif
