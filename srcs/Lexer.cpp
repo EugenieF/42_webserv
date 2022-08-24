@@ -1,4 +1,3 @@
-#include "webserv.hpp"
 #include "Lexer.hpp"
 
 Lexer::Lexer() {}
@@ -35,7 +34,6 @@ void	Lexer::readFile()
 		else
 			getToken(character);
 	}
-	std::cout << YELLOW << "Line count = " << _lineCount << RESET << std::endl;
 }
 
 void	Lexer::getToken(char character)
@@ -112,7 +110,6 @@ std::string		Lexer::handleSize(std::string &token)
 		size += "000000";
 	if (lastCharacter == 'g' || lastCharacter == 'G')
 		size += "000000000";
-	std::cout << "token = " << token << " | size = " << size << std::endl;
 	return (size);
 }
 
@@ -194,6 +191,11 @@ const Lexer::listOfTokens&		Lexer::getTokens() const
 	return (_tokens);
 }
 
+Lexer::listOfTokenTypes		Lexer::getTokenTypes() const
+{
+	return (_tokenTypes);
+}
+
 char	Lexer::getNextCharacter()
 {
 	char nextCharacter;
@@ -236,6 +238,7 @@ void	Lexer::buildTokenTypeArray(void)
 	_tokenTypes["upload_path"] = KEYWORD_UPLOAD_PATH;
 }
 
+
 /******************************************************************************/
 /*                                   PRINT                                    */
 /******************************************************************************/
@@ -266,31 +269,31 @@ std::string		Lexer::printType(Token::tokenType type)
 	else if (type == COLON)
 		return ("COLON");
 	else if (type == KEYWORD_SERVER)
-		return ("KEYWORD_SERVER");
+		return ("SERVER");
 	else if (type == KEYWORD_LOCATION)
-		return ("KEYWORD_LOCATION");
+		return ("LOCATION");
 	else if (type == KEYWORD_SERVER_NAME)
-		return ("KEYWORD_SERVER_NAME");
+		return ("SERVER_NAME");
 	else if (type == KEYWORD_LISTEN)
-		return ("KEYWORD_LISTEN");
+		return ("LISTEN");
 	else if (type == KEYWORD_ROOT)
-		return ("KEYWORD_ROOT");
+		return ("ROOT");
 	else if (type == KEYWORD_INDEX)
-		return ("KEYWORD_INDEX");
+		return ("INDEX");
 	else if (type == KEYWORD_AUTOINDEX)
-		return ("KEYWORD_AUTOINDEX");
+		return ("AUTOINDEX");
 	else if (type == KEYWORD_CGI)
-		return ("KEYWORD_CGI");
+		return ("CGI");
 	else if (type == KEYWORD_ERROR_PAGE)
-		return ("KEYWORD_ERROR_PAGE");
+		return ("ERROR_PAGE");
 	else if (type == KEYWORD_REDIRECT)
-		return ("KEYWORD_REDIRECT");
+		return ("REDIRECT");
 	else if (type == KEYWORD_BODY_LIMIT)
-		return ("KEYWORD_BODY_LIMIT");
+		return ("BODY_LIMIT");
 	else if (type == KEYWORD_ALLOWED_METHOD)
-		return ("KEYWORD_ALLOWED_METHOD");
+		return ("ALLOWED_METHOD");
 	else if (type == KEYWORD_UPLOAD_PATH)
-		return ("KEYWORD_UPLOAD_PATH");
+		return ("UPLOAD_PATH");
 	else if (type == NUMBER)
 		return ("NUMBER");
 	else if (type == PATH)

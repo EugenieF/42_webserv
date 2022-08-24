@@ -3,7 +3,6 @@
 
 # include "Lexer.hpp"
 # include "Block.hpp"
-# include "webserv.hpp"
 
 class Parser
 {
@@ -62,14 +61,19 @@ class Parser
 		bool								reachedEndOfDirective();
 		bool								reachedEndOfBlock();
 		bool								getNextToken();
+		void								expectNbOfArguments(int expectedNb);
 		void								expectNextToken(Token::tokenType expectedType, std::string errorMsg);
 		void								initArrayParsingFunctions();
 		void								deleteServers();
 		std::string							getConfigFile() const;
 		std::string							getDirective() const;
+		void								setDirective();
 
 		/****************************     ERROR     ***************************/
 
+		std::string							directiveNotAllowedHere();
+		std::string							invalidValueMsg();
+		std::string							invalidNbOfArgumentsMsg();
 		void								throwErrorParsing(std::string errorMsg);
 
 		/****************************     PRINT     ***************************/
@@ -79,9 +83,8 @@ class Parser
 		void								printArrayParsingFunctions();
 
 	public:
-		void								displayServerParams();
+		void								displayServersParams();
+
 };
 
 #endif
-
-		void								parseBlock();

@@ -1,5 +1,4 @@
-#include "webserv.hpp"
-#include "Parser.hpp"
+#include "Webserv.hpp"
 
 bool	createSocket(int *socketFd, struct sockaddr_in socketAddress)
 {
@@ -115,10 +114,9 @@ int main(int argc, char **argv)
 	try
 	{
 		std::string configFile(argv[1]);
-		Parser	parser(configFile);
-		parser.parseTokens();
-		parser.displayServerParams();
-		runServer();
+		Webserv	webserv(configFile);
+		webserv.displayServers();
+		// runServer();
 	}
 	catch(const std::exception& e)
 	{

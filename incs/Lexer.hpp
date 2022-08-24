@@ -1,7 +1,10 @@
 #ifndef LEXER_HPP
 # define LEXER_HPP
 
+# include <unistd.h>
+
 # include "Token.hpp"
+# include "Colors.hpp"
 
 bool	openFile(char *configFile);
 
@@ -54,6 +57,7 @@ class	Lexer
 
 	public :
 		const listOfTokens&					getTokens() const;
+		listOfTokenTypes					getTokenTypes() const;
 
 		/****************************     PRINT     ***************************/
 

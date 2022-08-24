@@ -8,7 +8,7 @@
 # include <iostream>
 # include <utility>
 
-# include "webserv.hpp"
+# include "Colors.hpp"
 
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
 # define DEFAULT_ROOT ""
@@ -34,6 +34,7 @@ class	Block
 		typedef Block*							blockPtr;
 		typedef	std::vector<std::string>		listOfStrings;
 		typedef std::map<std::string, blockPtr>	listOfLocations;
+		typedef std::map<int, std::string>		listOfErrorPages;
 
 	private :
 		t_context								_context;
@@ -44,10 +45,10 @@ class	Block
 		std::string								_root;
 		listOfStrings							_indexes;
 		bool									_autoindex;
-		unsigned long							_clientBodyLimit;
+		size_t									_clientBodyLimit;
 		std::string								_cgiExt;
 		std::string								_cgiPath;
-		std::map<int, std::string>				_errorPages;
+		listOfErrorPages						_errorPages;
 		int										_redirectCode;
 		std::string								_redirectUri;
 
@@ -64,50 +65,71 @@ class	Block
 
 		bool									isServerBlock();
 		bool									isLocationBlock();
+		void									setContext(t_context context);
 
-		void									setRoot(const std::string &root);
+		/*******************************    SERVER_NAME DIRECTIVE    ****************************/
+
+		void									setName(const std::string &name);
+
+		/*******************************       LISTEN DIRECTIVE       *****************************/
+
+		void									setPort(int port);
+		int										getPort() const;
+
+		void									setHost(const std::string& host);
+		const std::string&						getHost() const;
+
+		/*******************************       ROOT DIRECTIVE       *****************************/
+	
+		void									setRoot(const std::string& root);
 		const std::string&						getRoot() const;
 
-		void									setIndex(const std::string &index);
+		/*******************************      INDEX DIRECTIVE       *****************************/
+
+		void									setIndex(const std::string& index);
 		listOfStrings&							getIndexes();
+
+		/*******************************     AUTOINDEX DIRECTIVE    *****************************/
 
 		void									setAutoindex(bool value);
 		bool									getAutoindex() const;
 
-		void									setClientBodyLimit(unsigned long maxSize);
+		void									setClientBodyLimit(size_t size);
 		unsigned long							getClientBodyLimit() const;
 
-		void									setCgi(const std::string &extension, const std::string &path);
+		/*******************************        CGI DIRECTIVE       *****************************/
+
+		void									setCgiExt(const std::string& extension);
+		void									setCgiPath(const std::string& path);
 		const std::string&						getCgiExt() const;
 		const std::string&						getCgiPath() const;
 
-		void									setErrorPage(const std::string &codeStr, const std::string &page);
-		int										getErrorCode();
-		const std::string&						getErrorPage();
+		/*******************************    ERROR_PAGE DIRECTIVE    *****************************/
 
-		void									setRedirection(int code, const std::string &uri);
+		void									setErrorPage(int code, const std::string& page);
+		listOfErrorPages						getErrorPages();
+
+		/*******************************     REDIRECT DIRECTIVE     *****************************/
+
+		void									setRedirection(int code, const std::string& uri);
 		int										getRedirectCode();
 		const std::string&						getRedirectUri();
 
-		void									setUploadPath(const std::string &path);
+		/*******************************   UPLOAD_PATH DIRECTIVE   ******************************/
+
+		void									setUploadPath(const std::string& path);
 		const std::string&						getUploadPath() const;
 
+		/******************************   ALLOWED_METHOD DIRECTIVE  *****************************/
+
 		void									setMethod(t_method method);
-		bool									isAllowedMethod(std::string str);
+		bool									isAllowedMethod(const std::string& str);
+
 
 		void									displayListOfStrings(listOfStrings list);
 		void									displayBlockDirectives(t_context context);
 
-		void									setName(const std::string &name);
-
-		void									setPort(int port);
-		void									setPort(std::string port);
-		int										getPort() const;
-
-		void									setHost(const std::string &host);
-		const std::string&						getHost() const;
-
-		bool									insertLocation(std::string path, blockPtr newLocation);
+		bool									insertLocation(const std::string& path, blockPtr newLocation);
 
 		void									displayParams(int num);
 		void									displayServerNames();

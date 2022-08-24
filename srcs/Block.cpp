@@ -38,6 +38,11 @@ bool	Block::isLocationBlock()
 	return (_context == LOCATION);
 }
 
+void	Block::setContext(t_context context)
+{
+	_context = context;
+}
+
 void	Block::initAllowedMethods()
 {
 	_allowedMethods[GET] = "GET";
@@ -75,9 +80,9 @@ bool	Block::getAutoindex() const
 	return (_autoindex);
 }
 
-void	Block::setClientBodyLimit(size_t maxSize)
+void	Block::setClientBodyLimit(size_t size)
 {
-	_clientBodyLimit = maxSize;
+	_clientBodyLimit = size;
 }
 
 size_t	Block::getClientBodyLimit() const
@@ -85,9 +90,13 @@ size_t	Block::getClientBodyLimit() const
 	return (_clientBodyLimit);
 }
 
-void	Block::setCgi(const std::string &extension, const std::string &path)
+void	Block::setCgiExt(const std::string& extension)
 {
 	_cgiExt = extension;
+}
+
+void	Block::setCgiPath(const std::string& path)
+{
 	_cgiPath = path;
 }
 
@@ -101,25 +110,17 @@ const std::string&	Block::getCgiPath() const
 	return (_cgiPath);
 }
 
-void	Block::setErrorPage(const std::string &codeStr, const std::string &page)
+void	Block::setErrorPage(int code, const std::string& page)
 {
-	int	code;
-
-	code = atoi(codeStr.c_str());
 	_errorPages[code] = page;
 }
 
-// int		Block::getErrorCode()
-// {
-// 	return (_errorPages);
-// }
+Block::listOfErrorPages		Block::getErrorPages()
+{
+	return (_errorPages);
+}
 
-// const std::string&	Block::getErrorPage()
-// {
-
-// }
-
-void	Block::setRedirection(int code, const std::string &uri)
+void	Block::setRedirection(int code, const std::string& uri)
 {
 	_redirectCode = code;
 	_redirectUri = uri;
@@ -135,7 +136,7 @@ const std::string&	Block::getRedirectUri()
 	return (_redirectUri);
 }
 
-void	Block::setUploadPath(const std::string &path)
+void	Block::setUploadPath(const std::string& path)
 {
 	_uploadPath = path;
 }
@@ -150,7 +151,7 @@ void	Block::setMethod(t_method method)
 	_methods[method] = true;
 }
 
-bool	Block::isAllowedMethod(std::string str)
+bool	Block::isAllowedMethod(const std::string& str)
 {
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
 	{
@@ -185,7 +186,7 @@ void	Block::displayListOfStrings(listOfStrings list)
 	std::cout << std::endl;
 }
 
-bool	Block::insertLocation(std::string path, blockPtr newLocation)
+bool	Block::insertLocation(const std::string& path, blockPtr newLocation)
 {
 	std::pair<listOfLocations::const_iterator, bool>	ret;
 
@@ -194,21 +195,13 @@ bool	Block::insertLocation(std::string path, blockPtr newLocation)
 	return (ret.second);
 }
 
-void	Block::setName(const std::string &name)
+void	Block::setName(const std::string& name)
 {
 	_serverNames.insert(_serverNames.end(), name);
 }
 
 void	Block::setPort(int port)
 {
-	_port = port;
-}
-
-void	Block::setPort(std::string portStr)
-{
-	int	port;
-
-	port = atoi(portStr.c_str());
 	_port = port;
 }
 
@@ -248,7 +241,7 @@ void	Block::displayParams(int num)
 	std::cout << std::endl << " SERVER " << num << ": " << std::endl;
 	std::cout << "  ‣ Names: ";
 	displayListOfStrings(_serverNames);
-	std::cout << "  ‣ Port: " << getHost() << ":" << getPort() << std::endl;
+	std::cout << "  ‣ Listen: " << getHost() << ":" << getPort() << std::endl;
 	displayBlockDirectives(SERVER);
 	for (ite = _locations.begin(); ite != _locations.end(); ite++)
 	{
