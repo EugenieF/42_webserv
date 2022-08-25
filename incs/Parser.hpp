@@ -12,8 +12,10 @@ class Parser
 		typedef void (Parser::*parsingFunction)();
 		typedef std::map<Token::tokenType, parsingFunction>	listOfParsingFunctions;
 	
+		Parser();
 		Parser(std::string configFile);
 		~Parser();
+		void								parseFile(std::string configFile);
 		void								parseTokens();
 
 		/**************************    VARIABLES    ****************************/
@@ -65,9 +67,8 @@ class Parser
 		void								expectNextToken(Token::tokenType expectedType, std::string errorMsg);
 		void								initArrayParsingFunctions();
 		void								deleteServers();
-		std::string							getConfigFile() const;
-		std::string							getDirective() const;
 		void								setDirective();
+
 
 		/****************************     ERROR     ***************************/
 
@@ -83,8 +84,16 @@ class Parser
 		void								printArrayParsingFunctions();
 
 	public:
+
+		/****************************    DISPLAY    ***************************/
+
 		void								displayServersParams();
 
+		/****************************     GETTER     ***************************/
+
+		std::string							getConfigFile() const;
+		std::string							getDirective() const;
+		listOfServers						getServers();
 };
 
 #endif

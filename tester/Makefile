@@ -23,7 +23,7 @@ CXXFLAGS		+= -std=c++11 -Wno-deprecated-copy
 
 MAIN			= $(SRCS_DIR)/gtest_main.cpp
 
-FILES			= ftStackTest ftVectorTest ftMapTest ftSetTest
+FILES			= webservTests
 
 FILES_PATH		= $(addprefix $(SRCS_DIR)/, $(FILES))
 SRCS 			= $(addsuffix .cpp, $(FILES_PATH))

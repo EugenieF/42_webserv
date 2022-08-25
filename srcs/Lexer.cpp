@@ -1,6 +1,10 @@
 #include "Lexer.hpp"
 
-Lexer::Lexer() {}
+Lexer::Lexer(): _lineCount(1)
+{
+	buildTokenTypeArray();
+	_tokens.insert(_tokens.end(), Token(FILE_START, "", 0));
+}
 
 Lexer::Lexer(std::string configFile): _lineCount(1)
 {

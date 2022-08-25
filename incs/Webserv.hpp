@@ -1,14 +1,10 @@
 #ifndef WEBSERV_HPP
 # define WEBSERV_HPP
 
-/* Cpp libraries */
-// # include <cstdio>
-// # include <iostream>
-
 /* C libraries */
-// # include <unistd.h>
-// # include <stdlib.h>
-// # include <string.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <string.h>
 
 # include <sys/socket.h>
 # include <sys/types.h>
@@ -32,9 +28,13 @@ class Webserv
 		Parser	_parser;
 
 	public:
+		Webserv();
 		Webserv(std::string configFile);
 		~Webserv();
-		void			displayServers();
+		void						parse(std::string configFile);
+		void						displayServers();
+		Parser::listOfServers		getServers();
+		int							getNbOfServers();
 };
 
 #endif

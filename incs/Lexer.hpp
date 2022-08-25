@@ -41,9 +41,9 @@ class	Lexer
 
 		/****************************     FILE      ***************************/
 
-		void								openFile(std::string configFile);
 		void								closeFile();
 	public :
+		void								openFile(std::string configFile);
 		bool								checkFile(std::string configFile);
 
 		/****************************     UTILS     ***************************/

@@ -1,5 +1,12 @@
 #include "Parser.hpp"
 
+Parser::Parser():
+	_configFile(""),
+	_lexer(),
+	_currentToken(_lexer.getTokens().begin()),
+	_context(NONE)
+{}
+
 Parser::Parser(std::string configFile):
 	_configFile(configFile),
 	_lexer(configFile),
@@ -18,6 +25,12 @@ Parser::~Parser()
 /******************************************************************************/
 /*                                   PARSER                                   */
 /******************************************************************************/
+
+void	Parser::parseFile(std::string configFile)
+{
+	_configFile = configFile;
+	_lexer.openFile(configFile);
+}
 
 void	Parser::parseRule()
 {
@@ -376,6 +389,11 @@ void	Parser::setDirective()
 	}
 }
 
+Parser::listOfServers		Parser::getServers()
+{
+	return (_servers);
+}
+
 /******************************************************************************/
 /*                                   ERROR                                    */
 /******************************************************************************/
@@ -458,6 +476,7 @@ void	Parser::displayServersParams()
 	listOfServers::const_iterator	currentServer;
 	int								count;
 
+	std::cout << "OPENFILE" << std::endl;
 	count = 1;
 	std::cout << GREY << std::endl << "................................";
 	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++, count++)
