@@ -106,7 +106,6 @@ bool	runServer(void)
 
 int main(int argc, char **argv)
 {
-
 	if (argc != 2)
 	{
 		std::cerr << "usage : ./webserv [a configuration file]" << std::endl;
@@ -115,9 +114,9 @@ int main(int argc, char **argv)
 	try
 	{
 		std::string configFile(argv[1]);
-		// Webserv	webserv(configFile);
-		Webserv webserv;
-		webserv.parse(configFile);
+		Webserv	webserv(configFile);
+		// Webserv webserv;
+		// webserv.parse(configFile);
 		webserv.displayServers();
 		// runServer();
 	}

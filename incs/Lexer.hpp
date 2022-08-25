@@ -16,7 +16,9 @@ class	Lexer
 
 		Lexer();
 		Lexer(std::string configFile);
+		Lexer(const Lexer& other);
 		~Lexer();
+		Lexer&		operator=(const Lexer& other);
 
 	private :
 		std::ifstream						_file;
@@ -55,9 +57,13 @@ class	Lexer
 		bool								isDelimiter(char character);
 		void								buildTokenTypeArray();
 
+		/****************************     GETTER    ***************************/
+
 	public :
+		const std::ifstream&				getFile() const;
 		const listOfTokens&					getTokens() const;
 		listOfTokenTypes					getTokenTypes() const;
+		size_t								getLineCount() const;
 
 		/****************************     PRINT     ***************************/
 

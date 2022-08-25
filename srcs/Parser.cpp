@@ -1,11 +1,11 @@
 #include "Parser.hpp"
 
 Parser::Parser():
-	_configFile(""),
 	_lexer(),
-	_currentToken(_lexer.getTokens().begin()),
 	_context(NONE)
-{}
+{
+	initArrayParsingFunctions();
+}
 
 Parser::Parser(std::string configFile):
 	_configFile(configFile),
@@ -17,9 +17,36 @@ Parser::Parser(std::string configFile):
 	parseTokens();
 }
 
+Parser::Parser(const Parser& other):
+	_configFile(other.getConfigFile()),
+	_lexer(other.getLexer()),
+	_currentToken(other.getCurrentToken()),
+	_parsingFunct(other.getParsingFunct()),
+	_context(other.getContext()),
+	_directive(other.getDirective())
+{
+	*this = other;
+}
+
 Parser::~Parser()
 {
 	deleteServers();
+}
+
+Parser&		Parser::operator=(const Parser& other)
+{
+	if (this != &other)
+	{
+		_configFile = other.getConfigFile();
+		_lexer = other.getLexer();
+		_currentToken = other.getCurrentToken();
+		_currentServer = other.getCurrentServer();
+		_currentBlock = other.getCurrentBlock();
+		_parsingFunct = other.getParsingFunct();
+		_context = other.getContext();
+		_directive = other.getDirective();
+	}
+	return (*this);
 }
 
 /******************************************************************************/
@@ -30,6 +57,8 @@ void	Parser::parseFile(std::string configFile)
 {
 	_configFile = configFile;
 	_lexer.openFile(configFile);
+	_currentToken = _lexer.getTokens().begin();
+	parseTokens();
 }
 
 void	Parser::parseRule()
@@ -363,16 +392,6 @@ void	Parser::initArrayParsingFunctions()
 	_parsingFunct[KEYWORD_LOCATION] = &Parser::createNewLocation;
 }
 
-std::string		Parser::getConfigFile() const
-{
-	return (_configFile);
-}
-
-std::string		Parser::getDirective() const
-{
-	return (_directive);
-}
-
 void	Parser::setDirective()
 {
 	Lexer::listOfTokenTypes::const_iterator		ite;
@@ -389,10 +408,55 @@ void	Parser::setDirective()
 	}
 }
 
-Parser::listOfServers		Parser::getServers()
+/******************************************************************************/
+/*                                  GETTER                                    */
+/******************************************************************************/
+
+std::string		Parser::getConfigFile() const
+{
+	return (_configFile);
+}
+
+Lexer	Parser::getLexer() const
+{
+	return (_lexer);
+}
+
+Lexer::listOfTokens::const_iterator		Parser::getCurrentToken() const
+{
+	return (_currentToken);
+}
+
+Parser::listOfServers	Parser::getServers() const
 {
 	return (_servers);
 }
+
+Parser::listOfServers::const_iterator	Parser::getCurrentServer() const
+{
+	return (_currentServer);
+}
+
+Parser::blockPtr	Parser::getCurrentBlock() const
+{
+	return (_currentBlock);
+}
+
+Parser::listOfParsingFunctions		Parser::getParsingFunct() const
+{
+	return (_parsingFunct);
+}
+
+t_context	Parser::getContext() const
+{
+	return (_context);
+}
+
+std::string		Parser::getDirective() const
+{
+	return (_directive);
+}
+
 
 /******************************************************************************/
 /*                                   ERROR                                    */
@@ -476,7 +540,6 @@ void	Parser::displayServersParams()
 	listOfServers::const_iterator	currentServer;
 	int								count;
 
-	std::cout << "OPENFILE" << std::endl;
 	count = 1;
 	std::cout << GREY << std::endl << "................................";
 	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++, count++)

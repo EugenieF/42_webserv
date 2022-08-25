@@ -30,11 +30,14 @@ class Webserv
 	public:
 		Webserv();
 		Webserv(std::string configFile);
+		Webserv(const Webserv& other);
 		~Webserv();
+		Webserv&					operator=(const Webserv& other);
 		void						parse(std::string configFile);
 		void						displayServers();
 		Parser::listOfServers		getServers();
 		int							getNbOfServers();
+		Parser						getParser() const;
 };
 
 #endif

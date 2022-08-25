@@ -14,7 +14,9 @@ class Parser
 	
 		Parser();
 		Parser(std::string configFile);
+		Parser(const Parser& other);
 		~Parser();
+		Parser&								operator=(const Parser& other);
 		void								parseFile(std::string configFile);
 		void								parseTokens();
 
@@ -92,8 +94,14 @@ class Parser
 		/****************************     GETTER     ***************************/
 
 		std::string							getConfigFile() const;
+		Lexer								getLexer() const;
+		Lexer::listOfTokens::const_iterator	getCurrentToken() const;
+		listOfServers						getServers() const;
+		listOfServers::const_iterator		getCurrentServer() const;
+		blockPtr							getCurrentBlock() const;
+		listOfParsingFunctions				getParsingFunct() const;
+		t_context							getContext() const;
 		std::string							getDirective() const;
-		listOfServers						getServers();
 };
 
 #endif

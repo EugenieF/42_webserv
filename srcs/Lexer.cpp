@@ -13,9 +13,28 @@ Lexer::Lexer(std::string configFile): _lineCount(1)
 	openFile(configFile);
 }
 
+Lexer::Lexer(const Lexer& other):
+	_tokens(other.getTokens()),
+	_tokenTypes(other.getTokenTypes()),
+	_lineCount(other.getLineCount())
+{
+	*this = other;
+}
+
 Lexer::~Lexer()
 {
 	this->closeFile();
+}
+
+Lexer&	Lexer::operator=(const Lexer& other)
+{
+	if (this != &other)
+	{
+		_tokens = other.getTokens();
+		_tokenTypes = other.getTokenTypes();
+		_lineCount = other.getLineCount();
+	}
+	return (*this);
 }
 
 /******************************************************************************/
@@ -190,16 +209,6 @@ void	Lexer::closeFile()
 /*                                   UTILS                                    */
 /******************************************************************************/
 
-const Lexer::listOfTokens&		Lexer::getTokens() const
-{
-	return (_tokens);
-}
-
-Lexer::listOfTokenTypes		Lexer::getTokenTypes() const
-{
-	return (_tokenTypes);
-}
-
 char	Lexer::getNextCharacter()
 {
 	char nextCharacter;
@@ -242,6 +251,29 @@ void	Lexer::buildTokenTypeArray(void)
 	_tokenTypes["upload_path"] = KEYWORD_UPLOAD_PATH;
 }
 
+/******************************************************************************/
+/*                                  GETTER                                    */
+/******************************************************************************/
+
+const std::ifstream&	Lexer::getFile() const
+{
+	return (_file);
+}
+
+const Lexer::listOfTokens&		Lexer::getTokens() const
+{
+	return (_tokens);
+}
+
+Lexer::listOfTokenTypes		Lexer::getTokenTypes() const
+{
+	return (_tokenTypes);
+}
+
+size_t	Lexer::getLineCount() const
+{
+	return (_lineCount);
+}
 
 /******************************************************************************/
 /*                                   PRINT                                    */

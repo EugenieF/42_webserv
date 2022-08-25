@@ -1,53 +1,57 @@
-SHELL			= /bin/sh
+SHELL				= /bin/sh
 
-UNAME			= $(shell uname)
+UNAME				= $(shell uname)
 
-CXX				= c++
+CXX					= c++
 
-CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 $(INCLUDE)
+CXXFLAGS			= -Wall -Wextra -Werror -std=c++98 $(INCLUDE)
 
-NAME			= webserv_gtests
+NAME				= webserv_gtests
 
-INCLUDE			= -Igtest_incs/ -pthread -I$(WEBSERV_INCS)
+INCLUDE				= -Igtest_incs/ -pthread -I$(WEBSERV_INCS)
 
-WEBSERV_INCS	= ../incs
+WEBSERV_INCS		= ../incs
 
-VALGRIND_FILE	= valgrind-out.txt
+VALGRIND_FILE		= valgrind-out.txt
 
 ifeq ($(UNAME), Darwin)
-	LIBGTEST 	= gtest_incs/libgtest_mac.a
+	LIBGTEST 		= gtest_incs/libgtest_mac.a
 else
-	LIBGTEST 	= gtest_incs/libgtest.a
+	LIBGTEST 		= gtest_incs/libgtest.a
 endif
-CXXFLAGS		+= -std=c++11 -Wno-deprecated-copy
+CXXFLAGS			+= -std=c++11 -Wno-deprecated-copy
 
-MAIN			= $(SRCS_DIR)/gtest_main.cpp
+MAIN				= $(SRCS_DIR)/gtest_main.cpp
 
-FILES			= webservTests
+SRCS_DIR			= srcs
+SRCS				= webservTests.cpp
+OBJS_DIR			= objs
+OBJS 				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.o))
+DEP					= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
-FILES_PATH		= $(addprefix $(SRCS_DIR)/, $(FILES))
-SRCS 			= $(addsuffix .cpp, $(FILES_PATH))
-OBJ 			= $(addsuffix .o, $(FILES))
-OBJS 			= $(addprefix $(OBJS_DIR)/, $(OBJ))
+WEBSERV_OBJS_DIR	= ../objs
+WEBSERV_SRCS_DIR	= ../srcs
+WEBSERV_SRCS		= Token.cpp Lexer.cpp Parser.cpp Block.cpp Webserv.cpp
+WEBSERV_OBJS		= $(addprefix $(WEBSERV_OBJS_DIR)/, $(WEBSERV_SRCS:.cpp=.o))
+WEBSERV_DEP			= $(addprefix $(WEBSERV_OBJS_DIR)/, $(WEBSERV_SRCS:.cpp=.d))
 
-
-DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
-
-OBJS_DIR		= objs
-SRCS_DIR		= srcs
-
-RM				= rm -rf
+RM					= rm -rf
 
 all: $(NAME)
+
+-include $(WEBSERV_DEP)
+$(WEBSERV_OBJS_DIR)/%.o: $(WEBSERV_SRCS_DIR)/%.cpp
+	@mkdir -p $(WEBSERV_OBJS_DIR)
+	@$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 -include $(DEP)
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
 	@mkdir -p $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
-$(NAME): $(OBJS)
+$(NAME): $(WEBSERV_OBJS) $(OBJS)
 	@echo "$(YELLOW)🚧 Linking $(NAME)...$(RESET)"
-	@$(CXX) $(CXXFLAGS) $(MAIN) $(OBJS) $(LIBGTEST) -o $(NAME)
+	@$(CXX) $(CXXFLAGS) $(MAIN) $(WEBSERV_OBJS) $(OBJS) $(LIBGTEST) -o $(NAME)
 	@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 valgrind: $(NAME)

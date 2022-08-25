@@ -10,7 +10,10 @@ Token::Token(tokenType type, tokenValue value, unsigned int line):
 	_value(value),
 	_line(line)	{}
 
-Token::Token(Token const &other)
+Token::Token(Token const &other):
+	_type(other.getType()),
+	_value(other.getValue()),
+	_line(other.getLineNbr())
 {
 	*this = other;
 }
@@ -21,12 +24,16 @@ Token		&Token::operator=(const Token &other)
 {
 	if (this != &other)
 	{
-		this->_type = other.getType();
-		this->_value = other.getValue();
-		this->_line = other.getLineNbr();
+		_type = other.getType();
+		_value = other.getValue();
+		_line = other.getLineNbr();
 	}
 	return (*this);
 }
+
+/******************************************************************************/
+/*                                  GETTER                                    */
+/******************************************************************************/
 
 Token::tokenType	Token::getType() const
 {
@@ -38,7 +45,7 @@ Token::tokenValue	Token::getValue() const
 	return (this->_value);
 }
 
-unsigned int	Token::getLineNbr() const
+size_t	Token::getLineNbr() const
 {
 	return (this->_line);
 }
