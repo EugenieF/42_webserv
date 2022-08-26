@@ -224,7 +224,7 @@ void	Block::deleteLocations()
 {
 	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
 	{
-		std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
+		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
 		delete (_currentLocation->second);
 	}
 }
@@ -248,4 +248,15 @@ void	Block::displayParams(int num)
 		std::cout << std::endl << "     Location " << ite->first << ": " << std::endl;
 		ite->second->displayBlockDirectives(LOCATION);
 	}
+}
+
+int		Block::getNbOfLocations() const
+{
+	int									count;
+	listOfLocations::const_iterator		ite;
+
+	count = 0;
+	for (ite = _locations.begin(); ite != _locations.end(); ite++)
+		count++;
+	return (count);
 }

@@ -58,6 +58,7 @@ void	Parser::parseFile(std::string configFile)
 	_configFile = configFile;
 	_lexer.openFile(configFile);
 	_currentToken = _lexer.getTokens().begin();
+	// printTokens();
 	parseTokens();
 }
 
@@ -71,7 +72,7 @@ void	Parser::parseRule()
 	if (parseFunctIte == _parsingFunct.end())
 		throwErrorParsing(invalidValueMsg());
 	setDirective();
-	std::cout << "Parse " << _lexer.printType(_currentToken->getType()) << std::endl;
+	// std::cout << "Parse " << _lexer.printType(_currentToken->getType()) << std::endl;
 	(this->*parseFunctIte->second)();
 	if (tokenType != KEYWORD_LOCATION)
 		expectNextToken(SEMICOLON, invalidNbOfArgumentsMsg());
@@ -87,7 +88,7 @@ void	Parser::updateContext(t_context currentContext, blockPtr currentBlock)
 
 void	Parser::createNewLocation()
 {
-	std::cout << std::endl << BLUE << "  >>> New Location <<<" << RESET << std::endl;
+	// std::cout << std::endl << BLUE << "  >>> New Location <<<" << RESET << std::endl;
 	
 	blockPtr		newLocation;
 	std::string		locationPath;
@@ -105,7 +106,7 @@ void	Parser::createNewLocation()
 	_directive = "";
 	if (!(serverBlockTmp->insertLocation(locationPath, newLocation)))
 		throwErrorParsing("duplicate location \"" + locationPath + "\"");
-	std::cout << std::endl << GREEN << "  *** Suite Server ***" << RESET << std::endl;
+	// std::cout << std::endl << GREEN << "  *** Suite Server ***" << RESET << std::endl;
 	updateContext(SERVER, serverBlockTmp);
 }
 
@@ -137,7 +138,7 @@ void	Parser::parseTokens()
 
 	while (!reachedEndOfTokens())
 	{
-		std::cout << std::endl << GREEN << "  *** New Server ***" << RESET << std::endl;
+		// std::cout << std::endl << GREEN << "  *** New Server ***" << RESET << std::endl;
 		expectNextToken(KEYWORD_SERVER, "is not allowed here");
 		newServer = createNewServer();
 		parseBlock();
@@ -235,7 +236,7 @@ void	Parser::parseErrorPageRule()
 	page = _currentToken->getValue();
 
 	if (!_lexer.checkFile(_currentToken->getValue()))
-		throwErrorParsing(invalidValueMsg());
+		throwErrorParsing(invalidPathMsg());
 
 	_currentBlock->setErrorPage(code, page);
 }
@@ -371,7 +372,7 @@ void	Parser::deleteServers()
 {
 	for (_currentServer = _servers.begin(); _currentServer != _servers.end(); _currentServer++)
 	{
-		std::cout << RED << " xxx Delete a server xxx" << RESET << std::endl;
+		// std::cout << RED << " xxx Delete a server xxx" << RESET << std::endl;
 		delete (*_currentServer);
 	}
 }
@@ -491,6 +492,17 @@ std::string	Parser::invalidValueMsg()
 		incorrectValue = (_currentToken + 1)->getValue();
 	// std::cout << RED << "value = " +  incorrectValue << RESET << std::endl;
 	return ("invalid value \"" + incorrectValue + "\"");
+}
+
+std::string	Parser::invalidPathMsg()
+{
+	std::string	incorrectValue;
+
+	incorrectValue = "";
+	if ((_currentToken) != _lexer.getTokens().end())
+		incorrectValue = (_currentToken)->getValue();
+	// std::cout << RED << "value = " +  incorrectValue << RESET << std::endl;
+	return ("invalid path \"" + incorrectValue + "\"");
 }
 
 void	Parser::throwErrorParsing(std::string errorMsg)

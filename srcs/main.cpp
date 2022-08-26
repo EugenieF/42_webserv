@@ -117,7 +117,7 @@ int main(int argc, char **argv)
 		Webserv	webserv(configFile);
 		// Webserv webserv;
 		// webserv.parse(configFile);
-		webserv.displayServers();
+		// webserv.displayServers();
 		// runServer();
 	}
 	catch(const std::exception& e)

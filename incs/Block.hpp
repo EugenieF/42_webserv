@@ -130,6 +130,7 @@ class	Block
 		void									displayBlockDirectives(t_context context);
 
 		bool									insertLocation(const std::string& path, blockPtr newLocation);
+		int										getNbOfLocations() const;
 
 		void									displayParams(int num);
 		void									displayServerNames();

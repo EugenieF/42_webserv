@@ -76,6 +76,7 @@ class Parser
 
 		std::string							directiveNotAllowedHere();
 		std::string							invalidValueMsg();
+		std::string							invalidPathMsg();
 		std::string							invalidNbOfArgumentsMsg();
 		void								throwErrorParsing(std::string errorMsg);
 
