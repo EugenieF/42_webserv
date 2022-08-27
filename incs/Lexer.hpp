@@ -46,7 +46,7 @@ class	Lexer
 		void								closeFile();
 	public :
 		void								openFile(std::string configFile);
-		bool								checkFile(std::string configFile);
+		void								checkFile(std::string configFile);
 
 		/****************************     UTILS     ***************************/
 
@@ -56,6 +56,10 @@ class	Lexer
 		void								ignoreComments(char character);
 		bool								isDelimiter(char character);
 		void								buildTokenTypeArray();
+
+		/****************************     UTILS     ***************************/
+
+		void								throwErrorLexer(std::string errorMsg);
 
 		/****************************     GETTER    ***************************/
 

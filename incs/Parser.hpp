@@ -79,6 +79,7 @@ class Parser
 		std::string							invalidPathMsg();
 		std::string							invalidNbOfArgumentsMsg();
 		void								throwErrorParsing(std::string errorMsg);
+		void								throwErrorDuplicateLocation(std::string errorMsg, int lineNbr);
 
 		/****************************     PRINT     ***************************/
 

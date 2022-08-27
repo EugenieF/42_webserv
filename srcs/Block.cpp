@@ -22,10 +22,49 @@ Block::Block():
 		setPort(80);
 }
 
+Block::Block(const Block& other):
+	_context(other.getContext()),
+	_serverNames(other.getServerNames()),
+	_port(other.getPort()),
+	_host(other.getHost()),
+	_root(other.getRoot()),
+	_indexes(other.getIndexes()),
+	_autoindex(other.getAutoindex()),
+	_clientBodyLimit(other.getClientBodyLimit()),
+	_cgiExt(other.getCgiExt()),
+	_cgiPath(other.getCgiPath()),
+	_redirectCode(other.getRedirectCode()),
+	_redirectUri(other.getRedirectUri()),
+	_uploadPath(other.getUploadPath())
+{
+	*this = other;
+}
+
 Block::~Block()
 {
 	if (isServerBlock())
 		deleteLocations();
+}
+
+Block&	Block::operator=(const Block& other)
+{
+	if (this != &other)
+	{
+		_context = other.getContext();
+		_serverNames = other.getServerNames();
+		_port = other.getPort();
+		_host = other.getHost();
+		_root = other.getRoot();
+		_indexes = other.getIndexes();
+		_autoindex = other.getAutoindex();
+		_clientBodyLimit = other.getClientBodyLimit();
+		_cgiExt = other.getCgiExt();
+		_cgiPath = other.getCgiPath();
+		_redirectCode = other.getRedirectCode();
+		_redirectUri = other.getRedirectUri();
+		_uploadPath = other.getUploadPath();
+	}
+	return (*this);
 }
 
 bool	Block::isServerBlock()
@@ -65,7 +104,7 @@ void	Block::setIndex(const std::string &index)
 	_indexes.insert(_indexes.end(), index);
 }
 
-Block::listOfStrings&	Block::getIndexes()
+Block::listOfStrings	Block::getIndexes() const
 {
 	return (_indexes);
 }
@@ -131,9 +170,14 @@ int		Block::getRedirectCode()
 	return (_redirectCode);
 }
 
-const std::string&	Block::getRedirectUri()
+const std::string&	Block::getRedirectUri() const
 {
 	return (_redirectUri);
+}
+
+int		Block::getRedirectCode() const
+{
+	return (_redirectCode);
 }
 
 void	Block::setUploadPath(const std::string& path)
@@ -149,6 +193,20 @@ const std::string	&Block::getUploadPath() const
 void	Block::setMethod(t_method method)
 {
 	_methods[method] = true;
+}
+
+void	Block::setMethod(const std::string& str)
+{
+	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
+	{
+		if (str == _allowedMethods[i])
+			_methods[i] = true;
+	}
+}
+
+bool	Block::isAllowedMethod(t_method method)
+{
+	return (_methods[method]);
 }
 
 bool	Block::isAllowedMethod(const std::string& str)
@@ -198,6 +256,11 @@ bool	Block::insertLocation(const std::string& path, blockPtr newLocation)
 void	Block::setName(const std::string& name)
 {
 	_serverNames.insert(_serverNames.end(), name);
+}
+
+Block::listOfStrings	Block::getServerNames() const
+{
+	return (_serverNames);
 }
 
 void	Block::setPort(int port)
@@ -250,6 +313,11 @@ void	Block::displayParams(int num)
 	}
 }
 
+Block::listOfLocations	Block::getLocations() const
+{
+	return (_locations);
+}
+
 int		Block::getNbOfLocations() const
 {
 	int									count;
@@ -259,4 +327,9 @@ int		Block::getNbOfLocations() const
 	for (ite = _locations.begin(); ite != _locations.end(); ite++)
 		count++;
 	return (count);
+}
+
+t_context		Block::getContext() const
+{
+	return (_context);
 }

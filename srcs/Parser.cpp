@@ -96,7 +96,7 @@ void	Parser::createNewLocation()
 
 	_directive = "";
 	if (!currentBlockIsServer())
-		throwErrorParsing("nested Location");
+		throwErrorParsing("nested location");
 	serverBlockTmp = _currentBlock;
 	expectNextToken(PATH, invalidValueMsg());	
 	locationPath = _currentToken->getValue();
@@ -235,8 +235,8 @@ void	Parser::parseErrorPageRule()
 	expectNextToken(PATH, invalidValueMsg());
 	page = _currentToken->getValue();
 
-	if (!_lexer.checkFile(_currentToken->getValue()))
-		throwErrorParsing(invalidPathMsg());
+	// if (!_lexer.checkFile(page))
+	// 	throwErrorParsing(invalidPathMsg());
 
 	_currentBlock->setErrorPage(code, page);
 }
@@ -291,6 +291,7 @@ void	Parser::parseAllowedMethodRule()
 		getNextToken();
 		if (!_currentBlock->isAllowedMethod(_currentToken->getValue()))
 			throwErrorParsing("invalid value \"" + _currentToken->getValue() + "\"");
+		_currentBlock->setMethod(_currentToken->getValue());
 	}
 }
 
@@ -334,10 +335,7 @@ void	Parser::expectNbOfArguments(int expectedNb)
 void	Parser::expectNextToken(Token::tokenType expectedType, std::string errorMsg)
 {
 	if (!getNextToken() || _currentToken->getType() != expectedType)
-	{
-		std::cout << RED << "value = " + _currentToken->getValue() << RESET << std::endl;
 		throwErrorParsing(errorMsg);
-	}
 }
 
 bool	Parser::reachedEndOfDirective()
@@ -474,13 +472,13 @@ std::string		Parser::getDirective() const
 
 std::string Parser::directiveNotAllowedHere()
 {
-	return ("\"" + getDirective() + "\" directive is not allowed here");
+	return ("'" + getDirective() + "' directive is not allowed here");
 }
 
 std::string	Parser::invalidNbOfArgumentsMsg()
 {
 	// std::cout << RED << "Directive = " + getDirective() << RESET << std::endl;
-	return ("invalid number of arguments in \"" + getDirective() + "\" directive");
+	return ("invalid number of arguments in '" + getDirective() + "' directive");
 }
 
 std::string	Parser::invalidValueMsg()
@@ -490,8 +488,7 @@ std::string	Parser::invalidValueMsg()
 	incorrectValue = "";
 	if ((_currentToken + 1) != _lexer.getTokens().end())
 		incorrectValue = (_currentToken + 1)->getValue();
-	// std::cout << RED << "value = " +  incorrectValue << RESET << std::endl;
-	return ("invalid value \"" + incorrectValue + "\"");
+	return ("invalid value '" + incorrectValue + "'");
 }
 
 std::string	Parser::invalidPathMsg()
@@ -501,8 +498,7 @@ std::string	Parser::invalidPathMsg()
 	incorrectValue = "";
 	if ((_currentToken) != _lexer.getTokens().end())
 		incorrectValue = (_currentToken)->getValue();
-	// std::cout << RED << "value = " +  incorrectValue << RESET << std::endl;
-	return ("invalid path \"" + incorrectValue + "\"");
+	return ("invalid path '" + incorrectValue + "'");
 }
 
 void	Parser::throwErrorParsing(std::string errorMsg)
@@ -514,6 +510,16 @@ void	Parser::throwErrorParsing(std::string errorMsg)
 	delete _currentBlock;
 	throw (std::runtime_error(message));
 }
+
+// void	Parser::throwErrorDuplicateLocation(std::string errorMsg, int lineNbr)
+// {
+// 	std::string message;
+
+// 	message = "Webserv error: " + errorMsg;
+// 	message += " in " + getConfigFile() + ":" + lineNbr;
+// 	delete _currentBlock;
+// 	throw (std::runtime_error(message));
+// }
 
 /******************************************************************************/
 /*                                   PRINT                                    */

@@ -61,7 +61,9 @@ class	Block
 
 	public :
 		Block();
+		Block(const Block& other);
 		~Block();
+		Block&									operator=(const Block& other);
 
 		bool									isServerBlock();
 		bool									isLocationBlock();
@@ -70,6 +72,7 @@ class	Block
 		/*******************************    SERVER_NAME DIRECTIVE    ****************************/
 
 		void									setName(const std::string &name);
+		listOfStrings							getServerNames() const;	
 
 		/*******************************       LISTEN DIRECTIVE       *****************************/
 
@@ -87,7 +90,7 @@ class	Block
 		/*******************************      INDEX DIRECTIVE       *****************************/
 
 		void									setIndex(const std::string& index);
-		listOfStrings&							getIndexes();
+		listOfStrings							getIndexes() const;
 
 		/*******************************     AUTOINDEX DIRECTIVE    *****************************/
 
@@ -113,7 +116,8 @@ class	Block
 
 		void									setRedirection(int code, const std::string& uri);
 		int										getRedirectCode();
-		const std::string&						getRedirectUri();
+		const std::string&						getRedirectUri() const;
+		int										getRedirectCode() const;
 
 		/*******************************   UPLOAD_PATH DIRECTIVE   ******************************/
 
@@ -123,8 +127,11 @@ class	Block
 		/******************************   ALLOWED_METHOD DIRECTIVE  *****************************/
 
 		void									setMethod(t_method method);
+		void									setMethod(const std::string& str);
+		bool									isAllowedMethod(t_method method);
 		bool									isAllowedMethod(const std::string& str);
 
+		t_context								getContext() const;
 
 		void									displayListOfStrings(listOfStrings list);
 		void									displayBlockDirectives(t_context context);
@@ -136,6 +143,7 @@ class	Block
 		void									displayServerNames();
 
 		blockPtr								getCurrentLocation();
+		listOfLocations							getLocations() const;
 
 	private:
 		void									initAllowedMethods();

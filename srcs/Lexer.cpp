@@ -175,23 +175,29 @@ bool	Lexer::tokenIsPath(const std::string &token)
 /*                                    FILE                                    */
 /******************************************************************************/
 
-bool	Lexer::checkFile(std::string configFile)
+void	Lexer::throwErrorLexer(std::string errorMsg)
+{
+	std::string message;
+
+	message = "Webserv error: " + errorMsg;
+	throw (std::runtime_error(message));
+}
+
+void	Lexer::checkFile(std::string configFile)
 {
 	struct stat	statStruct;
 
 	if (stat(configFile.c_str(), &statStruct) != 0)
-		return (false); // not found
+		throwErrorLexer("file '" + configFile + "' not found");
 	if (statStruct.st_mode & S_IFDIR)
-		return (false); // is directory
+		throwErrorLexer("file '" + configFile + "' is a directory");
 	if (access(configFile.c_str(), F_OK) < 0)
-		return (false); // no rights
-	return (true);
+		throwErrorLexer("insufficient permission to open file '" + configFile + "'");
 }
 
 void	Lexer::openFile(std::string configFile)
 {
-	if (!checkFile(configFile))
-		throw(std::runtime_error("Cannot open file"));
+	checkFile(configFile);
 	_file.open(configFile.c_str());
 	if (!_file || !_file.is_open())
 		throw(std::runtime_error("Cannot open file"));
