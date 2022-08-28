@@ -1,15 +1,21 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+/******************************************************************************/
+/*                                CLASS SERVER                                */
+/******************************************************************************/
+
 class Server
 {
 	private:
-		int		_fd;
+	/**********************     MEMBER VARIABLES     ********************/
+		int				_fd;
 
 	public:
+	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 		Server();
 		~Server();
-		int	getFd() const;
+		int				getFd() const;
 };
 
 #endif

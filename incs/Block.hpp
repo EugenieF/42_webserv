@@ -13,6 +13,10 @@
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
 # define DEFAULT_ROOT ""
 
+/******************************************************************************/
+/*                                 ENUMS                                      */
+/******************************************************************************/
+
 typedef enum e_method
 {
 	GET	= 0,
@@ -28,127 +32,130 @@ typedef enum e_context
 	LOCATION	= 2,
 }	t_context;
 
+/******************************************************************************/
+/*                                CLASS BLOCK                                 */
+/******************************************************************************/
+
 class	Block
 {
 	public:
-		typedef Block*							blockPtr;
-		typedef	std::vector<std::string>		listOfStrings;
-		typedef std::map<std::string, blockPtr>	listOfLocations;
-		typedef std::map<int, std::string>		listOfErrorPages;
+	/***********************      MEMBER TYPES      *********************/
+		typedef Block*								blockPtr;
+		typedef	std::vector<std::string>			listOfStrings;
+		typedef std::map<std::string, blockPtr>		listOfLocations;
+		typedef std::map<int, std::string>			listOfErrorPages;
 
+	
 	private :
-		t_context								_context;
-		listOfStrings							_serverNames;
-		int										_port;
-		std::string								_host;
+	/**********************     MEMBER VARIABLES     ********************/
 
-		std::string								_root;
-		listOfStrings							_indexes;
-		bool									_autoindex;
-		size_t									_clientBodyLimit;
-		std::string								_cgiExt;
-		std::string								_cgiPath;
-		listOfErrorPages						_errorPages;
-		int										_redirectCode;
-		std::string								_redirectUri;
+					/*-----   Server block only   -----*/
+		t_context							_context;
+		listOfStrings						_serverNames;
+		int									_port;
+		std::string							_host;
 
-		listOfLocations							_locations;
-		listOfLocations::const_iterator			_currentLocation;
-		bool									_methods[ALLOWED_METHODS_COUNT];
-		std::string								_allowedMethods[ALLOWED_METHODS_COUNT];
-		std::string								_uploadPath;
+					/*---- Server / Location block ----*/
+		std::string							_root;
+		listOfStrings						_indexes;
+		bool								_autoindex;
+		size_t								_clientBodyLimit;
+		std::string							_cgiExt;
+		std::string							_cgiPath;
+		listOfErrorPages					_errorPages;
+		int									_redirectCode;
+		std::string							_redirectUri;
+
+					/*-----  Location block only  -----*/
+		listOfLocations						_locations;
+		listOfLocations::const_iterator		_currentLocation;
+		bool								_methods[ALLOWED_METHODS_COUNT];
+		std::string							_allowedMethods[ALLOWED_METHODS_COUNT];
+		std::string							_uploadPath;
 
 
 	public :
+	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
 		Block();
 		Block(const Block& other);
 		~Block();
-		Block&									operator=(const Block& other);
+		Block&								operator=(const Block& other);
 
-		bool									isServerBlock();
-		bool									isLocationBlock();
-		void									setContext(t_context context);
+		bool								isServerBlock();
+		bool								isLocationBlock();
+		void								setContext(t_context context);
 
-		/*******************************    SERVER_NAME DIRECTIVE    ****************************/
+						/*-------    Server_name    -------*/
+		void								setName(const std::string &name);
+		listOfStrings						getServerNames() const;	
 
-		void									setName(const std::string &name);
-		listOfStrings							getServerNames() const;	
+						/*-------      Listen       -------*/
+		void								setPort(int port);
+		int									getPort() const;
+		void								setHost(const std::string& host);
+		const std::string&					getHost() const;
 
-		/*******************************       LISTEN DIRECTIVE       *****************************/
+						/*-------       Root       -------*/
+		void								setRoot(const std::string& root);
+		const std::string&					getRoot() const;
 
-		void									setPort(int port);
-		int										getPort() const;
+						/*-------       Index       -------*/
+		void								setIndex(const std::string& index);
+		listOfStrings						getIndexes() const;
 
-		void									setHost(const std::string& host);
-		const std::string&						getHost() const;
+						/*-------     Autoindex     -------*/
+		void								setAutoindex(bool value);
+		bool								getAutoindex() const;
 
-		/*******************************       ROOT DIRECTIVE       *****************************/
-	
-		void									setRoot(const std::string& root);
-		const std::string&						getRoot() const;
+						/*----- Client_max_body_size ------*/
+		void								setClientBodyLimit(size_t size);
+		unsigned long						getClientBodyLimit() const;
 
-		/*******************************      INDEX DIRECTIVE       *****************************/
+						/*-------       CGI         -------*/
+		void								setCgiExt(const std::string& extension);
+		void								setCgiPath(const std::string& path);
+		const std::string&					getCgiExt() const;
+		const std::string&					getCgiPath() const;
 
-		void									setIndex(const std::string& index);
-		listOfStrings							getIndexes() const;
+						/*-------     Error_page    -------*/
+		void								setErrorPage(int code, const std::string& page);
+		listOfErrorPages					getErrorPages();
 
-		/*******************************     AUTOINDEX DIRECTIVE    *****************************/
+						/*-------      Redirect     -------*/
+		void								setRedirection(int code, const std::string& uri);
+		int									getRedirectCode();
+		const std::string&					getRedirectUri() const;
+		int									getRedirectCode() const;
 
-		void									setAutoindex(bool value);
-		bool									getAutoindex() const;
+						/*-------    Upload_path    -------*/
+		void								setUploadPath(const std::string& path);
+		const std::string&					getUploadPath() const;
 
-		void									setClientBodyLimit(size_t size);
-		unsigned long							getClientBodyLimit() const;
+						/*-------   Allowed_method   ------*/
+		void								setMethod(t_method method);
+		void								setMethod(const std::string& str);
+		bool								isAllowedMethod(t_method method);
+		bool								isAllowedMethod(const std::string& str);
 
-		/*******************************        CGI DIRECTIVE       *****************************/
+						/*-------      Location     ------*/
+		bool								insertLocation(const std::string& path, blockPtr newLocation);
+		int									getNbOfLocations() const;
+		blockPtr							getCurrentLocation();
+		listOfLocations						getLocations() const;
 
-		void									setCgiExt(const std::string& extension);
-		void									setCgiPath(const std::string& path);
-		const std::string&						getCgiExt() const;
-		const std::string&						getCgiPath() const;
+						/*-------      Context      ------*/
+		t_context							getContext() const;
 
-		/*******************************    ERROR_PAGE DIRECTIVE    *****************************/
-
-		void									setErrorPage(int code, const std::string& page);
-		listOfErrorPages						getErrorPages();
-
-		/*******************************     REDIRECT DIRECTIVE     *****************************/
-
-		void									setRedirection(int code, const std::string& uri);
-		int										getRedirectCode();
-		const std::string&						getRedirectUri() const;
-		int										getRedirectCode() const;
-
-		/*******************************   UPLOAD_PATH DIRECTIVE   ******************************/
-
-		void									setUploadPath(const std::string& path);
-		const std::string&						getUploadPath() const;
-
-		/******************************   ALLOWED_METHOD DIRECTIVE  *****************************/
-
-		void									setMethod(t_method method);
-		void									setMethod(const std::string& str);
-		bool									isAllowedMethod(t_method method);
-		bool									isAllowedMethod(const std::string& str);
-
-		t_context								getContext() const;
-
-		void									displayListOfStrings(listOfStrings list);
-		void									displayBlockDirectives(t_context context);
-
-		bool									insertLocation(const std::string& path, blockPtr newLocation);
-		int										getNbOfLocations() const;
-
-		void									displayParams(int num);
-		void									displayServerNames();
-
-		blockPtr								getCurrentLocation();
-		listOfLocations							getLocations() const;
+						/*-------      Display      ------*/
+		void								displayListOfStrings(listOfStrings list);
+		void								displayBlockDirectives(t_context context);
+		void								displayParams(int num);
+		void								displayServerNames();
 
 	private:
-		void									initAllowedMethods();
-		void									deleteLocations();
-
+	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
+		void								_initAllowedMethods();
+		void								_deleteLocations();
 };
 
 #endif

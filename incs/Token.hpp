@@ -13,6 +13,10 @@
 
 # include <sys/stat.h>
 
+/******************************************************************************/
+/*                                  ENUM                                      */
+/******************************************************************************/
+
 typedef enum e_tokenType
 {
 	FILE_START		= 0,
@@ -38,30 +42,36 @@ typedef enum e_tokenType
 	VALUE,
 }	t_tokenType;
 
+/******************************************************************************/
+/*                                CLASS TOKEN                                 */
+/******************************************************************************/
+
 class	Token
 {
 	public :
-		typedef t_tokenType		tokenType;
-		typedef std::string		tokenValue;
+	/***********************      MEMBER TYPES      *********************/
+		typedef t_tokenType				tokenType;
+		typedef std::string				tokenValue;
 
 	private :
-		tokenType				_type;
-		tokenValue				_value;
-		size_t					_line;
+	/**********************     MEMBER VARIABLES     ********************/
+		tokenType						_type;
+		tokenValue						_value;
+		size_t							_line;
 
 	public :
+	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 		Token();
 		Token(tokenType type, tokenValue value, unsigned int line);
 		Token(const Token &other);
 		~Token();
-		Token 					&operator=(const Token &other);
+		Token 							&operator=(const Token &other);
 
-		/****************************     GETTER    ***************************/
-
-		tokenType				getType() const;
-		tokenValue				getValue() const;
-		size_t					getLineNbr() const;
-		std::string				getLineStr() const;
+						/*-------    Getter    ------*/
+		tokenType						getType() const;
+		tokenValue						getValue() const;
+		size_t							getLineNbr() const;
+		std::string						getLineStr() const;
 };
 
 #endif

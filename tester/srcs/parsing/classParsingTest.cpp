@@ -125,6 +125,14 @@ class parsingErrorTest: public ::testing::Test
 		std::string		duplicateLocationFilename;
 		std::string		duplicateLocationMsg;
 
+		Webserv			nestedServer;
+		std::string		nestedServerFilename;
+		std::string		nestedServerMsg;
+
+		Webserv			endBracket;
+		std::string		endBracketFilename;
+		std::string		endBracketMsg;
+
 	void	SetUp() override
 	{
 		absentFileFilename = "absent.conf";
@@ -138,5 +146,11 @@ class parsingErrorTest: public ::testing::Test
 
 		duplicateLocationFilename = "testFiles/invalid/duplicateLocation.conf";
 		duplicateLocationMsg = "Webserv error: duplicate location '/www/' in " + duplicateLocationFilename + ":17";
+
+		nestedServerFilename = "testFiles/invalid/nestedServer.conf";
+		nestedServerMsg = "Webserv error: nested server in " + nestedServerFilename + ":8";
+
+		endBracketFilename = "testFiles/invalid/endBracket.conf";
+		endBracketMsg = "Webserv error: expected '{' in " + endBracketFilename + ":9";
 	}
 };

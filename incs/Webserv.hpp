@@ -15,6 +15,10 @@
 
 # define PORT	8080
 
+/******************************************************************************/
+/*                                  ENUM                                      */
+/******************************************************************************/
+
 typedef enum e_define
 {
 	FAILURE		= 0,
@@ -22,22 +26,33 @@ typedef enum e_define
 	BACKLOG		= 10,
 }	t_define;
 
+/******************************************************************************/
+/*                               CLASS WEBSERV                                */
+/******************************************************************************/
+
 class Webserv
 {
 	private:
-		Parser	_parser;
+	/**********************     MEMBER VARIABLES     ********************/
+		Parser							_parser;
 
 	public:
+	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 		Webserv();
 		Webserv(std::string configFile);
 		Webserv(const Webserv& other);
 		~Webserv();
-		Webserv&					operator=(const Webserv& other);
-		void						parse(std::string configFile);
-		void						displayServers();
-		Parser::listOfServers		getServers();
-		int							getNbOfServers();
-		Parser						getParser() const;
+		Webserv&						operator=(const Webserv& other);
+
+		void							parse(std::string configFile);
+
+						/*-------   Getter   ------*/
+		Parser::listOfServers			getServers();
+		int								getNbOfServers();
+		Parser							getParser() const;
+
+						/*-------   Display   ------*/
+		void							displayServers();
 };
 
 #endif

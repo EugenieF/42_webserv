@@ -13,6 +13,8 @@ OBJS_DIR		= ./objs
 
 OBJS			= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.o))
 
+vpath			%.cpp $(shell find $(SRCS_DIR) -type d)
+
 DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
 CXX				= c++
@@ -24,12 +26,13 @@ RM				= rm -rf
 
 INCLUDE			= ./incs
 
+
 $(NAME):	$(OBJS)
 		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 -include $(DEP)
-$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
+$(OBJS_DIR)/%.o: %.cpp
 		@mkdir -p $(OBJS_DIR)
 		@$(CXX) $(CXXFLAGS) -c $< -o $@
 		@echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"

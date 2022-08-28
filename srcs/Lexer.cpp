@@ -2,13 +2,13 @@
 
 Lexer::Lexer(): _lineCount(1)
 {
-	buildTokenTypeArray();
+	_buildTokenTypeArray();
 	_tokens.insert(_tokens.end(), Token(FILE_START, "", 0));
 }
 
 Lexer::Lexer(std::string configFile): _lineCount(1)
 {
-	buildTokenTypeArray();
+	_buildTokenTypeArray();
 	_tokens.insert(_tokens.end(), Token(FILE_START, "", 0));
 	openFile(configFile);
 }
@@ -23,7 +23,7 @@ Lexer::Lexer(const Lexer& other):
 
 Lexer::~Lexer()
 {
-	this->closeFile();
+	this->_closeFile();
 }
 
 Lexer&	Lexer::operator=(const Lexer& other)
@@ -41,7 +41,7 @@ Lexer&	Lexer::operator=(const Lexer& other)
 /*                                   LEXER                                    */
 /******************************************************************************/
 
-void	Lexer::readFile()
+void	Lexer::_readFile()
 {
 	char	character;
 
@@ -49,60 +49,60 @@ void	Lexer::readFile()
 	{
 		character = _file.peek();
 		if (character == '#')
-			ignoreComments(character);
+			_ignoreComments(character);
 		else if (isspace(character))
-			getNextCharacter();
-		else if (isDelimiter(character))
-			getDelimiter();
+			_getNextCharacter();
+		else if (_isDelimiter(character))
+			_getDelimiter();
 		else
-			getToken(character);
+			_getToken(character);
 	}
 }
 
-void	Lexer::getToken(char character)
+void	Lexer::_getToken(char character)
 {
 	std::string					token;
 	listOfTokenTypes::iterator	ite;
 
 	token = "";
-	while (!reachedEndOfFile() && !isspace(character) && !isDelimiter(character) && character != '#')
+	while (!_reachedEndOfFile() && !isspace(character) && !_isDelimiter(character) && character != '#')
 	{
-		token += getNextCharacter();
+		token += _getNextCharacter();
 		character = _file.peek();
 	}
 	if (token != "")
 	{
-		ite = _tokenTypes.find(token);
+		ite = _tokenTypes.find(token); // Not ok, need modif...
 		if (ite != _tokenTypes.end())
 			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
 		else
-			getValue(token);
+			_getValue(token);
 	}
 }
 
-void	Lexer::getValue(std::string &token)
+void	Lexer::_getValue(std::string &token)
 {
 	t_tokenType	type;
 
 	type = VALUE;
-	if (tokenIsNumber(token))
+	if (_tokenIsNumber(token))
 		type = NUMBER;
-	else if (tokenIsSize(token))
+	else if (_tokenIsSize(token))
 	{
-		token = handleSize(token);
+		token = _handleSize(token);
 		type = NUMBER;
 	}
-	else if (tokenIsPath(token))
+	else if (_tokenIsPath(token))
 		type = PATH;
 	_tokens.insert(_tokens.end(), Token(type, token, _lineCount));
 }
 
-void	Lexer::getDelimiter()
+void	Lexer::_getDelimiter()
 {
 	std::string		token;
 
 	token = "";
-	token += getNextCharacter();
+	token += _getNextCharacter();
 	_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
 }
 
@@ -110,17 +110,17 @@ void	Lexer::getDelimiter()
 /*                                TOKEN TYPE                                  */
 /******************************************************************************/
 
-bool	Lexer::isDelimiter(char character)
+bool	Lexer::_isDelimiter(char character)
 {
 	return (character == ';' || character == '{' || character == '}' || character == ':');
 }
 
-bool	Lexer::tokenIsNumber(const std::string &token)
+bool	Lexer::_tokenIsNumber(const std::string &token)
 {
 	return (token.find_first_not_of("0123456789") == std::string::npos);
 }
 
-std::string		Lexer::handleSize(std::string &token)
+std::string		Lexer::_handleSize(std::string &token)
 {
 	char			lastCharacter;
 	std::string		size;
@@ -136,7 +136,7 @@ std::string		Lexer::handleSize(std::string &token)
 	return (size);
 }
 
-bool	Lexer::tokenIsSize(const std::string &token)
+bool	Lexer::_tokenIsSize(const std::string &token)
 {
 	size_t	found;
 	char	lastCharacter;
@@ -150,7 +150,7 @@ bool	Lexer::tokenIsSize(const std::string &token)
 	return (false);
 }
 
-bool	Lexer::tokenIsPath(const std::string &token)
+bool	Lexer::_tokenIsPath(const std::string &token)
 {
 	return (token.find("/") != std::string::npos);
 }
@@ -175,7 +175,7 @@ bool	Lexer::tokenIsPath(const std::string &token)
 /*                                    FILE                                    */
 /******************************************************************************/
 
-void	Lexer::throwErrorLexer(std::string errorMsg)
+void	Lexer::_throwErrorLexer(std::string errorMsg)
 {
 	std::string message;
 
@@ -188,11 +188,11 @@ void	Lexer::checkFile(std::string configFile)
 	struct stat	statStruct;
 
 	if (stat(configFile.c_str(), &statStruct) != 0)
-		throwErrorLexer("file '" + configFile + "' not found");
+		_throwErrorLexer("file '" + configFile + "' not found");
 	if (statStruct.st_mode & S_IFDIR)
-		throwErrorLexer("file '" + configFile + "' is a directory");
+		_throwErrorLexer("file '" + configFile + "' is a directory");
 	if (access(configFile.c_str(), F_OK) < 0)
-		throwErrorLexer("insufficient permission to open file '" + configFile + "'");
+		_throwErrorLexer("insufficient permission to open file '" + configFile + "'");
 }
 
 void	Lexer::openFile(std::string configFile)
@@ -201,10 +201,10 @@ void	Lexer::openFile(std::string configFile)
 	_file.open(configFile.c_str());
 	if (!_file || !_file.is_open())
 		throw(std::runtime_error("Cannot open file"));
-	readFile();
+	_readFile();
 }
 
-void	Lexer::closeFile()
+void	Lexer::_closeFile()
 {
 	if (_file.is_open())
 		_file.close();
@@ -215,7 +215,7 @@ void	Lexer::closeFile()
 /*                                   UTILS                                    */
 /******************************************************************************/
 
-char	Lexer::getNextCharacter()
+char	Lexer::_getNextCharacter()
 {
 	char nextCharacter;
 	
@@ -225,18 +225,18 @@ char	Lexer::getNextCharacter()
 	return (nextCharacter);
 }
 
-bool	Lexer::reachedEndOfFile()
+bool	Lexer::_reachedEndOfFile()
 {
 	return (_file.eof());
 }
 
-void	Lexer::ignoreComments(char character)
+void	Lexer::_ignoreComments(char character)
 {
-	while (!reachedEndOfFile() && character != '\n')
-		character = getNextCharacter();
+	while (!_reachedEndOfFile() && character != '\n')
+		character = _getNextCharacter();
 }
 
-void	Lexer::buildTokenTypeArray(void)
+void	Lexer::_buildTokenTypeArray(void)
 {
 	_tokenTypes["{"] = BLOCK_START;
 	_tokenTypes["}"] = BLOCK_END;

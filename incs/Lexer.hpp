@@ -6,73 +6,73 @@
 # include "Token.hpp"
 # include "Colors.hpp"
 
-bool	openFile(char *configFile);
+/******************************************************************************/
+/*                                CLASS LEXER                                 */
+/******************************************************************************/
 
 class	Lexer
 {
 	public:
-		typedef std::vector<Token>						listOfTokens;
-		typedef std::map<std::string, Token::tokenType>	listOfTokenTypes;
+	/***********************      MEMBER TYPES      *********************/
+		typedef std::vector<Token>							listOfTokens;
+		typedef std::map<std::string, Token::tokenType>		listOfTokenTypes;
 
+	private :
+	/**********************     MEMBER VARIABLES     ********************/
+		std::ifstream					_file;
+		listOfTokens					_tokens;
+		listOfTokenTypes				_tokenTypes;
+		unsigned int					_lineCount;
+
+	public:
+	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 		Lexer();
 		Lexer(std::string configFile);
 		Lexer(const Lexer& other);
 		~Lexer();
-		Lexer&		operator=(const Lexer& other);
+		Lexer&							operator=(const Lexer& other);
+
+						/*-------      File      -------*/
+		void							openFile(std::string configFile);
+		void							checkFile(std::string configFile);
+
+						/*-------     Getter      ------*/
+		const std::ifstream&			getFile() const;
+		const listOfTokens&				getTokens() const;
+		listOfTokenTypes				getTokenTypes() const;
+		size_t							getLineCount() const;
+
+						/*-------     Display      ------*/
+		void							printTokens();
+		std::string						printType(Token::tokenType type);
 
 	private :
-		std::ifstream						_file;
-		listOfTokens						_tokens;
-		listOfTokenTypes					_tokenTypes;
-		unsigned int						_lineCount;
+	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
-		/****************************     LEXER      ***************************/
+						/*-------     Lexer      ------*/
+		void							_readFile();
+		void							_getToken(char character);
+		void							_getValue(std::string &token);
+		void							_getDelimiter();
 
-		void								readFile();
-		void								getToken(char character);
-		void								getValue(std::string &token);
-		void								getDelimiter();
+						/*-------   Token Type  ------*/
+		bool							_tokenIsNumber(const std::string &token);
+		bool							_tokenIsSize(const std::string &token);
+		bool							_tokenIsPath(const std::string &token);
+		bool							_tokenIsAddress(const std::string &token);
+		std::string						_handleSize(std::string &token);
+						/*-------     Utils      ------*/
+		char							_getNextCharacter();
+		bool							_reachedEndOfFile();
+		void							_ignoreComments(char character);
+		bool							_isDelimiter(char character);
+		void							_buildTokenTypeArray();
 
-		/****************************   TOKEN TYPE   ***************************/
+						/*-------      File      ------*/
+		void							_closeFile();
 
-		bool								tokenIsNumber(const std::string &token);
-		bool								tokenIsSize(const std::string &token);
-		bool								tokenIsPath(const std::string &token);
-		bool								tokenIsAddress(const std::string &token);
-		std::string							handleSize(std::string &token);
-
-		/****************************     FILE      ***************************/
-
-		void								closeFile();
-	public :
-		void								openFile(std::string configFile);
-		void								checkFile(std::string configFile);
-
-		/****************************     UTILS     ***************************/
-
-	private :
-		char								getNextCharacter();
-		bool								reachedEndOfFile();
-		void								ignoreComments(char character);
-		bool								isDelimiter(char character);
-		void								buildTokenTypeArray();
-
-		/****************************     UTILS     ***************************/
-
-		void								throwErrorLexer(std::string errorMsg);
-
-		/****************************     GETTER    ***************************/
-
-	public :
-		const std::ifstream&				getFile() const;
-		const listOfTokens&					getTokens() const;
-		listOfTokenTypes					getTokenTypes() const;
-		size_t								getLineCount() const;
-
-		/****************************     PRINT     ***************************/
-
-		void								printTokens();
-		std::string							printType(Token::tokenType type);
+						/*-------      Error     ------*/
+		void							_throwErrorLexer(std::string errorMsg);
 };
 
 #endif

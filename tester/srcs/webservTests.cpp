@@ -19,5 +19,7 @@ TEST_F(parsingErrorTest, errorFile)
 	checkErrorException(absentFile, absentFileFilename, absentFileMsg.c_str());
 	checkErrorException(errorRoot, errorRootFilename, errorRootMsg.c_str());
 	checkErrorException(nestedLocation, nestedLocationFilename, nestedLocationMsg.c_str());
-	// checkErrorException(duplicateLocation, duplicateLocationFilename, duplicateLocationMsg.c_str());
+	checkErrorException(duplicateLocation, duplicateLocationFilename, duplicateLocationMsg.c_str());
+	checkErrorException(nestedServer, nestedServerFilename, nestedServerMsg.c_str());
+	checkErrorException(endBracket, endBracketFilename, endBracketMsg.c_str());
 }

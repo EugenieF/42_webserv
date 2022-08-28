@@ -15,7 +15,7 @@ Block::Block():
 	_redirectUri(""),
 	_uploadPath("")
 {
-	initAllowedMethods();
+	_initAllowedMethods();
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
 		_methods[i] = false;
 	if (!getuid())
@@ -43,7 +43,7 @@ Block::Block(const Block& other):
 Block::~Block()
 {
 	if (isServerBlock())
-		deleteLocations();
+		_deleteLocations();
 }
 
 Block&	Block::operator=(const Block& other)
@@ -82,7 +82,7 @@ void	Block::setContext(t_context context)
 	_context = context;
 }
 
-void	Block::initAllowedMethods()
+void	Block::_initAllowedMethods()
 {
 	_allowedMethods[GET] = "GET";
 	_allowedMethods[POST] = "POST";
@@ -283,7 +283,7 @@ const std::string&	Block::getHost() const
 	return (_host);
 }
 
-void	Block::deleteLocations()
+void	Block::_deleteLocations()
 {
 	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
 	{
