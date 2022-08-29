@@ -1,5 +1,9 @@
 #include "Webserv.hpp"
 
+/******************************************************************************/
+/*                                  MAIN                                      */
+/******************************************************************************/
+
 Webserv::Webserv(): _parser() {}
 
 Webserv::Webserv(std::string configFile): _parser(configFile) {}
@@ -11,11 +15,6 @@ Webserv::Webserv(const Webserv& other): _parser(other.getParser())
 
 Webserv::~Webserv() {}
 
-void	Webserv::displayServers()
-{
-	_parser.displayServersParams();
-}
-
 Webserv&	Webserv::operator=(const Webserv& other)
 {
 	if (this != &other)
@@ -25,10 +24,18 @@ Webserv&	Webserv::operator=(const Webserv& other)
 	return (*this);
 }
 
+/******************************************************************************/
+/*                                  PARSER                                    */
+/******************************************************************************/
+
 void	Webserv::parse(std::string configFile)
 {
 	_parser.parseFile(configFile);
 }
+
+/******************************************************************************/
+/*                                  GETTER                                    */
+/******************************************************************************/
 
 Parser::listOfServers	Webserv::getServers()
 {
@@ -49,4 +56,13 @@ int		Webserv::getNbOfServers()
 Parser	Webserv::getParser() const
 {
 	return (_parser);
+}
+
+/******************************************************************************/
+/*                                 DISPLAY                                    */
+/******************************************************************************/
+
+void	Webserv::displayServers()
+{
+	_parser.displayServersParams();
 }

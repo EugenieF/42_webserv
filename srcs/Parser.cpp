@@ -1,5 +1,9 @@
 #include "Parser.hpp"
 
+/******************************************************************************/
+/*                                   MAIN                                     */
+/******************************************************************************/
+
 Parser::Parser():
 	_lexer(),
 	_context(NONE)
@@ -14,7 +18,7 @@ Parser::Parser(std::string configFile):
 	_context(NONE)
 {
 	_initArrayParsingFunctions();
-	printTokens();
+	// printTokens();
 	parseTokens();
 }
 
@@ -150,7 +154,6 @@ void	Parser::parseTokens()
 		_updateContext(NONE, NULL);
 	}
 }
-
 
 /******************************************************************************/
 /*                                PARSING RULES                               */
@@ -308,7 +311,6 @@ void	Parser::_parseUploadPathRule()
 	_currentBlock->setUploadPath(_currentToken->getValue());
 }
 
-
 /******************************************************************************/
 /*                                   UTILS                                    */
 /******************************************************************************/
@@ -464,11 +466,8 @@ std::string		Parser::getDirective() const
 /******************************************************************************/
 /*                                   ERROR                                    */
 /******************************************************************************/
-// Should we display the first error only or all errors occured ???
 
 /* unknown directive "Root" in nginx.conf:8 */
-/* invalid number of arguments in "root" directive in nginx.conf:8 */
-/* invalid number of arguments in "error_page" directive in nginx.conf:12 */
 /* "server" directive is not allowed here in nginx.conf:10 */
 /* invalid port in "0.0.0.0:" of the "listen" directive in nginx.conf:4 */
 /* invalid port in "8000000" of the "listen" directive in nginx.conf:4 */
@@ -526,7 +525,7 @@ void	Parser::_throwErrorParsingWithLine(std::string errorMsg, std::string lineNb
 }
 
 /******************************************************************************/
-/*                                   PRINT                                    */
+/*                                  DISPLAY                                   */
 /******************************************************************************/
 
 void	Parser::_printArrayParsingFunctions()

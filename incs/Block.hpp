@@ -76,77 +76,80 @@ class	Block
 
 	public :
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
+
+						/*-------     Main    -------*/
 		Block();
 		Block(const Block& other);
 		~Block();
 		Block&								operator=(const Block& other);
 
-		bool								isServerBlock();
-		bool								isLocationBlock();
-		void								setContext(t_context context);
-
-						/*-------    Server_name    -------*/
+						/*-------  Server_name  ------*/
 		void								setName(const std::string &name);
 		listOfStrings						getServerNames() const;	
 
-						/*-------      Listen       -------*/
+						/*-------    Listen    -------*/
 		void								setPort(int port);
 		int									getPort() const;
 		void								setHost(const std::string& host);
 		const std::string&					getHost() const;
 
-						/*-------       Root       -------*/
+						/*-------     Root     -------*/
 		void								setRoot(const std::string& root);
 		const std::string&					getRoot() const;
 
-						/*-------       Index       -------*/
+						/*-------     Index    -------*/
 		void								setIndex(const std::string& index);
 		listOfStrings						getIndexes() const;
 
-						/*-------     Autoindex     -------*/
+						/*-------   Autoindex  -------*/
 		void								setAutoindex(bool value);
 		bool								getAutoindex() const;
 
-						/*----- Client_max_body_size ------*/
+						/*--- Client_max_body_size ---*/
 		void								setClientBodyLimit(size_t size);
 		unsigned long						getClientBodyLimit() const;
 
-						/*-------       CGI         -------*/
+						/*-------      CGI     -------*/
 		void								setCgiExt(const std::string& extension);
 		void								setCgiPath(const std::string& path);
 		const std::string&					getCgiExt() const;
 		const std::string&					getCgiPath() const;
 
-						/*-------     Error_page    -------*/
+						/*-------  Error_page  -------*/
 		void								setErrorPage(int code, const std::string& page);
 		listOfErrorPages					getErrorPages();
 
-						/*-------      Redirect     -------*/
+						/*-------    Redirect  -------*/
 		void								setRedirection(int code, const std::string& uri);
 		int									getRedirectCode();
 		const std::string&					getRedirectUri() const;
 		int									getRedirectCode() const;
 
-						/*-------    Upload_path    -------*/
+						/*-------  Upload_path  -------*/
 		void								setUploadPath(const std::string& path);
 		const std::string&					getUploadPath() const;
 
-						/*-------   Allowed_method   ------*/
+						/*------- Allowed_method ------*/
 		void								setMethod(t_method method);
 		void								setMethod(const std::string& str);
 		bool								isAllowedMethod(t_method method);
 		bool								isAllowedMethod(const std::string& str);
 
-						/*-------      Location     ------*/
+						/*-------    Location   ------*/
 		bool								insertLocation(const std::string& path, blockPtr newLocation);
 		int									getNbOfLocations() const;
 		blockPtr							getCurrentLocation();
 		listOfLocations						getLocations() const;
 
-						/*-------      Context      ------*/
+						/*-------    Context    ------*/
+		void								setContext(t_context context);
 		t_context							getContext() const;
 
-						/*-------      Display      ------*/
+						/*-------     Utils    -------*/
+		bool								isServerBlock();
+		bool								isLocationBlock();
+
+						/*-------    Display    ------*/
 		void								displayListOfStrings(listOfStrings list);
 		void								displayBlockDirectives(t_context context);
 		void								displayParams(int num);
@@ -154,6 +157,8 @@ class	Block
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
+
+						/*-------     Utils    -------*/
 		void								_initAllowedMethods();
 		void								_deleteLocations();
 };

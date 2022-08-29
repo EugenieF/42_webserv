@@ -1,6 +1,7 @@
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
+/*  C++ libraries  */
 # include <string>
 # include <cstdlib>
 # include <iostream>
@@ -11,6 +12,8 @@
 # include <map>
 # include <utility>
 
+/*  C libraries  */
+# include <unistd.h>
 # include <sys/stat.h>
 
 /******************************************************************************/
@@ -61,6 +64,8 @@ class	Token
 
 	public :
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
+
+						/*-------    Main    ------*/
 		Token();
 		Token(tokenType type, tokenValue value, unsigned int line);
 		Token(const Token &other);

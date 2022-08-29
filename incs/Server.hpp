@@ -9,13 +9,15 @@ class Server
 {
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
-		int				_fd;
+		int			_fd;
 
 	public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 		Server();
 		~Server();
-		int				getFd() const;
+
+						/*-------   Getter   ------*/
+		int			getFd() const;
 };
 
 #endif

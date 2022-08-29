@@ -2,10 +2,8 @@
 # define WEBSERV_HPP
 
 /* C libraries */
-# include <unistd.h>
 # include <stdlib.h>
 # include <string.h>
-
 # include <sys/socket.h>
 # include <sys/types.h>
 # include <netinet/in.h>
@@ -38,12 +36,15 @@ class Webserv
 
 	public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
+
+						/*-------    Main    ------*/
 		Webserv();
 		Webserv(std::string configFile);
 		Webserv(const Webserv& other);
 		~Webserv();
 		Webserv&						operator=(const Webserv& other);
 
+						/*-------   Parser   ------*/
 		void							parse(std::string configFile);
 
 						/*-------   Getter   ------*/

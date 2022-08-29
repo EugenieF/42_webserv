@@ -33,14 +33,17 @@ class Parser
 		
 	public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
+
+						/*-------    Main    ------*/
 		Parser();
 		Parser(std::string configFile);
 		Parser(const Parser& other);
 		~Parser();
 		Parser&								operator=(const Parser& other);
+
+						/*-------    Parser   ------*/
 		void								parseFile(std::string configFile);
 		void								parseTokens();
-		void								printTokens();
 
 						/*-------    Getter   ------*/
 		std::string							getConfigFile() const;
@@ -54,15 +57,17 @@ class Parser
 		std::string							getDirective() const;
 
 						/*-------    Display   ------*/
+		void								printTokens();
 		void								displayServersParams();
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
+
+						/*-------    Parser   ------*/
 		void								_parseBlock();
 		blockPtr							_createNewServer();
 		void								_createNewLocation();
 		void								_parseRule();
-
 
 						/*-----  Parsing rules -----*/
 		void								_parseServerNameRule();

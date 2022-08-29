@@ -1,8 +1,6 @@
 #ifndef LEXER_HPP
 # define LEXER_HPP
 
-# include <unistd.h>
-
 # include "Token.hpp"
 # include "Colors.hpp"
 
@@ -26,6 +24,8 @@ class	Lexer
 
 	public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
+
+						/*-------    Main    ------*/
 		Lexer();
 		Lexer(std::string configFile);
 		Lexer(const Lexer& other);

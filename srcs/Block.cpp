@@ -1,5 +1,9 @@
 #include "Block.hpp"
 
+/******************************************************************************/
+/*                                   MAIN                                     */
+/******************************************************************************/
+
 Block::Block():
 	_context(NONE),
 	_serverNames(0),
@@ -67,27 +71,47 @@ Block&	Block::operator=(const Block& other)
 	return (*this);
 }
 
-bool	Block::isServerBlock()
+/******************************************************************************/
+/*                              SERVER_NAME                                   */
+/******************************************************************************/
+
+void	Block::setName(const std::string& name)
 {
-	return (_context == SERVER);
+	_serverNames.insert(_serverNames.end(), name);
 }
 
-bool	Block::isLocationBlock()
+Block::listOfStrings	Block::getServerNames() const
 {
-	return (_context == LOCATION);
+	return (_serverNames);
 }
 
-void	Block::setContext(t_context context)
+/******************************************************************************/
+/*                                 LISTEN                                     */
+/******************************************************************************/
+
+void	Block::setPort(int port)
 {
-	_context = context;
+	_port = port;
 }
 
-void	Block::_initAllowedMethods()
+int		Block::getPort() const
 {
-	_allowedMethods[GET] = "GET";
-	_allowedMethods[POST] = "POST";
-	_allowedMethods[DELETE] = "DELETE";
+	return (_port);
 }
+
+void	Block::setHost(const std::string &host)
+{
+	_host = host;
+}
+
+const std::string&	Block::getHost() const
+{
+	return (_host);
+}
+
+/******************************************************************************/
+/*                                  ROOT                                      */
+/******************************************************************************/
 
 void	Block::setRoot(const std::string &root)
 {
@@ -99,6 +123,10 @@ const std::string&	Block::getRoot() const
 	return (_root);
 }
 
+/******************************************************************************/
+/*                                  INDEX                                     */
+/******************************************************************************/
+
 void	Block::setIndex(const std::string &index)
 {
 	_indexes.insert(_indexes.end(), index);
@@ -108,6 +136,10 @@ Block::listOfStrings	Block::getIndexes() const
 {
 	return (_indexes);
 }
+
+/******************************************************************************/
+/*                                AUTOINDEX                                   */
+/******************************************************************************/
 
 void	Block::setAutoindex(bool value)
 {
@@ -119,6 +151,10 @@ bool	Block::getAutoindex() const
 	return (_autoindex);
 }
 
+/******************************************************************************/
+/*                            CLIENT_MAX_BODY_SIZE                            */
+/******************************************************************************/
+
 void	Block::setClientBodyLimit(size_t size)
 {
 	_clientBodyLimit = size;
@@ -128,6 +164,10 @@ size_t	Block::getClientBodyLimit() const
 {
 	return (_clientBodyLimit);
 }
+
+/******************************************************************************/
+/*                                   CGI                                      */
+/******************************************************************************/
 
 void	Block::setCgiExt(const std::string& extension)
 {
@@ -149,6 +189,10 @@ const std::string&	Block::getCgiPath() const
 	return (_cgiPath);
 }
 
+/******************************************************************************/
+/*                                ERROR_PAGE                                  */
+/******************************************************************************/
+
 void	Block::setErrorPage(int code, const std::string& page)
 {
 	_errorPages[code] = page;
@@ -158,6 +202,10 @@ Block::listOfErrorPages		Block::getErrorPages()
 {
 	return (_errorPages);
 }
+
+/******************************************************************************/
+/*                                 REDIRECT                                   */
+/******************************************************************************/
 
 void	Block::setRedirection(int code, const std::string& uri)
 {
@@ -180,6 +228,10 @@ int		Block::getRedirectCode() const
 	return (_redirectCode);
 }
 
+/******************************************************************************/
+/*                              UPLOAD_PATH                                   */
+/******************************************************************************/
+
 void	Block::setUploadPath(const std::string& path)
 {
 	_uploadPath = path;
@@ -189,6 +241,10 @@ const std::string	&Block::getUploadPath() const
 {
 	return (_uploadPath);
 }
+
+/******************************************************************************/
+/*                             ALLOWED_METHOD                                 */
+/******************************************************************************/
 
 void	Block::setMethod(t_method method)
 {
@@ -219,6 +275,104 @@ bool	Block::isAllowedMethod(const std::string& str)
 	return (false);
 }
 
+/******************************************************************************/
+/*                                LOCATION                                    */
+/******************************************************************************/
+
+bool	Block::insertLocation(const std::string& path, blockPtr newLocation)
+{
+	std::pair<listOfLocations::const_iterator, bool>	ret;
+
+	ret = _locations.insert(std::make_pair(path, newLocation));
+	_currentLocation = ret.first;
+	return (ret.second);
+}
+
+Block::blockPtr		Block::getCurrentLocation()
+{
+	return (_currentLocation->second);
+}
+
+Block::listOfLocations	Block::getLocations() const
+{
+	return (_locations);
+}
+
+int		Block::getNbOfLocations() const
+{
+	int									count;
+	listOfLocations::const_iterator		ite;
+
+	count = 0;
+	for (ite = _locations.begin(); ite != _locations.end(); ite++)
+		count++;
+	return (count);
+}
+
+/******************************************************************************/
+/*                                 CONTEXT                                    */
+/******************************************************************************/
+
+t_context		Block::getContext() const
+{
+	return (_context);
+}
+
+void	Block::setContext(t_context context)
+{
+	_context = context;
+}
+
+/******************************************************************************/
+/*                                  UTILS                                     */
+/******************************************************************************/
+
+bool	Block::isServerBlock()
+{
+	return (_context == SERVER);
+}
+
+bool	Block::isLocationBlock()
+{
+	return (_context == LOCATION);
+}
+
+void	Block::_initAllowedMethods()
+{
+	_allowedMethods[GET] = "GET";
+	_allowedMethods[POST] = "POST";
+	_allowedMethods[DELETE] = "DELETE";
+}
+
+void	Block::_deleteLocations()
+{
+	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
+	{
+		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
+		delete (_currentLocation->second);
+	}
+}
+
+/******************************************************************************/
+/*                                 DISPLAY                                    */
+/******************************************************************************/
+
+void	Block::displayParams(int num)
+{
+	listOfLocations::const_iterator	ite;
+
+	std::cout << std::endl << " SERVER " << num << ": " << std::endl;
+	std::cout << "  ‣ Names: ";
+	displayListOfStrings(_serverNames);
+	std::cout << "  ‣ Listen: " << getHost() << ":" << getPort() << std::endl;
+	displayBlockDirectives(SERVER);
+	for (ite = _locations.begin(); ite != _locations.end(); ite++)
+	{
+		std::cout << std::endl << "     Location " << ite->first << ": " << std::endl;
+		ite->second->displayBlockDirectives(LOCATION);
+	}
+}
+
 void	Block::displayBlockDirectives(t_context context)
 {
 	std::string indent;
@@ -242,94 +396,4 @@ void	Block::displayListOfStrings(listOfStrings list)
 	for (ite = list.begin(); ite != list.end(); ite++)
 		std::cout << *ite << " ";
 	std::cout << std::endl;
-}
-
-bool	Block::insertLocation(const std::string& path, blockPtr newLocation)
-{
-	std::pair<listOfLocations::const_iterator, bool>	ret;
-
-	ret = _locations.insert(std::make_pair(path, newLocation));
-	_currentLocation = ret.first;
-	return (ret.second);
-}
-
-void	Block::setName(const std::string& name)
-{
-	_serverNames.insert(_serverNames.end(), name);
-}
-
-Block::listOfStrings	Block::getServerNames() const
-{
-	return (_serverNames);
-}
-
-void	Block::setPort(int port)
-{
-	_port = port;
-}
-
-int		Block::getPort() const
-{
-	return (_port);
-}
-
-void	Block::setHost(const std::string &host)
-{
-	_host = host;
-}
-
-const std::string&	Block::getHost() const
-{
-	return (_host);
-}
-
-void	Block::_deleteLocations()
-{
-	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
-	{
-		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
-		delete (_currentLocation->second);
-	}
-}
-
-Block::blockPtr		Block::getCurrentLocation()
-{
-	return (_currentLocation->second);
-}
-
-void	Block::displayParams(int num)
-{
-	listOfLocations::const_iterator	ite;
-
-	std::cout << std::endl << " SERVER " << num << ": " << std::endl;
-	std::cout << "  ‣ Names: ";
-	displayListOfStrings(_serverNames);
-	std::cout << "  ‣ Listen: " << getHost() << ":" << getPort() << std::endl;
-	displayBlockDirectives(SERVER);
-	for (ite = _locations.begin(); ite != _locations.end(); ite++)
-	{
-		std::cout << std::endl << "     Location " << ite->first << ": " << std::endl;
-		ite->second->displayBlockDirectives(LOCATION);
-	}
-}
-
-Block::listOfLocations	Block::getLocations() const
-{
-	return (_locations);
-}
-
-int		Block::getNbOfLocations() const
-{
-	int									count;
-	listOfLocations::const_iterator		ite;
-
-	count = 0;
-	for (ite = _locations.begin(); ite != _locations.end(); ite++)
-		count++;
-	return (count);
-}
-
-t_context		Block::getContext() const
-{
-	return (_context);
 }
