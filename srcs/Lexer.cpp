@@ -71,27 +71,6 @@ void	Lexer::_readFile()
 	}
 }
 
-// void	Lexer::_getToken(char character)
-// {
-// 	std::string					token;
-// 	listOfTokenTypes::iterator	ite;
-
-// 	token = "";
-// 	while (!_reachedEndOfFile() && !isspace(character) && !_isDelimiter(character) && character != '#')
-// 	{
-// 		token += _getNextCharacter();
-// 		character = _file.peek();
-// 	}
-// 	if (token != "")
-// 	{
-// 		ite = _tokenTypes.find(token); // Not ok, need modif...
-// 		if (ite != _tokenTypes.end())
-// 			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
-// 		else
-// 			_getValue(token);
-// 	}
-// }
-
 void	Lexer::_getToken(char character, bool isDirective)
 {
 	std::string					token;
@@ -105,7 +84,7 @@ void	Lexer::_getToken(char character, bool isDirective)
 	}
 	if (token != "")
 	{
-		ite = _tokenTypes.find(token); // Not ok, need modif...
+		ite = _tokenTypes.find(token);
 		if (ite != _tokenTypes.end() && isDirective)
 			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
 		else

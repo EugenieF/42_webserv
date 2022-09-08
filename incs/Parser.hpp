@@ -101,6 +101,7 @@ class Parser
 		std::string							_keywordServerError();
 		std::string							_directiveNotAllowedHere();
 		std::string							_invalidValueMsg();
+		std::string							_invalidParameterMsg();
 		std::string							_invalidPathMsg();
 		std::string							_invalidNbOfArgumentsMsg();
 		void								_throwErrorParsing(std::string errorMsg);

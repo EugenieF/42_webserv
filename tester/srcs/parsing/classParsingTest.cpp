@@ -126,6 +126,7 @@ class parsingErrorTest: public ::testing::Test
 		t_invalidFile	locationMaj;
 		t_invalidFile	incorrectRoot;
 		t_invalidFile	missingSemicolonRoot;
+		t_invalidFile	missingSemicolonListen;
 
 	void	SetUp() override
 	{
@@ -161,5 +162,8 @@ class parsingErrorTest: public ::testing::Test
 
 		missingSemicolonRoot.filename = "testFiles/invalid/missingSemicolonRoot.conf";
 		missingSemicolonRoot.msg = "Webserv error: invalid number of arguments in 'root' directive in " + missingSemicolonRoot.filename + ":3";
+
+		missingSemicolonListen.filename = "testFiles/invalid/missingSemicolonListen.conf";
+		missingSemicolonListen.msg = "Webserv error: invalid parameter 'server_name' in " + missingSemicolonListen.filename + ":4";
 	}
 };

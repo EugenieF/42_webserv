@@ -27,4 +27,5 @@ TEST_F(parsingErrorTest, errorFile)
 	checkErrorException(locationMaj);
 	checkErrorException(incorrectRoot);
 	checkErrorException(missingSemicolonRoot);
+	checkErrorException(missingSemicolonListen);
 }

@@ -80,7 +80,7 @@ void	Parser::_parseRule()
 	_setDirective();
 	// std::cout << "Parse " << _lexer.printType(_currentToken->getType()) << std::endl;
 	(this->*parseFunctIte->second)();
-	if (tokenType != KEYWORD_LOCATION)
+	if (tokenType != KEYWORD_LOCATION && tokenType != KEYWORD_LISTEN)
 		_expectNextToken(SEMICOLON, _invalidNbOfArgumentsMsg());
 }
 
@@ -205,6 +205,7 @@ void	Parser::_parseListenRule()
 		default:
 			_throwErrorParsing(_invalidValueMsg());
 	}
+	_expectNextToken(SEMICOLON, _invalidParameterMsg());
 }
 
 /* Context: Server, Location */
@@ -521,6 +522,16 @@ std::string	Parser::_invalidNbOfArgumentsMsg()
 {
 	// std::cout << RED << "Directive = " + getDirective() << RESET << std::endl;
 	return ("invalid number of arguments in '" + getDirective() + "' directive");
+}
+
+std::string	Parser::_invalidParameterMsg()
+{
+	std::string	incorrectParam;
+
+	incorrectParam = "";
+	if ((_currentToken + 1) != _lexer.getTokens().end())
+		incorrectParam = (_currentToken + 1)->getValue();
+	return ("invalid parameter '" + incorrectParam + "'");
 }
 
 std::string	Parser::_invalidValueMsg()
