@@ -44,15 +44,14 @@ void	checkLocation(Webserv& webserv, expectedBlock& expectedLocation)
 	EXPECT_EQ(location->getUploadPath(), expectedLocation.uploadPath);
 }
 
-void	checkErrorException(Webserv& webservError, std::string invalidFile, const char *expectedException)
+void	checkErrorException(t_invalidFile invalidFile)
 {
-	(void)expectedException;
 	try
 	{
-		webservError.parse(invalidFile);
+		invalidFile.webserv.parse(invalidFile.filename);
 	}
 	catch(const std::exception& e)
 	{
-		EXPECT_STREQ(expectedException, e.what());
+		EXPECT_STREQ(invalidFile.msg.c_str(), e.what());
 	}
 }

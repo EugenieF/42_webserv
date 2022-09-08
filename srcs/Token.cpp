@@ -61,3 +61,12 @@ std::string		Token::getLineStr() const
 	ss << _line;
 	return (ss.str());
 }
+
+std::string		Token::getLineStr(int nb) const
+{
+	std::stringstream	ss;
+
+	ss << _line + nb;
+	return (ss.str());
+}
+

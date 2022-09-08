@@ -51,7 +51,8 @@ class	Lexer
 
 						/*-------     Lexer      ------*/
 		void							_readFile();
-		void							_getToken(char character);
+		// void							_getToken(char character);
+		void							_getToken(char character, bool isDirective);
 		void							_getValue(std::string &token);
 		void							_getDelimiter();
 

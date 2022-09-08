@@ -18,7 +18,7 @@ Parser::Parser(std::string configFile):
 	_context(NONE)
 {
 	_initArrayParsingFunctions();
-	// printTokens();
+	printTokens();
 	parseTokens();
 }
 
@@ -76,7 +76,7 @@ void	Parser::_parseRule()
 		_throwErrorParsing("nested server");
 	parseFunctIte = _parsingFunct.find(tokenType);
 	if (parseFunctIte == _parsingFunct.end())
-		_throwErrorParsing(_invalidValueMsg());
+		_throwErrorParsing(_unknownDirectiveError());
 	_setDirective();
 	// std::cout << "Parse " << _lexer.printType(_currentToken->getType()) << std::endl;
 	(this->*parseFunctIte->second)();
@@ -147,7 +147,7 @@ void	Parser::parseTokens()
 	while (!_reachedEndOfTokens())
 	{
 		// std::cout << std::endl << GREEN << "  *** New Server ***" << RESET << std::endl;
-		_expectNextToken(KEYWORD_SERVER, "is not allowed here");
+		_expectNextToken(KEYWORD_SERVER, _keywordServerError());
 		newServer = _createNewServer();
 		_parseBlock();
 		_currentServer = _servers.insert(_servers.end(), newServer);
@@ -357,7 +357,9 @@ bool	Parser::_reachedEndOfBlock()
 	Lexer::listOfTokens::const_iterator	ite;
 
 	ite = _currentToken + 1;
-	return (!_reachedEndOfTokens() && ite != _lexer.getTokens().end() && ite->getType() == BLOCK_END);
+	if (_reachedEndOfTokens())
+		_throwErrorParsingWithLine("unexpected end of file, expecting '}'", _currentToken->getLineStr(1));
+	return (ite != _lexer.getTokens().end() && ite->getType() == BLOCK_END);
 }
 
 bool	Parser::_getNextToken()
@@ -369,6 +371,7 @@ bool	Parser::_getNextToken()
 
 bool	Parser::_reachedEndOfTokens()
 {
+	// return (_currentToken && _currentToken + 1 == _lexer.getTokens().end());
 	return (_currentToken + 1 == _lexer.getTokens().end());
 }
 
@@ -411,6 +414,24 @@ void	Parser::_setDirective()
 			return;
 		}
 	}
+}
+
+bool	Parser::_isDirective(Token::tokenType type)
+{
+	Lexer::listOfTokenTypes::const_iterator		ite;
+	Lexer::listOfTokenTypes						tokenTypes;
+
+	tokenTypes = _lexer.getTokenTypes();
+	for (ite = tokenTypes.begin(); ite != tokenTypes.end(); ite++)
+	{
+		_lexer.printType(type);
+		if (ite->second == type)
+		{
+			_directive = ite->first;
+			return (true);
+		}
+	}
+	return (false);
 }
 
 /******************************************************************************/
@@ -472,6 +493,24 @@ std::string		Parser::getDirective() const
 /* invalid port in "0.0.0.0:" of the "listen" directive in nginx.conf:4 */
 /* invalid port in "8000000" of the "listen" directive in nginx.conf:4 */
 /* "client_max_body_size" directive invalid value in nginx.conf:10 */
+/* unexpected end of file, expecting ';' or '}' in nginx.conf:2 */
+/* unknown directive "Server" in nginx.conf:1 */
+
+std::string Parser::_unknownDirectiveError()
+{
+	return ("unknown directive '" + _currentToken->getValue() + "'");
+}
+
+std::string Parser::_keywordServerError()
+{
+	Lexer::listOfTokens::const_iterator		nextToken;
+
+	// _setDirective();
+	nextToken = _currentToken + 1;
+	if (_isDirective(nextToken->getType()))
+		return ("'" + getDirective() + "' directive is not allowed here");
+	return ("unknown directive '" + nextToken->getValue() + "'");
+}
 
 std::string Parser::_directiveNotAllowedHere()
 {

@@ -77,6 +77,7 @@ class	Token
 		tokenValue						getValue() const;
 		size_t							getLineNbr() const;
 		std::string						getLineStr() const;
+		std::string						getLineStr(int nb) const;
 };
 
 #endif

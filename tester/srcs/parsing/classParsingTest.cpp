@@ -105,52 +105,61 @@ class parsingSimpleTest: public ::testing::Test
 	}
 };
 
+typedef struct s_invalidFile
+{
+	Webserv			webserv;
+	std::string		filename;
+	std::string		msg;
+}	t_invalidFile;
 
 class parsingErrorTest: public ::testing::Test
 {
 	protected:
-		Webserv			absentFile;
-		std::string		absentFileFilename;
-		std::string		absentFileMsg;
-
-		Webserv			errorRoot;
-		std::string		errorRootFilename;
-		std::string		errorRootMsg;
-
-		Webserv			nestedLocation;
-		std::string		nestedLocationFilename;
-		std::string		nestedLocationMsg;
-
-		Webserv			duplicateLocation;
-		std::string		duplicateLocationFilename;
-		std::string		duplicateLocationMsg;
-
-		Webserv			nestedServer;
-		std::string		nestedServerFilename;
-		std::string		nestedServerMsg;
-
-		Webserv			endBracket;
-		std::string		endBracketFilename;
-		std::string		endBracketMsg;
+		t_invalidFile	absentFile;
+		t_invalidFile	errorRoot;
+		t_invalidFile	nestedLocation;
+		t_invalidFile	duplicateLocation;
+		t_invalidFile	nestedServer;
+		t_invalidFile	endBracket;
+		t_invalidFile	onlyLocation;
+		t_invalidFile	noBlock;
+		t_invalidFile	locationMaj;
+		t_invalidFile	incorrectRoot;
+		t_invalidFile	missingSemicolonRoot;
 
 	void	SetUp() override
 	{
-		absentFileFilename = "absent.conf";
-		absentFileMsg = "Webserv error: file '" + absentFileFilename + "' not found";
+		absentFile.filename = "absent.conf";
+		absentFile.msg = "Webserv error: file '" + absentFile.filename + "' not found";
 
-		errorRootFilename = "testFiles/invalid/rootArgs.conf";
-		errorRootMsg = "Webserv error: invalid number of arguments in 'root' directive in " + errorRootFilename + ":3";
+		errorRoot.filename = "testFiles/invalid/rootArgs.conf";
+		errorRoot.msg = "Webserv error: invalid number of arguments in 'root' directive in " + errorRoot.filename + ":3";
 
-		nestedLocationFilename = "testFiles/invalid/nestedLocation.conf";
-		nestedLocationMsg = "Webserv error: nested location in " + nestedLocationFilename + ":14";
+		nestedLocation.filename = "testFiles/invalid/nestedLocation.conf";
+		nestedLocation.msg = "Webserv error: nested location in " + nestedLocation.filename + ":14";
 
-		duplicateLocationFilename = "testFiles/invalid/duplicateLocation.conf";
-		duplicateLocationMsg = "Webserv error: duplicate location '/www/' in " + duplicateLocationFilename + ":17";
+		duplicateLocation.filename = "testFiles/invalid/duplicateLocation.conf";
+		duplicateLocation.msg = "Webserv error: duplicate location '/www/' in " + duplicateLocation.filename + ":17";
 
-		nestedServerFilename = "testFiles/invalid/nestedServer.conf";
-		nestedServerMsg = "Webserv error: nested server in " + nestedServerFilename + ":8";
+		nestedServer.filename = "testFiles/invalid/nestedServer.conf";
+		nestedServer.msg = "Webserv error: nested server in " + nestedServer.filename + ":8";
 
-		endBracketFilename = "testFiles/invalid/endBracket.conf";
-		endBracketMsg = "Webserv error: expected '{' in " + endBracketFilename + ":9";
+		endBracket.filename = "testFiles/invalid/endBracket.conf";
+		endBracket.msg = "Webserv error: unexpected end of file, expecting '}' in " + endBracket.filename + ":9";
+
+		onlyLocation.filename = "testFiles/invalid/onlyLocation.conf";
+		onlyLocation.msg = "Webserv error: 'location' directive is not allowed here in " + onlyLocation.filename + ":1";
+
+		noBlock.filename = "testFiles/invalid/noBlock.conf";
+		noBlock.msg = "Webserv error: 'root' directive is not allowed here in " + noBlock.filename + ":1";
+
+		locationMaj.filename = "testFiles/invalid/locationMaj.conf";
+		locationMaj.msg = "Webserv error: unknown directive 'Location' in " + locationMaj.filename + ":10";
+
+		incorrectRoot.filename = "testFiles/invalid/incorrectRoot.conf";
+		incorrectRoot.msg = "Webserv error: unknown directive 'rooot' in " + incorrectRoot.filename + ":5";
+
+		missingSemicolonRoot.filename = "testFiles/invalid/missingSemicolonRoot.conf";
+		missingSemicolonRoot.msg = "Webserv error: invalid number of arguments in 'root' directive in " + missingSemicolonRoot.filename + ":3";
 	}
 };

@@ -48,7 +48,9 @@ Lexer&	Lexer::operator=(const Lexer& other)
 void	Lexer::_readFile()
 {
 	char	character;
+	bool	isDirective;
 
+	isDirective = true;
 	while (!_file.eof())
 	{
 		character = _file.peek();
@@ -57,13 +59,40 @@ void	Lexer::_readFile()
 		else if (isspace(character))
 			_getNextCharacter();
 		else if (_isDelimiter(character))
+		{
 			_getDelimiter();
+			isDirective = true;
+		}
 		else
-			_getToken(character);
+		{
+			_getToken(character, isDirective);
+			isDirective = false;
+		}
 	}
 }
 
-void	Lexer::_getToken(char character)
+// void	Lexer::_getToken(char character)
+// {
+// 	std::string					token;
+// 	listOfTokenTypes::iterator	ite;
+
+// 	token = "";
+// 	while (!_reachedEndOfFile() && !isspace(character) && !_isDelimiter(character) && character != '#')
+// 	{
+// 		token += _getNextCharacter();
+// 		character = _file.peek();
+// 	}
+// 	if (token != "")
+// 	{
+// 		ite = _tokenTypes.find(token); // Not ok, need modif...
+// 		if (ite != _tokenTypes.end())
+// 			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
+// 		else
+// 			_getValue(token);
+// 	}
+// }
+
+void	Lexer::_getToken(char character, bool isDirective)
 {
 	std::string					token;
 	listOfTokenTypes::iterator	ite;
@@ -77,7 +106,7 @@ void	Lexer::_getToken(char character)
 	if (token != "")
 	{
 		ite = _tokenTypes.find(token); // Not ok, need modif...
-		if (ite != _tokenTypes.end())
+		if (ite != _tokenTypes.end() && isDirective)
 			_tokens.insert(_tokens.end(), Token(_tokenTypes[token], token, _lineCount));
 		else
 			_getValue(token);

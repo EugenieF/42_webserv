@@ -95,14 +95,17 @@ class Parser
 		void								_initArrayParsingFunctions();
 		void								_deleteServers();
 		void								_setDirective();
+		bool								_isDirective(Token::tokenType type);
 
 						/*-------     Error    ------*/
+		std::string							_keywordServerError();
 		std::string							_directiveNotAllowedHere();
 		std::string							_invalidValueMsg();
 		std::string							_invalidPathMsg();
 		std::string							_invalidNbOfArgumentsMsg();
 		void								_throwErrorParsing(std::string errorMsg);
 		void								_throwErrorParsingWithLine(std::string errorMsg, std::string lineNbr);
+		std::string							_unknownDirectiveError();
 
 						/*-------    Display   ------*/
 		void								_printCurrentToken();
