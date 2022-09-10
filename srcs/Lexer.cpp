@@ -197,8 +197,12 @@ void	Lexer::_throwErrorLexer(std::string errorMsg)
 
 void	Lexer::checkFile(std::string configFile)
 {
-	struct stat	statStruct;
+	struct stat		statStruct;
+	size_t			filenameLength;
 
+	filenameLength = configFile.length();
+	if (!(filenameLength > 5 && configFile.substr(filenameLength - 5) == ".conf"))
+		_throwErrorLexer("invalid extension, the configuration file must end with '.conf'");
 	if (stat(configFile.c_str(), &statStruct) != 0)
 		_throwErrorLexer("file '" + configFile + "' not found");
 	if (statStruct.st_mode & S_IFDIR)
@@ -212,7 +216,7 @@ void	Lexer::openFile(std::string configFile)
 	checkFile(configFile);
 	_file.open(configFile.c_str());
 	if (!_file || !_file.is_open())
-		throw(std::runtime_error("Cannot open file"));
+		_throwErrorLexer("cannot open file '" + configFile + "'");
 	_readFile();
 }
 

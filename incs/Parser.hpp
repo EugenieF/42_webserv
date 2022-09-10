@@ -83,6 +83,7 @@ class Parser
 		void								_parseUploadPathRule();
 
 						/*-------    Utils    ------*/
+		void								_checkBrackets();
 		void								_updateContext(t_context currentContext, blockPtr currentBlock);
 		bool								_currentBlockIsServer();
 		bool								_currentBlockIsLocation();
@@ -96,17 +97,20 @@ class Parser
 		void								_deleteServers();
 		void								_setDirective();
 		bool								_isDirective(Token::tokenType type);
+		bool								_tokenIsDelimiter(Token::tokenType tokenType);
 
 						/*-------     Error    ------*/
+		std::string							_unexpectedValueMsg(Lexer::listOfTokens::const_iterator token);
+		std::string							_unknownDirectiveMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_keywordServerError();
-		std::string							_directiveNotAllowedHere();
+		std::string							_directiveNotAllowedHereMsg();
 		std::string							_invalidValueMsg();
+		std::string							_invalidCurrentValueMsg();
 		std::string							_invalidParameterMsg();
 		std::string							_invalidPathMsg();
 		std::string							_invalidNbOfArgumentsMsg();
 		void								_throwErrorParsing(std::string errorMsg);
-		void								_throwErrorParsingWithLine(std::string errorMsg, std::string lineNbr);
-		std::string							_unknownDirectiveError();
+		void								_throwErrorParsing(std::string errorMsg, std::string lineNbr);
 
 						/*-------    Display   ------*/
 		void								_printCurrentToken();

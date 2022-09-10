@@ -6,6 +6,7 @@
 
 Parser::Parser():
 	_lexer(),
+	_currentBlock(NULL),
 	_context(NONE)
 {
 	_initArrayParsingFunctions();
@@ -15,10 +16,11 @@ Parser::Parser(std::string configFile):
 	_configFile(configFile),
 	_lexer(configFile),
 	_currentToken(_lexer.getTokens().begin()),
+	_currentBlock(NULL),
 	_context(NONE)
 {
 	_initArrayParsingFunctions();
-	printTokens();
+	// printTokens();
 	parseTokens();
 }
 
@@ -26,6 +28,8 @@ Parser::Parser(const Parser& other):
 	_configFile(other.getConfigFile()),
 	_lexer(other.getLexer()),
 	_currentToken(other.getCurrentToken()),
+	_currentServer(other.getCurrentServer()),
+	_currentBlock(other.getCurrentBlock()),
 	_parsingFunct(other.getParsingFunct()),
 	_context(other.getContext()),
 	_directive(other.getDirective())
@@ -74,11 +78,12 @@ void	Parser::_parseRule()
 	tokenType = _currentToken->getType();
 	if (tokenType == KEYWORD_SERVER)
 		_throwErrorParsing("nested server");
+	if (_tokenIsDelimiter(tokenType))
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken));
 	parseFunctIte = _parsingFunct.find(tokenType);
 	if (parseFunctIte == _parsingFunct.end())
-		_throwErrorParsing(_unknownDirectiveError());
+		_throwErrorParsing(_unknownDirectiveMsg(_currentToken));
 	_setDirective();
-	// std::cout << "Parse " << _lexer.printType(_currentToken->getType()) << std::endl;
 	(this->*parseFunctIte->second)();
 	if (tokenType != KEYWORD_LOCATION && tokenType != KEYWORD_LISTEN)
 		_expectNextToken(SEMICOLON, _invalidNbOfArgumentsMsg());
@@ -94,8 +99,6 @@ void	Parser::_updateContext(t_context currentContext, blockPtr currentBlock)
 
 void	Parser::_createNewLocation()
 {
-	// std::cout << std::endl << BLUE << "  >>> New Location <<<" << RESET << std::endl;
-	
 	blockPtr		newLocation;
 	std::string		locationPath;
 	blockPtr		serverBlockTmp;
@@ -113,8 +116,7 @@ void	Parser::_createNewLocation()
 	_parseBlock();
 	_directive = "";
 	if (!(serverBlockTmp->insertLocation(locationPath, newLocation)))
-		_throwErrorParsingWithLine("duplicate location '" + locationPath + "'", lineNbrLocation);
-	// std::cout << std::endl << GREEN << "  *** Suite Server ***" << RESET << std::endl;
+		_throwErrorParsing("duplicate location '" + locationPath + "'", lineNbrLocation);
 	_updateContext(SERVER, serverBlockTmp);
 }
 
@@ -131,13 +133,13 @@ Parser::blockPtr	Parser::_createNewServer()
 
 void	Parser::_parseBlock()
 {
-	_expectNextToken(BLOCK_START, "expecting '{'");
+	_expectNextToken(BLOCK_START, _unexpectedValueMsg(_currentToken + 1));
 	while (!_reachedEndOfBlock())
 	{
 		_getNextToken();
 		_parseRule();
 	}
-	_expectNextToken(BLOCK_END, "expecting '}'");
+	_expectNextToken(BLOCK_END, _unexpectedValueMsg(_currentToken + 1));
 }
 
 void	Parser::parseTokens()
@@ -146,7 +148,6 @@ void	Parser::parseTokens()
 
 	while (!_reachedEndOfTokens())
 	{
-		// std::cout << std::endl << GREEN << "  *** New Server ***" << RESET << std::endl;
 		_expectNextToken(KEYWORD_SERVER, _keywordServerError());
 		newServer = _createNewServer();
 		_parseBlock();
@@ -163,7 +164,7 @@ void	Parser::parseTokens()
 void	Parser::_parseServerNameRule()
 {
 	if (!_currentBlockIsServer())
-		_throwErrorParsing(_directiveNotAllowedHere());
+		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	while (!_reachedEndOfDirective())
 	{
 		_expectNextToken(VALUE, _invalidValueMsg());
@@ -187,7 +188,7 @@ void	Parser::_parseListenRule()
 	int	port;
 
 	if (!_currentBlockIsServer())
-		_throwErrorParsing(_directiveNotAllowedHere());
+		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	_getNextToken();
 	switch (_currentToken->getType())
 	{
@@ -226,7 +227,7 @@ void	Parser::_parseAutoindexRule()
 		return (_currentBlock->setAutoindex(true));
 	if (_currentToken->getValue() == "off")
 		return (_currentBlock->setAutoindex(false));
-	_throwErrorParsing(_invalidValueMsg());
+	_throwErrorParsing(_invalidCurrentValueMsg());
 }
 
 /* Context: Server, Location */
@@ -278,14 +279,12 @@ void	Parser::_parseRedirectRule()
 	std::string		uri;
 
 	if (!_currentBlockIsLocation())
-		_throwErrorParsing(_directiveNotAllowedHere());
+		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	_expectNbOfArguments(2);
 	_expectNextToken(NUMBER, _invalidValueMsg());
 	code = atoi(_currentToken->getValue().c_str());
-
 	_expectNextToken(PATH, _invalidValueMsg());
 	uri = _currentToken->getValue();
-
 	_currentBlock->setRedirection(code, uri);
 }
 
@@ -293,12 +292,12 @@ void	Parser::_parseRedirectRule()
 void	Parser::_parseAllowedMethodRule()
 {
 	if (!_currentBlockIsLocation())
-		_throwErrorParsing(_directiveNotAllowedHere());
+		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	while (!_reachedEndOfDirective())
 	{
 		_getNextToken();
 		if (!_currentBlock->isAllowedMethod(_currentToken->getValue()))
-			_throwErrorParsing("invalid value \"" + _currentToken->getValue() + "\"");
+			_throwErrorParsing(_invalidCurrentValueMsg());
 		_currentBlock->setMethod(_currentToken->getValue());
 	}
 }
@@ -307,7 +306,7 @@ void	Parser::_parseAllowedMethodRule()
 void	Parser::_parseUploadPathRule()
 {
 	if (!_currentBlockIsLocation())
-		_throwErrorParsing(_directiveNotAllowedHere());
+		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	_expectNextToken(PATH, _invalidValueMsg());
 	_currentBlock->setUploadPath(_currentToken->getValue());
 }
@@ -328,8 +327,7 @@ bool	Parser::_currentBlockIsLocation()
 
 void	Parser::_expectNbOfArguments(int expectedNb)
 {
-	(void)expectedNb;
-	int	count;
+	int									count;
 	Lexer::listOfTokens::const_iterator	ite;
 
 	count = 0;
@@ -359,7 +357,7 @@ bool	Parser::_reachedEndOfBlock()
 
 	ite = _currentToken + 1;
 	if (_reachedEndOfTokens())
-		_throwErrorParsingWithLine("unexpected end of file, expecting '}'", _currentToken->getLineStr(1));
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken), _currentToken->getLineStr(1));
 	return (ite != _lexer.getTokens().end() && ite->getType() == BLOCK_END);
 }
 
@@ -372,16 +370,15 @@ bool	Parser::_getNextToken()
 
 bool	Parser::_reachedEndOfTokens()
 {
-	// return (_currentToken && _currentToken + 1 == _lexer.getTokens().end());
-	return (_currentToken + 1 == _lexer.getTokens().end());
+	return (_currentToken != _lexer.getTokens().end() && _currentToken + 1 == _lexer.getTokens().end());
 }
 
 void	Parser::_deleteServers()
 {
 	for (_currentServer = _servers.begin(); _currentServer != _servers.end(); _currentServer++)
 	{
-		// std::cout << RED << " xxx Delete a server xxx" << RESET << std::endl;
-		delete (*_currentServer);
+		if (*_currentServer)
+			delete (*_currentServer);
 	}
 }
 
@@ -433,6 +430,11 @@ bool	Parser::_isDirective(Token::tokenType type)
 		}
 	}
 	return (false);
+}
+
+bool	Parser::_tokenIsDelimiter(Token::tokenType tokenType)
+{
+	return (tokenType == BLOCK_END || tokenType == BLOCK_START || tokenType == SEMICOLON);
 }
 
 /******************************************************************************/
@@ -489,38 +491,42 @@ std::string		Parser::getDirective() const
 /*                                   ERROR                                    */
 /******************************************************************************/
 
-/* unknown directive "Root" in nginx.conf:8 */
-/* "server" directive is not allowed here in nginx.conf:10 */
 /* invalid port in "0.0.0.0:" of the "listen" directive in nginx.conf:4 */
 /* invalid port in "8000000" of the "listen" directive in nginx.conf:4 */
 /* "client_max_body_size" directive invalid value in nginx.conf:10 */
 /* unexpected end of file, expecting ';' or '}' in nginx.conf:2 */
-/* unknown directive "Server" in nginx.conf:1 */
 
-std::string Parser::_unknownDirectiveError()
+std::string Parser::_unexpectedValueMsg(Lexer::listOfTokens::const_iterator token)
 {
-	return ("unknown directive '" + _currentToken->getValue() + "'");
+	if (token != _lexer.getTokens().end())
+		return ("unexpected '" + token->getValue() + "'");
+	return ("unexpected end of file, expecting '}'");
+}
+
+std::string Parser::_unknownDirectiveMsg(Lexer::listOfTokens::const_iterator token)
+{
+	return ("unknown directive '" + token->getValue() + "'");
 }
 
 std::string Parser::_keywordServerError()
 {
 	Lexer::listOfTokens::const_iterator		nextToken;
 
-	// _setDirective();
 	nextToken = _currentToken + 1;
+	if (_tokenIsDelimiter(nextToken->getType()))
+		return (_unexpectedValueMsg(nextToken));
 	if (_isDirective(nextToken->getType()))
-		return ("'" + getDirective() + "' directive is not allowed here");
-	return ("unknown directive '" + nextToken->getValue() + "'");
+		return (_directiveNotAllowedHereMsg());
+	return (_unknownDirectiveMsg(nextToken));
 }
 
-std::string Parser::_directiveNotAllowedHere()
+std::string Parser::_directiveNotAllowedHereMsg()
 {
 	return ("'" + getDirective() + "' directive is not allowed here");
 }
 
 std::string	Parser::_invalidNbOfArgumentsMsg()
 {
-	// std::cout << RED << "Directive = " + getDirective() << RESET << std::endl;
 	return ("invalid number of arguments in '" + getDirective() + "' directive");
 }
 
@@ -541,7 +547,15 @@ std::string	Parser::_invalidValueMsg()
 	incorrectValue = "";
 	if ((_currentToken + 1) != _lexer.getTokens().end())
 		incorrectValue = (_currentToken + 1)->getValue();
-	return ("invalid value '" + incorrectValue + "'");
+	return ("invalid value '" + incorrectValue + "' in '" + getDirective() + "' directive");
+}
+
+std::string	Parser::_invalidCurrentValueMsg()
+{
+	std::string	incorrectValue;
+
+	incorrectValue = _currentToken->getValue();
+	return ("invalid value '" + incorrectValue + "' in '" + getDirective() + "' directive");
 }
 
 std::string	Parser::_invalidPathMsg()
@@ -560,17 +574,19 @@ void	Parser::_throwErrorParsing(std::string errorMsg)
 
 	message = "Webserv error: " + errorMsg;
 	message += " in " + getConfigFile() + ":" + _currentToken->getLineStr();
-	delete _currentBlock;
+	if (_currentBlock)
+		delete _currentBlock;
 	throw (std::runtime_error(message));
 }
 
-void	Parser::_throwErrorParsingWithLine(std::string errorMsg, std::string lineNbr)
+void	Parser::_throwErrorParsing(std::string errorMsg, std::string lineNbr)
 {
 	std::string message;
 
 	message = "Webserv error: " + errorMsg;
 	message += " in " + getConfigFile() + ":" + lineNbr;
-	delete _currentBlock;
+	if (_currentBlock)
+		delete _currentBlock;
 	throw (std::runtime_error(message));
 }
 

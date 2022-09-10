@@ -116,6 +116,9 @@ class parsingErrorTest: public ::testing::Test
 {
 	protected:
 		t_invalidFile	absentFile;
+		t_invalidFile	incorrectExt;
+		t_invalidFile	noPermission;
+		t_invalidFile	directory;
 		t_invalidFile	errorRoot;
 		t_invalidFile	nestedLocation;
 		t_invalidFile	duplicateLocation;
@@ -127,11 +130,38 @@ class parsingErrorTest: public ::testing::Test
 		t_invalidFile	incorrectRoot;
 		t_invalidFile	missingSemicolonRoot;
 		t_invalidFile	missingSemicolonListen;
+		t_invalidFile	incorrectAutoindex;
+		t_invalidFile	incorrectMaxBodySize;
+		t_invalidFile	incorrectErrorPage;
+
+		t_invalidFile	inverseBracket;
+		t_invalidFile	doubleBrackets;
+		t_invalidFile	unexpectedOpeningBracket;
+		t_invalidFile	unexpectedClosingBracket;
+		t_invalidFile	unexpectedSemicolon;
+		t_invalidFile	unexpectedEndSemicolon;
+
+	std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission, &directory,
+		&errorRoot, &nestedLocation, &duplicateLocation, &nestedServer,
+		/*&endBracket,*/ &onlyLocation, &noBlock, &locationMaj, &incorrectRoot,
+		&missingSemicolonRoot, &missingSemicolonListen,
+		&incorrectAutoindex, &incorrectMaxBodySize, &incorrectErrorPage,
+		&inverseBracket, &doubleBrackets, &unexpectedOpeningBracket, &unexpectedClosingBracket,
+		&unexpectedSemicolon, &unexpectedEndSemicolon};
 
 	void	SetUp() override
 	{
 		absentFile.filename = "absent.conf";
 		absentFile.msg = "Webserv error: file '" + absentFile.filename + "' not found";
+
+		incorrectExt.filename = "testFiles/invalid/incorrectExt.con";
+		incorrectExt.msg = "Webserv error: invalid extension, the configuration file must end with '.conf'";
+
+		noPermission.filename = "testFiles/invalid/noPermission.conf";
+		noPermission.msg = "Webserv error: cannot open file '" + noPermission.filename + "'";
+
+		directory.filename = "testFiles/invalid/directory.conf";
+		directory.msg = "Webserv error: file '" + directory.filename + "' is a directory";
 
 		errorRoot.filename = "testFiles/invalid/rootArgs.conf";
 		errorRoot.msg = "Webserv error: invalid number of arguments in 'root' directive in " + errorRoot.filename + ":3";
@@ -165,5 +195,33 @@ class parsingErrorTest: public ::testing::Test
 
 		missingSemicolonListen.filename = "testFiles/invalid/missingSemicolonListen.conf";
 		missingSemicolonListen.msg = "Webserv error: invalid parameter 'server_name' in " + missingSemicolonListen.filename + ":4";
+
+		incorrectAutoindex.filename = "testFiles/invalid/incorrectAutoindex.conf";
+		incorrectAutoindex.msg = "Webserv error: invalid value 'yes' in 'autoindex' directive in " + incorrectAutoindex.filename + ":7";
+
+		incorrectMaxBodySize.filename = "testFiles/invalid/incorrectMaxBodySize.conf";
+		incorrectMaxBodySize.msg = "Webserv error: invalid value '-600' in 'client_max_body_size' directive in " + incorrectMaxBodySize.filename + ":9";
+
+		incorrectErrorPage.filename = "testFiles/invalid/incorrectErrorPage.conf";
+		incorrectErrorPage.msg = "Webserv error: invalid value '-404' in 'error_page' directive in " + incorrectErrorPage.filename + ":9";
+
+		inverseBracket.filename = "testFiles/invalid/inverseBracket.conf";
+		inverseBracket.msg = "Webserv error: unexpected '}' in " + inverseBracket.filename + ":1";
+
+		doubleBrackets.filename = "testFiles/invalid/doubleBrackets.conf";
+		doubleBrackets.msg = "Webserv error: unexpected '{' in " + doubleBrackets.filename + ":1";
+
+		unexpectedOpeningBracket.filename = "testFiles/invalid/unexpectedOpeningBracket.conf";
+		unexpectedOpeningBracket.msg = "Webserv error: unexpected '{' in " + unexpectedOpeningBracket.filename + ":1";
+		
+		unexpectedClosingBracket.filename = "testFiles/invalid/unexpectedClosingBracket.conf";
+		unexpectedClosingBracket.msg = "Webserv error: unexpected '}' in " + unexpectedClosingBracket.filename + ":1";
+
+		unexpectedSemicolon.filename = "testFiles/invalid/unexpectedSemicolon.conf";
+		unexpectedSemicolon.msg = "Webserv error: unexpected ';' in " + unexpectedSemicolon.filename + ":1";
+
+		unexpectedEndSemicolon.filename = "testFiles/invalid/unexpectedEndSemicolon.conf";
+		unexpectedEndSemicolon.msg = "Webserv error: unexpected ';' in " + unexpectedEndSemicolon.filename + ":9";
 	}
+	
 };

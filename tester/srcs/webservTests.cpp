@@ -16,16 +16,9 @@ TEST_F(parsingSimpleTest, simpleConfig)
 
 TEST_F(parsingErrorTest, errorFile)
 {
-	checkErrorException(absentFile);
-	checkErrorException(errorRoot);
-	checkErrorException(nestedLocation);
-	checkErrorException(duplicateLocation);
-	checkErrorException(nestedServer);
-	checkErrorException(endBracket);
-	checkErrorException(onlyLocation);
-	checkErrorException(noBlock);
-	checkErrorException(locationMaj);
-	checkErrorException(incorrectRoot);
-	checkErrorException(missingSemicolonRoot);
-	checkErrorException(missingSemicolonListen);
+	std::vector<t_invalidFile *>::const_iterator	ite;
+
+	for (ite = invalidFile.begin(); ite != invalidFile.end(); ite++)
+		checkErrorException(**ite);
+
 }
