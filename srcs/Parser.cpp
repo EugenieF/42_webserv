@@ -203,13 +203,16 @@ void	Parser::_parseListenRule()
 			_currentBlock->setHost(_currentToken->getValue());
 			if (_reachedEndOfDirective())
 				break;	
-			_expectNextToken(COLON, _invalidValueMsg(_currentToken + 1));
+			_expectNextToken(COLON, _invalidParameterMsg());
+			// _expectNextToken(COLON, _invalidValueMsg(_currentToken + 1));
 		case COLON:
-			_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
+			_expectNextToken(NUMBER, _invalidPortMsg());
 		case NUMBER:
 			port = atoi(_currentToken->getValue().c_str());
 			_currentBlock->setPort(port);
 			break;
+		case SEMICOLON:
+			_throwErrorParsing(_invalidNbOfArgumentsMsg());
 		default:
 			_throwErrorParsing(_invalidValueMsg(_currentToken + 1));
 	}
@@ -221,6 +224,7 @@ void	Parser::_parseRootRule()
 {
 	std::string	path;
 
+	_expectNbOfArguments(1);
 	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
 	path = _currentToken->getValue();
 	_currentBlock->setRoot(path);
@@ -229,7 +233,8 @@ void	Parser::_parseRootRule()
 /* Context: Server, Location */
 void	Parser::_parseAutoindexRule()
 {
-	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
+	_expectNbOfArguments(1);
+	_getNextToken();
 	if (_currentToken->getValue() == "on")
 		return (_currentBlock->setAutoindex(true));
 	if (_currentToken->getValue() == "off")
@@ -304,7 +309,7 @@ void	Parser::_parseAllowedMethodRule()
 	{
 		_getNextToken();
 		if (!_currentBlock->isAllowedMethod(_currentToken->getValue()))
-			_throwErrorParsing(_invalidValueMsg(_currentToken));
+			_throwErrorParsing(_unknownMethodMsg(_currentToken));
 		_currentBlock->setMethod(_currentToken->getValue());
 	}
 }
@@ -341,6 +346,18 @@ void	Parser::_expectNbOfArguments(int expectedNb)
 	for (ite = _currentToken + 1; ite->getType() != SEMICOLON && ite != _lexer.getTokens().end(); ite++)
 		count++;
 	if (count != expectedNb)
+		_throwErrorParsing(_invalidNbOfArgumentsMsg(), ite->getLineStr());	
+}
+
+void	Parser::_expectMinimumNbOfArguments(int expectedNb)
+{
+	int									count;
+	Lexer::listOfTokens::const_iterator	ite;
+
+	count = 0;
+	for (ite = _currentToken + 1; ite->getType() != SEMICOLON && ite != _lexer.getTokens().end(); ite++)
+		count++;
+	if (count < expectedNb)
 		_throwErrorParsing(_invalidNbOfArgumentsMsg());	
 }
 
@@ -510,6 +527,11 @@ std::string Parser::_unexpectedValueMsg(Lexer::listOfTokens::const_iterator toke
 	return ("unexpected end of file, expecting '}'");
 }
 
+std::string Parser::_unknownMethodMsg(Lexer::listOfTokens::const_iterator token)
+{
+	return ("unknown method '" + token->getValue() + "' in '" + getDirective() + "' directive");
+}
+
 std::string Parser::_unknownDirectiveMsg(Lexer::listOfTokens::const_iterator token)
 {
 	return ("unknown directive '" + token->getValue() + "'");
@@ -545,6 +567,11 @@ std::string	Parser::_invalidParameterMsg()
 	if ((_currentToken + 1) != _lexer.getTokens().end())
 		incorrectParam = (_currentToken + 1)->getValue();
 	return ("invalid parameter '" + incorrectParam + "'");
+}
+
+std::string	Parser::_invalidPortMsg()
+{
+	return ("invalid port of the 'listen' directive");
 }
 
 std::string	Parser::_invalidValueMsg(Lexer::listOfTokens::const_iterator token)

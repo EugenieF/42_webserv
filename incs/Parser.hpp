@@ -92,6 +92,7 @@ class Parser
 		bool								_reachedEndOfBlock();
 		bool								_getNextToken();
 		void								_expectNbOfArguments(int expectedNb);
+		void								_expectMinimumNbOfArguments(int expectedNb);
 		void								_expectNextToken(Token::tokenType expectedType, std::string errorMsg);
 		void								_initArrayParsingFunctions();
 		void								_deleteServers();
@@ -102,10 +103,12 @@ class Parser
 						/*-------     Error    ------*/
 		std::string							_unexpectedValueMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_unknownDirectiveMsg(Lexer::listOfTokens::const_iterator token);
+		std::string							_unknownMethodMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_keywordServerError();
 		std::string							_directiveNotAllowedHereMsg();
 		std::string							_invalidValueMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_invalidParameterMsg();
+		std::string							_invalidPortMsg();
 		std::string							_invalidPathMsg();
 		std::string							_invalidNbOfArgumentsMsg();
 		void								_throwErrorParsing(std::string errorMsg);
