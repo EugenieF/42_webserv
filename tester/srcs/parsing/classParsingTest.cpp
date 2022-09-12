@@ -182,6 +182,18 @@ class parsingErrorTest: public ::testing::Test
 		t_invalidFile	invalidListen2;
 		t_invalidFile	invalidListen3;
 
+		t_invalidFile	emptyRedirect;
+		t_invalidFile	invalidRedirect;
+		t_invalidFile	invalidRedirect2;
+		t_invalidFile	invalidRedirect3;
+		t_invalidFile	invalidRedirect4;
+
+		t_invalidFile	emptyServerName;
+		t_invalidFile	serverNameInLocation;
+
+		t_invalidFile	emptyUploadPath;
+		t_invalidFile	invalidUploadPath;
+
 		std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission, &directory,
 		&nestedServer, &serverMaj, &noBlock,
 		&nestedLocation, &duplicateLocation, &onlyLocation, &locationMaj, &missingLocationPath,
@@ -194,7 +206,10 @@ class parsingErrorTest: public ::testing::Test
 		&invalidErrorPage, &invalidErrorPage2, &invalidErrorPage3, &invalidErrorPage4, &noErrorPage,
 		&cgiArgs, &cgiArgs2, &cgiNoArg,
 		&indexNoArgServer, &indexNoArgLocation,
-		&emptyListen, &listenInLocation, &invalidListen, &invalidListen2, &invalidListen3};
+		&emptyListen, &listenInLocation, &invalidListen, &invalidListen2, &invalidListen3,
+		&emptyRedirect, &invalidRedirect, &invalidRedirect2, &invalidRedirect3, &invalidRedirect4,
+		&emptyServerName, &serverNameInLocation,
+		&emptyUploadPath, &invalidUploadPath};
 
 	void	SetUp() override
 	{
@@ -372,6 +387,37 @@ class parsingErrorTest: public ::testing::Test
 
 		invalidListen3.filename = "testFiles/invalid/listen/invalidListen3.conf";
 		invalidListen3.msg = "Webserv error: invalid parameter ':' in " + invalidListen3.filename + ":3";
+
+/* redirect */
+		emptyRedirect.filename = "testFiles/invalid/redirect/emptyRedirect.conf";
+		emptyRedirect.msg = "Webserv error: invalid number of arguments in 'redirect' directive in " + emptyRedirect.filename + ":16";
+
+		invalidRedirect.filename = "testFiles/invalid/redirect/invalidRedirect.conf";
+		invalidRedirect.msg = "Webserv error: invalid value '-301' in 'redirect' directive in " + invalidRedirect.filename + ":7";
+
+		invalidRedirect2.filename = "testFiles/invalid/redirect/invalidRedirect2.conf";
+		invalidRedirect2.msg = "Webserv error: invalid value '/www/redirection.html' in 'redirect' directive in " + invalidRedirect2.filename + ":16";
+
+		invalidRedirect3.filename = "testFiles/invalid/redirect/invalidRedirect3.conf";
+		invalidRedirect3.msg = "Webserv error: invalid number of arguments in 'redirect' directive in " + invalidRedirect3.filename + ":16";
+
+		invalidRedirect4.filename = "testFiles/invalid/redirect/invalidRedirect4.conf";
+		invalidRedirect4.msg = "Webserv error: invalid number of arguments in 'redirect' directive in " + invalidRedirect4.filename + ":7";
+
+/* server_name */
+		emptyServerName.filename = "testFiles/invalid/server_name/emptyServerName.conf";
+		emptyServerName.msg = "Webserv error: invalid number of arguments in 'server_name' directive in " + emptyServerName.filename + ":6";
+
+		serverNameInLocation.filename = "testFiles/invalid/server_name/serverNameInLocation.conf";
+		serverNameInLocation.msg = "Webserv error: 'server_name' directive is not allowed here in " + serverNameInLocation.filename + ":14";
+
+/* upload_path */
+		emptyUploadPath.filename = "testFiles/invalid/upload_path/emptyUploadPath.conf";
+		emptyUploadPath.msg = "Webserv error: invalid number of arguments in 'upload_path' directive in " + emptyUploadPath.filename + ":14";
+
+		invalidUploadPath.filename = "testFiles/invalid/upload_path/invalidUploadPath.conf";
+		invalidUploadPath.msg = "Webserv error: invalid number of arguments in 'upload_path' directive in " + invalidUploadPath.filename + ":14";
+
 	}
 	
 };

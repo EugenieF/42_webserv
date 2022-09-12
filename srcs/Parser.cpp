@@ -284,14 +284,14 @@ void	Parser::_parseCgiRule()
 	_currentBlock->setCgiPath(_currentToken->getValue());
 }
 
-/* Context: Location, (Server ???) */
+/* Context: Location, Server ??? */
 void	Parser::_parseRedirectRule()
 {
 	int				code;
 	std::string		uri;
 
-	if (!_currentBlockIsLocation())
-		_throwErrorParsing(_directiveNotAllowedHereMsg());
+	// if (!_currentBlockIsLocation())
+	// 	_throwErrorParsing(_directiveNotAllowedHereMsg());
 	_expectNbOfArguments(2);
 	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 	code = atoi(_currentToken->getValue().c_str());
@@ -314,12 +314,15 @@ void	Parser::_parseAllowedMethodRule()
 	}
 }
 
-/* Context: Location */
+/* Context: Location, Server ??? */
 void	Parser::_parseUploadPathRule()
 {
-	if (!_currentBlockIsLocation())
-		_throwErrorParsing(_directiveNotAllowedHereMsg());
-	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
+	// if (!_currentBlockIsLocation())
+	// 	_throwErrorParsing(_directiveNotAllowedHereMsg());
+	_expectNbOfArguments(1);
+	_getNextToken();
+	if (_tokenIsDelimiter(_currentToken->getType()))
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken));
 	_currentBlock->setUploadPath(_currentToken->getValue());
 }
 
