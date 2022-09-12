@@ -104,12 +104,19 @@ void	Parser::_createNewLocation()
 	blockPtr		serverBlockTmp;
 	std::string		lineNbrLocation;
 
-	_directive = "";
+	_directive = "location";
 	if (!_currentBlockIsServer())
 		_throwErrorParsing("nested location");
 	lineNbrLocation	= _currentToken->getLineStr();
 	serverBlockTmp = _currentBlock;
-	_expectNextToken(PATH, _invalidValueMsg());	
+
+	// _expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
+	_getNextToken();
+	if (_currentToken->getType() == BLOCK_START)
+		_throwErrorParsing(_invalidNbOfArgumentsMsg());
+	if (_tokenIsDelimiter(_currentToken->getType()))
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken));
+
 	locationPath = _currentToken->getValue();
 	newLocation = new Block;
 	_updateContext(LOCATION, newLocation);
@@ -167,7 +174,7 @@ void	Parser::_parseServerNameRule()
 		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	while (!_reachedEndOfDirective())
 	{
-		_expectNextToken(VALUE, _invalidValueMsg());
+		_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 		_currentBlock->setName(_currentToken->getValue());
 	}
 }
@@ -177,7 +184,7 @@ void	Parser::_parseIndexRule()
 {
 	while (!_reachedEndOfDirective())
 	{
-		_expectNextToken(VALUE, _invalidValueMsg());
+		_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 		_currentBlock->setIndex(_currentToken->getValue());
 	}
 }
@@ -196,15 +203,15 @@ void	Parser::_parseListenRule()
 			_currentBlock->setHost(_currentToken->getValue());
 			if (_reachedEndOfDirective())
 				break;	
-			_expectNextToken(COLON, _invalidValueMsg());
+			_expectNextToken(COLON, _invalidValueMsg(_currentToken + 1));
 		case COLON:
-			_expectNextToken(NUMBER, _invalidValueMsg());
+			_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 		case NUMBER:
 			port = atoi(_currentToken->getValue().c_str());
 			_currentBlock->setPort(port);
 			break;
 		default:
-			_throwErrorParsing(_invalidValueMsg());
+			_throwErrorParsing(_invalidValueMsg(_currentToken + 1));
 	}
 	_expectNextToken(SEMICOLON, _invalidParameterMsg());
 }
@@ -214,7 +221,7 @@ void	Parser::_parseRootRule()
 {
 	std::string	path;
 
-	_expectNextToken(PATH, _invalidValueMsg());
+	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
 	path = _currentToken->getValue();
 	_currentBlock->setRoot(path);
 }
@@ -222,12 +229,12 @@ void	Parser::_parseRootRule()
 /* Context: Server, Location */
 void	Parser::_parseAutoindexRule()
 {
-	_expectNextToken(VALUE, _invalidValueMsg());
+	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	if (_currentToken->getValue() == "on")
 		return (_currentBlock->setAutoindex(true));
 	if (_currentToken->getValue() == "off")
 		return (_currentBlock->setAutoindex(false));
-	_throwErrorParsing(_invalidCurrentValueMsg());
+	_throwErrorParsing(_invalidValueMsg(_currentToken));
 }
 
 /* Context: Server, Location */
@@ -237,11 +244,11 @@ void	Parser::_parseErrorPageRule()
 	std::string		page;
 
 	_expectNbOfArguments(2);
-	_expectNextToken(NUMBER, _invalidValueMsg());
+	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 	code = atoi(_currentToken->getValue().c_str());
 	if (code < 100 || code > 600)
 		_throwErrorParsing("invalid error code");
-	_expectNextToken(PATH, _invalidValueMsg());
+	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
 	page = _currentToken->getValue();
 
 	// if (!_lexer.checkFile(page))
@@ -256,7 +263,7 @@ void	Parser::_parseMaxBodySizeRule()
 	size_t	maxSize;
 
 	_expectNbOfArguments(1);
-	_expectNextToken(NUMBER, _invalidValueMsg());
+	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 	maxSize = atol(_currentToken->getValue().c_str());
 	_currentBlock->setClientBodyLimit(maxSize);
 }
@@ -266,9 +273,9 @@ void	Parser::_parseMaxBodySizeRule()
 void	Parser::_parseCgiRule()
 {
 	_expectNbOfArguments(2);
-	_expectNextToken(VALUE, _invalidValueMsg());
+	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setCgiExt(_currentToken->getValue());
-	_expectNextToken(PATH, _invalidValueMsg());
+	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setCgiPath(_currentToken->getValue());
 }
 
@@ -281,9 +288,9 @@ void	Parser::_parseRedirectRule()
 	if (!_currentBlockIsLocation())
 		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	_expectNbOfArguments(2);
-	_expectNextToken(NUMBER, _invalidValueMsg());
+	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 	code = atoi(_currentToken->getValue().c_str());
-	_expectNextToken(PATH, _invalidValueMsg());
+	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
 	uri = _currentToken->getValue();
 	_currentBlock->setRedirection(code, uri);
 }
@@ -297,7 +304,7 @@ void	Parser::_parseAllowedMethodRule()
 	{
 		_getNextToken();
 		if (!_currentBlock->isAllowedMethod(_currentToken->getValue()))
-			_throwErrorParsing(_invalidCurrentValueMsg());
+			_throwErrorParsing(_invalidValueMsg(_currentToken));
 		_currentBlock->setMethod(_currentToken->getValue());
 	}
 }
@@ -307,7 +314,7 @@ void	Parser::_parseUploadPathRule()
 {
 	if (!_currentBlockIsLocation())
 		_throwErrorParsing(_directiveNotAllowedHereMsg());
-	_expectNextToken(PATH, _invalidValueMsg());
+	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setUploadPath(_currentToken->getValue());
 }
 
@@ -357,7 +364,7 @@ bool	Parser::_reachedEndOfBlock()
 
 	ite = _currentToken + 1;
 	if (_reachedEndOfTokens())
-		_throwErrorParsing(_unexpectedValueMsg(_currentToken), _currentToken->getLineStr(1));
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken + 1), _currentToken->getLineStr(1));
 	return (ite != _lexer.getTokens().end() && ite->getType() == BLOCK_END);
 }
 
@@ -540,21 +547,13 @@ std::string	Parser::_invalidParameterMsg()
 	return ("invalid parameter '" + incorrectParam + "'");
 }
 
-std::string	Parser::_invalidValueMsg()
+std::string	Parser::_invalidValueMsg(Lexer::listOfTokens::const_iterator token)
 {
 	std::string	incorrectValue;
 
 	incorrectValue = "";
-	if ((_currentToken + 1) != _lexer.getTokens().end())
-		incorrectValue = (_currentToken + 1)->getValue();
-	return ("invalid value '" + incorrectValue + "' in '" + getDirective() + "' directive");
-}
-
-std::string	Parser::_invalidCurrentValueMsg()
-{
-	std::string	incorrectValue;
-
-	incorrectValue = _currentToken->getValue();
+	if (token != _lexer.getTokens().end())
+		incorrectValue = token->getValue();
 	return ("invalid value '" + incorrectValue + "' in '" + getDirective() + "' directive");
 }
 

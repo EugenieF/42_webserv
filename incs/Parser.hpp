@@ -104,8 +104,7 @@ class Parser
 		std::string							_unknownDirectiveMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_keywordServerError();
 		std::string							_directiveNotAllowedHereMsg();
-		std::string							_invalidValueMsg();
-		std::string							_invalidCurrentValueMsg();
+		std::string							_invalidValueMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_invalidParameterMsg();
 		std::string							_invalidPathMsg();
 		std::string							_invalidNbOfArgumentsMsg();

@@ -141,13 +141,18 @@ class parsingErrorTest: public ::testing::Test
 		t_invalidFile	unexpectedSemicolon;
 		t_invalidFile	unexpectedEndSemicolon;
 
-	std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission, &directory,
+		t_invalidFile	incorrectMethod;
+		t_invalidFile	autoindexArgs;
+		t_invalidFile	missingLocationPath;
+
+		std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission, &directory,
 		&errorRoot, &nestedLocation, &duplicateLocation, &nestedServer,
-		/*&endBracket,*/ &onlyLocation, &noBlock, &locationMaj, &incorrectRoot,
+		&endBracket, &onlyLocation, &noBlock, &locationMaj, &incorrectRoot,
 		&missingSemicolonRoot, &missingSemicolonListen,
 		&incorrectAutoindex, &incorrectMaxBodySize, &incorrectErrorPage,
 		&inverseBracket, &doubleBrackets, &unexpectedOpeningBracket, &unexpectedClosingBracket,
-		&unexpectedSemicolon, &unexpectedEndSemicolon};
+		&unexpectedSemicolon, &unexpectedEndSemicolon,
+		&incorrectMethod, &autoindexArgs, &missingLocationPath};
 
 	void	SetUp() override
 	{
@@ -222,6 +227,15 @@ class parsingErrorTest: public ::testing::Test
 
 		unexpectedEndSemicolon.filename = "testFiles/invalid/unexpectedEndSemicolon.conf";
 		unexpectedEndSemicolon.msg = "Webserv error: unexpected ';' in " + unexpectedEndSemicolon.filename + ":9";
+
+		incorrectMethod.filename = "testFiles/invalid/incorrectMethod.conf";
+		incorrectMethod.msg = "Webserv error: invalid value 'GOT' in 'allowed_method' directive in " + incorrectMethod.filename + ":12";
+		
+		autoindexArgs.filename = "testFiles/invalid/autoindexArgs.conf";
+		autoindexArgs.msg = "Webserv error: invalid number of arguments in 'autoindex' directive in " + autoindexArgs.filename + ":8";
+
+		missingLocationPath.filename = "testFiles/invalid/missingLocationPath.conf";
+		missingLocationPath.msg = "Webserv error: invalid number of arguments in 'location' directive in " + missingLocationPath.filename + ":9";
 	}
 	
 };
