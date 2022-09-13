@@ -283,7 +283,7 @@ class parsingErrorTest: public ::testing::Test
 		cgiArgs2.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + cgiArgs2.filename + ":13";
 
 		cgiArgs3.filename = "testFiles/invalid/cgi/cgiArgs3.conf";
-		cgiArgs3.msg = "Webserv error: invalid value 'not_a_path' in 'cgi' directive in " + cgiArgs3.filename + ":13";
+		cgiArgs3.msg = "Webserv error: unexpected '}' in " + cgiArgs3.filename + ":14";
 
 		cgiNoArg.filename = "testFiles/invalid/cgi/cgiNoArg.conf";
 		cgiNoArg.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + cgiNoArg.filename + ":10";
@@ -293,7 +293,7 @@ class parsingErrorTest: public ::testing::Test
 		indexNoArgServer.msg = "Webserv error: invalid number of arguments in 'index' directive in " + indexNoArgServer.filename + ":5";
 
 		indexNoArgLocation.filename = "testFiles/invalid/index/indexNoArgLocation.conf";
-		indexNoArgLocation.msg = "Webserv error: invalid number of arguments in 'index' directive in " + indexNoArgLocation.filename + ":11";
+		indexNoArgLocation.msg = "Webserv error: invalid number of arguments in 'index' directive in " + indexNoArgLocation.filename + ":10";
 
 /* listen */
 		emptyListen.filename = "testFiles/invalid/listen/emptyListen.conf";

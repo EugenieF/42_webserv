@@ -49,6 +49,7 @@ void	checkErrorException(t_invalidFile invalidFile)
 	try
 	{
 		invalidFile.webserv.parse(invalidFile.filename);
+		FAIL() << "Error " << invalidFile.filename;
 	}
 	catch(const std::exception& e)
 	{

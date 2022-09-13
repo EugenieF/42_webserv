@@ -51,6 +51,7 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
 
 $(NAME): $(WEBSERV_OBJS) $(OBJS)
 	@echo "$(YELLOW)🚧 Linking $(NAME)...$(RESET)"
+	@chmod 000 testFiles/invalid/noPermission.conf
 	@$(CXX) $(CXXFLAGS) $(MAIN) $(WEBSERV_OBJS) $(OBJS) $(LIBGTEST) -o $(NAME)
 	@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
@@ -65,6 +66,7 @@ clean:
 	@echo "$(CUT)$(RED)[deleting gtests objs]$(RESET)"
 
 fclean: clean
+	@chmod 777 testFiles/invalid/noPermission.conf
 	@$(RM) $(NAME)
 	@echo "$(CUT)$(RED)[deleting $(NAME)]$(RESET)"
 

@@ -172,6 +172,7 @@ void	Parser::_parseServerNameRule()
 {
 	if (!_currentBlockIsServer())
 		_throwErrorParsing(_directiveNotAllowedHereMsg());
+	_expectMinimumNbOfArguments(1);
 	while (!_reachedEndOfDirective())
 	{
 		_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
@@ -212,6 +213,7 @@ void	Parser::_parseListenRule()
 /* Context: Server, Location */
 void	Parser::_parseIndexRule()
 {
+	_expectMinimumNbOfArguments(1);
 	while (!_reachedEndOfDirective())
 	{
 		_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
@@ -343,9 +345,17 @@ void	Parser::_expectNbOfArguments(int expectedNb)
 
 	count = 0;
 	for (ite = _currentToken + 1; ite->getType() != SEMICOLON && ite != _lexer.getTokens().end(); ite++)
+	{
+		if (_tokenIsDelimiter(ite->getType()))
+			_throwErrorParsing(_unexpectedValueMsg(ite), ite->getLineStr());
 		count++;
+	}
 	if (count != expectedNb)
+	{
+		if (ite == _lexer.getTokens().end())
+			ite--;
 		_throwErrorParsing(_invalidNbOfArgumentsMsg(), ite->getLineStr());	
+	}
 }
 
 void	Parser::_expectMinimumNbOfArguments(int expectedNb)
@@ -355,7 +365,11 @@ void	Parser::_expectMinimumNbOfArguments(int expectedNb)
 
 	count = 0;
 	for (ite = _currentToken + 1; ite->getType() != SEMICOLON && ite != _lexer.getTokens().end(); ite++)
+	{
+		if (_tokenIsDelimiter(ite->getType()))
+			_throwErrorParsing(_unexpectedValueMsg(ite), ite->getLineStr());
 		count++;
+	}
 	if (count < expectedNb)
 		_throwErrorParsing(_invalidNbOfArgumentsMsg());	
 }
