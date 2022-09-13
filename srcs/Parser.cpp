@@ -179,16 +179,6 @@ void	Parser::_parseServerNameRule()
 	}
 }
 
-/* Context: Server, Location */
-void	Parser::_parseIndexRule()
-{
-	while (!_reachedEndOfDirective())
-	{
-		_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
-		_currentBlock->setIndex(_currentToken->getValue());
-	}
-}
-
 /* Context: Server */
 void	Parser::_parseListenRule()
 {
@@ -200,11 +190,11 @@ void	Parser::_parseListenRule()
 	switch (_currentToken->getType())
 	{
 		case VALUE:
+			_checkHost(_currentToken->getValue());
 			_currentBlock->setHost(_currentToken->getValue());
 			if (_reachedEndOfDirective())
 				break;	
 			_expectNextToken(COLON, _invalidParameterMsg());
-			// _expectNextToken(COLON, _invalidValueMsg(_currentToken + 1));
 		case COLON:
 			_expectNextToken(NUMBER, _invalidPortMsg());
 		case NUMBER:
@@ -220,12 +210,22 @@ void	Parser::_parseListenRule()
 }
 
 /* Context: Server, Location */
+void	Parser::_parseIndexRule()
+{
+	while (!_reachedEndOfDirective())
+	{
+		_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
+		_currentBlock->setIndex(_currentToken->getValue());
+	}
+}
+
+/* Context: Server, Location */
 void	Parser::_parseRootRule()
 {
 	std::string	path;
 
 	_expectNbOfArguments(1);
-	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
+	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	path = _currentToken->getValue();
 	_currentBlock->setRoot(path);
 }
@@ -251,14 +251,10 @@ void	Parser::_parseErrorPageRule()
 	_expectNbOfArguments(2);
 	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 	code = atoi(_currentToken->getValue().c_str());
-	if (code < 100 || code > 600)
-		_throwErrorParsing("invalid error code");
-	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
+	if (code < 300 || code > 527)
+		_throwErrorParsing(_invalidErrorCodeMsg(_currentToken));
+	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	page = _currentToken->getValue();
-
-	// if (!_lexer.checkFile(page))
-	// 	throwErrorParsing(invalidPathMsg());
-
 	_currentBlock->setErrorPage(code, page);
 }
 
@@ -273,29 +269,28 @@ void	Parser::_parseMaxBodySizeRule()
 	_currentBlock->setClientBodyLimit(maxSize);
 }
 
-
 /* Context: Server, Location */
 void	Parser::_parseCgiRule()
 {
 	_expectNbOfArguments(2);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setCgiExt(_currentToken->getValue());
-	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
+	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setCgiPath(_currentToken->getValue());
 }
 
-/* Context: Location, Server ??? */
+/* Context: Location */
 void	Parser::_parseRedirectRule()
 {
 	int				code;
 	std::string		uri;
 
-	// if (!_currentBlockIsLocation())
-	// 	_throwErrorParsing(_directiveNotAllowedHereMsg());
+	if (!_currentBlockIsLocation())
+		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	_expectNbOfArguments(2);
 	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 	code = atoi(_currentToken->getValue().c_str());
-	_expectNextToken(PATH, _invalidValueMsg(_currentToken + 1));
+	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	uri = _currentToken->getValue();
 	_currentBlock->setRedirection(code, uri);
 }
@@ -314,15 +309,16 @@ void	Parser::_parseAllowedMethodRule()
 	}
 }
 
-/* Context: Location, Server ??? */
+/* Context: Location */
 void	Parser::_parseUploadPathRule()
 {
-	// if (!_currentBlockIsLocation())
-	// 	_throwErrorParsing(_directiveNotAllowedHereMsg());
+	if (!_currentBlockIsLocation())
+		_throwErrorParsing(_directiveNotAllowedHereMsg());
 	_expectNbOfArguments(1);
-	_getNextToken();
-	if (_tokenIsDelimiter(_currentToken->getType()))
-		_throwErrorParsing(_unexpectedValueMsg(_currentToken));
+	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
+	// _getNextToken();
+	// if (_tokenIsDelimiter(_currentToken->getType()))
+	// 	_throwErrorParsing(_unexpectedValueMsg(_currentToken));
 	_currentBlock->setUploadPath(_currentToken->getValue());
 }
 
@@ -464,6 +460,25 @@ bool	Parser::_tokenIsDelimiter(Token::tokenType tokenType)
 	return (tokenType == BLOCK_END || tokenType == BLOCK_START || tokenType == SEMICOLON);
 }
 
+void	Parser::_checkHost(const std::string &token)
+{
+	size_t		found;
+	size_t		pos;
+
+	pos = 0;
+	if (token == "localhost")
+		return ;
+	for (int i = 0; i < 4; i++)
+	{
+		found = token.find_first_not_of("0123456789", pos);
+		if ((i < 3 && (found == std::string::npos || token[found] != '.')) 
+			|| (i == 3 && found != std::string::npos)
+			|| (atoi(token.substr(pos, found - pos).c_str()) > 255))
+			_throwErrorParsing("host not found in '" + token + "' of the 'listen' directive");
+		pos = found + 1;
+	}
+}
+
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
@@ -522,6 +537,11 @@ std::string		Parser::getDirective() const
 /* invalid port in "8000000" of the "listen" directive in nginx.conf:4 */
 /* "client_max_body_size" directive invalid value in nginx.conf:10 */
 /* unexpected end of file, expecting ';' or '}' in nginx.conf:2 */
+
+std::string Parser::_invalidErrorCodeMsg(Lexer::listOfTokens::const_iterator token)
+{
+	return ("value '" + token->getValue() + "' must be between 300 and 527");
+}
 
 std::string Parser::_unexpectedValueMsg(Lexer::listOfTokens::const_iterator token)
 {

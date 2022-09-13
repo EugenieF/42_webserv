@@ -10,6 +10,7 @@
 # include "gtest/gtest.h"
 
 # include "parsing/classParsingTest.cpp"
+# include "parsing/classParsingErrorTest.cpp"
 # include "parsing/parsingTest.cpp"
 
 #endif

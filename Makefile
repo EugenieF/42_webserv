@@ -20,7 +20,6 @@ DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 CXX				= c++
 
 CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
-# CXXFLAGS		= -Wall -Wextra -Werror -MMD -MP -I$(INCLUDE)
 
 RM				= rm -rf
 

@@ -104,8 +104,8 @@ void	Lexer::_getValue(std::string &token)
 		token = _handleSize(token);
 		type = NUMBER;
 	}
-	else if (_tokenIsPath(token))
-		type = PATH;
+	// else if (_tokenIsPath(token))
+	// 	type = PATH;
 	_tokens.insert(_tokens.end(), Token(type, token, _lineCount));
 }
 
@@ -162,10 +162,10 @@ bool	Lexer::_tokenIsSize(const std::string &token)
 	return (false);
 }
 
-bool	Lexer::_tokenIsPath(const std::string &token)
-{
-	return (token.find("/") != std::string::npos);
-}
+// bool	Lexer::_tokenIsPath(const std::string &token)
+// {
+// 	return (token.find("/") != std::string::npos);
+// }
 
 // bool	Lexer::tokenIsAddress(const std::string &token)
 // {

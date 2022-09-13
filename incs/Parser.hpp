@@ -99,6 +99,7 @@ class Parser
 		void								_setDirective();
 		bool								_isDirective(Token::tokenType type);
 		bool								_tokenIsDelimiter(Token::tokenType tokenType);
+		void								_checkHost(const std::string &token);
 
 						/*-------     Error    ------*/
 		std::string							_unexpectedValueMsg(Lexer::listOfTokens::const_iterator token);
@@ -108,6 +109,7 @@ class Parser
 		std::string							_directiveNotAllowedHereMsg();
 		std::string							_invalidValueMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_invalidParameterMsg();
+		std::string							_invalidErrorCodeMsg(Lexer::listOfTokens::const_iterator token);
 		std::string							_invalidPortMsg();
 		std::string							_invalidPathMsg();
 		std::string							_invalidNbOfArgumentsMsg();

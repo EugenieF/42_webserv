@@ -115,8 +115,6 @@ int main(int argc, char **argv)
 	{
 		std::string configFile(argv[1]);
 		Webserv	webserv(configFile);
-		// Webserv webserv;
-		// webserv.parse(configFile);
 		// webserv.displayServers();
 		// runServer();
 	}
