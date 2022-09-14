@@ -88,22 +88,6 @@ void	Parser::_parseRule()
 		_expectNextToken(SEMICOLON, _invalidNbOfArgumentsMsg());
 }
 
-// void	Parser::_expectNbOfArgumentsLoc(int expectedNb, bool expectComp)
-// {
-// 	int									count;
-// 	Lexer::listOfTokens::const_iterator	ite;
-
-// 	count = 0;
-// 	_checkEndOfFile(_currentToken + 1);
-// 	for (ite = _currentToken + 1; ite != _lexer.getTokens().end() && ite->getType() != BLOCK_START; ite++)
-// 	{
-// 		_checkDelimiter(ite);
-// 		count++;
-// 	}
-// 	if ((expectComp == EQUAL && count != expectedNb) || (expectComp == MINIMUM && count < expectedNb))
-// 		_throwErrorParsing(_invalidNbOfArgumentsMsg(), ite->getLineStr());	
-// }
-
 void	Parser::_createNewLocation()
 {
 	blockPtr		newLocation;
@@ -336,7 +320,7 @@ void	Parser::_checkDelimiter(Lexer::listOfTokens::const_iterator token)
 void	Parser::_checkEndOfFile(Lexer::listOfTokens::const_iterator token)
 {
 	if (token == _lexer.getTokens().end())
-		_throwErrorParsing(_unexpectedValueMsg(token), _lexer.getLineCountStr());
+		_throwErrorParsing(_unexpectedValueMsg(token));
 }
 
 void	Parser::_checkHost(const std::string &token)
@@ -365,10 +349,7 @@ void	Parser::_checkHost(const std::string &token)
 void	Parser::_expectNextToken(Token::tokenType expectedType, std::string errorMsg)
 {
 	if (!_getNextToken() || _currentToken->getType() != expectedType)
-	{
-		std::cout << "********************" << std::endl;
 		_throwErrorParsing(errorMsg);
-	}
 }
 
 void	Parser::_expectNbOfArguments(int expectedNb, bool expectComp, Token::tokenType tokenType)
@@ -553,12 +534,9 @@ std::string		Parser::getDirective() const
 	return (_directive);
 }
 
-
 /******************************************************************************/
 /*                                   ERROR                                    */
 /******************************************************************************/
-
-/* unexpected end of file, expecting ';' or '}' in nginx.conf:2 */
 
 std::string Parser::_invalidErrorCodeMsg(Lexer::listOfTokens::const_iterator token)
 {
@@ -642,10 +620,15 @@ std::string	Parser::_invalidPathMsg()
 
 void	Parser::_throwErrorParsing(std::string errorMsg)
 {
-	std::string message;
+	std::string	message;
+	std::string	lineNbr;
 
+	if (_currentToken + 1 == _lexer.getTokens().end())
+		lineNbr = _lexer.getLineCountStr();
+	else
+		lineNbr = _currentToken->getLineStr();
 	message = "Webserv error: " + errorMsg;
-	message += " in " + getConfigFile() + ":" + _currentToken->getLineStr();
+	message += " in " + getConfigFile() + ":" + lineNbr;
 	if (_currentBlock)
 		delete _currentBlock;
 	throw (std::runtime_error(message));
