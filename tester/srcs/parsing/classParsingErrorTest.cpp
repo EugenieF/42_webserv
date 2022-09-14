@@ -42,7 +42,9 @@ class parsingErrorTest: public ::testing::Test
 		t_invalidFile	nestedServer;
 		t_invalidFile	serverMaj;
 		t_invalidFile	noBlock;
-		std::vector<t_invalidFile *> invalidServerBlock = {&nestedServer, &serverMaj, &noBlock};
+		t_invalidFile	server;
+		t_invalidFile	server2;
+		std::vector<t_invalidFile *> invalidServerBlock = {&nestedServer, &serverMaj, &noBlock, &server, &server2};
 	
 /* location block */
 		t_invalidFile	nestedLocation;
@@ -50,8 +52,10 @@ class parsingErrorTest: public ::testing::Test
 		t_invalidFile	onlyLocation;
 		t_invalidFile	locationMaj;
 		t_invalidFile	missingLocationPath;
+		t_invalidFile	location;
+		t_invalidFile	location2;
 		std::vector<t_invalidFile *> invalidLocationBlock = {&nestedLocation, &duplicateLocation, &onlyLocation,
-		&locationMaj, &missingLocationPath};
+		&locationMaj, &missingLocationPath, &location, &location2};
 
 /* allowed_method */
 		t_invalidFile	noMethod;
@@ -210,6 +214,12 @@ class parsingErrorTest: public ::testing::Test
 		serverMaj.filename = "testFiles/invalid/server/serverMaj.conf";
 		serverMaj.msg = "Webserv error: unknown directive 'Server' in " + serverMaj.filename + ":1";
 
+		server.filename = "testFiles/invalid/server/server.conf";
+		server.msg = "Webserv error: unexpected end of file in " + server.filename + ":1";
+
+		server2.filename = "testFiles/invalid/server/server2.conf";
+		server2.msg = "Webserv error: unexpected end of file in " + server2.filename + ":4";
+
 /* location block */
 		onlyLocation.filename = "testFiles/invalid/location/onlyLocation.conf";
 		onlyLocation.msg = "Webserv error: 'location' directive is not allowed here in " + onlyLocation.filename + ":1";
@@ -225,6 +235,12 @@ class parsingErrorTest: public ::testing::Test
 
 		missingLocationPath.filename = "testFiles/invalid/location/missingLocationPath.conf";
 		missingLocationPath.msg = "Webserv error: invalid number of arguments in 'location' directive in " + missingLocationPath.filename + ":9";
+
+		location.filename = "testFiles/invalid/location/location.conf";
+		location.msg = "Webserv error: unexpected '}' in " + location.filename + ":4";
+
+		location2.filename = "testFiles/invalid/location/location2.conf";
+		location2.msg = "Webserv error: unexpected end of file in " + location2.filename + ":6";
 
 /* allowed_method */
 		noMethod.filename = "testFiles/invalid/allowed_method/noMethod.conf";

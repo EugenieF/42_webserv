@@ -8,9 +8,14 @@
 /*                               CLASS PARSER                                 */
 /******************************************************************************/
 
+typedef enum e_comp
+{
+	EQUAL	= 0,
+	MINIMUM	= 1
+} t_comp;
+
 class Parser
 {
-	
 	public:
 	/***********************      MEMBER TYPES      *********************/
 		typedef std::vector<Block *>						listOfServers;
@@ -82,24 +87,29 @@ class Parser
 		void								_parseAllowedMethodRule();
 		void								_parseUploadPathRule();
 
-						/*-------    Utils    ------*/
+						/*-------    Check    ------*/
 		void								_checkDelimiter(Lexer::listOfTokens::const_iterator token);
-		void								_updateContext(t_context currentContext, blockPtr currentBlock);
-		bool								_currentBlockIsServer();
-		bool								_currentBlockIsLocation();
+		void								_checkEndOfFile(Lexer::listOfTokens::const_iterator token);
+		void								_checkHost(const std::string &token);
+
+						/*-------    Expect    ------*/
+		void								_expectNextToken(Token::tokenType expectedType, std::string errorMsg);
+		void								_expectNbOfArguments(int expectedNb, bool expectComp, Token::tokenType tokenType);
+		void								_expectContext(t_context expectedContext);
+		void								_expectContext(t_context expectedContext, std::string errorMsg);
+
+						/*-------   Reached    ------*/
 		bool								_reachedEndOfTokens();
 		bool								_reachedEndOfDirective();
 		bool								_reachedEndOfBlock();
+
+						/*-------    Utils    ------*/
 		bool								_getNextToken();
-		void								_expectNbOfArguments(int expectedNb);
-		void								_expectMinimumNbOfArguments(int expectedNb);
-		void								_expectNextToken(Token::tokenType expectedType, std::string errorMsg);
 		void								_initArrayParsingFunctions();
-		void								_deleteServers();
+		void								_updateContext(t_context currentContext, blockPtr currentBlock);
 		void								_setDirective();
 		bool								_isDirective(Token::tokenType type);
-		bool								_tokenIsDelimiter(Token::tokenType tokenType);
-		void								_checkHost(const std::string &token);
+		void								_deleteServers();
 
 						/*-------     Error    ------*/
 		std::string							_unexpectedValueMsg(Lexer::listOfTokens::const_iterator token);
