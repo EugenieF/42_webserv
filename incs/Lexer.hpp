@@ -41,6 +41,7 @@ class	Lexer
 		const listOfTokens&				getTokens() const;
 		listOfTokenTypes				getTokenTypes() const;
 		size_t							getLineCount() const;
+		std::string						getLineCountStr() const;
 
 						/*-------     Display      ------*/
 		void							printTokens();

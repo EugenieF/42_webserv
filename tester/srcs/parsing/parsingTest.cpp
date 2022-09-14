@@ -56,3 +56,11 @@ void	checkErrorException(t_invalidFile invalidFile)
 		EXPECT_STREQ(invalidFile.msg.c_str(), e.what());
 	}
 }
+
+void	checkErrorCase(std::vector<t_invalidFile *> invalidFile)
+{
+	std::vector<t_invalidFile *>::const_iterator	ite;
+
+	for (ite = invalidFile.begin(); ite != invalidFile.end(); ite++)
+		checkErrorException(**ite);
+}

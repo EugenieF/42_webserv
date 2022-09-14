@@ -167,21 +167,6 @@ bool	Lexer::_tokenIsSize(const std::string &token)
 // 	return (token.find("/") != std::string::npos);
 // }
 
-// bool	Lexer::tokenIsAddress(const std::string &token)
-// {
-// 	size_t	found;
-// 	size_t	pos;
-
-// 	pos = 0;
-// 	for (int i = 0; i < 3; i++)
-// 	{
-// 		found = token.find_first_not_of("0123456789", pos);
-// 		if (found == std::string::npos || token[found] != '.')
-// 			return (false);
-// 		pos = found + 1;
-// 	}
-// 	return (token.find_first_not_of("0123456789", found + 1) == std::string::npos);
-// }
 
 /******************************************************************************/
 /*                                    FILE                                    */
@@ -296,6 +281,15 @@ size_t	Lexer::getLineCount() const
 {
 	return (_lineCount);
 }
+
+std::string		Lexer::getLineCountStr() const
+{
+	std::stringstream	ss;
+
+	ss << _lineCount;
+	return (ss.str());
+}
+
 
 /******************************************************************************/
 /*                                  DISPLAY                                   */

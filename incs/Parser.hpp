@@ -83,7 +83,7 @@ class Parser
 		void								_parseUploadPathRule();
 
 						/*-------    Utils    ------*/
-		void								_checkBrackets();
+		void								_checkDelimiter(Lexer::listOfTokens::const_iterator token);
 		void								_updateContext(t_context currentContext, blockPtr currentBlock);
 		bool								_currentBlockIsServer();
 		bool								_currentBlockIsLocation();

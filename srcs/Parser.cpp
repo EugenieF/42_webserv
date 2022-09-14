@@ -187,6 +187,7 @@ void	Parser::_parseListenRule()
 
 	if (!_currentBlockIsServer())
 		_throwErrorParsing(_directiveNotAllowedHereMsg());
+	_expectMinimumNbOfArguments(1);
 	_getNextToken();
 	switch (_currentToken->getType())
 	{
@@ -302,6 +303,7 @@ void	Parser::_parseAllowedMethodRule()
 {
 	if (!_currentBlockIsLocation())
 		_throwErrorParsing(_directiveNotAllowedHereMsg());
+	_expectMinimumNbOfArguments(1);
 	while (!_reachedEndOfDirective())
 	{
 		_getNextToken();
@@ -338,12 +340,22 @@ bool	Parser::_currentBlockIsLocation()
 	return (_context == LOCATION);
 }
 
+void	Parser::_checkDelimiter(Lexer::listOfTokens::const_iterator token)
+{
+	if (token == _lexer.getTokens().end())
+		_throwErrorParsing(_unexpectedValueMsg(token), _lexer.getLineCountStr());
+	if (_tokenIsDelimiter(token->getType()))
+		_throwErrorParsing(_unexpectedValueMsg(token), token->getLineStr());
+}
+
 void	Parser::_expectNbOfArguments(int expectedNb)
 {
 	int									count;
 	Lexer::listOfTokens::const_iterator	ite;
 
 	count = 0;
+	if (_currentToken + 1 == _lexer.getTokens().end())
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken + 1), _lexer.getLineCountStr());
 	for (ite = _currentToken + 1; ite->getType() != SEMICOLON && ite != _lexer.getTokens().end(); ite++)
 	{
 		if (_tokenIsDelimiter(ite->getType()))
@@ -364,6 +376,8 @@ void	Parser::_expectMinimumNbOfArguments(int expectedNb)
 	Lexer::listOfTokens::const_iterator	ite;
 
 	count = 0;
+	if (_currentToken + 1 == _lexer.getTokens().end())
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken + 1), _lexer.getLineCountStr());
 	for (ite = _currentToken + 1; ite->getType() != SEMICOLON && ite != _lexer.getTokens().end(); ite++)
 	{
 		if (_tokenIsDelimiter(ite->getType()))
@@ -371,7 +385,11 @@ void	Parser::_expectMinimumNbOfArguments(int expectedNb)
 		count++;
 	}
 	if (count < expectedNb)
-		_throwErrorParsing(_invalidNbOfArgumentsMsg());	
+	{
+		if (ite == _lexer.getTokens().end())
+			ite--;
+		_throwErrorParsing(_invalidNbOfArgumentsMsg(), ite->getLineStr());	
+	}
 }
 
 void	Parser::_expectNextToken(Token::tokenType expectedType, std::string errorMsg)
@@ -385,7 +403,9 @@ bool	Parser::_reachedEndOfDirective()
 	Lexer::listOfTokens::const_iterator	ite;
 
 	ite = _currentToken + 1;
-	return (!_reachedEndOfTokens() && ite != _lexer.getTokens().end() && ite->getType() == SEMICOLON);
+	if (_reachedEndOfTokens())
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken + 1), _lexer.getLineCountStr());
+	return (ite != _lexer.getTokens().end() && ite->getType() == SEMICOLON);
 }
 
 bool	Parser::_reachedEndOfBlock()
@@ -394,7 +414,7 @@ bool	Parser::_reachedEndOfBlock()
 
 	ite = _currentToken + 1;
 	if (_reachedEndOfTokens())
-		_throwErrorParsing(_unexpectedValueMsg(_currentToken + 1), _currentToken->getLineStr(1));
+		_throwErrorParsing(_unexpectedValueMsg(_currentToken + 1), _lexer.getLineCountStr());
 	return (ite != _lexer.getTokens().end() && ite->getType() == BLOCK_END);
 }
 
@@ -547,9 +567,6 @@ std::string		Parser::getDirective() const
 /*                                   ERROR                                    */
 /******************************************************************************/
 
-/* invalid port in "0.0.0.0:" of the "listen" directive in nginx.conf:4 */
-/* invalid port in "8000000" of the "listen" directive in nginx.conf:4 */
-/* "client_max_body_size" directive invalid value in nginx.conf:10 */
 /* unexpected end of file, expecting ';' or '}' in nginx.conf:2 */
 
 std::string Parser::_invalidErrorCodeMsg(Lexer::listOfTokens::const_iterator token)
@@ -561,7 +578,8 @@ std::string Parser::_unexpectedValueMsg(Lexer::listOfTokens::const_iterator toke
 {
 	if (token != _lexer.getTokens().end())
 		return ("unexpected '" + token->getValue() + "'");
-	return ("unexpected end of file, expecting '}'");
+	return ("unexpected end of file");
+	// return ("unexpected end of file, expecting '}'");
 }
 
 std::string Parser::_unknownMethodMsg(Lexer::listOfTokens::const_iterator token)

@@ -14,110 +14,144 @@ typedef struct s_invalidFile
 class parsingErrorTest: public ::testing::Test
 {
 	protected:
+/* file */
 		t_invalidFile	absentFile;
 		t_invalidFile	incorrectExt;
 		t_invalidFile	noPermission;
 		t_invalidFile	directory;
-	
-		t_invalidFile	nestedServer;
-		t_invalidFile	serverMaj;
-		t_invalidFile	noBlock;
-	
-		t_invalidFile	nestedLocation;
-		t_invalidFile	duplicateLocation;
-		t_invalidFile	onlyLocation;
-		t_invalidFile	locationMaj;
-		t_invalidFile	missingLocationPath;
+		std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission, &directory};
 
+/* brackets */
 		t_invalidFile	endBracket;
 		t_invalidFile	inverseBracket;
 		t_invalidFile	doubleBrackets;
 		t_invalidFile	unexpectedOpeningBracket;
 		t_invalidFile	unexpectedClosingBracket;
 		t_invalidFile	multipleClosing;
-
+		std::vector<t_invalidFile *> invalidBracket = {&endBracket, &inverseBracket, &doubleBrackets,
+		&unexpectedOpeningBracket, &unexpectedClosingBracket, &multipleClosing};
+		
+/* semicolon */
 		t_invalidFile	unexpectedSemicolon;
 		t_invalidFile	unexpectedEndSemicolon;
 		t_invalidFile	missingSemicolonRoot;
 		t_invalidFile	missingSemicolonListen;
+		std::vector<t_invalidFile *> invalidSemicolon = {&unexpectedSemicolon, &unexpectedEndSemicolon, &missingSemicolonListen, &missingSemicolonRoot};
+	
+/* server block */
+		t_invalidFile	nestedServer;
+		t_invalidFile	serverMaj;
+		t_invalidFile	noBlock;
+		std::vector<t_invalidFile *> invalidServerBlock = {&nestedServer, &serverMaj, &noBlock};
+	
+/* location block */
+		t_invalidFile	nestedLocation;
+		t_invalidFile	duplicateLocation;
+		t_invalidFile	onlyLocation;
+		t_invalidFile	locationMaj;
+		t_invalidFile	missingLocationPath;
+		std::vector<t_invalidFile *> invalidLocationBlock = {&nestedLocation, &duplicateLocation, &onlyLocation,
+		&locationMaj, &missingLocationPath};
 
-		t_invalidFile	unknownMethod;
-		t_invalidFile	unknownMethod2;
-		t_invalidFile	unknownMethod3;
-		t_invalidFile	unknownMethod4;
-		t_invalidFile	unknownMethod5;
+/* allowed_method */
+		t_invalidFile	noMethod;
+		t_invalidFile	method;
+		t_invalidFile	method2;
+		t_invalidFile	method3;
+		t_invalidFile	method4;
+		t_invalidFile	method5;
+		t_invalidFile	method6;
+		std::vector<t_invalidFile *> invalidMethod = {&noMethod, &method, &method2, &method3, &method4, &method5, &method6};
 
-		t_invalidFile	autoindexArgs;
-		t_invalidFile	autoindexNoArgs;
-		t_invalidFile	incorrectAutoindexServer;
-		t_invalidFile	incorrectAutoindexServer2;
-		t_invalidFile	incorrectAutoindexLocation;
+/* autoindex */
+		t_invalidFile	noAutoindex;
+		t_invalidFile	autoindex;
+		t_invalidFile	autoindex2;
+		t_invalidFile	autoindex3;
+		t_invalidFile	autoindex4;
+		t_invalidFile	autoindexServer;
+		t_invalidFile	autoindexServer2;
+		t_invalidFile	autoindexLocation;
+		std::vector<t_invalidFile *> invalidAutoindex = {&noAutoindex, &autoindex, &autoindex2, &autoindex3,
+		&autoindex4, &autoindexServer, &autoindexServer2, &autoindexLocation};
 
-		t_invalidFile	errorRoot;
+/* root */
 		t_invalidFile	emptyRoot;
-		t_invalidFile	incorrectRoot;
-		t_invalidFile	incorrectRoot2;
+		t_invalidFile	root;
+		t_invalidFile	root2;
+		t_invalidFile	root3;
+		std::vector<t_invalidFile *> invalidRoot = {&emptyRoot, &root, &root3};
 
-		t_invalidFile	incorrectSize;
-		t_invalidFile	incorrectSize2;
-		t_invalidFile	incorrectSize3;
-		t_invalidFile	incorrectSizeLocation;
+/* client_max_body_size */
+		t_invalidFile	maxBodySize;
+		t_invalidFile	maxBodySize2;
+		t_invalidFile	maxBodySize3;
+		t_invalidFile	maxBodySizeLocation;
 		t_invalidFile	multipleSize;
 		t_invalidFile	noSize;
+		std::vector<t_invalidFile *> invalidClientMaxBodySize = {&maxBodySize, &maxBodySize2, &maxBodySize3,
+		&maxBodySizeLocation, &multipleSize, &noSize};
 
-		t_invalidFile	invalidErrorPage;
-		t_invalidFile	invalidErrorPage2;
-		t_invalidFile	invalidErrorPage3;
-		t_invalidFile	invalidErrorPage4;
-		t_invalidFile	invalidErrorPage5;
+/* error_page */
+		t_invalidFile	errorPage;
+		t_invalidFile	errorPage2;
+		t_invalidFile	errorPage3;
+		t_invalidFile	errorPage4;
+		t_invalidFile	errorPage5;
 		t_invalidFile	noErrorPage;
+		std::vector<t_invalidFile *> invalidErrorPage = {&errorPage, &errorPage2, &errorPage3,
+		&errorPage4, &errorPage5, &noErrorPage};
 
-		t_invalidFile	cgiArgs;
-		t_invalidFile	cgiArgs2;
-		t_invalidFile	cgiArgs3;
-		t_invalidFile	cgiNoArg;
+/* cgi */
+		t_invalidFile	cgi;
+		t_invalidFile	cgi2;
+		t_invalidFile	cgi3;
+		t_invalidFile	noCgi;
+		std::vector<t_invalidFile *> invalidCgi = {&cgi, &cgi2, &cgi3, &noCgi};
 	
-		t_invalidFile	indexNoArgServer;
-		t_invalidFile	indexNoArgLocation;
+/* index */
+		t_invalidFile	noIndexServer;
+		t_invalidFile	noIndexLocation;
+		t_invalidFile	index;
+		t_invalidFile	index2;
+		std::vector<t_invalidFile *> invalidIndex = {&noIndexServer, &noIndexLocation, &index, &index2};
 
+/* listen */
 		t_invalidFile	emptyListen;
 		t_invalidFile	listenInLocation;
-		t_invalidFile	invalidListen;
-		t_invalidFile	invalidListen2;
-		t_invalidFile	invalidListen3;
-		t_invalidFile	invalidListen4;
-		t_invalidFile	invalidListen5;
-		t_invalidFile	invalidListen6;
+		t_invalidFile	listen;
+		t_invalidFile	listen2;
+		t_invalidFile	listen3;
+		t_invalidFile	listen4;
+		t_invalidFile	listen5;
+		t_invalidFile	listen6;
+		t_invalidFile	listen7;
+		std::vector<t_invalidFile *> invalidListen = {&emptyListen, &listenInLocation, &listen, &listen2, &listen3,
+		&listen4, &listen5, &listen6, &listen7};
 
+/* redirect */
 		t_invalidFile	emptyRedirect;
-		t_invalidFile	invalidRedirect;
-		t_invalidFile	invalidRedirect2;
-		t_invalidFile	invalidRedirect3;
-		t_invalidFile	invalidRedirect4;
+		t_invalidFile	redirect;
+		t_invalidFile	redirect2;
+		t_invalidFile	redirect3;
+		t_invalidFile	redirect4;
+		std::vector<t_invalidFile *> invalidRedirect = {&emptyRedirect, &redirect, &redirect2, &redirect3, &redirect4};
 
+/* server_name */
 		t_invalidFile	emptyServerName;
+		t_invalidFile	serverName;
+		t_invalidFile	serverName2;
+		t_invalidFile	serverName3;
 		t_invalidFile	serverNameInLocation;
+		std::vector<t_invalidFile *> invalidServerName = {&emptyServerName, &serverName, &serverName2,
+		&serverName3, &serverNameInLocation};
 
+/* upload_path */
 		t_invalidFile	emptyUploadPath;
-		t_invalidFile	invalidUploadPath;
-		t_invalidFile	invalidUploadPath2;
+		t_invalidFile	uploadPath;
+		t_invalidFile	uploadPath2;
+		std::vector<t_invalidFile *> invalidUploadPath = {&emptyUploadPath, &uploadPath, &uploadPath2};
 
-		std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission, &directory,
-		&nestedServer, &serverMaj, &noBlock,
-		&nestedLocation, &duplicateLocation, &onlyLocation, &locationMaj, &missingLocationPath,
-		&endBracket, &inverseBracket, &doubleBrackets, &unexpectedOpeningBracket, &unexpectedClosingBracket, &multipleClosing,
-		&unexpectedSemicolon, &unexpectedEndSemicolon, &missingSemicolonListen, &missingSemicolonRoot,
-		&unknownMethod, &unknownMethod2, &unknownMethod3, &unknownMethod4, &unknownMethod5,
-		&autoindexArgs, &autoindexNoArgs, &incorrectAutoindexServer, &incorrectAutoindexServer2, &incorrectAutoindexLocation,
-		&errorRoot, &emptyRoot, &incorrectRoot, //&incorrectRoot2,
-		&incorrectSize, &incorrectSize2, &incorrectSize3, &incorrectSizeLocation, &multipleSize, &noSize,
-		&invalidErrorPage, &invalidErrorPage2, &invalidErrorPage3, &invalidErrorPage4, &invalidErrorPage5, &noErrorPage,
-		&cgiArgs, &cgiArgs2, &cgiArgs3, &cgiNoArg,
-		&indexNoArgServer, &indexNoArgLocation,
-		&emptyListen, &listenInLocation, &invalidListen, &invalidListen2, &invalidListen3, &invalidListen4, &invalidListen5, &invalidListen6,
-		&emptyRedirect, &invalidRedirect, &invalidRedirect2, &invalidRedirect3, &invalidRedirect4,
-		&emptyServerName, &serverNameInLocation,
-		&emptyUploadPath, &invalidUploadPath, &invalidUploadPath2};
 
 	void	SetUp() override
 	{
@@ -136,7 +170,7 @@ class parsingErrorTest: public ::testing::Test
 
 /* brackets */
 		endBracket.filename = "testFiles/invalid/brackets/endBracket.conf";
-		endBracket.msg = "Webserv error: unexpected end of file, expecting '}' in " + endBracket.filename + ":9";
+		endBracket.msg = "Webserv error: unexpected end of file in " + endBracket.filename + ":8";
 
 		inverseBracket.filename = "testFiles/invalid/brackets/inverseBracket.conf";
 		inverseBracket.msg = "Webserv error: unexpected '}' in " + inverseBracket.filename + ":1";
@@ -166,7 +200,7 @@ class parsingErrorTest: public ::testing::Test
 		missingSemicolonListen.filename = "testFiles/invalid/semicolon/missingSemicolonListen.conf";
 		missingSemicolonListen.msg = "Webserv error: invalid parameter 'server_name' in " + missingSemicolonListen.filename + ":4";
 
-/* server */
+/* server block */
 		nestedServer.filename = "testFiles/invalid/server/nestedServer.conf";
 		nestedServer.msg = "Webserv error: nested server in " + nestedServer.filename + ":8";
 
@@ -176,7 +210,7 @@ class parsingErrorTest: public ::testing::Test
 		serverMaj.filename = "testFiles/invalid/server/serverMaj.conf";
 		serverMaj.msg = "Webserv error: unknown directive 'Server' in " + serverMaj.filename + ":1";
 
-/* location */
+/* location block */
 		onlyLocation.filename = "testFiles/invalid/location/onlyLocation.conf";
 		onlyLocation.msg = "Webserv error: 'location' directive is not allowed here in " + onlyLocation.filename + ":1";
 
@@ -193,62 +227,77 @@ class parsingErrorTest: public ::testing::Test
 		missingLocationPath.msg = "Webserv error: invalid number of arguments in 'location' directive in " + missingLocationPath.filename + ":9";
 
 /* allowed_method */
-		unknownMethod.filename = "testFiles/invalid/allowed_method/unknownMethod.conf";
-		unknownMethod.msg = "Webserv error: unknown method 'GOT' in 'allowed_method' directive in " + unknownMethod.filename + ":12";
+		noMethod.filename = "testFiles/invalid/allowed_method/noMethod.conf";
+		noMethod.msg = "Webserv error: invalid number of arguments in 'allowed_method' directive in " + noMethod.filename + ":12";
+
+		method.filename = "testFiles/invalid/allowed_method/method.conf";
+		method.msg = "Webserv error: unknown method 'GOT' in 'allowed_method' directive in " + method.filename + ":12";
 		
-		unknownMethod2.filename = "testFiles/invalid/allowed_method/unknownMethod2.conf";
-		unknownMethod2.msg = "Webserv error: unknown method 'GE' in 'allowed_method' directive in " + unknownMethod2.filename + ":12";
+		method2.filename = "testFiles/invalid/allowed_method/method2.conf";
+		method2.msg = "Webserv error: unknown method 'GE' in 'allowed_method' directive in " + method2.filename + ":12";
 
-		unknownMethod3.filename = "testFiles/invalid/allowed_method/unknownMethod3.conf";
-		unknownMethod3.msg = "Webserv error: unknown method 'GETT' in 'allowed_method' directive in " + unknownMethod3.filename + ":12";
+		method3.filename = "testFiles/invalid/allowed_method/method3.conf";
+		method3.msg = "Webserv error: unknown method 'GETT' in 'allowed_method' directive in " + method3.filename + ":12";
 
-		unknownMethod4.filename = "testFiles/invalid/allowed_method/unknownMethod4.conf";
-		unknownMethod4.msg = "Webserv error: unknown method 'HEAD' in 'allowed_method' directive in " + unknownMethod4.filename + ":12";
+		method4.filename = "testFiles/invalid/allowed_method/method4.conf";
+		method4.msg = "Webserv error: unknown method 'HEAD' in 'allowed_method' directive in " + method4.filename + ":12";
 
-		unknownMethod5.filename = "testFiles/invalid/allowed_method/unknownMethod5.conf";
-		unknownMethod5.msg = "Webserv error: unknown method 'index' in 'allowed_method' directive in " + unknownMethod5.filename + ":12";
+		method5.filename = "testFiles/invalid/allowed_method/method5.conf";
+		method5.msg = "Webserv error: unknown method 'index' in 'allowed_method' directive in " + method5.filename + ":12";
+
+		method6.filename = "testFiles/invalid/allowed_method/method6.conf";
+		method6.msg = "Webserv error: unexpected '}' in " + method6.filename + ":11";
 
 /* root */
-		errorRoot.filename = "testFiles/invalid/root/rootArgs.conf";
-		errorRoot.msg = "Webserv error: invalid number of arguments in 'root' directive in " + errorRoot.filename + ":3";
-
 		emptyRoot.filename = "testFiles/invalid/root/emptyRoot.conf";
 		emptyRoot.msg = "Webserv error: invalid number of arguments in 'root' directive in " + emptyRoot.filename + ":3";
 
-		incorrectRoot.filename = "testFiles/invalid/root/incorrectRoot.conf";
-		incorrectRoot.msg = "Webserv error: unknown directive 'rooot' in " + incorrectRoot.filename + ":5";
+		root.filename = "testFiles/invalid/root/root.conf";
+		root.msg = "Webserv error: unknown directive 'rooot' in " + root.filename + ":5";
 
-		incorrectRoot2.filename = "testFiles/invalid/root/incorrectRoot2.conf";
-		incorrectRoot2.msg = "Webserv error: invalid value 'not_a_path' in 'root' directive in " + incorrectRoot2.filename + ":5";
+		root2.filename = "testFiles/invalid/root/root2.conf";
+		root2.msg = "Webserv error: invalid value 'not_a_path' in 'root' directive in " + root2.filename + ":5";
+
+		root3.filename = "testFiles/invalid/root/root3.conf";
+		root3.msg = "Webserv error: invalid number of arguments in 'root' directive in " + root3.filename + ":3";
 
 /* autoindex */
-		autoindexArgs.filename = "testFiles/invalid/autoindex/args.conf";
-		autoindexArgs.msg = "Webserv error: invalid number of arguments in 'autoindex' directive in " + autoindexArgs.filename + ":8";
+		noAutoindex.filename = "testFiles/invalid/autoindex/noAutoindex.conf";
+		noAutoindex.msg = "Webserv error: invalid number of arguments in 'autoindex' directive in " + noAutoindex.filename + ":8";
 
-		autoindexNoArgs.filename = "testFiles/invalid/autoindex/noArgs.conf";
-		autoindexNoArgs.msg = "Webserv error: invalid number of arguments in 'autoindex' directive in " + autoindexNoArgs.filename + ":8";
+		autoindex.filename = "testFiles/invalid/autoindex/autoindex.conf";
+		autoindex.msg = "Webserv error: unexpected '}' in " + autoindex.filename + ":10";
 
-		incorrectAutoindexServer.filename = "testFiles/invalid/autoindex/incorrectInServer.conf";
-		incorrectAutoindexServer.msg = "Webserv error: invalid value 'offf' in 'autoindex' directive in " + incorrectAutoindexServer.filename + ":16";
+		autoindex2.filename = "testFiles/invalid/autoindex/autoindex2.conf";
+		autoindex2.msg = "Webserv error: unexpected end of file in " + autoindex2.filename + ":12";
 
-		incorrectAutoindexServer2.filename = "testFiles/invalid/autoindex/incorrectInServer2.conf";
-		incorrectAutoindexServer2.msg = "Webserv error: invalid value '15667' in 'autoindex' directive in " + incorrectAutoindexServer2.filename + ":16";
+		autoindex3.filename = "testFiles/invalid/autoindex/autoindex3.conf";
+		autoindex3.msg = "Webserv error: unexpected end of file in " + autoindex3.filename + ":12";
 
-		incorrectAutoindexLocation.filename = "testFiles/invalid/autoindex/incorrectInLocation.conf";
-		incorrectAutoindexLocation.msg = "Webserv error: invalid value 'offf' in 'autoindex' directive in " + incorrectAutoindexLocation.filename + ":12";
+		autoindex4.filename = "testFiles/invalid/autoindex/autoindex4.conf";
+		autoindex4.msg = "Webserv error: invalid number of arguments in 'autoindex' directive in " + autoindex4.filename + ":8";
+
+		autoindexServer.filename = "testFiles/invalid/autoindex/autoindexServer.conf";
+		autoindexServer.msg = "Webserv error: invalid value 'offf' in 'autoindex' directive in " + autoindexServer.filename + ":16";
+
+		autoindexServer2.filename = "testFiles/invalid/autoindex/autoindexServer2.conf";
+		autoindexServer2.msg = "Webserv error: invalid value '15667' in 'autoindex' directive in " + autoindexServer2.filename + ":16";
+
+		autoindexLocation.filename = "testFiles/invalid/autoindex/autoindexLocation.conf";
+		autoindexLocation.msg = "Webserv error: invalid value 'offf' in 'autoindex' directive in " + autoindexLocation.filename + ":12";
 
 /* client_max_body_size */
-		incorrectSize.filename = "testFiles/invalid/client_max_body_size/incorrectSize.conf";
-		incorrectSize.msg = "Webserv error: invalid value '-600' in 'client_max_body_size' directive in " + incorrectSize.filename + ":9";
+		maxBodySize.filename = "testFiles/invalid/client_max_body_size/maxBodySize.conf";
+		maxBodySize.msg = "Webserv error: invalid value '-600' in 'client_max_body_size' directive in " + maxBodySize.filename + ":9";
 
-		incorrectSize2.filename = "testFiles/invalid/client_max_body_size/incorrectSize2.conf";
-		incorrectSize2.msg = "Webserv error: invalid value 'index' in 'client_max_body_size' directive in " + incorrectSize2.filename + ":9";
+		maxBodySize2.filename = "testFiles/invalid/client_max_body_size/maxBodySize2.conf";
+		maxBodySize2.msg = "Webserv error: invalid value 'index' in 'client_max_body_size' directive in " + maxBodySize2.filename + ":9";
 
-		incorrectSize3.filename = "testFiles/invalid/client_max_body_size/incorrectSize3.conf";
-		incorrectSize3.msg = "Webserv error: invalid value '145dB' in 'client_max_body_size' directive in " + incorrectSize3.filename + ":9";
+		maxBodySize3.filename = "testFiles/invalid/client_max_body_size/maxBodySize3.conf";
+		maxBodySize3.msg = "Webserv error: invalid value '145dB' in 'client_max_body_size' directive in " + maxBodySize3.filename + ":9";
 
-		incorrectSizeLocation.filename = "testFiles/invalid/client_max_body_size/incorrectSizeLocation.conf";
-		incorrectSizeLocation.msg = "Webserv error: invalid value '00001a' in 'client_max_body_size' directive in " + incorrectSizeLocation.filename + ":10";
+		maxBodySizeLocation.filename = "testFiles/invalid/client_max_body_size/maxBodySizeLocation.conf";
+		maxBodySizeLocation.msg = "Webserv error: invalid value '00001a' in 'client_max_body_size' directive in " + maxBodySizeLocation.filename + ":10";
 
 		multipleSize.filename = "testFiles/invalid/client_max_body_size/multipleSize.conf";
 		multipleSize.msg = "Webserv error: invalid number of arguments in 'client_max_body_size' directive in " + multipleSize.filename + ":9";
@@ -257,43 +306,49 @@ class parsingErrorTest: public ::testing::Test
 		noSize.msg = "Webserv error: invalid number of arguments in 'client_max_body_size' directive in " + noSize.filename + ":10";
 
 /* error_page */
-		invalidErrorPage.filename = "testFiles/invalid/error_page/invalidErrorPage.conf";
-		invalidErrorPage.msg = "Webserv error: invalid value 'index' in 'error_page' directive in " + invalidErrorPage.filename + ":6";
+		errorPage.filename = "testFiles/invalid/error_page/errorPage.conf";
+		errorPage.msg = "Webserv error: invalid value 'index' in 'error_page' directive in " + errorPage.filename + ":6";
 
-		invalidErrorPage2.filename = "testFiles/invalid/error_page/invalidErrorPage2.conf";
-		invalidErrorPage2.msg = "Webserv error: invalid value '-404' in 'error_page' directive in " + invalidErrorPage2.filename + ":8";
+		errorPage2.filename = "testFiles/invalid/error_page/errorPage2.conf";
+		errorPage2.msg = "Webserv error: invalid value '-404' in 'error_page' directive in " + errorPage2.filename + ":8";
 
-		invalidErrorPage3.filename = "testFiles/invalid/error_page/invalidErrorPage3.conf";
-		invalidErrorPage3.msg = "Webserv error: invalid number of arguments in 'error_page' directive in " + invalidErrorPage3.filename + ":18";
+		errorPage3.filename = "testFiles/invalid/error_page/errorPage3.conf";
+		errorPage3.msg = "Webserv error: invalid number of arguments in 'error_page' directive in " + errorPage3.filename + ":18";
 
-		invalidErrorPage4.filename = "testFiles/invalid/error_page/invalidErrorPage4.conf";
-		invalidErrorPage4.msg = "Webserv error: invalid value '404' in 'error_page' directive in " + invalidErrorPage4.filename + ":13";
+		errorPage4.filename = "testFiles/invalid/error_page/errorPage4.conf";
+		errorPage4.msg = "Webserv error: invalid value '404' in 'error_page' directive in " + errorPage4.filename + ":13";
 
-		invalidErrorPage5.filename = "testFiles/invalid/error_page/invalidErrorPage5.conf";
-		invalidErrorPage5.msg = "Webserv error: value '12' must be between 300 and 527 in " + invalidErrorPage5.filename + ":13";
+		errorPage5.filename = "testFiles/invalid/error_page/errorPage5.conf";
+		errorPage5.msg = "Webserv error: value '12' must be between 300 and 527 in " + errorPage5.filename + ":13";
 
 		noErrorPage.filename = "testFiles/invalid/error_page/noErrorPage.conf";
 		noErrorPage.msg = "Webserv error: invalid number of arguments in 'error_page' directive in " + noErrorPage.filename + ":13";
 
 /* cgi */
-		cgiArgs.filename = "testFiles/invalid/cgi/cgiArgs.conf";
-		cgiArgs.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + cgiArgs.filename + ":14";
+		cgi.filename = "testFiles/invalid/cgi/cgi.conf";
+		cgi.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + cgi.filename + ":14";
 
-		cgiArgs2.filename = "testFiles/invalid/cgi/cgiArgs2.conf";
-		cgiArgs2.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + cgiArgs2.filename + ":13";
+		cgi2.filename = "testFiles/invalid/cgi/cgi2.conf";
+		cgi2.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + cgi2.filename + ":13";
 
-		cgiArgs3.filename = "testFiles/invalid/cgi/cgiArgs3.conf";
-		cgiArgs3.msg = "Webserv error: unexpected '}' in " + cgiArgs3.filename + ":14";
+		cgi3.filename = "testFiles/invalid/cgi/cgi3.conf";
+		cgi3.msg = "Webserv error: unexpected '}' in " + cgi3.filename + ":14";
 
-		cgiNoArg.filename = "testFiles/invalid/cgi/cgiNoArg.conf";
-		cgiNoArg.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + cgiNoArg.filename + ":10";
+		noCgi.filename = "testFiles/invalid/cgi/noCgi.conf";
+		noCgi.msg = "Webserv error: invalid number of arguments in 'cgi' directive in " + noCgi.filename + ":10";
 
 /* index */
-		indexNoArgServer.filename = "testFiles/invalid/index/indexNoArgServer.conf";
-		indexNoArgServer.msg = "Webserv error: invalid number of arguments in 'index' directive in " + indexNoArgServer.filename + ":5";
+		noIndexServer.filename = "testFiles/invalid/index/noIndexServer.conf";
+		noIndexServer.msg = "Webserv error: invalid number of arguments in 'index' directive in " + noIndexServer.filename + ":5";
 
-		indexNoArgLocation.filename = "testFiles/invalid/index/indexNoArgLocation.conf";
-		indexNoArgLocation.msg = "Webserv error: invalid number of arguments in 'index' directive in " + indexNoArgLocation.filename + ":10";
+		noIndexLocation.filename = "testFiles/invalid/index/noIndexLocation.conf";
+		noIndexLocation.msg = "Webserv error: invalid number of arguments in 'index' directive in " + noIndexLocation.filename + ":10";
+
+		index.filename = "testFiles/invalid/index/index.conf";
+		index.msg = "Webserv error: unexpected end of file in " + index.filename + ":6";
+
+		index2.filename = "testFiles/invalid/index/index2.conf";
+		index2.msg = "Webserv error: unexpected end of file in " + index2.filename + ":6";
 
 /* listen */
 		emptyListen.filename = "testFiles/invalid/listen/emptyListen.conf";
@@ -302,43 +357,55 @@ class parsingErrorTest: public ::testing::Test
 		listenInLocation.filename = "testFiles/invalid/listen/listenInLocation.conf";
 		listenInLocation.msg = "Webserv error: 'listen' directive is not allowed here in " + listenInLocation.filename + ":7";
 
-		invalidListen.filename = "testFiles/invalid/listen/invalidListen.conf";
-		invalidListen.msg = "Webserv error: invalid port of the 'listen' directive in " + invalidListen.filename + ":3";
+		listen.filename = "testFiles/invalid/listen/listen.conf";
+		listen.msg = "Webserv error: invalid port of the 'listen' directive in " + listen.filename + ":3";
 
-		invalidListen2.filename = "testFiles/invalid/listen/invalidListen2.conf";
-		invalidListen2.msg = "Webserv error: invalid parameter '8000' in " + invalidListen2.filename + ":3";
+		listen2.filename = "testFiles/invalid/listen/listen2.conf";
+		listen2.msg = "Webserv error: invalid parameter '8000' in " + listen2.filename + ":3";
 
-		invalidListen3.filename = "testFiles/invalid/listen/invalidListen3.conf";
-		invalidListen3.msg = "Webserv error: invalid parameter ':' in " + invalidListen3.filename + ":3";
+		listen3.filename = "testFiles/invalid/listen/listen3.conf";
+		listen3.msg = "Webserv error: invalid parameter ':' in " + listen3.filename + ":3";
 
-		invalidListen4.filename = "testFiles/invalid/listen/invalidListen4.conf";
-		invalidListen4.msg = "Webserv error: invalid port of the 'listen' directive in " + invalidListen4.filename + ":3";
+		listen4.filename = "testFiles/invalid/listen/listen4.conf";
+		listen4.msg = "Webserv error: invalid port of the 'listen' directive in " + listen4.filename + ":3";
 
-		invalidListen5.filename = "testFiles/invalid/listen/invalidListen5.conf";
-		invalidListen5.msg = "Webserv error: invalid parameter ':' in " + invalidListen5.filename + ":3";
+		listen5.filename = "testFiles/invalid/listen/listen5.conf";
+		listen5.msg = "Webserv error: invalid parameter ':' in " + listen5.filename + ":3";
 
-		invalidListen6.filename = "testFiles/invalid/listen/invalidListen6.conf";
-		invalidListen6.msg = "Webserv error: invalid port of the 'listen' directive in " + invalidListen6.filename + ":3";
+		listen6.filename = "testFiles/invalid/listen/listen6.conf";
+		listen6.msg = "Webserv error: invalid port of the 'listen' directive in " + listen6.filename + ":3";
+
+		listen7.filename = "testFiles/invalid/listen/listen7.conf";
+		listen7.msg = "Webserv error: unexpected '}' in " + listen7.filename + ":4";
 
 /* redirect */
 		emptyRedirect.filename = "testFiles/invalid/redirect/emptyRedirect.conf";
 		emptyRedirect.msg = "Webserv error: invalid number of arguments in 'redirect' directive in " + emptyRedirect.filename + ":16";
 
-		invalidRedirect.filename = "testFiles/invalid/redirect/invalidRedirect.conf";
-		invalidRedirect.msg = "Webserv error: invalid value '-301' in 'redirect' directive in " + invalidRedirect.filename + ":10";
+		redirect.filename = "testFiles/invalid/redirect/redirect.conf";
+		redirect.msg = "Webserv error: invalid value '-301' in 'redirect' directive in " + redirect.filename + ":10";
 
-		invalidRedirect2.filename = "testFiles/invalid/redirect/invalidRedirect2.conf";
-		invalidRedirect2.msg = "Webserv error: invalid value '/www/redirection.html' in 'redirect' directive in " + invalidRedirect2.filename + ":16";
+		redirect2.filename = "testFiles/invalid/redirect/redirect2.conf";
+		redirect2.msg = "Webserv error: invalid value '/www/redirection.html' in 'redirect' directive in " + redirect2.filename + ":16";
 
-		invalidRedirect3.filename = "testFiles/invalid/redirect/invalidRedirect3.conf";
-		invalidRedirect3.msg = "Webserv error: invalid number of arguments in 'redirect' directive in " + invalidRedirect3.filename + ":16";
+		redirect3.filename = "testFiles/invalid/redirect/redirect3.conf";
+		redirect3.msg = "Webserv error: invalid number of arguments in 'redirect' directive in " + redirect3.filename + ":16";
 
-		invalidRedirect4.filename = "testFiles/invalid/redirect/invalidRedirect4.conf";
-		invalidRedirect4.msg = "Webserv error: 'redirect' directive is not allowed here in " + invalidRedirect4.filename + ":7";
+		redirect4.filename = "testFiles/invalid/redirect/redirect4.conf";
+		redirect4.msg = "Webserv error: 'redirect' directive is not allowed here in " + redirect4.filename + ":7";
 
 /* server_name */
 		emptyServerName.filename = "testFiles/invalid/server_name/emptyServerName.conf";
 		emptyServerName.msg = "Webserv error: invalid number of arguments in 'server_name' directive in " + emptyServerName.filename + ":6";
+
+		serverName.filename = "testFiles/invalid/server_name/serverName.conf";
+		serverName.msg = "Webserv error: unexpected '}' in " + serverName.filename + ":1";
+
+		serverName2.filename = "testFiles/invalid/server_name/serverName2.conf";
+		serverName2.msg = "Webserv error: unexpected end of file in " + serverName2.filename + ":3";
+
+		serverName3.filename = "testFiles/invalid/server_name/serverName3.conf";
+		serverName3.msg = "Webserv error: unexpected end of file in " + serverName3.filename + ":3";
 
 		serverNameInLocation.filename = "testFiles/invalid/server_name/serverNameInLocation.conf";
 		serverNameInLocation.msg = "Webserv error: 'server_name' directive is not allowed here in " + serverNameInLocation.filename + ":14";
@@ -347,11 +414,11 @@ class parsingErrorTest: public ::testing::Test
 		emptyUploadPath.filename = "testFiles/invalid/upload_path/emptyUploadPath.conf";
 		emptyUploadPath.msg = "Webserv error: invalid number of arguments in 'upload_path' directive in " + emptyUploadPath.filename + ":14";
 
-		invalidUploadPath.filename = "testFiles/invalid/upload_path/invalidUploadPath.conf";
-		invalidUploadPath.msg = "Webserv error: invalid number of arguments in 'upload_path' directive in " + invalidUploadPath.filename + ":14";
+		uploadPath.filename = "testFiles/invalid/upload_path/uploadPath.conf";
+		uploadPath.msg = "Webserv error: invalid number of arguments in 'upload_path' directive in " + uploadPath.filename + ":14";
 
-		invalidUploadPath2.filename = "testFiles/invalid/upload_path/invalidUploadPath2.conf";
-		invalidUploadPath2.msg = "Webserv error: 'upload_path' directive is not allowed here in " + invalidUploadPath2.filename + ":17";
+		uploadPath2.filename = "testFiles/invalid/upload_path/uploadPath2.conf";
+		uploadPath2.msg = "Webserv error: 'upload_path' directive is not allowed here in " + uploadPath2.filename + ":17";
 	}
 	
 };

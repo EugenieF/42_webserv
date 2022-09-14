@@ -14,11 +14,84 @@ TEST_F(parsingSimpleTest, simpleConfig)
 	checkLocation(webservSimple, expectedLocation1);
 }
 
+/* ERROR TEST */
+
 TEST_F(parsingErrorTest, errorFile)
 {
-	std::vector<t_invalidFile *>::const_iterator	ite;
+	checkErrorCase(invalidFile);
+}
 
-	for (ite = invalidFile.begin(); ite != invalidFile.end(); ite++)
-		checkErrorException(**ite);
+TEST_F(parsingErrorTest, errorBracket)
+{
+	checkErrorCase(invalidBracket);
+}
 
+TEST_F(parsingErrorTest, errorSemicolon)
+{
+	checkErrorCase(invalidSemicolon);
+}
+
+TEST_F(parsingErrorTest, errorServerBlock)
+{
+	checkErrorCase(invalidServerBlock);
+}
+
+TEST_F(parsingErrorTest, errorLocationBlock)
+{
+	checkErrorCase(invalidLocationBlock);
+}
+
+TEST_F(parsingErrorTest, errorMethod)
+{
+	checkErrorCase(invalidMethod);
+}
+
+TEST_F(parsingErrorTest, errorAutoindex)
+{
+	checkErrorCase(invalidAutoindex);
+}
+
+TEST_F(parsingErrorTest, errorRoot)
+{
+	checkErrorCase(invalidRoot);
+}
+
+TEST_F(parsingErrorTest, errorCgi)
+{
+	checkErrorCase(invalidCgi);
+}
+
+TEST_F(parsingErrorTest, errorErrorPage)
+{
+	checkErrorCase(invalidErrorPage);
+}
+
+TEST_F(parsingErrorTest, errorIndex)
+{
+	checkErrorCase(invalidIndex);
+}
+
+TEST_F(parsingErrorTest, errorRedirect)
+{
+	checkErrorCase(invalidRedirect);
+}
+
+TEST_F(parsingErrorTest, errorListen)
+{
+	checkErrorCase(invalidListen);
+}
+
+TEST_F(parsingErrorTest, errorUploadPath)
+{
+	checkErrorCase(invalidUploadPath);
+}
+
+TEST_F(parsingErrorTest, errorServerName)
+{
+	checkErrorCase(invalidServerName);
+}
+
+TEST_F(parsingErrorTest, errorClientMaxBodySize)
+{
+	checkErrorCase(invalidClientMaxBodySize);
 }
