@@ -1,4 +1,6 @@
 #include "Webserv.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
 
 bool	createSocket(int *socketFd, struct sockaddr_in socketAddress)
 {
@@ -50,15 +52,18 @@ bool	receiveMessage(int connectionFd)
 		perror("recv failed");            
 		return (FAILURE);        
 	}
-	std::cout << buffer << std::endl;
+	Request	request(buffer);
+	request.parseRequest();
 	return (SUCCESS);
 }
 
 bool	sendMessage(int connectionFd)
 {
-	char response[] = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello world !";
+	Response	response;
 
-	send(connectionFd, response, strlen(response), 0);
+	const char *responseMsg = response.getResponse();
+
+	send(connectionFd, responseMsg, strlen(responseMsg), 0);
 	std::cout << "------------------Hello message sent-------------------" << std::endl;
 	return (SUCCESS);
 }
@@ -116,7 +121,7 @@ int main(int argc, char **argv)
 		std::string configFile(argv[1]);
 		Webserv	webserv(configFile);
 		// webserv.displayServers();
-		// runServer();
+		runServer();
 	}
 	catch(const std::exception& e)
 	{

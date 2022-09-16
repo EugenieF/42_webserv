@@ -7,7 +7,9 @@ SRCS			= main.cpp \
 				Lexer.cpp \
 				Parser.cpp \
 				Block.cpp \
-				Webserv.cpp
+				Webserv.cpp \
+				Request.cpp \
+				Response.cpp
 
 OBJS_DIR		= ./objs
 

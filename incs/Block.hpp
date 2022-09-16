@@ -19,10 +19,11 @@
 
 typedef enum e_method
 {
-	GET	= 0,
-	POST,
-	DELETE,
-	ALLOWED_METHODS_COUNT,
+	GET			= 0,
+	POST		= 1,
+	DELETE		= 2,
+	ALLOWED_METHODS_COUNT = 3,
+	NO_METHOD	= 4,
 }	t_method;
 
 typedef enum e_context
