@@ -4,25 +4,35 @@
 #include <sys/time.h>
 
 #include "Block.hpp"
+#include "Response.hpp"
 
 class   Request
 {
+	public:
+	/***********************      MEMBER TYPES      *********************/
+		typedef void (Request::*parsingFunction)(std::string&);
+		typedef std::vector<parsingFunction>		listOfParsingFunctions;
+
     private:
 	/**********************     MEMBER VARIABLES     ********************/
-		std::string		_request;
-		t_method		_method;
-		std::string		_uri;
-		std::string		_httpProtocol;
-		std::string		_body;
-		size_t			_bodySize;
-		struct timeval	_time;
+		listOfParsingFunctions		_parsingFunct;
+		Block*						_server;
+		std::string					_request;
+		t_method					_method;
+		std::string					_uri;
+		std::string					_httpProtocol;
+		// std::string					_body;
+		// size_t						_bodySize;
+		// struct timeval				_time;
+		t_statusCode				_statusCode;
+		bool						_requestIsValid;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
         Request();
-        Request(const std::string& buffer);
+        Request(Block* server, const std::string& buffer);
         Request(const Request& other);
         ~Request();
         Request&    	operator=(const Request& other);
@@ -31,11 +41,13 @@ class   Request
 		bool			parseRequest();
 		void			completeRequest(const std::string& buffer);
 
-		void			parseMethod(std::string &requestLine);
-		void			parseUri(std::string &requestLine);
-		void			parseHttpProtocol(std::string &requestLine);
-		void			parseHeaders();
+	private:
+		void			_parseMethod(std::string &requestLine);
+		void			_parseUri(std::string &requestLine);
+		void			_parseHttpProtocol(std::string &requestLine);
+		void			_parseHeaders();
 
+	public:
 						/*------   Getter  ------*/
 		std::string		getRequest() const;
 		t_method		getMethod() const;
@@ -43,7 +55,11 @@ class   Request
 		std::string		getHttpProtocol() const;
 
 	private:
-		void			_requestIsInvalid();
+	/**********************  PRIVATE MEMBER FUNCTIONS  ******************/
+
+						/*------   Utils  ------*/
+		void			_initParsingFunct();
+		void			_requestIsInvalid(t_statusCode code);
 		std::string		_getNextWord(std::string& line);
 
 };

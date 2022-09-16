@@ -40,7 +40,7 @@ bool	createSocket(int *socketFd, struct sockaddr_in socketAddress)
 	return (SUCCESS);
 }
 
-bool	receiveMessage(int connectionFd)
+bool	receiveMessage(Webserv &webserv, int connectionFd)
 {
 	char buffer[30000];
 	int retRecv;
@@ -52,7 +52,7 @@ bool	receiveMessage(int connectionFd)
 		perror("recv failed");            
 		return (FAILURE);        
 	}
-	Request	request(buffer);
+	Request	request(webserv.getServers()[0], buffer);
 	request.parseRequest();
 	return (SUCCESS);
 }
@@ -68,7 +68,7 @@ bool	sendMessage(int connectionFd)
 	return (SUCCESS);
 }
 
-bool	waitForConnection(int socketFd, struct sockaddr_in socketAddress)
+bool	waitForConnection(Webserv &webserv, int socketFd, struct sockaddr_in socketAddress)
 {
 	int connectionFd;
 	int addressLength;
@@ -85,14 +85,14 @@ bool	waitForConnection(int socketFd, struct sockaddr_in socketAddress)
 			perror("In accept");            
 			return (FAILURE);        
 		}
-		receiveMessage(connectionFd);
+		receiveMessage(webserv, connectionFd);
 		sendMessage(connectionFd);
 		close(connectionFd);
 	}
 	return (SUCCESS);
 }
 
-bool	runServer(void)
+bool	runServer(Webserv &webserv)
 {
 	int socketFd;
 	struct sockaddr_in socketAddress;
@@ -102,7 +102,7 @@ bool	runServer(void)
 	socketAddress.sin_port = htons(PORT);
 
 	createSocket(&socketFd, socketAddress);
-	waitForConnection(socketFd, socketAddress);
+	waitForConnection(webserv, socketFd, socketAddress);
 	
 	close(socketFd);
 	return (SUCCESS);
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 	{
 		Webserv	webserv(configFile);
 		// webserv.displayServers();
-		runServer();
+		runServer(webserv);
 	}
 	catch(const std::exception& e)
 	{
