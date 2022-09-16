@@ -111,14 +111,19 @@ bool	runServer(void)
 
 int main(int argc, char **argv)
 {
+	std::string configFile("tester/testFiles/valid/default.conf");
+
 	if (argc != 2)
 	{
 		std::cerr << "usage : ./webserv [a configuration file]" << std::endl;
-		return (EXIT_FAILURE);
+		if (argc > 2)
+			return (EXIT_FAILURE);
+		std::cout << "Using default configuration file" << std::endl;
 	}
+	else
+		std::string configFile(argv[1]);
 	try
 	{
-		std::string configFile(argv[1]);
 		Webserv	webserv(configFile);
 		// webserv.displayServers();
 		runServer();

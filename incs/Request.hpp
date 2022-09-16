@@ -28,12 +28,12 @@ class   Request
         Request&    	operator=(const Request& other);
 
 						/*------   Parsing  ------*/
-		void			parseRequest();
+		bool			parseRequest();
 		void			completeRequest(const std::string& buffer);
 
-		void			parseMethod();
-		void			parseUri();
-		void			parseHttpProtocol();
+		void			parseMethod(std::string &requestLine);
+		void			parseUri(std::string &requestLine);
+		void			parseHttpProtocol(std::string &requestLine);
 		void			parseHeaders();
 
 						/*------   Getter  ------*/
@@ -43,7 +43,8 @@ class   Request
 		std::string		getHttpProtocol() const;
 
 	private:
-		void			requestIsInvalid();
+		void			_requestIsInvalid();
+		std::string		_getNextWord(std::string& line);
 
 };
 

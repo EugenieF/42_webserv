@@ -42,13 +42,23 @@ Request&	Request::operator=(const Request &other)
 /*                                  PARSING                                   */
 /******************************************************************************/
 
-void	Request::parseRequest()
+bool	Request::parseRequest()
 {
-	std::cout << "Request : " << _request << std::endl;
-	parseMethod();
-	parseUri();
-	parseHttpProtocol();
+	size_t	pos;
+
+	pos = _request.find("\r\n");
+	if (pos == std::string::npos)
+		return (false);
+	std::string requestLine(_request, 0, pos);
+	std::cout << "RequestLine : " << requestLine << std::endl;
+	parseMethod(requestLine);
+	parseUri(requestLine);
+	parseHttpProtocol(requestLine);
+
+	std::string headers(_request, pos + 2);
+	std::cout << "Headers = '" << headers << "'" << std::endl;
 	parseHeaders();
+	return (true);
 }
 	
 void	Request::completeRequest(const std::string& buffer)
@@ -56,19 +66,33 @@ void	Request::completeRequest(const std::string& buffer)
 	_request += buffer;
 }
 
-void	Request::parseMethod()
+std::string		Request::_getNextWord(std::string &line)
 {
+	size_t	pos;
 
+	pos = line.find(" ");
+	std::string word(line, 0, pos);
+	line.erase(0, pos + 1);
+	std::cout << "word = '" << word << "' | line = '" << line << "'" << std::endl;
+	return (word);
 }
 
-void	Request::parseUri()
+void	Request::parseMethod(std::string &requestLine)
 {
-	
+	std::string method = _getNextWord(requestLine);
+	std::cout << "method = " << method << std::endl;
 }
 
-void	Request::parseHttpProtocol()
+void	Request::parseUri(std::string &requestLine)
 {
-	
+	std::string uri = _getNextWord(requestLine);
+	std::cout << "uri = '" << uri << "'" << std::endl;
+}
+
+void	Request::parseHttpProtocol(std::string &requestLine)
+{
+	std::string httpProtocol = _getNextWord(requestLine);
+	std::cout << "httpProtocol = '" << httpProtocol << "'" << std::endl;
 }
 
 void	Request::parseHeaders()
