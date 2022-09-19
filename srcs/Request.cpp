@@ -1,5 +1,18 @@
 #include "Request.hpp"
 
+/* The HTTP GET request method is used to request a resource from the server.
+The GET request should only receive data (the server must not change its state).
+
+The HTTP POST method is used to create or add a resource on the server.
+The POST method asks the web server to accept the data contained in the
+body of the message. The data type in the HTTP POST body is indicated by the
+Content-Type header.
+
+- request line / status line
+- HTTP headers [Header: value]
+- HTTP body
+*/
+
 /******************************************************************************/
 /*                                   MAIN                                     */
 /******************************************************************************/
@@ -22,7 +35,8 @@ Request::Request(const Request &other):
 	_method(other.getMethod()),
 	_uri(other.getUri()),
 	_httpProtocol(other.getHttpProtocol()),
-	_requestIsValid(true)
+	_requestIsValid(other.getRequestValidity()),
+	_parsingFunct(other.getParsingFunct())
 {
 	*this = other;
 }
@@ -37,6 +51,8 @@ Request&	Request::operator=(const Request &other)
 		_method = other.getMethod();
 		_uri = other.getUri();
 		_httpProtocol = other.getHttpProtocol();
+		_requestIsValid = other.getRequestValidity();
+		_parsingFunct = other.getParsingFunct();
 	}
 	return (*this);
 }
@@ -47,26 +63,11 @@ Request&	Request::operator=(const Request &other)
 
 bool	Request::parseRequest()
 {
-	size_t	pos;
-	// Request::listOfParsingFunctions::const_iterator	ite;
+	Request::listOfParsingFunctions::const_iterator	ite;
 
-	pos = _request.find("\r\n");
-	if (pos == std::string::npos)
-		return (false);
-	std::string requestLine(_request, 0, pos);
-	std::cout << "RequestLine : " << requestLine << std::endl;
-
-	// for (ite = _parsingFunct.begin(); ite != _parsingFunct.end(); ite++)
-	// {
-	// 	*ite();
-	// }
-	_parseMethod(requestLine);
-	_parseUri(requestLine);
-	_parseHttpProtocol(requestLine);
-
-	std::string headers(_request, pos + 2);
-	std::cout << "Headers = '" << headers << "'" << std::endl;
-	_parseHeaders();
+	for (ite = _parsingFunct.begin(); _requestIsValid && ite != _parsingFunct.end(); ite++)
+		(this->**ite)();
+	printRequestInfo();
 	return (true);
 }
 	
@@ -75,37 +76,89 @@ void	Request::completeRequest(const std::string& buffer)
 	_request += buffer;
 }
 
-void	Request::_parseMethod(std::string &requestLine)
+void	Request::_parseMethod()
 {
-	std::string method = _getNextWord(requestLine);
-	std::cout << "method = " << method << std::endl;
-	if (_server->isAllowedMethod(method))
-		std::cout << "METHOD IS OK" << std::endl;
-		// _method = method;
+	std::string method;
+	
+	_getNextWord(method, " ");
+	if (!_server->isMethod(method))
+		return (_requestIsInvalid(NOT_IMPLEMENTED));
+	if (!_server->isAllowedMethod(method))
+		return (_requestIsInvalid(METHOD_NOT_ALLOWED));
+	_method = _server->getMethod(method);
 }
 
-void	Request::_parseUri(std::string &requestLine)
+void	Request::_parseUri()
 {
-	std::string uri = _getNextWord(requestLine);
-	std::cout << "uri = '" << uri << "'" << std::endl;
+	std::string uri;
+	
+	_getNextWord(uri, " ");
+	if (uri == "" || uri[0] != '/')
+		return (_requestIsInvalid(BAD_REQUEST));
+	if (uri.length() > 2048)
+		return (_requestIsInvalid(URI_TOO_LONG));
 	_uri = uri;
 }
 
-void	Request::_parseHttpProtocol(std::string &requestLine)
+void	Request::_parseHttpProtocol()
 {
-	std::string httpProtocol = _getNextWord(requestLine);
-	std::cout << "httpProtocol = '" << httpProtocol << "'" << std::endl;
+	std::string httpProtocol;
+	
+	_getNextWord(httpProtocol, "\r\n");
+	if (httpProtocol.find("HTTP") == std::string::npos)
+		return (_requestIsInvalid(BAD_REQUEST));
 	if (!(httpProtocol == "HTTP/1.0" || httpProtocol == "HTTP/1.1"))
-	{
-		std::cout << "ERROR Http protocol" << std::endl;
 		return (_requestIsInvalid(HTTP_VERSION_NOT_SUPPORTED));
-	}
 	_httpProtocol = httpProtocol;
 }
 
 void	Request::_parseHeaders()
 {
-	
+	std::string		headerName;
+	std::string		headerValue;
+	size_t			pos;
+
+	pos = 0;
+	while (pos != std::string::npos)
+	{
+		pos = _getNextWord(headerName, ":");
+		_toLowerStr(&headerName);
+		if (pos == std::string::npos)
+			break ;
+		_getNextWord(headerValue, "\r\n");
+		_trimSpaceStr(&headerValue);
+		std::cout << YELLOW << headerName << ": '" << headerValue << "'" << RESET << std::endl;
+		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
+			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
+		_headers[headerName] = headerValue;
+	}
+	_getNextWord(headerName, "\r\n");
+}
+
+void	Request::_checkHeaders()
+{
+	if (_headers.find("host") == _headers.end())
+		return (_requestIsInvalid(BAD_REQUEST));
+	// _headers.find("Host");
+	// _headers.find("Transfer-Encoding");
+	// _headers.find("Content-Length");
+	// _headers.find("Content-Type");
+}
+
+std::string	Request::_trimSpaceStr(std::string *str, const char *toTrim)
+{
+	str->erase(0, str->find_first_not_of(toTrim));
+	str->erase(str->find_last_not_of(toTrim) + 1);
+	return (*str);
+}
+
+void	Request::_parseBody()
+{
+	std::string		body;
+
+	std::cout << "request : " << _request << std::endl;
+	_getNextWord(body, "\r\n");
+	_body = body;
 }
 
 /******************************************************************************/
@@ -117,7 +170,7 @@ std::string		Request::getRequest() const
 	return (_request);
 }
 
-t_method	Request::getMethod() const
+Request::t_method	Request::getMethod() const
 {
 	return (_method);
 }
@@ -132,19 +185,51 @@ std::string		Request::getHttpProtocol() const
 	return (_httpProtocol);
 }
 
+Request::listOfParsingFunctions		Request::getParsingFunct() const
+{
+	return (_parsingFunct);
+}
+
+bool	Request::getRequestValidity() const
+{
+	return (_requestIsValid);
+}
+
+t_statusCode	Request::getStatusCode() const
+{
+	return (_statusCode);
+}
+
+std::string		Request::getStatusCodeStr() const
+{
+	std::stringstream	ss;
+
+	ss << _statusCode;
+	return (ss.str());
+}
+
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
 
-std::string		Request::_getNextWord(std::string &line)
+std::string		Request::_toLowerStr(std::string* str)
+{
+	std::string::iterator ite;
+
+	for (ite = str->begin(); ite != str->end(); ite++)
+		*ite = std::tolower(*ite);
+	return (*str);
+}
+
+size_t	Request::_getNextWord(std::string &word, std::string const& delimiter)
 {
 	size_t	pos;
 
-	pos = line.find(" ");
-	std::string word(line, 0, pos);
-	line.erase(0, pos + 1);
-	std::cout << "word = '" << word << "' | line = '" << line << "'" << std::endl;
-	return (word);
+	pos = _request.find(delimiter);
+	std::string nextWord(_request, 0, pos);
+	_request.erase(0, pos + delimiter.length());
+	word = nextWord;
+	return (pos);
 }
 
 void	Request::_requestIsInvalid(t_statusCode code)
@@ -155,8 +240,34 @@ void	Request::_requestIsInvalid(t_statusCode code)
 
 void	Request::_initParsingFunct()
 {
-	// _parsingFunct = {&Request::_parseMethod, &Request::_parseUri, &Request::_parseHttpProtocol};
-	// _parsingFunct.insert(&Request::_parseMethod);
-	// _parsingFunct[1] = &Request::_parseUri;
-	// _parsingFunct[2] = &Request::_parseHttpProtocol;
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseMethod);
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseUri);
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHttpProtocol);
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHeaders);
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_checkHeaders);
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseBody);
+}
+
+/******************************************************************************/
+/*                                  UTILS                                     */
+/******************************************************************************/
+
+void	Request::printRequestInfo()
+{
+	Request::listOfHeaders::const_iterator ite;
+
+	std::cout <<  BLUE << "------------ INFO REQUEST -------------" << std::endl;
+	std::cout << "          method : " << GREEN << _method << std::endl;
+	std::cout << BLUE << "             uri : " << GREEN << _uri << std::endl;
+	std::cout << BLUE << "    httpProtocol : " << GREEN << _httpProtocol << std::endl;
+	std::cout << BLUE << "      statusCode : " << GREEN << _statusCode << std::endl;
+	for (ite = _headers.begin(); ite != _headers.end(); ite++)
+	{
+		for (int i = ite->first.length(); i < 16 ; i++)
+			std::cout << " ";
+		std::cout << BLUE << ite->first << " : '" << GREEN << ite->second << BLUE << "'" << std::endl;
+	}
+	std::cout << BLUE << "            body : '" << GREEN << _body << BLUE << "'" << std::endl;
+	std::cout << "---------------------------------------" << std::endl;
+	std::cout << RESET << std::endl;
 }

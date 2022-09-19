@@ -2,30 +2,34 @@
 # define REQUEST_HPP
 
 #include <sys/time.h>
+# include <sstream>
 
 #include "Block.hpp"
-#include "Response.hpp"
+#include "StatusCode.hpp"
 
 class   Request
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef void (Request::*parsingFunction)(std::string&);
+		typedef Block::t_method					t_method;
+		typedef void (Request::*parsingFunction)();
 		typedef std::vector<parsingFunction>		listOfParsingFunctions;
+		typedef std::map<std::string, std::string>	listOfHeaders;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
-		listOfParsingFunctions		_parsingFunct;
 		Block*						_server;
 		std::string					_request;
 		t_method					_method;
 		std::string					_uri;
 		std::string					_httpProtocol;
-		// std::string					_body;
+		std::string					_body;
 		// size_t						_bodySize;
 		// struct timeval				_time;
 		t_statusCode				_statusCode;
 		bool						_requestIsValid;
+		listOfParsingFunctions		_parsingFunct;
+		listOfHeaders				_headers;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -35,32 +39,42 @@ class   Request
         Request(Block* server, const std::string& buffer);
         Request(const Request& other);
         ~Request();
-        Request&    	operator=(const Request& other);
+        Request&    				operator=(const Request& other);
 
 						/*------   Parsing  ------*/
-		bool			parseRequest();
-		void			completeRequest(const std::string& buffer);
+		bool						parseRequest();
+		void						completeRequest(const std::string& buffer);
 
-	private:
-		void			_parseMethod(std::string &requestLine);
-		void			_parseUri(std::string &requestLine);
-		void			_parseHttpProtocol(std::string &requestLine);
-		void			_parseHeaders();
-
-	public:
 						/*------   Getter  ------*/
-		std::string		getRequest() const;
-		t_method		getMethod() const;
-		std::string		getUri() const;
-		std::string		getHttpProtocol() const;
+		std::string					getRequest() const;
+		t_method					getMethod() const;
+		std::string					getUri() const;
+		std::string					getHttpProtocol() const;
+		t_statusCode				getStatusCode() const;
+		std::string					getStatusCodeStr() const;
+		bool						getRequestValidity() const;
+		listOfParsingFunctions		getParsingFunct() const;
+
+						/*------   Display  ------*/
+		void						printRequestInfo();
 
 	private:
 	/**********************  PRIVATE MEMBER FUNCTIONS  ******************/
 
+						/*------   Parsing  ------*/
+		void						_parseMethod();
+		void						_parseUri();
+		void						_parseHttpProtocol();
+		void						_parseHeaders();
+		void						_checkHeaders();
+		void						_parseBody();
+
 						/*------   Utils  ------*/
-		void			_initParsingFunct();
-		void			_requestIsInvalid(t_statusCode code);
-		std::string		_getNextWord(std::string& line);
+		void						_initParsingFunct();
+		void						_requestIsInvalid(t_statusCode code);
+		size_t						_getNextWord(std::string& word, std::string const& delimiter);
+		std::string					_toLowerStr(std::string* str);
+		std::string					_trimSpaceStr(std::string *str, const char *toTrim = " \t");
 
 };
 

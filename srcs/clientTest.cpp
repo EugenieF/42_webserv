@@ -14,7 +14,8 @@ int main()
     long valread;
     (void)valread;
     struct sockaddr_in serv_addr;
-    char hello[] = "GET / HTTP/1.1\r\nHello from client\n";
+    char hello[] = "POST /data HTTP/1.1\r\nHost:    www.yoursite.com  	 	\r\nContent-Length:    30		\r\nContent-TYPE: 	application/json  \r\n\r\nHello from client\r\n";
+    // char hello[] = "GET\r\nHello from client\n";
     char buffer[1024] = {0};
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)

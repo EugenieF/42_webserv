@@ -9,7 +9,14 @@ Response::Response()
 	generateResponse();
 }
 
-Response::Response(const Response &other)
+Response::Response(Request const& request):
+	_request(request)
+{
+	generateResponse();
+}
+
+Response::Response(const Response &other):
+	_request(other.getRequest())
 {
 	*this = other;
 }
@@ -20,14 +27,17 @@ Response&	Response::operator=(const Response &other)
 {
 	if (this != &other)
 	{
-
+		_request = other.getRequest();
 	}
 	return (*this);
 }
 
 void	Response::generateResponse()
 {
-	_response = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nHello world !";
+	_response = _request.getHttpProtocol() + " "
+		+ _request.getStatusCodeStr() + " ";
+	// "HTTP/1.1 200 OK";
+	_response += "\nContent-Type: text/plain\nContent-Length: 13\n\nHello world !";
 }
 
 const char*		Response::getResponse() const
@@ -55,6 +65,14 @@ const std::string	Response::getMimeType(const std::string &ext)
 	return (_mimeTypes[".bin"]);
 }
 
+/******************************************************************************/
+/*                                  GETTER                                    */
+/******************************************************************************/
+
+Request const&	Response::getRequest() const
+{
+	return (_request);
+}
 
 /******************************************************************************/
 /*                                   INIT                                     */

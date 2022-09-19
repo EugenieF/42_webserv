@@ -40,6 +40,17 @@ bool	createSocket(int *socketFd, struct sockaddr_in socketAddress)
 	return (SUCCESS);
 }
 
+bool	sendMessage(int connectionFd, Request &request)
+{
+	Response	response(request);
+
+	const char *responseMsg = response.getResponse();
+
+	send(connectionFd, responseMsg, strlen(responseMsg), 0);
+	std::cout << "------------------Hello message sent-------------------" << std::endl;
+	return (SUCCESS);
+}
+
 bool	receiveMessage(Webserv &webserv, int connectionFd)
 {
 	char buffer[30000];
@@ -54,17 +65,7 @@ bool	receiveMessage(Webserv &webserv, int connectionFd)
 	}
 	Request	request(webserv.getServers()[0], buffer);
 	request.parseRequest();
-	return (SUCCESS);
-}
-
-bool	sendMessage(int connectionFd)
-{
-	Response	response;
-
-	const char *responseMsg = response.getResponse();
-
-	send(connectionFd, responseMsg, strlen(responseMsg), 0);
-	std::cout << "------------------Hello message sent-------------------" << std::endl;
+	sendMessage(connectionFd, request);
 	return (SUCCESS);
 }
 
@@ -86,7 +87,6 @@ bool	waitForConnection(Webserv &webserv, int socketFd, struct sockaddr_in socket
 			return (FAILURE);        
 		}
 		receiveMessage(webserv, connectionFd);
-		sendMessage(connectionFd);
 		close(connectionFd);
 	}
 	return (SUCCESS);
