@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/09/20 18:15:54 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/21 00:07:59 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,6 +167,8 @@ void EpollInstance::_handleRequest(int index) {
 			break ;
 		}
 	}
+	// Request	request(webserv.getServers()[0], str);
+	// request.parseRequest();
 	std::cout << YELLOW << "Msg read from " << _events[index].data.fd << ": \n" << str << RESET << NL;
 	_editSocket(_events[index].data.fd, EPOLLOUT);
 }

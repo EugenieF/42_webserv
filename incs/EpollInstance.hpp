@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/09/20 18:15:11 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/21 00:04:57 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include "TcpSocket.hpp"
 # include "utils.hpp"
 # include "Colors.hpp"
+# include "Request.hpp"
 
 # define BUFSIZE 2048
 # define MAX_EVENT 100
