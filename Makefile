@@ -9,7 +9,11 @@ SRCS			= main.cpp \
 				Block.cpp \
 				Webserv.cpp \
 				Request.cpp \
-				Response.cpp
+				Response.cpp \
+				EpollInstance.cpp \
+				signal.cpp \
+				TcpSocket.cpp \
+				Server.cpp
 
 OBJS_DIR		= ./objs
 

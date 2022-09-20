@@ -23,9 +23,10 @@ Request::Request(Block* server, const std::string& buffer):
 	_server(server),
 	_request(buffer),
 	_method(NO_METHOD),
-	_uri(""),
+	_path(""),
 	_httpProtocol(""),
-	_requestIsValid(true)
+	_requestIsValid(true),
+	_chunkedTransfer(false)
 {
 	_initParsingFunct();
 }
@@ -33,10 +34,11 @@ Request::Request(Block* server, const std::string& buffer):
 Request::Request(const Request &other):
 	_request(other.getRequest()),
 	_method(other.getMethod()),
-	_uri(other.getUri()),
+	_path(other.getPath()),
 	_httpProtocol(other.getHttpProtocol()),
 	_requestIsValid(other.getRequestValidity()),
-	_parsingFunct(other.getParsingFunct())
+	_parsingFunct(other.getParsingFunct()),
+	_chunkedTransfer(other.getChunkedTransfer())
 {
 	*this = other;
 }
@@ -49,10 +51,11 @@ Request&	Request::operator=(const Request &other)
 	{
 		_request = other.getRequest();
 		_method = other.getMethod();
-		_uri = other.getUri();
+		_path = other.getPath();
 		_httpProtocol = other.getHttpProtocol();
 		_requestIsValid = other.getRequestValidity();
 		_parsingFunct = other.getParsingFunct();
+		_chunkedTransfer = other.getChunkedTransfer();
 	}
 	return (*this);
 }
@@ -88,16 +91,16 @@ void	Request::_parseMethod()
 	_method = _server->getMethod(method);
 }
 
-void	Request::_parseUri()
+void	Request::_parsePath()
 {
-	std::string uri;
+	std::string path;
 	
-	_getNextWord(uri, " ");
-	if (uri == "" || uri[0] != '/')
+	_getNextWord(path, " ");
+	if (path == "" || path[0] != '/')
 		return (_requestIsInvalid(BAD_REQUEST));
-	if (uri.length() > 2048)
+	if (path.length() > 2048)
 		return (_requestIsInvalid(URI_TOO_LONG));
-	_uri = uri;
+	_path = path;
 }
 
 void	Request::_parseHttpProtocol()
@@ -122,11 +125,11 @@ void	Request::_parseHeaders()
 	while (pos != std::string::npos)
 	{
 		pos = _getNextWord(headerName, ":");
-		_toLowerStr(&headerName);
+		_toLowerStr(&headerName); /* Case-insensitive */
 		if (pos == std::string::npos)
 			break ;
 		_getNextWord(headerValue, "\r\n");
-		_trimSpaceStr(&headerValue);
+		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
 		std::cout << YELLOW << headerName << ": '" << headerValue << "'" << RESET << std::endl;
 		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
 			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
@@ -137,7 +140,28 @@ void	Request::_parseHeaders()
 
 void	Request::_checkHeaders()
 {
+	Request::listOfHeaders::const_iterator	ite;
+	std::string								contentLength;
+	size_t									size;
+
 	if (_headers.find("host") == _headers.end())
+		return (_requestIsInvalid(BAD_REQUEST));
+	ite = _headers.find("transfer-encoding");
+	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos) // not really sure about this
+	{
+		_chunkedTransfer = true;
+		std::cout << "CHUNKED" << std::endl;	
+	}
+	else if (_headers.find("content-length") != _headers.end())
+	{
+		contentLength = _headers["content-length"];
+		size = std::strtoul(contentLength.c_str(), NULL, 10);
+		std::cout << "size = " << size << std::endl;
+		if (contentLength.find_first_not_of("0123456789") != std::string::npos || !size || size >= ULONG_MAX)
+			return (_requestIsInvalid(BAD_REQUEST));
+		_bodySize = size;
+	}
+	else
 		return (_requestIsInvalid(BAD_REQUEST));
 	// _headers.find("Host");
 	// _headers.find("Transfer-Encoding");
@@ -175,9 +199,9 @@ Request::t_method	Request::getMethod() const
 	return (_method);
 }
 
-std::string		Request::getUri() const
+std::string		Request::getPath() const
 {
-	return (_uri);
+	return (_path);
 }
 
 std::string		Request::getHttpProtocol() const
@@ -206,6 +230,11 @@ std::string		Request::getStatusCodeStr() const
 
 	ss << _statusCode;
 	return (ss.str());
+}
+
+bool	Request::getChunkedTransfer() const
+{
+	return (_chunkedTransfer);
 }
 
 /******************************************************************************/
@@ -241,7 +270,7 @@ void	Request::_requestIsInvalid(t_statusCode code)
 void	Request::_initParsingFunct()
 {
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseMethod);
-	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseUri);
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_parsePath);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHttpProtocol);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHeaders);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_checkHeaders);
@@ -258,7 +287,7 @@ void	Request::printRequestInfo()
 
 	std::cout <<  BLUE << "------------ INFO REQUEST -------------" << std::endl;
 	std::cout << "          method : " << GREEN << _method << std::endl;
-	std::cout << BLUE << "             uri : " << GREEN << _uri << std::endl;
+	std::cout << BLUE << "             path : " << GREEN << _path << std::endl;
 	std::cout << BLUE << "    httpProtocol : " << GREEN << _httpProtocol << std::endl;
 	std::cout << BLUE << "      statusCode : " << GREEN << _statusCode << std::endl;
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
