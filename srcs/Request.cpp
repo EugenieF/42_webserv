@@ -205,7 +205,7 @@ int		Request::_parseChunks()
 	size_t			pos;
 
 	if (_request.find("\r\n\r\n") == std::string::npos)
-		return (0)
+		return (0);
 	while (1)
 	{
 		chunkSize = 0;
@@ -216,7 +216,10 @@ int		Request::_parseChunks()
 		}
 		chunkSize = std::strtoul(chunk.c_str(), NULL, 16);
 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos || !chunkSize || chunkSize >= ULONG_MAX)
-			return (_requestIsInvalid(BAD_REQUEST));
+		{
+			return (3);
+			// return (_requestIsInvalid(BAD_REQUEST));
+		}
 		if (!chunkSize)
 		{
 			return (1);
@@ -310,7 +313,7 @@ size_t	Request::_getNextWord(std::string &word, std::string const& delimiter)
 
 std::string		Request::_getNextWord(size_t sizeWord)
 {
-	std::string nextWord
+	std::string nextWord;
 
 	nextWord = _request.substr(0, sizeWord);
 	_request.erase(0, sizeWord + 2);
