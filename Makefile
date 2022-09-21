@@ -13,7 +13,8 @@ SRCS			= main.cpp \
 				EpollInstance.cpp \
 				signal.cpp \
 				TcpSocket.cpp \
-				Server.cpp
+				Server.cpp \
+				Client.cpp
 
 OBJS_DIR		= ./objs
 

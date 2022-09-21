@@ -25,6 +25,8 @@ Request::Request(Block* server, const std::string& buffer):
 	_method(NO_METHOD),
 	_path(""),
 	_httpProtocol(""),
+	_bodySize(0),
+	_statusCode(OK),
 	_requestIsValid(true),
 	_chunkedTransfer(false)
 {
@@ -36,6 +38,8 @@ Request::Request(const Request &other):
 	_method(other.getMethod()),
 	_path(other.getPath()),
 	_httpProtocol(other.getHttpProtocol()),
+	_bodySize(other.getBodySize()),
+	_statusCode(other.getStatusCode()),
 	_requestIsValid(other.getRequestValidity()),
 	_parsingFunct(other.getParsingFunct()),
 	_chunkedTransfer(other.getChunkedTransfer())
@@ -53,6 +57,8 @@ Request&	Request::operator=(const Request &other)
 		_method = other.getMethod();
 		_path = other.getPath();
 		_httpProtocol = other.getHttpProtocol();
+		_bodySize = other.getBodySize();
+		_statusCode = other.getStatusCode(),
 		_requestIsValid = other.getRequestValidity();
 		_parsingFunct = other.getParsingFunct();
 		_chunkedTransfer = other.getChunkedTransfer();
@@ -110,7 +116,7 @@ void	Request::_parseHttpProtocol()
 	_getNextWord(httpProtocol, "\r\n");
 	if (httpProtocol.find("HTTP") == std::string::npos)
 		return (_requestIsInvalid(BAD_REQUEST));
-	if (!(httpProtocol == "HTTP/1.0" || httpProtocol == "HTTP/1.1"))
+	if (httpProtocol != "HTTP/1.1")
 		return (_requestIsInvalid(HTTP_VERSION_NOT_SUPPORTED));
 	_httpProtocol = httpProtocol;
 }
@@ -162,10 +168,9 @@ void	Request::_checkHeaders()
 		_bodySize = size;
 	}
 	else
+	{
 		return (_requestIsInvalid(BAD_REQUEST));
-	// _headers.find("Host");
-	// _headers.find("Transfer-Encoding");
-	// _headers.find("Content-Length");
+	}
 	// _headers.find("Content-Type");
 }
 
@@ -180,9 +185,27 @@ void	Request::_parseBody()
 {
 	std::string		body;
 
-	std::cout << "request : " << _request << std::endl;
-	_getNextWord(body, "\r\n");
-	_body = body;
+	// std::cout << "request : " << _request << std::endl;
+	if (_chunkedTransfer == true)
+	{
+		_parseChunks();
+	}
+	else
+	{
+		_getNextWord(body, "\r\n");
+		_body = body;
+	}
+	// if (_request.length() < _bodySize)
+}
+
+int		Request::_parseChunks()
+{
+	size_t	chunkSize;
+
+	chunkSize = 0;
+	std::cout << "**********************************************" << std::endl;
+	std::cout << RED << "request : " << _request << RESET << std::endl;
+	return (0);
 }
 
 /******************************************************************************/
@@ -237,6 +260,11 @@ bool	Request::getChunkedTransfer() const
 	return (_chunkedTransfer);
 }
 
+size_t	Request::getBodySize() const
+{
+	return (_bodySize);
+}
+
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
@@ -278,7 +306,7 @@ void	Request::_initParsingFunct()
 }
 
 /******************************************************************************/
-/*                                  UTILS                                     */
+/*                                 DISPLAY                                    */
 /******************************************************************************/
 
 void	Request::printRequestInfo()
@@ -287,7 +315,7 @@ void	Request::printRequestInfo()
 
 	std::cout <<  BLUE << "------------ INFO REQUEST -------------" << std::endl;
 	std::cout << "          method : " << GREEN << _method << std::endl;
-	std::cout << BLUE << "             path : " << GREEN << _path << std::endl;
+	std::cout << BLUE << "            path : " << GREEN << _path << std::endl;
 	std::cout << BLUE << "    httpProtocol : " << GREEN << _httpProtocol << std::endl;
 	std::cout << BLUE << "      statusCode : " << GREEN << _statusCode << std::endl;
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)

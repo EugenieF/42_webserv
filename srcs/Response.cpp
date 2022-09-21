@@ -4,15 +4,10 @@
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response()
+Response::Response(Request* request): _response(""), _request(request)
 {
-	generateResponse();
-}
-
-Response::Response(Request const& request):
-	_request(request)
-{
-	generateResponse();
+	_initStatusCodes();
+	_initMimeTypes();
 }
 
 Response::Response(const Response &other):
@@ -34,15 +29,11 @@ Response&	Response::operator=(const Response &other)
 
 void	Response::generateResponse()
 {
-	_response = _request.getHttpProtocol() + " "
-		+ _request.getStatusCodeStr() + " ";
+	_response = "HTTP/1.1 "
+		+ _request->getStatusCodeStr() + " "
+		+ getStatusMessage(_request->getStatusCode());
 	// "HTTP/1.1 200 OK";
-	_response += "\nContent-Type: text/plain\nContent-Length: 13\n\nHello world !";
-}
-
-const char*		Response::getResponse() const
-{
-	return (_response.c_str());
+	_response += "\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\nHello world !\r\n";
 }
 
 const std::string	Response::getStatusMessage(int statusCode)
@@ -65,20 +56,51 @@ const std::string	Response::getMimeType(const std::string &ext)
 	return (_mimeTypes[".bin"]);
 }
 
+std::string		Response::_generateStatusPage()
+{
+	std::string	statusPage;
+
+	statusPage = "<!DOCTYPE html>\n\
+	  	<html><head>\n\
+	  	<title>" + getStatusCodeStr() + " - " + getStatusMessage(_statusCode) + "</title>\n\
+	  	</head>\n\
+	  	<body><p>Hello world!</p></body>\n\
+	  	</html>";
+	return (statusPage);
+}
+
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
 
-Request const&	Response::getRequest() const
+Request*	Response::getRequest() const
 {
 	return (_request);
+}
+
+std::string		Response::getResponse() const
+{
+	return (_response);
+}
+
+t_statusCode	Response::getStatusCode() const
+{
+	return (_statusCode);
+}
+
+std::string		Response::getStatusCodeStr() const
+{
+	std::stringstream	ss;
+
+	ss << _statusCode;
+	return (ss.str());
 }
 
 /******************************************************************************/
 /*                                   INIT                                     */
 /******************************************************************************/
 
-void	Response::initStatusCodes()
+void	Response::_initStatusCodes()
 {
 /* Informational response */	
 	_statusCodes[CONTINUE] = "Continue";
@@ -151,7 +173,7 @@ void	Response::initStatusCodes()
 }
 
 /* This table lists important MIME types for the Web: */
-void	Response::initMimeTypes()
+void	Response::_initMimeTypes()
 {
 	_mimeTypes[".aac"] = "audio/aac";
 	_mimeTypes[".abw"] = "application/x-abiword";

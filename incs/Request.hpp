@@ -13,7 +13,7 @@ class   Request
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef Block::t_method					t_method;
+		typedef Block::t_method						t_method;
 		typedef void (Request::*parsingFunction)();
 		typedef std::vector<parsingFunction>		listOfParsingFunctions;
 		typedef std::map<std::string, std::string>	listOfHeaders;
@@ -58,6 +58,7 @@ class   Request
 		bool						getRequestValidity() const;
 		listOfParsingFunctions		getParsingFunct() const;
 		bool						getChunkedTransfer() const;
+		size_t						getBodySize() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
@@ -72,6 +73,7 @@ class   Request
 		void						_parseHeaders();
 		void						_checkHeaders();
 		void						_parseBody();
+		int							_parseChunks();
 
 						/*------   Utils  ------*/
 		void						_initParsingFunct();
