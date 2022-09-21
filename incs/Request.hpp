@@ -79,6 +79,7 @@ class   Request
 		void						_initParsingFunct();
 		void						_requestIsInvalid(t_statusCode code);
 		size_t						_getNextWord(std::string& word, std::string const& delimiter);
+		std::string					_getNextWord(size_t sizeWord);
 		std::string					_toLowerStr(std::string* str);
 		std::string					_trimSpaceStr(std::string *str, const char *toTrim = " \t");
 
