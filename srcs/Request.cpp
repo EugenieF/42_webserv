@@ -214,6 +214,7 @@ int		Request::_parseChunks()
 		{
 			return (2);
 		}
+		std::cout << "---> chunkSizeStr : " << chunk << std::endl;
 		chunkSize = std::strtoul(chunk.c_str(), NULL, 16);
 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos || !chunkSize || chunkSize >= ULONG_MAX)
 		{
