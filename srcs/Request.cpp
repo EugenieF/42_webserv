@@ -203,6 +203,7 @@ int		Request::_parseChunks()
 	size_t			chunkSize;
 	std::string		chunk;
 	size_t			pos;
+	std::string		body;
 
 	if (_request.find("\r\n\r\n") == std::string::npos)
 		return (0);
@@ -228,6 +229,7 @@ int		Request::_parseChunks()
 		chunk = _getNextWord(chunkSize);
 		std::cout << "**********************************************" << std::endl;
 		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = " << chunk << RESET << std::endl;
+		body += chunk;
 	}
 }
 
