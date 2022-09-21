@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/09/20 15:14:46 by etran            ###   ########.fr       */
+/*   Updated: 2022/09/21 11:21:35 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 # include "Server.hpp"
 
-Server::Server(const Block& x) :
-	_socket(socket(PF_INET, SOCK_STREAM, 0)) {
+Server::Server(Block& x) :
+	_socket(socket(PF_INET, SOCK_STREAM, 0)),
+	_epoll(&x) {
 		_socket.setToReusable();
 		memset(&_addr, 0, sizeof(_addr)); 
 		_addr.sin_family = AF_INET;

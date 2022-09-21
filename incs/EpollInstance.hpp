@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/09/21 00:04:57 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/21 11:21:24 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class EpollInstance {
 		/* -- Typedef ------------------------------------------------------ */
 		typedef		std::set<int>::iterator				it;
 
-		EpollInstance();
+		EpollInstance(Block* x);
 		virtual ~EpollInstance();
 
 		/* -- Epoll manipulation ------------------------------------------- */
@@ -64,6 +64,7 @@ class EpollInstance {
 		int							_serversocket;
 		struct epoll_event			_events[MAX_EVENT];
 		std::set<int>				_clientlist;
+		Block*						_server;
 };
 
 #endif
