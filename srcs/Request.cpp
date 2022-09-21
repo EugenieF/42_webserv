@@ -215,8 +215,8 @@ int		Request::_parseChunks()
 		{
 			return (2);
 		}
-		std::cout << "---> chunkSizeStr : " << chunk << std::endl;
 		chunkSize = std::strtoul(chunk.c_str(), NULL, 16);
+		std::cout << "---> chunkSizeStr : '" << chunk << "' | size : " << chunkSize << std::endl;
 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos || !chunkSize || chunkSize >= ULONG_MAX)
 		{
 			return (3);
@@ -228,7 +228,7 @@ int		Request::_parseChunks()
 		}
 		chunk = _getNextWord(chunkSize);
 		std::cout << "**********************************************" << std::endl;
-		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = " << chunk << RESET << std::endl;
+		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
 		body += chunk;
 	}
 }
