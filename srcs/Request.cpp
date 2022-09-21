@@ -200,13 +200,31 @@ void	Request::_parseBody()
 
 int		Request::_parseChunks()
 {
-	size_t	chunkSize;
+	size_t			chunkSize;
+	std::string		chunk;
+	size_t			pos;
 
-	chunkSize = 0;
-    (void)chunkSize;
-	std::cout << "**********************************************" << std::endl;
-	std::cout << RED << "request : " << _request << RESET << std::endl;
-	return (0);
+	if (_request.find("\r\n\r\n") == std::string::npos)
+		return (0)
+	while (1)
+	{
+		chunkSize = 0;
+		pos = _getNextWord(chunk, "\r\n");
+		if (pos == std::string::npos)
+		{
+			return (2);
+		}
+		chunkSize = std::strtoul(chunk.c_str(), NULL, 16);
+		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos || !chunkSize || chunkSize >= ULONG_MAX)
+			return (_requestIsInvalid(BAD_REQUEST));
+		if (!chunkSize)
+		{
+			return (1);
+		}
+		chunk = _getNextWord(chunkSize);
+		std::cout << "**********************************************" << std::endl;
+		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = " << chunk << RESET << std::endl;
+	}
 }
 
 /******************************************************************************/
@@ -288,6 +306,15 @@ size_t	Request::_getNextWord(std::string &word, std::string const& delimiter)
 	_request.erase(0, pos + delimiter.length());
 	word = nextWord;
 	return (pos);
+}
+
+std::string		Request::_getNextWord(size_t sizeWord)
+{
+	std::string nextWord
+
+	nextWord = _request.substr(0, sizeWord);
+	_request.erase(0, sizeWord + 2);
+	return (nextWord);
 }
 
 void	Request::_requestIsInvalid(t_statusCode code)
