@@ -203,6 +203,7 @@ int		Request::_parseChunks()
 	size_t	chunkSize;
 
 	chunkSize = 0;
+    (void)chunkSize;
 	std::cout << "**********************************************" << std::endl;
 	std::cout << RED << "request : " << _request << RESET << std::endl;
 	return (0);
