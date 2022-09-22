@@ -177,7 +177,6 @@ void	Request::_checkHeaders()
 	}
 	else
 		return (_requestIsInvalid(BAD_REQUEST));
-	_setRequestStatus(COMPLETE_REQUEST);
 	// _headers.find("Content-Type");
 }
 
@@ -193,15 +192,17 @@ void	Request::_parseBody()
 	std::string		body;
 
 	// std::cout << "request : " << _request << std::endl;
+	if (_requestStatus == COMPLETE_REQUEST)
+		return ;
 	if (_chunkedTransfer == true)
 	{
 		_parseChunks();
 	}
-	else
-	{
-		_getNextWord(body, "\r\n");
-		_body = body;
-	}
+	// else
+	// {
+	// 	_getNextWord(body, "\r\n");
+	// 	_body = body;
+	// }
 	if (_request.length() < _bodySize)
 	{
 
@@ -216,7 +217,8 @@ void	Request::_parseChunks()
 
 	if (_request.find("0\r\n\r\n") == std::string::npos)
 	{
-		std::cout << RED << "*****  CHUNKS, INCOMPLETE REQUEST  *****" << RESET << std::endl;
+		std::cout << RED << "*****  CHUNKS, INCOMPLETE REQUEST  *****" << std::endl;
+		std::cout << "request = " << _request << RESET << std::endl;
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
 	}
 	while (_requestStatus != COMPLETE_REQUEST)

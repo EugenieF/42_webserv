@@ -51,6 +51,8 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
 
     if (!_request)
         _request = new Request(_runningServer, buffer);
+    else
+        _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
     return (requestStatus);
 }
