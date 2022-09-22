@@ -203,13 +203,6 @@ void EpollInstance::_handleResponse(int index) {
 	
 	// cgi or page display
 
-	/******************************************************************************************/
-	if (_request)
-	{
-		delete _request;
-		request = NULL;
-	}
-	/******************************************************************************************/
 }
 
 void EpollInstance::_clearClients() {

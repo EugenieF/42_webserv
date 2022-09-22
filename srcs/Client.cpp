@@ -63,6 +63,11 @@ std::string     Client::generateResponse()
         delete _response;
     _response = new Response(_request);
     _response->generateResponse();
+	if (_request)
+	{
+		delete _request;
+		_request = NULL;
+	}
     return (_response->getResponse());
 }
 
