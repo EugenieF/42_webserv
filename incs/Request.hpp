@@ -90,6 +90,7 @@ class   Request
 		std::string					_getNextWord(size_t sizeWord);
 		std::string					_toLowerStr(std::string* str);
 		std::string					_trimSpaceStr(std::string *str, const char *toTrim = " \t");
+		bool						_reachedEndOfChunkedBody();
 
 };
 

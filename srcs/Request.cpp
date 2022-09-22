@@ -184,22 +184,11 @@ void	Request::_parseBody()
 {
 	std::string		body;
 
-	// std::cout << "request : " << _request << std::endl;
 	if (_requestStatus == COMPLETE_REQUEST)
 		return ;
-	if (_chunkedTransfer == true)
-	{
+	if (_chunkedTransfer)
 		_parseChunks();
-	}
-	// else
-	// {
-	// 	_getNextWord(body, "\r\n");
-	// 	_body = body;
-	// }
-	if (_request.length() < _bodySize)
-	{
-
-	}
+	// if (_request.length() < _bodySize) {}
 }
 
 void	Request::_parseChunks()
@@ -208,13 +197,14 @@ void	Request::_parseChunks()
 	std::string		chunk;
 	size_t			pos;
 
-	if (_request.find("0\r\n\r\n") == std::string::npos)
+	if (!_reachedEndOfChunkedBody())
 	{
+		_bodySize = _request.length();
 		std::cout << RED << "*****  CHUNKS, INCOMPLETE REQUEST  *****" << std::endl;
 		std::cout << "request = " << _request << RESET << std::endl;
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
 	}
-	while (_requestStatus != COMPLETE_REQUEST)
+	while (1)
 	{
 		chunkSize = 0;
 		pos = _getNextWord(chunk, "\r\n");
@@ -224,13 +214,10 @@ void	Request::_parseChunks()
 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
 			return (_requestIsInvalid(BAD_REQUEST));
 		if (!chunkSize)
-			_setRequestStatus(COMPLETE_REQUEST);
-		else
-		{
-			chunk = _getNextWord(chunkSize);
-			std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
-			_body += chunk;
-		}
+			return (_setRequestStatus(COMPLETE_REQUEST));
+		chunk = _getNextWord(chunkSize);
+		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
+		_body += chunk;
 	}
 }
 
@@ -294,6 +281,11 @@ size_t	Request::getBodySize() const
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
+
+bool	Request::_reachedEndOfChunkedBody()
+{
+	return (_request.find("0\r\n\r\n") != std::string::npos);
+}
 
 void	Request::_setRequestStatus(t_requestStatus status)
 {
