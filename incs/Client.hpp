@@ -21,7 +21,7 @@ class Client
         ~Client();
         Client&         operator=(Client const& other);
 
-        void            parseRequest(std::string const& buffer);
+        t_requestStatus parseRequest(std::string const& buffer);
         std::string     generateResponse();
 
 						/*-------     Getter      ------*/

@@ -169,8 +169,8 @@ void EpollInstance::_handleRequest(int index) {
 		}
 	}
 	/******************************************************************************************/
-	_client.parseRequest(str);
-	std::cout << YELLOW << "Msg read from " << _events[index].data.fd << ": \n" << str << RESET << NL;
+	t_requestStatus requestStatus = _client.parseRequest(str);
+	std::cout << YELLOW << "HANDLE REQUEST : fd " << _events[index].data.fd << ": " << requestStatus << RESET << NL;
 	/*******************************************************************************************/
 
 	// std::cout << "Msg read from " << _events[index].data.fd << ": \n" << str << NL;

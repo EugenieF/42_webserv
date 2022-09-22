@@ -45,16 +45,15 @@ Client&     Client::operator=(Client const& other)
     return (*this);
 }
 
-void    Client::parseRequest(std::string const& buffer)
+t_requestStatus     Client::parseRequest(std::string const& buffer)
 {
+    t_requestStatus requestStatus;
+
     if (!_request)
         _request = new Request(_runningServer, buffer);
-    _request->parseRequest();
+    requestStatus = _request->parseRequest();
+    return (requestStatus);
 }
-
-/******************************************************************************/
-/*                                  GETTER                                    */
-/******************************************************************************/
 
 std::string     Client::generateResponse()
 {
@@ -64,6 +63,10 @@ std::string     Client::generateResponse()
     _response->generateResponse();
     return (_response->getResponse());
 }
+
+/******************************************************************************/
+/*                                  GETTER                                    */
+/******************************************************************************/
 
 Block*  Client::getRunningServer() const
 {
