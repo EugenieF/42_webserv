@@ -9,6 +9,13 @@
 #include "Block.hpp"
 #include "StatusCode.hpp"
 
+typedef enum t_readSate
+{
+	INCOMPLETE_REQUEST	= 0,
+	COMPLETE_REQUEST	= 1,
+	INVALID_REQUEST		= 2,
+}	t_readState;
+
 class   Request
 {
 	public:
@@ -73,7 +80,7 @@ class   Request
 		void						_parseHeaders();
 		void						_checkHeaders();
 		void						_parseBody();
-		int							_parseChunks();
+		t_readState					_parseChunks();
 
 						/*------   Utils  ------*/
 		void						_initParsingFunct();

@@ -198,33 +198,33 @@ void	Request::_parseBody()
 	// if (_request.length() < _bodySize)
 }
 
-int		Request::_parseChunks()
+t_readState		Request::_parseChunks()
 {
 	size_t			chunkSize;
 	std::string		chunk;
 	size_t			pos;
 	std::string		body;
 
-	if (_request.find("\r\n\r\n") == std::string::npos)
-		return (0);
+	if (_request.find("0\r\n\r\n") == std::string::npos)
+		return (INCOMPLETE_REQUEST);
 	while (1)
 	{
 		chunkSize = 0;
 		pos = _getNextWord(chunk, "\r\n");
 		if (pos == std::string::npos)
 		{
-			return (2);
+			return (INVALID_REQUEST);
 		}
 		chunkSize = std::strtoul(chunk.c_str(), NULL, 16);
 		std::cout << "---> chunkSizeStr : '" << chunk << "' | size : " << chunkSize << std::endl;
 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos || !chunkSize || chunkSize >= ULONG_MAX)
 		{
-			return (3);
+			return (INVALID_REQUEST);
 			// return (_requestIsInvalid(BAD_REQUEST));
 		}
 		if (!chunkSize)
 		{
-			return (1);
+			return (COMPLETE_REQUEST);
 		}
 		chunk = _getNextWord(chunkSize);
 		std::cout << "**********************************************" << std::endl;
