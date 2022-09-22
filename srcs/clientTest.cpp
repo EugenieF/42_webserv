@@ -15,7 +15,7 @@ int main()
     (void)valread;
     struct sockaddr_in serv_addr;
     
-    char hello[] = "POST /data HTTP/1.1\r\nhost:    www.yoursite.com  	\r\nTransfer-Encoding: chunked	\r\nContent-TYPE: application/json \r\n\r\n25\r\nVoici les données du premier morceau\r\n1B\r\net voici un second morceau\r\n0\r\n\r\n";
+    char hello[] = "POST /data HTTP/1.1\r\nhost:    www.yoursite.com  	\r\nTransfer-Encoding: chunked	\r\nContent-TYPE: application/json \r\n\r\n26\r\nVoici les données du premier morceau \r\n1F\r\net voici deux derniers morceaux\r\n0\r\n\r\n";
     // char hello[] = "POST /data HTTP/1.1\r\nHOST:    www.yoursite.com  	 	\r\nTransfer-Encoding: chunked		\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
     char buffer[1024] = {0};
 

@@ -216,7 +216,9 @@ t_readState		Request::_parseChunks()
 			return (INVALID_REQUEST);
 		}
 		chunkSize = std::strtoul(chunk.c_str(), NULL, 16);
-		std::cout << "---> chunkSizeStr : '" << chunk << "' | size : " << chunkSize << std::endl;
+		std::cout << "---> chunkSizeStr : '" << chunk << "' | size : " << chunkSize;
+		std::cout << " | _Request : " << _request << std::endl;
+
 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos || !chunkSize || chunkSize >= ULONG_MAX)
 		{
 			return (INVALID_REQUEST);
@@ -227,7 +229,6 @@ t_readState		Request::_parseChunks()
 			return (COMPLETE_REQUEST);
 		}
 		chunk = _getNextWord(chunkSize);
-		std::cout << "**********************************************" << std::endl;
 		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
 		_body += chunk;
 	}
