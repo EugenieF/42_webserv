@@ -229,7 +229,7 @@ int		Request::_parseChunks()
 		chunk = _getNextWord(chunkSize);
 		std::cout << "**********************************************" << std::endl;
 		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
-		body += chunk;
+		_body += chunk;
 	}
 }
 
