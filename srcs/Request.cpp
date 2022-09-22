@@ -210,20 +210,23 @@ void	Request::_parseBody()
 
 void	Request::_parseChunks()
 {
-	size_t			chunkSize;
+	long			chunkSize;
 	std::string		chunk;
 	size_t			pos;
 
 	if (_request.find("0\r\n\r\n") == std::string::npos)
+	{
+		std::cout << RED << "*****  CHUNKS, INCOMPLETE REQUEST  *****" << RESET << std::endl;
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
+	}
 	while (_requestStatus != COMPLETE_REQUEST)
 	{
 		chunkSize = 0;
 		pos = _getNextWord(chunk, "\r\n");
 		if (pos == std::string::npos)
 			return (_requestIsInvalid(BAD_REQUEST));
-		chunkSize = std::strtoul(chunk.c_str(), NULL, 16);
-		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos || !chunkSize || chunkSize >= ULONG_MAX)
+		chunkSize = std::strtol(chunk.c_str(), NULL, 16);
+		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
 			return (_requestIsInvalid(BAD_REQUEST));
 		if (!chunkSize)
 			_setRequestStatus(COMPLETE_REQUEST);
