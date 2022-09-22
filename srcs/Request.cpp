@@ -177,15 +177,7 @@ void	Request::_checkHeaders()
 	}
 	else
 		return (_requestIsInvalid(BAD_REQUEST));
-	_setRequestStatus(COMPLETE_REQUEST);
 	// _headers.find("Content-Type");
-}
-
-std::string	Request::_trimSpaceStr(std::string *str, const char *toTrim)
-{
-	str->erase(0, str->find_first_not_of(toTrim));
-	str->erase(str->find_last_not_of(toTrim) + 1);
-	return (*str);
 }
 
 void	Request::_parseBody()
@@ -338,6 +330,13 @@ void	Request::_requestIsInvalid(t_statusCode code)
 {
 	_statusCode = code;
 	_requestStatus = INVALID_REQUEST;
+}
+
+std::string	Request::_trimSpaceStr(std::string *str, const char *toTrim)
+{
+	str->erase(0, str->find_first_not_of(toTrim));
+	str->erase(str->find_last_not_of(toTrim) + 1);
+	return (*str);
 }
 
 void	Request::_initParsingFunct()
