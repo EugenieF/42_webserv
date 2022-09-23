@@ -6,6 +6,7 @@
 
 Response::Response(Request* request, Block *server):
 	_response(""),
+	_statusCode(OK),
 	_body(""),
 	_request(request),
 	_server(server)
@@ -16,6 +17,9 @@ Response::Response(Request* request, Block *server):
 }
 
 Response::Response(const Response &other):
+	_response(other.getResponse()),
+	_statusCode(other.getStatusCode()),
+	_body(other.getBody()),
 	_request(other.getRequest())
 {
 	*this = other;
@@ -27,6 +31,9 @@ Response&	Response::operator=(const Response &other)
 {
 	if (this != &other)
 	{
+		_response = other.getResponse();
+		_statusCode = other.getStatusCode();
+		_body = other.getBody();
 		_request = other.getRequest();
 	}
 	return (*this);
@@ -34,7 +41,7 @@ Response&	Response::operator=(const Response &other)
 
 void	Response::_selectMatchingBlock()
 {
-
+	_matchingBlock = _server;
 }
 
 void	Response::_processMethod()
@@ -45,6 +52,7 @@ void	Response::_processMethod()
 	if (ite == _httpMethods.end())
 			return (setStatusCode(METHOD_NOT_ALLOWED));
 	(this->*ite->second)();
+	_body = "Response body";
 }
 
 void	Response::generateResponse()
@@ -57,6 +65,7 @@ void	Response::generateResponse()
 		_processMethod();
 		_generateResponseLine();
 		_generateHeaders();
+		_response += _body;
 	}
 	else {}
 	/*********	Invalid request *********/
@@ -194,6 +203,11 @@ std::string		Response::getStatusCodeStr() const
 
 	ss << _statusCode;
 	return (ss.str());
+}
+
+std::string		Response::getBody() const
+{
+	return (_body);
 }
 
 /******************************************************************************/
