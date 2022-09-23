@@ -27,11 +27,11 @@ class   Response
 	/**********************     MEMBER VARIABLES     ********************/
 		listOfHttpMethods					_httpMethods;
 
+		Block*								_server;
+		Request*							_request;
 		std::string							_response;
 		t_statusCode						_statusCode;
 		std::string							_body;
-		Request*							_request;
-		Block*								_server;
 		Block*								_matchingBlock;
 		listOfHeaders						_headers;
 		t_method							_method;

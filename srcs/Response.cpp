@@ -5,21 +5,21 @@
 /******************************************************************************/
 
 Response::Response(Block *server, Request* request):
-	_response(""),
-	_statusCode(OK),
-	_body(""),
-	_request(request),
 	_server(server),
+	_request(request),
+	_response(""),
+	_statusCode(_request->getStatusCode()),
+	_body(""),
 	_method(_request->getMethod())
 {
 	_initHttpMethods();
 }
 
 Response::Response(const Response &other):
+	_request(other.getRequest()),
 	_response(other.getResponse()),
 	_statusCode(other.getStatusCode()),
-	_body(other.getBody()),
-	_request(other.getRequest())
+	_body(other.getBody())
 {
 	*this = other;
 }
@@ -30,10 +30,10 @@ Response&	Response::operator=(const Response &other)
 {
 	if (this != &other)
 	{
+		_request = other.getRequest();
 		_response = other.getResponse();
 		_statusCode = other.getStatusCode();
 		_body = other.getBody();
-		_request = other.getRequest();
 	}
 	return (*this);
 }
