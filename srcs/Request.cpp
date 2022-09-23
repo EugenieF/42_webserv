@@ -265,10 +265,7 @@ t_statusCode	Request::getStatusCode() const
 
 std::string		Request::getStatusCodeStr() const
 {
-	std::stringstream	ss;
-
-	ss << _statusCode;
-	return (ss.str());
+	return (convertNbToString(_statusCode));
 }
 
 bool	Request::getChunkedTransfer() const

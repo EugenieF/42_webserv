@@ -7,7 +7,6 @@
 # include <iostream>
 # include <cstdio>
 # include <fstream>
-# include <sstream>
 # include <vector>
 # include <map>
 # include <utility>
@@ -15,6 +14,8 @@
 /*  C libraries  */
 # include <unistd.h>
 # include <sys/stat.h>
+
+# include "utils.hpp"
 
 /******************************************************************************/
 /*                                  ENUM                                      */
@@ -77,7 +78,7 @@ class	Token
 		tokenValue						getValue() const;
 		size_t							getLineNbr() const;
 		std::string						getLineStr() const;
-		std::string						getLineStr(int nb) const;
+		std::string						getLineStr(size_t nb) const;
 };
 
 #endif

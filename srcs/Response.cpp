@@ -86,13 +86,7 @@ void	Response::_generateResponseLine()
 		+ "\r\n";
 }
 
-std::string	sizeToString(size_t size)
-{
-	std::stringstream	ss;
 
-	ss << size;
-	return (ss.str());
-}
 
 void	Response::_generateHeaders()
 {
@@ -232,10 +226,7 @@ t_statusCode	Response::getStatusCode() const
 
 std::string		Response::getStatusCodeStr() const
 {
-	std::stringstream	ss;
-
-	ss << _statusCode;
-	return (ss.str());
+	return (convertNbToString(_statusCode));
 }
 
 std::string		Response::getBody() const

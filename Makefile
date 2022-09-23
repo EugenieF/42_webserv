@@ -14,7 +14,8 @@ SRCS			= main.cpp \
 				signal.cpp \
 				TcpSocket.cpp \
 				Server.cpp \
-				Client.cpp
+				Client.cpp \
+				utils.cpp
 
 OBJS_DIR		= ./objs
 
