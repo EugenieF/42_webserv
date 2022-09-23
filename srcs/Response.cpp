@@ -161,7 +161,7 @@ std::string		Response::_getDateHeader()
     char		mbstr[100];
 
 	time = std::time(NULL);
-    if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X %Z", std::localtime(&time)))
+    if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X GMT", std::localtime(&time)))
 	{ /* Error Date */ }
 	return (std::string(mbstr));
 }
