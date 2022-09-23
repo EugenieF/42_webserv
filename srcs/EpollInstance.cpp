@@ -171,7 +171,7 @@ void EpollInstance::_handleRequest(int index) {
 	/******************************************************************************************/
 	t_requestStatus requestStatus = _client.parseRequest(str);
 	std::cout << YELLOW << "HANDLE REQUEST : fd " << _events[index].data.fd << ": " << requestStatus << RESET << NL;
-	if (requestStatus == ERROR_REQUEST)
+	if (requestStatus == INVALID_REQUEST)
 		_removeSocket(_events[index].data.fd);
 	else if (requestStatus == COMPLETE_REQUEST)
 		_editSocket(_events[index].data.fd, EPOLLOUT);
