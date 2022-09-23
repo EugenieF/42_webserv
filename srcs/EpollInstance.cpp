@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/09/22 15:33:43 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/23 12:12:17 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,7 @@ void EpollInstance::_handleResponse(int index) {
 	
 	if (write(_events[index].data.fd, responseMsg.c_str(), responseMsg.size()) < 0)
 		throw std::runtime_error("handleResponse (write) error");
+	_client.clear();
 	/******************************************************************************************/
 
 	// if (write(_events[index].data.fd, str.c_str(), str.size()) < 0)
