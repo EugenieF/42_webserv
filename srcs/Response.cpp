@@ -50,9 +50,9 @@ void	Response::_processMethod()
 	Response::listOfHttpMethods::const_iterator	ite;
 
 	/* Check method validity */
-	if (!_matchingBlock->isAllowedMethod(_method))
-		return (setStatusCode(METHOD_NOT_ALLOWED));
-	_buildPath();
+	// if (!_matchingBlock->isAllowedMethod(_method))
+	// 	return (setStatusCode(METHOD_NOT_ALLOWED));
+	// _buildPath();
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 			return (setStatusCode(METHOD_NOT_ALLOWED));
@@ -62,8 +62,8 @@ void	Response::_processMethod()
 
 void	Response::generateResponse()
 {
-	if (_requestIsValid())
-	{
+	// if (_requestIsValid())
+	// {
 		_selectMatchingBlock();
 		if (!_checkBodyLimit())
 			return (setStatusCode(PAYLOAD_TOO_LARGE));
@@ -71,9 +71,11 @@ void	Response::generateResponse()
 		_generateResponseLine();
 		_generateHeaders();
 		_response += _body;
-	}
-	else {}
+	// }
+	// else {}
 	/*********	Invalid request *********/
+	// _response += "That's the response!";
+	std::cout << GREEN << ">>> RESPONSE <<<" << RESET << std::endl;
 }
 
 void	Response::_generateResponseLine()
@@ -84,13 +86,21 @@ void	Response::_generateResponseLine()
 		+ "\r\n";
 }
 
+std::string	sizeToString(size_t size)
+{
+	std::stringstream	ss;
+
+	ss << size;
+	return (ss.str());
+}
+
 void	Response::_generateHeaders()
 {
 	Response::listOfHeaders::const_iterator	ite;
 
 	_headers["Server"] = WEBSERV_VERSION;
 	_headers["Content-Type"] = _getContentTypeHeader();
-	_headers["Content-Length"] = _body.length();
+	_headers["Content-Length"] = sizeToString(_body.length());
 	_headers["Date"] = _getDateHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
@@ -161,7 +171,7 @@ std::string		Response::_getDateHeader()
     char		mbstr[100];
 
 	time = std::time(NULL);
-    if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X %Z", std::localtime(&time)))
+    if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X GMT", std::localtime(&time)))
 	{ /* Error Date */ }
 	return (std::string(mbstr));
 }

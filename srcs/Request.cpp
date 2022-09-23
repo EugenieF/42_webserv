@@ -186,6 +186,11 @@ void	Request::_parseBody()
 		return ;
 	if (_chunkedTransfer)
 		_parseChunks();
+	else
+	{
+		_getNextWord(_body, "\r\n\r\n");
+		_bodySize = _body.length();
+	}
 	// if (_request.length() < _bodySize) {}
 }
 
