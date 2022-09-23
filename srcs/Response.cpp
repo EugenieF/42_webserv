@@ -94,7 +94,7 @@ void	Response::_generateHeaders()
 
 	_headers["Server"] = WEBSERV_VERSION;
 	_headers["Content-Type"] = _getContentTypeHeader();
-	_headers["Content-Length"] = sizeToString(_body.length());
+	_headers["Content-Length"] = convertSizeToString(_body.length());
 	_headers["Date"] = _getDateHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";

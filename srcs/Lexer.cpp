@@ -284,7 +284,7 @@ size_t	Lexer::getLineCount() const
 
 std::string		Lexer::getLineCountStr() const
 {
-	return (convertNbToString(_lineCount));
+	return (convertSizeToString(_lineCount));
 }
 
 

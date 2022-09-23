@@ -24,7 +24,7 @@ extern bool	_triggered;
 void			setupSignal(int state);
 bool			getTriggeredValue();
 
-std::string		convertNbToString(size_t size);
+std::string		convertSizeToString(size_t size);
 std::string		convertNbToString(int nb);
 
 #endif

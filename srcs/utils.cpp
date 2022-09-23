@@ -1,6 +1,6 @@
 # include "utils.hpp"
 
-std::string	convertNbToString(size_t size)
+std::string	convertSizeToString(size_t size)
 {
 	std::stringstream	ss;
 
