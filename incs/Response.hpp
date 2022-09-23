@@ -49,6 +49,7 @@ class   Response
 		std::string							getResponse() const;
 		t_statusCode						getStatusCode() const;
 		std::string							getStatusCodeStr() const;
+		std::string							getBody() const;
 
 						/*-------   Setter  ------*/
 		void								setStatusCode(t_statusCode status);
