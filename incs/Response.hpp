@@ -62,7 +62,7 @@ class   Response
 		void								_initHttpMethods();
 
 
-        std::string							_generateStatusPage();
+        std::string							_generateErrorPage();
 		void								_generateResponseLine();
 		void								_generateHeaders();
 		void								_selectMatchingBlock();

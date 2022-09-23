@@ -66,11 +66,14 @@ void	Response::generateResponse()
 		if (!_checkBodyLimit())
 			return (setStatusCode(PAYLOAD_TOO_LARGE));
 		_processMethod();
-		_generateResponseLine();
-		_generateHeaders();
-		_response += _body;
 	}
-	// else {}
+	else
+	{
+		_body = _generateErrorPage();
+	}
+	_generateResponseLine();
+	_generateHeaders();
+	_response += _body;
 	/*********	Invalid request *********/
 	// _response += "That's the response!";
 	std::cout << GREEN << ">>> RESPONSE <<<" << RESET << std::endl;
@@ -99,7 +102,7 @@ void	Response::_generateHeaders()
 
 }
 
-std::string		Response::_generateStatusPage()
+std::string		Response::_generateErrorPage()
 {
 	std::string	statusPage;
 
@@ -154,7 +157,9 @@ bool	Response::_uploadPathDirective()
 
 std::string		Response::_getContentTypeHeader()
 {
-	return ("text/plain");
+	if (!_requestIsValid())
+		return (g_mimeType[".html"]);
+	return (g_mimeType[".txt"]);
 }
 
 std::string		Response::_getDateHeader()
