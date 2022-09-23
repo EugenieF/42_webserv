@@ -1,5 +1,8 @@
-#ifndef STATUS_CODE_HPP
-# define STATUS_CODE_HPP
+#ifndef HTTP_STATUS_CODE_HPP
+# define HTTP_STATUS_CODE_HPP
+
+# include <string>
+# include <map>
 
 typedef enum e_statusCode
 {
@@ -72,5 +75,19 @@ typedef enum e_statusCode
 	NOT_EXTENDED					= 510,
 	NETWORK_AUTHENTICATION_REQUIRED = 511
 }	t_statusCode;
+
+class StatusCode
+{
+	private:
+		std::map<int, std::string>	_statusCodes;
+
+	public:
+		StatusCode();
+		~StatusCode();
+		std::string&	operator[](int statusCode);
+
+	private:
+		void			_initStatusCodesMap();
+};
 
 #endif

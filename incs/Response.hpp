@@ -6,8 +6,13 @@
 # include <ctime>
 
 # include "Request.hpp"
+# include "MimeType.hpp"
 
 # define WEBSERV_VERSION	"Cutie Webserv 1.0"
+
+extern StatusCode	g_statusCode;
+extern MimeType		g_mimeType;
+
 class   Response
 {
 	public:
@@ -17,11 +22,10 @@ class   Response
 		typedef std::map<t_method, httpMethod>		listOfHttpMethods;
 		typedef Request::listOfHeaders				listOfHeaders;
 
+
     private:
 	/**********************     MEMBER VARIABLES     ********************/
 		listOfHttpMethods					_httpMethods;
-		std::map<int, std::string>			_statusCodes;
-		std::map<std::string, std::string>	_mimeTypes;
 
 		std::string							_response;
 		t_statusCode						_statusCode;
@@ -44,8 +48,6 @@ class   Response
 		void								generateResponse();
 
 						/*-------   Getter  ------*/
-		const std::string					getStatusMessage(int statusCode);
-		const std::string					getMimeType(const std::string &ext);
 		Request*							getRequest() const;
 		std::string							getResponse() const;
 		t_statusCode						getStatusCode() const;
