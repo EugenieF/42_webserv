@@ -47,9 +47,9 @@ void	Response::_processMethod()
 {
 	Response::listOfHttpMethods::const_iterator	ite;
 
-	/* Check method validity */
-	// if (!_matchingBlock->isAllowedMethod(_method))
-	// 	return (setStatusCode(METHOD_NOT_ALLOWED));
+	// /* Check method validity */
+	if (!_matchingBlock->isAllowedMethod(_method))
+		return (setStatusCode(METHOD_NOT_ALLOWED));
 	// _buildPath();
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
@@ -60,34 +60,29 @@ void	Response::_processMethod()
 
 void	Response::generateResponse()
 {
-	if (_requestIsValid())
+	if (_requestIsValid()) /* Handle valid request */
 	{
 		_selectMatchingBlock();
 		if (!_checkBodyLimit())
 			return (setStatusCode(PAYLOAD_TOO_LARGE));
 		_processMethod();
 	}
-	else
+	else /*	Handle invalid request */
 	{
 		_body = _generateErrorPage();
 	}
 	_generateResponseLine();
 	_generateHeaders();
 	_response += _body;
-	/*********	Invalid request *********/
-	// _response += "That's the response!";
-	std::cout << GREEN << ">>> RESPONSE <<<" << RESET << std::endl;
 }
 
 void	Response::_generateResponseLine()
 {
 	_response = "HTTP/1.1 "
-		+ _request->getStatusCodeStr() + " "
+		+ getStatusCodeStr() + " "
 		+ g_statusCode[_statusCode]
 		+ "\r\n";
 }
-
-
 
 void	Response::_generateHeaders()
 {
