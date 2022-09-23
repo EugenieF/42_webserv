@@ -50,7 +50,7 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-        _request = new Request(buffer);
+        _request = new Request(_runningServer, buffer);
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
@@ -61,7 +61,7 @@ std::string     Client::generateResponse()
 {
     if (_response)
         delete _response;
-    _response = new Response(_request);
+    _response = new Response(_runningServer, _request);
     _response->generateResponse();
 	if (_request)
 	{

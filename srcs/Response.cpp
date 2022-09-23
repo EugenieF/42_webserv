@@ -4,7 +4,7 @@
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response(Request* request, Block *server):
+Response::Response(Block *server, Request* request):
 	_response(""),
 	_statusCode(OK),
 	_body(""),
@@ -160,7 +160,7 @@ std::string		Response::_getDateHeader()
 	std::time_t	time;
     char		mbstr[100];
 
-	time = std::time(nullptr);
+	time = std::time(NULL);
     if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X %Z", std::localtime(&time)))
 	{ /* Error Date */ }
 	return (std::string(mbstr));

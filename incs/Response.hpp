@@ -25,7 +25,6 @@ class   Response
 
 		std::string							_response;
 		t_statusCode						_statusCode;
-		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 		Request*							_request;
 		Block*								_server;
@@ -37,7 +36,7 @@ class   Response
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
-        Response(Request* request, Block* server);
+        Response(Block* server, Request* request);
         Response(const Response& other);
         ~Response();
         Response&    						operator=(const Response& other);
