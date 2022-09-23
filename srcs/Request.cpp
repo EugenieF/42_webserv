@@ -98,8 +98,6 @@ void	Request::_parseMethod()
 	_getNextWord(method, " ");
 	if (!_server->isMethod(method))
 		return (_requestIsInvalid(NOT_IMPLEMENTED));
-	if (!_server->isAllowedMethod(method))
-		return (_requestIsInvalid(METHOD_NOT_ALLOWED));
 	_method = _server->getMethod(method);
 }
 
@@ -276,6 +274,11 @@ bool	Request::getChunkedTransfer() const
 size_t	Request::getBodySize() const
 {
 	return (_bodySize);
+}
+
+std::string		Request::getBody() const
+{
+	return (_body);
 }
 
 /******************************************************************************/

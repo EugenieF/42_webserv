@@ -4,8 +4,13 @@
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response(Request* request): _response(""), _request(request)
+Response::Response(Request* request, Block *server):
+	_response(""),
+	_body(""),
+	_request(request),
+	_server(server)
 {
+	_initHttpMethods();
 	_initStatusCodes();
 	_initMimeTypes();
 }
@@ -27,13 +32,121 @@ Response&	Response::operator=(const Response &other)
 	return (*this);
 }
 
+void	Response::_selectMatchingBlock()
+{
+
+}
+
+void	Response::_processMethod()
+{
+	Response::listOfHttpMethods::const_iterator	ite;
+
+	ite = _httpMethods.find(_request->getMethod());
+	if (ite == _httpMethods.end())
+			return (setStatusCode(METHOD_NOT_ALLOWED));
+	(this->*ite->second)();
+}
+
 void	Response::generateResponse()
+{
+	if (_requestIsValid())
+	{
+		_selectMatchingBlock();
+		if (!_checkBodyLimit())
+			return (setStatusCode(PAYLOAD_TOO_LARGE));
+		_processMethod();
+		_generateResponseLine();
+		_generateHeaders();
+	}
+	else {}
+	/*********	Invalid request *********/
+}
+
+void	Response::_generateResponseLine()
 {
 	_response = "HTTP/1.1 "
 		+ _request->getStatusCodeStr() + " "
 		+ getStatusMessage(_request->getStatusCode());
-	// "HTTP/1.1 200 OK";
-	_response += "\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\nHello world !\r\n";
+}
+
+void	Response::_generateHeaders()
+{
+	Response::listOfHeaders::const_iterator	ite;
+
+	_headers["Server"] = WEBSERV_VERSION;
+	_headers["Content-Type"] = _getContentTypeHeader();
+	_headers["Content-Length"] = _body.length();
+	_headers["Date"] = _getDateHeader();
+	for (ite = _headers.begin(); ite != _headers.end(); ite++)
+		_response += ite->first + ": " + ite->second + "\r\n";
+
+}
+
+std::string		Response::_generateStatusPage()
+{
+	std::string	statusPage;
+
+	statusPage = "<!DOCTYPE html>\n\
+	  	<html><head>\n\
+	  	<title>" + getStatusCodeStr() + " - " + getStatusMessage(_statusCode) + "</title>\n\
+	  	</head>\n\
+	  	<body><p>Hello world!</p></body>\n\
+	  	</html>";
+	return (statusPage);
+}
+
+/******************************************************************************/
+/*                                 METHODS                                    */
+/******************************************************************************/
+
+void	Response::_getMethod()
+{
+	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
+}
+
+void	Response::_postMethod()
+{
+	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
+}
+
+void	Response::_deleteMethod()
+{
+	std::cout << GREEN << "DELETE METHOD" << RESET << std::endl;
+}
+
+/******************************************************************************/
+/*                                  UTILS                                     */
+/******************************************************************************/
+
+std::string		Response::_getContentTypeHeader()
+{
+	return ("text/plain");
+}
+
+std::string		Response::_getDateHeader()
+{
+	std::time_t	time;
+    char		mbstr[100];
+
+	time = std::time(nullptr);
+    if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X %Z", std::localtime(&time)))
+	{ /* Error Date */ }
+	return (std::string(mbstr));
+}
+
+bool	Response::_requestIsValid()
+{
+	return (_request && _request->getStatusCode() < 400);
+}
+
+bool	Response::_checkBodyLimit()
+{
+	return (_request->getBodySize() < _matchingBlock->getClientBodyLimit());
+}
+
+void	Response::setStatusCode(t_statusCode status)
+{
+	_statusCode = status;
 }
 
 const std::string	Response::getStatusMessage(int statusCode)
@@ -54,19 +167,6 @@ const std::string	Response::getMimeType(const std::string &ext)
 	if (ite != _mimeTypes.end())
 		return ite->second;
 	return (_mimeTypes[".bin"]);
-}
-
-std::string		Response::_generateStatusPage()
-{
-	std::string	statusPage;
-
-	statusPage = "<!DOCTYPE html>\n\
-	  	<html><head>\n\
-	  	<title>" + getStatusCodeStr() + " - " + getStatusMessage(_statusCode) + "</title>\n\
-	  	</head>\n\
-	  	<body><p>Hello world!</p></body>\n\
-	  	</html>";
-	return (statusPage);
 }
 
 /******************************************************************************/
@@ -99,6 +199,13 @@ std::string		Response::getStatusCodeStr() const
 /******************************************************************************/
 /*                                   INIT                                     */
 /******************************************************************************/
+
+void	Response::_initHttpMethods()
+{
+	_httpMethods[GET] = &Response::_getMethod;
+	_httpMethods[POST] = &Response::_postMethod;
+	_httpMethods[DELETE] = &Response::_deleteMethod;
+}
 
 void	Response::_initStatusCodes()
 {

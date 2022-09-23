@@ -66,6 +66,7 @@ class   Request
 		listOfParsingFunctions		getParsingFunct() const;
 		bool						getChunkedTransfer() const;
 		size_t						getBodySize() const;
+		std::string					getBody() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();

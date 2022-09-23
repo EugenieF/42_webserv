@@ -50,7 +50,7 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-        _request = new Request(_runningServer, buffer);
+        _request = new Request(buffer);
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
