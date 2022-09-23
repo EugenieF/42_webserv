@@ -1,5 +1,8 @@
 # include "utils.hpp"
 
+StatusCode		g_statusCode;
+MimeType		g_mimeType;
+
 std::string	convertSizeToString(size_t size)
 {
 	std::stringstream	ss;

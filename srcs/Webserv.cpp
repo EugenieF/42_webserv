@@ -1,19 +1,12 @@
 #include "Webserv.hpp"
 
-StatusCode		g_statusCode;
-MimeType		g_mimeType;
-
 /******************************************************************************/
 /*                                  MAIN                                      */
 /******************************************************************************/
 
 Webserv::Webserv(): _parser() {}
 
-Webserv::Webserv(std::string configFile): _parser(configFile)
-{
-	initStatusCodesMap();
-	initMimeTypesMap();
-}
+Webserv::Webserv(std::string configFile): _parser(configFile) {}
 
 Webserv::Webserv(const Webserv& other): _parser(other.getParser())
 {

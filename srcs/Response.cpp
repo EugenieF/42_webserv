@@ -13,8 +13,6 @@ Response::Response(Block *server, Request* request):
 	_method(_request->getMethod())
 {
 	_initHttpMethods();
-	_initStatusCodes();
-	_initMimeTypes();
 }
 
 Response::Response(const Response &other):
@@ -62,8 +60,8 @@ void	Response::_processMethod()
 
 void	Response::generateResponse()
 {
-	// if (_requestIsValid())
-	// {
+	if (_requestIsValid())
+	{
 		_selectMatchingBlock();
 		if (!_checkBodyLimit())
 			return (setStatusCode(PAYLOAD_TOO_LARGE));
@@ -71,7 +69,7 @@ void	Response::generateResponse()
 		_generateResponseLine();
 		_generateHeaders();
 		_response += _body;
-	// }
+	}
 	// else {}
 	/*********	Invalid request *********/
 	// _response += "That's the response!";
@@ -82,7 +80,7 @@ void	Response::_generateResponseLine()
 {
 	_response = "HTTP/1.1 "
 		+ _request->getStatusCodeStr() + " "
-		+ g_statusCode[_statusCode];
+		+ g_statusCode[_statusCode]
 		+ "\r\n";
 }
 

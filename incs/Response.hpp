@@ -60,8 +60,6 @@ class   Response
 	private:
 						/*-------   Init    ------*/
 		void								_initHttpMethods();
-		void								_initStatusCodes();
-		void								_initMimeTypes();
 
 
         std::string							_generateStatusPage();

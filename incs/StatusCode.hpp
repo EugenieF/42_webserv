@@ -1,8 +1,11 @@
 #ifndef HTTP_STATUS_CODE_HPP
 # define HTTP_STATUS_CODE_HPP
 
+# include <iostream>
 # include <string>
 # include <map>
+
+# include "Colors.hpp"
 
 typedef enum e_statusCode
 {

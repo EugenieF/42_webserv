@@ -10,13 +10,9 @@ StatusCode::~StatusCode() {}
 std::string&	StatusCode::operator[](int statusCode)
 {
 	std::map<int, std::string>::iterator	ite;
-	std::string								message;
 
-	message = "";
 	ite = _statusCodes.find(statusCode);
-	if (ite != _statusCodes.end())
-		message = ite->second;
-	return (message);
+	return (ite->second);
 }
 
 void	StatusCode::_initStatusCodesMap()
