@@ -9,7 +9,8 @@ Response::Response(Request* request, Block *server):
 	_statusCode(OK),
 	_body(""),
 	_request(request),
-	_server(server)
+	_server(server),
+	_method(_request->getMethod())
 {
 	_initHttpMethods();
 	_initStatusCodes();
@@ -48,11 +49,15 @@ void	Response::_processMethod()
 {
 	Response::listOfHttpMethods::const_iterator	ite;
 
-	ite = _httpMethods.find(_request->getMethod());
+	/* Check method validity */
+	if (!_matchingBlock->isAllowedMethod(_method))
+		return (setStatusCode(METHOD_NOT_ALLOWED));
+	_buildPath();
+	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 			return (setStatusCode(METHOD_NOT_ALLOWED));
 	(this->*ite->second)();
-	_body = "Response body";
+	_body = "That's the response body for testing";
 }
 
 void	Response::generateResponse()
@@ -75,7 +80,8 @@ void	Response::_generateResponseLine()
 {
 	_response = "HTTP/1.1 "
 		+ _request->getStatusCodeStr() + " "
-		+ getStatusMessage(_request->getStatusCode());
+		+ getStatusMessage(_request->getStatusCode())
+		+ "\r\n";
 }
 
 void	Response::_generateHeaders()
@@ -126,6 +132,23 @@ void	Response::_deleteMethod()
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
+
+std::string		Response::_buildPath()
+{
+	std::string		path;
+
+	if (_uploadPathDirective())
+		path = _matchingBlock->getUploadPath();
+	else
+		path = _matchingBlock->getRoot();
+	path += "/" + _request->getPath();
+	return (path);
+}
+
+bool	Response::_uploadPathDirective()
+{
+	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
+}
 
 std::string		Response::_getContentTypeHeader()
 {

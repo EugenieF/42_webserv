@@ -31,6 +31,7 @@ class   Response
 		Block*								_server;
 		Block*								_matchingBlock;
 		listOfHeaders						_headers;
+		t_method							_method;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -66,6 +67,7 @@ class   Response
 		void								_generateResponseLine();
 		void								_generateHeaders();
 		void								_selectMatchingBlock();
+		std::string							_buildPath();
 
 						/*-------  Methods   ------*/
 		void								_processMethod();
@@ -74,6 +76,7 @@ class   Response
 		void								_deleteMethod();
 
 						/*-------   Utils    ------*/
+		bool								_uploadPathDirective();
 		std::string							_getDateHeader();
 		std::string							_getContentTypeHeader();
 		bool								_requestIsValid();
