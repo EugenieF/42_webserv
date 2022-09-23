@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/09/23 16:16:57 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/23 16:27:36 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,7 +171,9 @@ void EpollInstance::_handleRequest(int index) {
 	/******************************************************************************************/
 	t_requestStatus requestStatus = _client.parseRequest(str);
 	std::cout << YELLOW << "HANDLE REQUEST : fd " << _events[index].data.fd << ": " << requestStatus << RESET << NL;
-	if (requestStatus != INCOMPLETE_REQUEST)
+	if (requestStatus == ERROR_REQUEST)
+		_removeSocket(_events[index].data.fd);
+	else if (requestStatus == COMPLETE_REQUEST)
 		_editSocket(_events[index].data.fd, EPOLLOUT);
 	/*******************************************************************************************/
 
@@ -199,8 +201,8 @@ void EpollInstance::_handleResponse(int index) {
 
 	// if (write(_events[index].data.fd, str.c_str(), str.size()) < 0)
 		// throw std::runtime_error("handleResponse (write) error");
+	_removeSocket(_events[index].data.fd);
 	_editSocket(_events[index].data.fd, EPOLLIN);
-	//_removeSocket(_events[index].data.fd);
 	//if (close(_events[index].data.fd) < 0)
 	//	throw std::runtime_error("handleResponse (close) error");
 	
