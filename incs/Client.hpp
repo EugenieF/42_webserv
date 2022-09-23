@@ -23,6 +23,7 @@ class Client
 
         t_requestStatus parseRequest(std::string const& buffer);
         std::string     generateResponse();
+		void			clear();
 
 						/*-------     Getter      ------*/
         Block*          getRunningServer() const;
