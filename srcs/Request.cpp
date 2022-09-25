@@ -140,7 +140,6 @@ void	Request::_parseHeaders()
 			break ;
 		_getNextWord(headerValue, "\r\n");
 		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
-		std::cout << YELLOW << headerName << ": '" << headerValue << "'" << RESET << std::endl;
 		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
 			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		_headers[headerName] = headerValue;
@@ -159,7 +158,7 @@ void	Request::_checkHeaders()
 		return (_requestIsInvalid(BAD_REQUEST));
 	_host = ite->second;
 	if (_method != POST)
-		return (_setRequestStatus(COMPLETE_REQUEST));
+		return ;
 	ite = _headers.find("transfer-encoding");
 	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos) // not really sure about this
 	{
@@ -192,6 +191,7 @@ void	Request::_parseBody()
 	{
 		_getNextWord(_body, "\r\n\r\n");
 		_bodySize = _body.length();
+		return (_setRequestStatus(COMPLETE_REQUEST));
 	}
 	// if (_request.length() < _bodySize) {}
 }

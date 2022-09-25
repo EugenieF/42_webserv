@@ -18,7 +18,7 @@ class   Response
 	public:
 	/***********************      MEMBER TYPES      *********************/
 		typedef Block::t_method						t_method;
-		typedef void (Response::*httpMethod)(std::string);
+		typedef void (Response::*httpMethod)(std::string&);
 		typedef std::map<t_method, httpMethod>		listOfHttpMethods;
 		typedef Request::listOfHeaders				listOfHeaders;
 

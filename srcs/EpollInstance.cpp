@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/09/23 16:27:36 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/25 17:08:09 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,7 +170,7 @@ void EpollInstance::_handleRequest(int index) {
 	}
 	/******************************************************************************************/
 	t_requestStatus requestStatus = _client.parseRequest(str);
-	std::cout << YELLOW << "HANDLE REQUEST : fd " << _events[index].data.fd << ": " << requestStatus << RESET << NL;
+	// std::cout << YELLOW << "HANDLE REQUEST : fd " << _events[index].data.fd << ": " << requestStatus << RESET << NL;
 	if (requestStatus == INVALID_REQUEST)
 		_removeSocket(_events[index].data.fd);
 	else if (requestStatus == COMPLETE_REQUEST)
