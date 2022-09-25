@@ -148,7 +148,9 @@ std::string		Response::_buildPath()
 		path = _matchingBlock->getUploadPath();
 	else
 		path = _matchingBlock->getRoot();
-	path += "/" + _request->getPath();
+	if (_request->getPath()[0] != '/')
+		path += "/";
+	path += _request->getPath();
 	std::cout << BLUE << "PATH = " << path << RESET << std::endl;
 	return (path);
 }
@@ -166,7 +168,8 @@ std::string		Response::_getContentTypeHeader()
 	if (!_requestIsValid())
 		return (g_mimeType[".html"]);
 	pos = _request->getPath().find(".");
-	typeExtension = _request->getPath().substr(pos);
+	if (pos != std::string::npos)
+		typeExtension = _request->getPath().substr(pos);
 	return (g_mimeType[typeExtension]);
 }
 

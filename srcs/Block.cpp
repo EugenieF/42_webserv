@@ -21,7 +21,7 @@ Block::Block():
 {
 	_initAllowedMethods();
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
-		_methods[i] = false;
+		_methods[i] = true; // Need to think about this, init to false or true ?
 	if (!getuid())
 		setPort(80);
 }
@@ -293,7 +293,9 @@ bool	Block::isAllowedMethod(const std::string& str)
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
 	{
 		if (str == _allowedMethods[i])
+		{
 			return (true);
+		}
 	}
 	return (false);
 }
