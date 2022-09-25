@@ -154,8 +154,10 @@ void	Request::_checkHeaders()
 	std::string								contentLength;
 	size_t									size;
 
-	if (_headers.find("host") == _headers.end())
+	ite = _headers.find("host");
+	if (ite == _headers.end())
 		return (_requestIsInvalid(BAD_REQUEST));
+	_host = ite->second;
 	if (_method != POST)
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	ite = _headers.find("transfer-encoding");
@@ -281,6 +283,11 @@ size_t	Request::getBodySize() const
 std::string		Request::getBody() const
 {
 	return (_body);
+}
+
+std::string		Request::getHost() const
+{
+	return (_host);
 }
 
 /******************************************************************************/

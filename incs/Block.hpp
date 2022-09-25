@@ -85,6 +85,7 @@ class	Block
 		Block(const Block& other);
 		~Block();
 		Block&								operator=(const Block& other);
+		Block*								getMatchingBlock(std::string const& host, std::string const& path);
 
 						/*-------  Server_name  ------*/
 		void								setName(const std::string &name);
@@ -121,6 +122,7 @@ class	Block
 						/*-------  Error_page  -------*/
 		void								setErrorPage(int code, const std::string& page);
 		listOfErrorPages					getErrorPages();
+		std::string							getErrorPage(int statusCode);
 
 						/*-------    Redirect  -------*/
 		void								setRedirection(int code, const std::string& uri);

@@ -71,6 +71,12 @@ Block&	Block::operator=(const Block& other)
 	return (*this);
 }
 
+Block*		Block::getMatchingBlock(std::string const& host, std::string const& path)
+{
+	std::cout << BLUE << "Host : " << host << " | path : " << path << RESET << std::endl;
+	return (this);
+}
+
 /******************************************************************************/
 /*                              SERVER_NAME                                   */
 /******************************************************************************/
@@ -201,6 +207,18 @@ void	Block::setErrorPage(int code, const std::string& page)
 Block::listOfErrorPages		Block::getErrorPages()
 {
 	return (_errorPages);
+}
+
+std::string		Block::getErrorPage(int statusCode)
+{
+	Block::listOfErrorPages::const_iterator	ite;
+	std::string								errorPage;
+
+	errorPage = "";
+	ite = _errorPages.find(statusCode);
+	if (ite != _errorPages.end())
+		errorPage = ite->second;
+	return (errorPage);
 }
 
 /******************************************************************************/

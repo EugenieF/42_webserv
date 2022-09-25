@@ -40,21 +40,22 @@ Response&	Response::operator=(const Response &other)
 
 void	Response::_selectMatchingBlock()
 {
-	_matchingBlock = _server;
+	_matchingBlock = _server->getMatchingBlock(_request->getHost(), _request->getPath());
 }
 
 void	Response::_processMethod()
 {
 	Response::listOfHttpMethods::const_iterator	ite;
+	std::string									path;
 
 	// /* Check method validity */
 	if (!_matchingBlock->isAllowedMethod(_method))
 		return (setStatusCode(METHOD_NOT_ALLOWED));
-	// _buildPath();
+	path = _buildPath();
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 			return (setStatusCode(METHOD_NOT_ALLOWED));
-	(this->*ite->second)();
+	(this->*ite->second)(path);
 	_body = "That's the response body for testing";
 }
 
@@ -71,12 +72,12 @@ void	Response::generateResponse()
 	{
 		_body = _generateErrorPage();
 	}
-	_generateResponseLine();
-	_generateHeaders();
+	_fillResponseLine();
+	_fillHeaders();
 	_response += _body;
 }
 
-void	Response::_generateResponseLine()
+void	Response::_fillResponseLine()
 {
 	_response = "HTTP/1.1 "
 		+ getStatusCodeStr() + " "
@@ -84,7 +85,7 @@ void	Response::_generateResponseLine()
 		+ "\r\n";
 }
 
-void	Response::_generateHeaders()
+void	Response::_fillHeaders()
 {
 	Response::listOfHeaders::const_iterator	ite;
 
@@ -94,38 +95,44 @@ void	Response::_generateHeaders()
 	_headers["Date"] = _getDateHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
-
 }
 
 std::string		Response::_generateErrorPage()
 {
-	std::string	statusPage;
+	std::string	errorPage;
 
-	statusPage = "<!DOCTYPE html>\n\
-	  	<html><head>\n\
-	  	<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
-	  	</head>\n\
-	  	<body><p>Hello world!</p></body>\n\
-	  	</html>";
-	return (statusPage);
+	errorPage = _server->getErrorPage(_statusCode);
+	if (errorPage.empty())
+	{
+		errorPage = "<!DOCTYPE html>\n\
+	  		<html><head>\n\
+	  		<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
+	  		</head>\n\
+	  		<body><p>Hello world!</p></body>\n\
+	  		</html>";
+	}
+	return (errorPage);
 }
 
 /******************************************************************************/
 /*                                 METHODS                                    */
 /******************************************************************************/
 
-void	Response::_getMethod()
+void	Response::_getMethod(std::string& path)
 {
+	(void)path;
 	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
 }
 
-void	Response::_postMethod()
+void	Response::_postMethod(std::string& path)
 {
+	(void)path;
 	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
 }
 
-void	Response::_deleteMethod()
+void	Response::_deleteMethod(std::string& path)
 {
+	(void)path;
 	std::cout << GREEN << "DELETE METHOD" << RESET << std::endl;
 }
 
@@ -142,6 +149,7 @@ std::string		Response::_buildPath()
 	else
 		path = _matchingBlock->getRoot();
 	path += "/" + _request->getPath();
+	std::cout << BLUE << "PATH = " << path << RESET << std::endl;
 	return (path);
 }
 
@@ -152,9 +160,14 @@ bool	Response::_uploadPathDirective()
 
 std::string		Response::_getContentTypeHeader()
 {
+	size_t			pos;
+	std::string		typeExtension;
+
 	if (!_requestIsValid())
 		return (g_mimeType[".html"]);
-	return (g_mimeType[".txt"]);
+	pos = _request->getPath().find(".");
+	typeExtension = _request->getPath().substr(pos);
+	return (g_mimeType[typeExtension]);
 }
 
 std::string		Response::_getDateHeader()
@@ -165,7 +178,7 @@ std::string		Response::_getDateHeader()
 	time = std::time(NULL);
     if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X GMT", std::localtime(&time)))
 	{ /* Error Date */ }
-	return (std::string(mbstr));
+	return(std::string(mbstr));
 }
 
 bool	Response::_requestIsValid()

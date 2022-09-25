@@ -35,11 +35,11 @@ class   Request
 		std::string					_httpProtocol;
 		std::string					_body;
 		size_t						_bodySize;
-		// struct timeval				_time;
 		t_statusCode				_statusCode;
 		listOfParsingFunctions		_parsingFunct;
 		listOfHeaders				_headers;
 		bool						_chunkedTransfer;
+		std::string					_host;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -67,6 +67,7 @@ class   Request
 		bool						getChunkedTransfer() const;
 		size_t						getBodySize() const;
 		std::string					getBody() const;
+		std::string					getHost() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();

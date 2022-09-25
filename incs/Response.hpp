@@ -18,7 +18,7 @@ class   Response
 	public:
 	/***********************      MEMBER TYPES      *********************/
 		typedef Block::t_method						t_method;
-		typedef void (Response::*httpMethod)();
+		typedef void (Response::*httpMethod)(std::string);
 		typedef std::map<t_method, httpMethod>		listOfHttpMethods;
 		typedef Request::listOfHeaders				listOfHeaders;
 
@@ -63,16 +63,16 @@ class   Response
 
 
         std::string							_generateErrorPage();
-		void								_generateResponseLine();
-		void								_generateHeaders();
+		void								_fillResponseLine();
+		void								_fillHeaders();
 		void								_selectMatchingBlock();
 		std::string							_buildPath();
 
 						/*-------  Methods   ------*/
 		void								_processMethod();
-		void								_getMethod();
-		void								_postMethod();
-		void								_deleteMethod();
+		void								_getMethod(std::string& path);
+		void								_postMethod(std::string& path);
+		void								_deleteMethod(std::string& path);
 
 						/*-------   Utils    ------*/
 		bool								_uploadPathDirective();
