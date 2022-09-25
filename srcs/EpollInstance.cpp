@@ -174,7 +174,10 @@ void EpollInstance::_handleRequest(int index) {
 	if (requestStatus == INVALID_REQUEST)
 		_removeSocket(_events[index].data.fd);
 	else if (requestStatus == COMPLETE_REQUEST)
+	{
 		_editSocket(_events[index].data.fd, EPOLLOUT);
+	}
+	std::cout << "###############################################" << std::endl;
 	/*******************************************************************************************/
 
 	// std::cout << "Msg read from " << _events[index].data.fd << ": \n" << str << NL;
