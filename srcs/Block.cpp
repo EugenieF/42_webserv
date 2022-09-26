@@ -21,7 +21,7 @@ Block::Block():
 {
 	_initAllowedMethods();
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
-		_methods[i] = false;
+		_methods[i] = true; // Need to think about this, init to false or true ?
 	if (!getuid())
 		setPort(80);
 }
@@ -69,6 +69,12 @@ Block&	Block::operator=(const Block& other)
 		_uploadPath = other.getUploadPath();
 	}
 	return (*this);
+}
+
+Block*		Block::getMatchingBlock(std::string const& host, std::string const& path)
+{
+	std::cout << BLUE << "Host : " << host << " | path : " << path << RESET << std::endl;
+	return (this);
 }
 
 /******************************************************************************/
@@ -203,6 +209,18 @@ Block::listOfErrorPages		Block::getErrorPages()
 	return (_errorPages);
 }
 
+std::string		Block::getErrorPage(int statusCode)
+{
+	Block::listOfErrorPages::const_iterator	ite;
+	std::string								errorPage;
+
+	errorPage = "";
+	ite = _errorPages.find(statusCode);
+	if (ite != _errorPages.end())
+		errorPage = ite->second;
+	return (errorPage);
+}
+
 /******************************************************************************/
 /*                                 REDIRECT                                   */
 /******************************************************************************/
@@ -275,7 +293,9 @@ bool	Block::isAllowedMethod(const std::string& str)
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
 	{
 		if (str == _allowedMethods[i])
+		{
 			return (true);
+		}
 	}
 	return (false);
 }

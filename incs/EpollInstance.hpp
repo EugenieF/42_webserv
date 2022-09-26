@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/09/20 18:15:11 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/23 13:00:15 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 # include "TcpSocket.hpp"
 # include "utils.hpp"
-# include "Colors.hpp"
+# include "Client.hpp"
 
 # define BUFSIZE 2048
 # define MAX_EVENT 100
@@ -35,7 +35,7 @@ class EpollInstance {
 		/* -- Typedef ------------------------------------------------------ */
 		typedef		std::set<int>::iterator				it;
 
-		EpollInstance();
+		EpollInstance(Block* x);
 		virtual ~EpollInstance();
 
 		/* -- Epoll manipulation ------------------------------------------- */
@@ -63,6 +63,10 @@ class EpollInstance {
 		int							_serversocket;
 		struct epoll_event			_events[MAX_EVENT];
 		std::set<int>				_clientlist;
+
+/****************************************************************************************/
+		Client						_client;
+/****************************************************************************************/
 };
 
 #endif

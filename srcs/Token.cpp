@@ -56,17 +56,11 @@ size_t	Token::getLineNbr() const
 
 std::string		Token::getLineStr() const
 {
-	std::stringstream	ss;
-
-	ss << _line;
-	return (ss.str());
+	return (convertSizeToString(_line));
 }
 
-std::string		Token::getLineStr(int nb) const
+std::string		Token::getLineStr(size_t nb) const
 {
-	std::stringstream	ss;
-
-	ss << _line + nb;
-	return (ss.str());
+	return (convertSizeToString(_line + nb));
 }
 

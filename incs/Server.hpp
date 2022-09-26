@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
+/*   Updated: 2022/09/26 11:15:25 by efrancon         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
@@ -12,9 +24,8 @@ class Server
 		int			_fd;
 
 	public:
-	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
-		Server();
-		~Server();
+		Server(Block& x);
+		virtual ~Server();
 
 						/*-------   Getter   ------*/
 		int			getFd() const;

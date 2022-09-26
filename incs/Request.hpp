@@ -7,11 +7,18 @@
 #include "Block.hpp"
 #include "StatusCode.hpp"
 
+typedef enum t_requestStatus
+{
+	INCOMPLETE_REQUEST	= 0,
+	COMPLETE_REQUEST	= 1,
+	INVALID_REQUEST		= 2,
+}	t_requestStatus;
+
 class   Request
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef Block::t_method					t_method;
+		typedef Block::t_method						t_method;
 		typedef void (Request::*parsingFunction)();
 		typedef std::vector<parsingFunction>		listOfParsingFunctions;
 		typedef std::map<std::string, std::string>	listOfHeaders;
@@ -20,16 +27,17 @@ class   Request
 	/**********************     MEMBER VARIABLES     ********************/
 		Block*						_server;
 		std::string					_request;
+		t_requestStatus				_requestStatus;
 		t_method					_method;
 		std::string					_uri;
 		std::string					_httpProtocol;
 		std::string					_body;
-		// size_t						_bodySize;
-		// struct timeval				_time;
+		size_t						_bodySize;
 		t_statusCode				_statusCode;
-		bool						_requestIsValid;
 		listOfParsingFunctions		_parsingFunct;
 		listOfHeaders				_headers;
+		bool						_chunkedTransfer;
+		std::string					_host;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -42,7 +50,7 @@ class   Request
         Request&    				operator=(const Request& other);
 
 						/*------   Parsing  ------*/
-		bool						parseRequest();
+		t_requestStatus				parseRequest();
 		void						completeRequest(const std::string& buffer);
 
 						/*------   Getter  ------*/
@@ -52,8 +60,12 @@ class   Request
 		std::string					getHttpProtocol() const;
 		t_statusCode				getStatusCode() const;
 		std::string					getStatusCodeStr() const;
-		bool						getRequestValidity() const;
+		t_requestStatus				getRequestStatus() const;
 		listOfParsingFunctions		getParsingFunct() const;
+		bool						getChunkedTransfer() const;
+		size_t						getBodySize() const;
+		std::string					getBody() const;
+		std::string					getHost() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
@@ -68,13 +80,17 @@ class   Request
 		void						_parseHeaders();
 		void						_checkHeaders();
 		void						_parseBody();
+		void						_parseChunks();
 
 						/*------   Utils  ------*/
 		void						_initParsingFunct();
+		void						_setRequestStatus(t_requestStatus status);
 		void						_requestIsInvalid(t_statusCode code);
 		size_t						_getNextWord(std::string& word, std::string const& delimiter);
+		std::string					_getNextWord(size_t sizeWord);
 		std::string					_toLowerStr(std::string* str);
 		std::string					_trimSpaceStr(std::string *str, const char *toTrim = " \t");
+		bool						_reachedEndOfChunkedBody();
 
 };
 

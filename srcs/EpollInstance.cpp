@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/09/20 18:15:54 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/25 17:08:09 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 # include "EpollInstance.hpp"
 
-EpollInstance::EpollInstance() : _efd(-1) {
+EpollInstance::EpollInstance(Block* x) : _efd(-1), _client(x) {
 	DEBUG("Epoll constructor");
 }
 
@@ -59,6 +59,7 @@ void EpollInstance::startMonitoring(int servsocket) {
 			} else if (_events[i].data.fd == _serversocket) {
 				_processConnections();
 			} else if (_events[i].events & EPOLLIN) {
+				std::cout << RED << "_events[i].data.fd : " << _events[i].data.fd << RESET << std::endl;
 				_handleRequest(i);
 			} else if (_events[i].events & EPOLLOUT) {
 				_handleResponse(i); 
@@ -167,28 +168,46 @@ void EpollInstance::_handleRequest(int index) {
 			break ;
 		}
 	}
-	std::cout << YELLOW << "Msg read from " << _events[index].data.fd << ": \n" << str << RESET << NL;
-	_editSocket(_events[index].data.fd, EPOLLOUT);
+	/******************************************************************************************/
+	t_requestStatus requestStatus = _client.parseRequest(str);
+	// std::cout << YELLOW << "HANDLE REQUEST : fd " << _events[index].data.fd << ": " << requestStatus << RESET << NL;
+	if (requestStatus == INVALID_REQUEST)
+		_removeSocket(_events[index].data.fd);
+	else if (requestStatus == COMPLETE_REQUEST)
+		_editSocket(_events[index].data.fd, EPOLLOUT);
+	/*******************************************************************************************/
+
+	// std::cout << "Msg read from " << _events[index].data.fd << ": \n" << str << NL;
+	// _editSocket(_events[index].data.fd, EPOLLOUT);
 }
 
 void EpollInstance::_handleResponse(int index) {
 	DEBUG("Response");
-	std::string	str =
-		"<!DOCTYPE html>\n\
-	  	<html><head>\n\
-	  	<title>First try</title>\n\
-	  	</head>\n\
-	  	<body><p>Hello world!</p></body>\n\
-	  	</html>";
+	// std::string	str =
+	// 	"<!DOCTYPE html>\n\
+	//   	<html><head>\n\
+	//   	<title>First try</title>\n\
+	//   	</head>\n\
+	//   	<body><p>Hello world!</p></body>\n\
+	//   	</html>";
+
+	/******************************************************************************************/
+	std::string responseMsg = _client.generateResponse();
 	
-	if (write(_events[index].data.fd, str.c_str(), str.size()) < 0)
+	if (write(_events[index].data.fd, responseMsg.c_str(), responseMsg.size()) < 0)
 		throw std::runtime_error("handleResponse (write) error");
+	_client.clear();
+	/******************************************************************************************/
+
+	// if (write(_events[index].data.fd, str.c_str(), str.size()) < 0)
+		// throw std::runtime_error("handleResponse (write) error");
+	_removeSocket(_events[index].data.fd);
 	_editSocket(_events[index].data.fd, EPOLLIN);
-	//_removeSocket(_events[index].data.fd);
 	//if (close(_events[index].data.fd) < 0)
 	//	throw std::runtime_error("handleResponse (close) error");
 	
 	// cgi or page display
+
 }
 
 void EpollInstance::_clearClients() {

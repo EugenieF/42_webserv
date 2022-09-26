@@ -22,21 +22,36 @@ Request::Request() {}
 Request::Request(Block* server, const std::string& buffer):
 	_server(server),
 	_request(buffer),
+	_requestStatus(INCOMPLETE_REQUEST),
 	_method(NO_METHOD),
 	_uri(""),
 	_httpProtocol(""),
+<<<<<<< HEAD
 	_requestIsValid(true)
+=======
+	_bodySize(0),
+	_statusCode(OK),
+	_chunkedTransfer(false)
+>>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
 {
 	_initParsingFunct();
 }
 
 Request::Request(const Request &other):
 	_request(other.getRequest()),
+	_requestStatus(other.getRequestStatus()),
 	_method(other.getMethod()),
 	_uri(other.getUri()),
 	_httpProtocol(other.getHttpProtocol()),
+<<<<<<< HEAD
 	_requestIsValid(other.getRequestValidity()),
 	_parsingFunct(other.getParsingFunct())
+=======
+	_bodySize(other.getBodySize()),
+	_statusCode(other.getStatusCode()),
+	_parsingFunct(other.getParsingFunct()),
+	_chunkedTransfer(other.getChunkedTransfer())
+>>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
 {
 	*this = other;
 }
@@ -48,10 +63,12 @@ Request&	Request::operator=(const Request &other)
 	if (this != &other)
 	{
 		_request = other.getRequest();
+		_requestStatus = other.getRequestStatus();
 		_method = other.getMethod();
 		_uri = other.getUri();
 		_httpProtocol = other.getHttpProtocol();
-		_requestIsValid = other.getRequestValidity();
+		_bodySize = other.getBodySize();
+		_statusCode = other.getStatusCode(),
 		_parsingFunct = other.getParsingFunct();
 	}
 	return (*this);
@@ -61,14 +78,20 @@ Request&	Request::operator=(const Request &other)
 /*                                  PARSING                                   */
 /******************************************************************************/
 
-bool	Request::parseRequest()
+t_requestStatus	Request::parseRequest()
 {
 	Request::listOfParsingFunctions::const_iterator	ite;
 
-	for (ite = _parsingFunct.begin(); _requestIsValid && ite != _parsingFunct.end(); ite++)
-		(this->**ite)();
+	if (_chunkedTransfer && _requestStatus != COMPLETE_REQUEST)
+		_parseChunks();
+	else
+	{
+		for (ite = _parsingFunct.begin();
+			_requestStatus != COMPLETE_REQUEST && ite != _parsingFunct.end(); ite++)
+			(this->**ite)();
+	}
 	printRequestInfo();
-	return (true);
+	return (_requestStatus);
 }
 	
 void	Request::completeRequest(const std::string& buffer)
@@ -79,12 +102,10 @@ void	Request::completeRequest(const std::string& buffer)
 void	Request::_parseMethod()
 {
 	std::string method;
-	
+
 	_getNextWord(method, " ");
 	if (!_server->isMethod(method))
 		return (_requestIsInvalid(NOT_IMPLEMENTED));
-	if (!_server->isAllowedMethod(method))
-		return (_requestIsInvalid(METHOD_NOT_ALLOWED));
 	_method = _server->getMethod(method);
 }
 
@@ -107,7 +128,7 @@ void	Request::_parseHttpProtocol()
 	_getNextWord(httpProtocol, "\r\n");
 	if (httpProtocol.find("HTTP") == std::string::npos)
 		return (_requestIsInvalid(BAD_REQUEST));
-	if (!(httpProtocol == "HTTP/1.0" || httpProtocol == "HTTP/1.1"))
+	if (httpProtocol != "HTTP/1.1")
 		return (_requestIsInvalid(HTTP_VERSION_NOT_SUPPORTED));
 	_httpProtocol = httpProtocol;
 }
@@ -126,8 +147,12 @@ void	Request::_parseHeaders()
 		if (pos == std::string::npos)
 			break ;
 		_getNextWord(headerValue, "\r\n");
+<<<<<<< HEAD
 		_trimSpaceStr(&headerValue);
 		std::cout << YELLOW << headerName << ": '" << headerValue << "'" << RESET << std::endl;
+=======
+		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
+>>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
 		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
 			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		_headers[headerName] = headerValue;
@@ -137,28 +162,81 @@ void	Request::_parseHeaders()
 
 void	Request::_checkHeaders()
 {
-	if (_headers.find("host") == _headers.end())
-		return (_requestIsInvalid(BAD_REQUEST));
-	// _headers.find("Host");
-	// _headers.find("Transfer-Encoding");
-	// _headers.find("Content-Length");
-	// _headers.find("Content-Type");
-}
+	Request::listOfHeaders::const_iterator	ite;
+	std::string								contentLength;
+	size_t									size;
 
-std::string	Request::_trimSpaceStr(std::string *str, const char *toTrim)
-{
-	str->erase(0, str->find_first_not_of(toTrim));
-	str->erase(str->find_last_not_of(toTrim) + 1);
-	return (*str);
+	ite = _headers.find("host");
+	if (ite == _headers.end())
+		return (_requestIsInvalid(BAD_REQUEST));
+	_host = ite->second;
+	if (_method != POST)
+		return ;
+	ite = _headers.find("transfer-encoding");
+	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos) // not really sure about this
+	{
+		_chunkedTransfer = true;
+		std::cout << "CHUNKED" << std::endl;	
+	}
+	else if (_headers.find("content-length") != _headers.end())
+	{
+		contentLength = _headers["content-length"];
+		size = std::strtoul(contentLength.c_str(), NULL, 10);
+		std::cout << "size = " << size << std::endl;
+		if (contentLength.find_first_not_of("0123456789") != std::string::npos || !size || size >= ULONG_MAX)
+			return (_requestIsInvalid(BAD_REQUEST));
+		_bodySize = size;
+	}
+	else
+		return (_requestIsInvalid(BAD_REQUEST));
+	// _headers.find("Content-Type");
 }
 
 void	Request::_parseBody()
 {
 	std::string		body;
 
-	std::cout << "request : " << _request << std::endl;
-	_getNextWord(body, "\r\n");
-	_body = body;
+	if (_requestStatus == COMPLETE_REQUEST)
+		return ;
+	if (_chunkedTransfer)
+		_parseChunks();
+	else
+	{
+		_getNextWord(_body, "\r\n\r\n");
+		_bodySize = _body.length();
+		return (_setRequestStatus(COMPLETE_REQUEST));
+	}
+	// if (_request.length() < _bodySize) {}
+}
+
+void	Request::_parseChunks()
+{
+	long			chunkSize;
+	std::string		chunk;
+	size_t			pos;
+
+	if (!_reachedEndOfChunkedBody())
+	{
+		_bodySize = _request.length();
+		std::cout << RED << "*****  CHUNKS, INCOMPLETE REQUEST  *****" << std::endl;
+		std::cout << "request = " << _request << RESET << std::endl;
+		return (_setRequestStatus(INCOMPLETE_REQUEST));
+	}
+	while (1)
+	{
+		chunkSize = 0;
+		pos = _getNextWord(chunk, "\r\n");
+		if (pos == std::string::npos)
+			return (_requestIsInvalid(BAD_REQUEST));
+		chunkSize = std::strtol(chunk.c_str(), NULL, 16);
+		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
+			return (_requestIsInvalid(BAD_REQUEST));
+		if (!chunkSize)
+			return (_setRequestStatus(COMPLETE_REQUEST));
+		chunk = _getNextWord(chunkSize);
+		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
+		_body += chunk;
+	}
 }
 
 /******************************************************************************/
@@ -190,9 +268,9 @@ Request::listOfParsingFunctions		Request::getParsingFunct() const
 	return (_parsingFunct);
 }
 
-bool	Request::getRequestValidity() const
+t_requestStatus		Request::getRequestStatus() const
 {
-	return (_requestIsValid);
+	return (_requestStatus);
 }
 
 t_statusCode	Request::getStatusCode() const
@@ -202,15 +280,45 @@ t_statusCode	Request::getStatusCode() const
 
 std::string		Request::getStatusCodeStr() const
 {
-	std::stringstream	ss;
-
-	ss << _statusCode;
-	return (ss.str());
+	return (convertNbToString(_statusCode));
 }
 
+<<<<<<< HEAD
+=======
+bool	Request::getChunkedTransfer() const
+{
+	return (_chunkedTransfer);
+}
+
+size_t	Request::getBodySize() const
+{
+	return (_bodySize);
+}
+
+std::string		Request::getBody() const
+{
+	return (_body);
+}
+
+std::string		Request::getHost() const
+{
+	return (_host);
+}
+
+>>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
+
+bool	Request::_reachedEndOfChunkedBody()
+{
+	return (_request.find("0\r\n\r\n") != std::string::npos);
+}
+
+void	Request::_setRequestStatus(t_requestStatus status)
+{
+	_requestStatus = status;
+}
 
 std::string		Request::_toLowerStr(std::string* str)
 {
@@ -232,10 +340,26 @@ size_t	Request::_getNextWord(std::string &word, std::string const& delimiter)
 	return (pos);
 }
 
+std::string		Request::_getNextWord(size_t sizeWord)
+{
+	std::string nextWord;
+
+	nextWord = _request.substr(0, sizeWord);
+	_request.erase(0, sizeWord + 2);
+	return (nextWord);
+}
+
 void	Request::_requestIsInvalid(t_statusCode code)
 {
 	_statusCode = code;
-	_requestIsValid = false;
+	_requestStatus = INVALID_REQUEST;
+}
+
+std::string	Request::_trimSpaceStr(std::string *str, const char *toTrim)
+{
+	str->erase(0, str->find_first_not_of(toTrim));
+	str->erase(str->find_last_not_of(toTrim) + 1);
+	return (*str);
 }
 
 void	Request::_initParsingFunct()
@@ -249,7 +373,7 @@ void	Request::_initParsingFunct()
 }
 
 /******************************************************************************/
-/*                                  UTILS                                     */
+/*                                 DISPLAY                                    */
 /******************************************************************************/
 
 void	Request::printRequestInfo()
@@ -258,7 +382,11 @@ void	Request::printRequestInfo()
 
 	std::cout <<  BLUE << "------------ INFO REQUEST -------------" << std::endl;
 	std::cout << "          method : " << GREEN << _method << std::endl;
+<<<<<<< HEAD
 	std::cout << BLUE << "             uri : " << GREEN << _uri << std::endl;
+=======
+	std::cout << BLUE << "            path : " << GREEN << _path << std::endl;
+>>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
 	std::cout << BLUE << "    httpProtocol : " << GREEN << _httpProtocol << std::endl;
 	std::cout << BLUE << "      statusCode : " << GREEN << _statusCode << std::endl;
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
