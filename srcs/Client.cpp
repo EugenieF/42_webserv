@@ -85,10 +85,29 @@ void	Client::clear()
 
 Block*  Client::findMatchingServer(std::string requestedHost)
 {
-    listOfServers::const_iterator   ite;
+    listOfServers::iterator  	 	ite;
+	std::vector<Block*>				matchingServers;
+	size_t							pos;
+	std::string						serverHost;
+	int								serverPort;
 
+	// Check listen -> host and listen
+	// If multiple -> check server_names
+	// Default server
+	pos = requestedHost.find(":");
+	serverHost = requestedHost;
+	serverPort = UNDEFINED_PORT;
+	if (pos != std::string::npos)
+	{
+		serverHost = requestedHost.substr(0, pos);
+		serverPort = atoi(requestedHost.substr(pos + 1).c_str());
+	}
     for (ite = _servers.begin(); ite != _servers.end(); ite++)
     {
+		if (serverHost == (*ite)->getHost() && (serverPort == (*ite)->getPort() || serverPort == UNDEFINED_PORT))
+		{
+			matchingServers.push_back(*ite);
+		}
         std::cout << RED << "host : " << (*ite)->getHost() << " | port : " << (*ite)->getPort() << " | requestedHost : " << requestedHost << RESET << std::endl;
     }
     return (_servers[0]);
