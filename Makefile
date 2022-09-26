@@ -3,6 +3,7 @@ NAME    		= webserv
 SRCS_DIR		= ./srcs
 
 SRCS			= main.cpp \
+				utils.cpp \
 				Token.cpp \
 				Lexer.cpp \
 				Parser.cpp \
@@ -15,9 +16,9 @@ SRCS			= main.cpp \
 				TcpSocket.cpp \
 				Server.cpp \
 				Client.cpp \
-				utils.cpp \
 				StatusCode.cpp \
-				MimeType.cpp
+				MimeType.cpp \
+				HttpMethod.cpp
 
 OBJS_DIR		= ./objs
 

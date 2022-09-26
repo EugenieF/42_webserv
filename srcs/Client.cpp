@@ -12,14 +12,14 @@ are done in a non-blocking manner. */
 
 Client::Client() {}
 
-Client::Client(Block* server):
-    _runningServer(server),
+Client::Client(Client::listOfServers servers):
+    _servers(servers),
     _request(0),
     _response(0)
 {}
 
 Client::Client(Client const& other):
-    _runningServer(other.getRunningServer()),
+    _servers(other.getServers()),
     _request(other.getRequest()),
     _response(other.getResponse())
 {
@@ -38,7 +38,7 @@ Client&     Client::operator=(Client const& other)
 {
     if (this != &other)
     {
-        _runningServer = other.getRunningServer();
+        _servers = other.getServers();
         _request = other.getRequest();
         _response = other.getResponse();
     }
@@ -50,7 +50,7 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-        _request = new Request(_runningServer, buffer);
+        _request = new Request(buffer);
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
@@ -59,9 +59,12 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
 
 std::string     Client::generateResponse()
 {
+    Block*  matchingServer;
+
+    matchingServer = findMatchingServer();
     if (_response)
         delete _response;
-    _response = new Response(_runningServer, _request);
+    _response = new Response(matchingServer, _request);
     _response->generateResponse();
     return (_response->getResponse());
 }
@@ -80,13 +83,24 @@ void	Client::clear()
 	}
 }
 
+Block*  Client::findMatchingServer()
+{
+    listOfServers::const_iterator   ite;
+
+    for (ite = _servers.begin(); ite != _servers.end(); ite++)
+    {
+        std::cout << RED << "host : " << (*ite)->getHost() << " | port : " << (*ite)->getPort() << RESET << std::endl;
+    }
+    return (_servers[0]);
+}
+
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
 
-Block*  Client::getRunningServer() const
+Client::listOfServers   Client::getServers() const
 {
-    return (_runningServer);
+    return (_servers);
 }
 
 Request*    Client::getRequest() const

@@ -5,10 +5,10 @@
 # include <map>
 # include <ctime>
 
+# define WEBSERV_VERSION	"Cutie Webserv 1.0"
+
 # include "Request.hpp"
 # include "MimeType.hpp"
-
-# define WEBSERV_VERSION	"Cutie Webserv 1.0"
 
 extern StatusCode	g_statusCode;
 extern MimeType		g_mimeType;
@@ -17,15 +17,15 @@ class   Response
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef Block::t_method						t_method;
+		// typedef Block::t_method						t_method;
 		typedef void (Response::*httpMethod)(std::string&);
-		typedef std::map<t_method, httpMethod>		listOfHttpMethods;
+		typedef std::map<t_method, httpMethod>		listOfHttpMethodsFunct;
 		typedef Request::listOfHeaders				listOfHeaders;
 
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
-		listOfHttpMethods					_httpMethods;
+		listOfHttpMethodsFunct				_httpMethods;
 
 		Block*								_server;
 		Request*							_request;

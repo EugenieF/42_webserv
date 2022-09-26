@@ -8,6 +8,9 @@
 
 #include "Block.hpp"
 #include "StatusCode.hpp"
+#include "HttpMethod.hpp"
+
+extern HttpMethod	g_httpMethod;
 
 typedef enum t_requestStatus
 {
@@ -20,14 +23,13 @@ class   Request
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef Block::t_method						t_method;
+		// typedef Block::t_method						t_method;
 		typedef void (Request::*parsingFunction)();
 		typedef std::vector<parsingFunction>		listOfParsingFunctions;
 		typedef std::map<std::string, std::string>	listOfHeaders;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
-		Block*						_server;
 		std::string					_request;
 		t_requestStatus				_requestStatus;
 		t_method					_method;
@@ -46,7 +48,7 @@ class   Request
 
 						/*------    Main    ------*/
         Request();
-        Request(Block* server, const std::string& buffer);
+        Request(const std::string& buffer);
         Request(const Request& other);
         ~Request();
         Request&    				operator=(const Request& other);

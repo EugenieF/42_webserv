@@ -2,6 +2,7 @@
 
 StatusCode		g_statusCode;
 MimeType		g_mimeType;
+HttpMethod		g_httpMethod;
 
 std::string	convertSizeToString(size_t size)
 {

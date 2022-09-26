@@ -289,7 +289,7 @@ void	Parser::_parseAllowedMethodRule()
 	while (!_reachedEndOfDirective())
 	{
 		_getNextToken();
-		if (!_currentBlock->isAllowedMethod(_currentToken->getValue()))
+		if (g_httpMethod.isHttpMethod(_currentToken->getValue()) == false)
 			_throwErrorParsing(_unknownMethodMsg(_currentToken));
 		_currentBlock->setMethod(_currentToken->getValue());
 	}

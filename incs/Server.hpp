@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/09/21 11:21:44 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/26 14:09:56 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,15 @@
 # include <string.h>
 
 # include "TcpSocket.hpp"
-# include "Block.hpp"
 # include "EpollInstance.hpp"
 
 class Server {
 	public:
-		Server(Block& x);
+	/**********************************************************************************/
+		typedef Parser::listOfServers	listOfServers;
+	/**********************************************************************************/
+
+		Server(Block& x, listOfServers servers);
 		virtual ~Server();
 
 		/* -- Server management -------------------------------------------- */
@@ -47,6 +50,10 @@ class Server {
 		TcpSocket						_socket;
 		EpollInstance					_epoll;
 		struct sockaddr_in				_addr;
+	/**********************************************************************************/
+		listOfServers					_servers;
+	/**********************************************************************************/
+
 };
 
 #endif

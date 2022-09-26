@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/09/23 14:34:52 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/26 14:38:17 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 # include "StatusCode.hpp"
 # include "MimeType.hpp"
+# include "HttpMethod.hpp"
 
 # define INIT_SIGNAL 0
 # define RESET_SIGNAL 1

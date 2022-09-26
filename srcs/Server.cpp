@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/09/21 11:21:35 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/26 15:20:06 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 # include "Server.hpp"
 
-Server::Server(Block& x) :
+Server::Server(Block& x, Server::listOfServers servers) :
 	_socket(socket(PF_INET, SOCK_STREAM, 0)),
-	_epoll(&x) {
+	_epoll(&x, servers),
+	_servers(servers) {
 		_socket.setToReusable();
 		memset(&_addr, 0, sizeof(_addr)); 
 		_addr.sin_family = AF_INET;
@@ -31,7 +32,7 @@ Server::Server(Block& x) :
 		_socket.setSockaddr(_addr);
 		_socket.displaySocketInfo();
 		DEBUG("Server Block constructor");
-	}
+}
 
 Server::~Server() {
 	DEBUG("Server Block destructor");

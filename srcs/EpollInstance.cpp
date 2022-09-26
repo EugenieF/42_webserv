@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/09/25 17:08:09 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/26 15:23:13 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 # include "EpollInstance.hpp"
 
-EpollInstance::EpollInstance(Block* x) : _efd(-1), _client(x) {
+EpollInstance::EpollInstance(Block* x, EpollInstance::listOfServers servers) : _efd(-1), _client(servers) {
 	DEBUG("Epoll constructor");
 }
 

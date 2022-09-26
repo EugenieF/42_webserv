@@ -19,8 +19,7 @@ Content-Type header.
 
 Request::Request() {}
 
-Request::Request(Block* server, const std::string& buffer):
-	_server(server),
+Request::Request(const std::string& buffer):
 	_request(buffer),
 	_requestStatus(INCOMPLETE_REQUEST),
 	_method(NO_METHOD),
@@ -96,9 +95,9 @@ void	Request::_parseMethod()
 	std::string method;
 
 	_getNextWord(method, " ");
-	if (!_server->isMethod(method))
+	if (g_httpMethod.isHttpMethod(method) == false)
 		return (_requestIsInvalid(NOT_IMPLEMENTED));
-	_method = _server->getMethod(method);
+	_method = g_httpMethod.getMethod(method);
 }
 
 void	Request::_parsePath()
@@ -235,7 +234,7 @@ std::string		Request::getRequest() const
 	return (_request);
 }
 
-Request::t_method	Request::getMethod() const
+t_method	Request::getMethod() const
 {
 	return (_method);
 }

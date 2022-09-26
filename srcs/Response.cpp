@@ -45,8 +45,8 @@ void	Response::_selectMatchingBlock()
 
 void	Response::_processMethod()
 {
-	Response::listOfHttpMethods::const_iterator	ite;
-	std::string									path;
+	Response::listOfHttpMethodsFunct::const_iterator	ite;
+	std::string											path;
 
 	// /* Check method validity */
 	if (!_matchingBlock->isAllowedMethod(_method))
@@ -139,6 +139,7 @@ void	Response::_deleteMethod(std::string& path)
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
+
 
 std::string		Response::_buildPath()
 {

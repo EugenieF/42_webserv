@@ -10,6 +10,9 @@
 
 # include "Colors.hpp"
 # include "utils.hpp"
+# include "HttpMethod.hpp"
+
+extern HttpMethod	g_httpMethod;
 
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
 # define DEFAULT_ROOT ""
@@ -17,15 +20,6 @@
 /******************************************************************************/
 /*                                 ENUMS                                      */
 /******************************************************************************/
-
-enum e_method
-{
-	GET			= 0,
-	POST		= 1,
-	DELETE		= 2,
-	ALLOWED_METHODS_COUNT = 3,
-	NO_METHOD	= 4,
-};
 
 typedef enum e_context
 {
@@ -42,7 +36,6 @@ class	Block
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef int									t_method;
 		typedef Block*								blockPtr;
 		typedef	std::vector<std::string>			listOfStrings;
 		typedef std::map<std::string, blockPtr>		listOfLocations;
@@ -73,7 +66,6 @@ class	Block
 		listOfLocations						_locations;
 		listOfLocations::const_iterator		_currentLocation;
 		bool								_methods[ALLOWED_METHODS_COUNT];
-		std::string							_allowedMethods[ALLOWED_METHODS_COUNT];
 		std::string							_uploadPath;
 
 
@@ -137,11 +129,7 @@ class	Block
 						/*------- Allowed_method ------*/
 		void								setMethod(t_method method);
 		void								setMethod(const std::string& str);
-		bool								isMethod(const std::string& str);
 		bool								isAllowedMethod(t_method method);
-		bool								isAllowedMethod(const std::string& str);
-		t_method							getMethod(const std::string& str) const;
-		std::string const&					getMethod(t_method method) const;
 
 						/*-------    Location   ------*/
 		bool								insertLocation(const std::string& path, blockPtr newLocation);
@@ -167,7 +155,6 @@ class	Block
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 						/*-------     Utils    -------*/
-		void								_initAllowedMethods();
 		void								_deleteLocations();
 };
 

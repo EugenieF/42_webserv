@@ -19,7 +19,6 @@ Block::Block():
 	_redirectUri(""),
 	_uploadPath("")
 {
-	_initAllowedMethods();
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
 		_methods[i] = true; // Need to think about this, init to false or true ?
 	if (!getuid())
@@ -73,7 +72,13 @@ Block&	Block::operator=(const Block& other)
 
 Block*		Block::getMatchingBlock(std::string const& host, std::string const& path)
 {
-	std::cout << BLUE << "Host : " << host << " | path : " << path << RESET << std::endl;
+	std::string	prefix;
+
+	prefix = path.substr(0, path.find("/", 1));
+	std::cout << BLUE << "Host : " << host << " | path : " << path << " | prefix : " << prefix << RESET << std::endl;
+	_currentLocation = _locations.find(prefix);
+	if (_currentLocation != _locations.end())
+		return (_currentLocation->second);
 	return (this);
 }
 
@@ -264,55 +269,22 @@ const std::string	&Block::getUploadPath() const
 /*                             ALLOWED_METHOD                                 */
 /******************************************************************************/
 
-void	Block::setMethod(Block::t_method method)
+void	Block::setMethod(t_method method)
 {
 	_methods[method] = true;
 }
 
 void	Block::setMethod(const std::string& str)
 {
-	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
-	{
-		if (str == _allowedMethods[i])
-			_methods[i] = true;
-	}
+	t_method	method;
+
+	method = g_httpMethod.getMethod(str);
+	_methods[method] = true;
 }
 
-bool	Block::isMethod(const std::string& str)
-{
-	return (str == "GET" || str == "POST" || str == "DELETE");
-}
-
-bool	Block::isAllowedMethod(Block::t_method method)
+bool	Block::isAllowedMethod(t_method method)
 {
 	return (_methods[method]);
-}
-
-bool	Block::isAllowedMethod(const std::string& str)
-{
-	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
-	{
-		if (str == _allowedMethods[i])
-		{
-			return (true);
-		}
-	}
-	return (false);
-}
-
-Block::t_method	Block::getMethod(const std::string& str) const
-{
-	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
-	{
-		if (str == _allowedMethods[i])
-			return (i);
-	}
-	return (NO_METHOD);
-}
-
-std::string const&	Block::getMethod(Block::t_method method) const
-{
-	return (_allowedMethods[method]);
 }
 
 /******************************************************************************/
@@ -375,13 +347,6 @@ bool	Block::isServerBlock()
 bool	Block::isLocationBlock()
 {
 	return (_context == LOCATION);
-}
-
-void	Block::_initAllowedMethods()
-{
-	_allowedMethods[GET] = "GET";
-	_allowedMethods[POST] = "POST";
-	_allowedMethods[DELETE] = "DELETE";
 }
 
 void	Block::_deleteLocations()
