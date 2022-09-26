@@ -4,6 +4,8 @@
 # include "Parser.hpp"
 # include "Response.hpp"
 
+# define UNDEFINED_PORT -1;
+
 class Client
 {
     public:
