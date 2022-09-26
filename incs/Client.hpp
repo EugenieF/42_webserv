@@ -28,7 +28,7 @@ class Client
         t_requestStatus     parseRequest(std::string const& buffer);
         std::string         generateResponse();
 		void			    clear();
-        Block*              findMatchingServer();
+        Block*              findMatchingServer(std::string requestedHost);
 
 						/*-------     Getter      ------*/
         listOfServers       getServers() const;

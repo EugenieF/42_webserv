@@ -61,7 +61,7 @@ std::string     Client::generateResponse()
 {
     Block*  matchingServer;
 
-    matchingServer = findMatchingServer();
+    matchingServer = findMatchingServer(_request->getHost());
     if (_response)
         delete _response;
     _response = new Response(matchingServer, _request);
@@ -83,13 +83,13 @@ void	Client::clear()
 	}
 }
 
-Block*  Client::findMatchingServer()
+Block*  Client::findMatchingServer(std::string requestedHost)
 {
     listOfServers::const_iterator   ite;
 
     for (ite = _servers.begin(); ite != _servers.end(); ite++)
     {
-        std::cout << RED << "host : " << (*ite)->getHost() << " | port : " << (*ite)->getPort() << RESET << std::endl;
+        std::cout << RED << "host : " << (*ite)->getHost() << " | port : " << (*ite)->getPort() << " | requestedHost : " << requestedHost << RESET << std::endl;
     }
     return (_servers[0]);
 }
