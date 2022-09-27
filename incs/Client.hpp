@@ -4,7 +4,7 @@
 # include "Parser.hpp"
 # include "Response.hpp"
 
-# define UNDEFINED_PORT -1;
+# define UNDEFINED_PORT -1
 
 class Client
 {
@@ -39,7 +39,9 @@ class Client
 
 	private :
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
-
+		void				_parseHostHeader(std::string const& hostHeader, std::string& host, int& port);
+		void				_evaluateServerListen(listOfServers matchingServers, std::string const& host, int const& port);
+		Block*				_evaluateServerNames(listOfServers matchingServers, std::string const& host);
 };
 
 #endif

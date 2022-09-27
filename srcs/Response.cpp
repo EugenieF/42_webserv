@@ -122,18 +122,23 @@ void	Response::_getMethod(std::string& path)
 {
 	(void)path;
 	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
+	// Do redirection if necessary
+	// Get_file_path
 }
 
 void	Response::_postMethod(std::string& path)
 {
 	(void)path;
 	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
+	// cgi_pass
+	// handle_upload
 }
 
 void	Response::_deleteMethod(std::string& path)
 {
 	(void)path;
 	std::cout << GREEN << "DELETE METHOD" << RESET << std::endl;
+	// remove_path
 }
 
 /******************************************************************************/

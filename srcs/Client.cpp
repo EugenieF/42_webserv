@@ -83,34 +83,67 @@ void	Client::clear()
 	}
 }
 
-Block*  Client::findMatchingServer(std::string requestedHost)
+void	Client::_parseHostHeader(std::string const& hostHeader, std::string& host, int& port)
 {
-    listOfServers::iterator  	 	ite;
-	std::vector<Block*>				matchingServers;
-	size_t							pos;
-	std::string						serverHost;
-	int								serverPort;
+	size_t	pos;
+
+	host = hostHeader;
+	port = UNDEFINED_PORT;
+	pos = hostHeader.find(":");
+	if (pos != std::string::npos)
+	{
+		host = host.substr(0, pos);
+		port = atoi(host.substr(pos + 1).c_str());
+	}
+}
+
+void	Client::_evaluateServerListen(listOfServers matchingServers, std::string const& host, int const& port)
+{
+	listOfServers::iterator	currentServer;
+
+    for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
+    {
+		if (host == (*currentServer)->getHost() && (port == (*currentServer)->getPort() || port == UNDEFINED_PORT))
+			matchingServers.push_back(*currentServer);
+        // std::cout << RED << "host : " << (*currentServer)->getHost() << " | port : " << (*currentServer)->getPort() << " | requestedHost : " << requestedHost << RESET << std::endl;
+    }
+}
+
+Block*	Client::_evaluateServerNames(listOfServers matchingServers, std::string const& host)
+{
+	listOfServers::iterator			currentServer;
+	Block::listOfStrings::iterator	currentName;
+
+	for (currentServer = matchingServers.begin(); currentServer != matchingServers.end(); currentServer++)
+	{
+    	for (currentName = (*currentServer)->getServerNames().begin(); currentName != (*currentServer)->getServerNames().end(); currentName++)
+		{
+			if (host == *currentName)
+				return (*currentServer);
+		}
+	}
+    return (matchingServers[0]);
+}
+
+Block*  Client::findMatchingServer(std::string hostHeader)
+{
+	Block*							matchingServer;
+	listOfServers					matchingServers;
+	std::string						host;
+	int								port;
 
 	// Check listen -> host and listen
 	// If multiple -> check server_names
 	// Default server
-	pos = requestedHost.find(":");
-	serverHost = requestedHost;
-	serverPort = UNDEFINED_PORT;
-	if (pos != std::string::npos)
-	{
-		serverHost = requestedHost.substr(0, pos);
-		serverPort = atoi(requestedHost.substr(pos + 1).c_str());
-	}
-    for (ite = _servers.begin(); ite != _servers.end(); ite++)
-    {
-		if (serverHost == (*ite)->getHost() && (serverPort == (*ite)->getPort() || serverPort == UNDEFINED_PORT))
-		{
-			matchingServers.push_back(*ite);
-		}
-        std::cout << RED << "host : " << (*ite)->getHost() << " | port : " << (*ite)->getPort() << " | requestedHost : " << requestedHost << RESET << std::endl;
-    }
-    return (_servers[0]);
+	
+	matchingServer = _servers[0];
+	_parseHostHeader(hostHeader, host, port);
+	_evaluateServerListen(matchingServers, host, port);
+	if (matchingServers.size() == 1)
+		matchingServer = matchingServers.front();
+	if (matchingServers.size() > 1)
+		matchingServer = _evaluateServerNames(matchingServers, host);
+	return (matchingServer);
 }
 
 /******************************************************************************/
