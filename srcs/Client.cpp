@@ -62,6 +62,7 @@ std::string     Client::generateResponse()
     Block*  matchingServer;
 
     matchingServer = selectVirtualServer();
+    std::cout << GREEN << "selected server : " << matchingServer->getServerNames()[0] << RESET << std::endl;
     if (_response)
         delete _response;
     _response = new Response(matchingServer, _request);
@@ -92,7 +93,7 @@ bool	Client::_matchingServerName(listOfStrings serverNames, int listeningPort)
     for (currentName = serverNames.begin(); currentName != serverNames.end(); currentName++)
 	{
 		if (_request->getHost() == *currentName
-			&& requestedPort == UNDEFINED_PORT || requestedPort == listeningPort)
+			&& (requestedPort == UNDEFINED_PORT || requestedPort == listeningPort))
 			return (true);
 	}
     return (false);
