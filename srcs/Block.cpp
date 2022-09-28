@@ -414,5 +414,9 @@ bool	Block::operator==(Block const& otherServer)
 
 void	Block::setVirtualHost(Block* server)
 {
-	_virtualHosts.push_back(server);
+	blockPtr	virtualHost;
+
+	virtualHost = new Block(*server);
+	_virtualHosts.push_back(virtualHost);
+	delete server;
 }

@@ -319,7 +319,6 @@ void	Parser::_parseVirtualHosts()
 			{
 				std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
 				(*currentServer)->setVirtualHost(*nextServer);
-				// delete *nextServer;
 				_servers.erase(nextServer);
 				nextServer--;
 			}
