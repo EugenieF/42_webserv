@@ -126,49 +126,83 @@ bool	Response::_fileExists(const std::string& path)
 	return (!ret);
 }
 
-bool	Response::_isDirectory(const std::string& path)
-{
-	struct stat s;
 
-	if( stat(path.c_str(), &s) == 0 )
-	{
-    	if(s.st_mode & S_IFDIR) 
-    	{
-			return (true);
-        //it's a directory
-    	}
-    	else if(s.st_mode & S_IFREG)
-    	{
-        	//it's a file
-			return (false);
-    	}
-    	else
-    	{
-        //something else
-			return (false);
-    	}
-	}
-	return (false);
-
-}
-
-void	Response::_checkFilePath(std::string& path)
-{
-	(void)path;
 	// If it's a directory {
 		// check index files -> get_index
 		// check Autoindex ??
+
+bool	Response::_foundIndexPage(DIR* dir, std::string indexPage)
+{
+	struct dirent*	diread;
+
+	while ((diread = readdir(dir)))
+	{
+		if (diread->d_name == indexPage)
+			return (true);
+	}
+	return (false);
+}
+
+bool	Response::_searchOfIndexPage(listOfStrings indexes, std::string* path)
+{
+	listOfStrings::iterator	currentIndex;
+	DIR*					dir;
+	bool					indexFound;
+
+	indexFound = false;
+	dir = opendir(path->c_str());
+	if (dir) /* error */
+		return false;
+	for (currentIndex = indexes.begin(); currentIndex != indexes.end(); currentIndex++)
+	{
+		if (_foundIndexPage(dir, *currentIndex))
+		{
+			*path += "/" + *currentIndex;
+			indexFound = true;
+			break ;
+		}
+	}
+	closedir(dir);
+	return (indexFound);
+}
+
+std::string		Response::_buildFilePath(std::string& path)
+{
+	// if (*(path.rbegin()) == '/')
+	// {
+	// 		/* get index page */
+	// 	if (!_searchOfIndexPage(_matchingBlock->getIndexes(), &path))
+	// 	{
+
+	// 	}
+	// }
+	
+	if (_pathIsFile(path))
+	{
+		/* read content file */
+	}
+	else if (_pathIsDirectory(path) && _matchingBlock->getAutoindex())
+	{
+		/* generate index page */
+	}
+	else
+	{
+		/* error */
+	}
+	std::cout << BLUE << "PATH = " << path << RESET << std::endl;
+	return (path);
 }
 
 /*  Transfer a current representation of the target resource. */
 void	Response::_getMethod(std::string& path)
 {
 	std::ifstream	ifs;
+	std::string		filePath;
 
 	(void)path;
 	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
 	// Do redirection if necessary
-	_checkFilePath(path);
+	filePath = _buildFilePath(path);
 	// _body = get_file_content
 	setStatusCode(OK);
 }
@@ -277,6 +311,20 @@ bool	Response::_checkBodyLimit()
 void	Response::setStatusCode(t_statusCode status)
 {
 	_statusCode = status;
+}
+
+bool	Response::_pathIsFile(const std::string& path)
+{
+	struct stat s;
+
+	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFREG));
+}
+
+bool	Response::_pathIsDirectory(const std::string& path)
+{
+	struct stat s;
+
+	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFDIR));
 }
 
 /******************************************************************************/

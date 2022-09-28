@@ -12,6 +12,7 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <dirent.h>
 
 # define WEBSERV_VERSION	"Cutie Webserv 1.0"
 
@@ -29,7 +30,7 @@ class   Response
 		typedef void (Response::*httpMethod)(std::string&);
 		typedef std::map<t_method, httpMethod>		listOfHttpMethodsFunct;
 		typedef Request::listOfHeaders				listOfHeaders;
-
+		typedef Block::listOfStrings				listOfStrings;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -83,18 +84,23 @@ class   Response
 		void								_deleteMethod(std::string& path);
 		void								_handleUploadFile();
 		void								_handleCgi();
-		void								_checkFilePath(std::string& path);
 
 						/*-------   Utils    ------*/
-		bool								_isDirectory(const std::string& path);
-		bool								_fileExists(const std::string& path);
 		void								_setErrorCodeWithErrno();
 		bool								_hasUploadPathDirective();
 		std::string							_getDateHeader();
 		std::string							_getContentTypeHeader();
 		bool								_requestIsValid();
 		bool								_checkBodyLimit();
-		
+
+						/*------- Get utils ------*/
+		bool								_pathIsFile(const std::string& path);
+		bool								_pathIsDirectory(const std::string& path);
+		bool								_fileExists(const std::string& path);
+		std::string							_buildFilePath(std::string& path);
+		bool								_searchOfIndexPage(listOfStrings indexes, std::string* path);
+		bool								_foundIndexPage(DIR* dir, std::string indexPage);
+
 };
 
 #endif
