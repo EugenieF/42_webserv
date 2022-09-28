@@ -34,15 +34,14 @@ typedef enum e_context
 
 class	Block
 {
-	public:
+	public :
 	/***********************      MEMBER TYPES      *********************/
 		typedef Block*								blockPtr;
 		typedef	std::vector<std::string>			listOfStrings;
 		typedef std::map<std::string, blockPtr>		listOfLocations;
 		typedef std::map<int, std::string>			listOfErrorPages;
-		typedef std::vector<Block*>					listOfVirtualHosts;
+		typedef std::vector<Block*>					listOfServers;
 
-	
 	private :
 	/**********************     MEMBER VARIABLES     ********************/
 
@@ -51,7 +50,7 @@ class	Block
 		listOfStrings						_serverNames;
 		int									_port;
 		std::string							_host;
-		listOfVirtualHosts					_virtualHosts;
+		listOfServers						_virtualHosts;
 
 					/*---- Server / Location block ----*/
 		std::string							_root;
@@ -153,8 +152,11 @@ class	Block
 		void								displayParams(int num);
 		void								displayServerNames();
 
+						/*------ Virtual hosts -----*/
+		void								setVirtualHost(blockPtr server);
+		listOfServers						getVirtualHosts() const;
+
 		bool								operator==(Block const& otherServer);
-		void								setVirtualHost(Block* server);
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

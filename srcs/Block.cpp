@@ -403,20 +403,31 @@ void	Block::displayListOfStrings(listOfStrings list)
 	std::cout << std::endl;
 }
 
-bool	Block::operator==(Block const& otherServer)
-{
+/******************************************************************************/
+/*                                 DISPLAY                                    */
+/******************************************************************************/
 
-	std::cout << GREEN << "***********************" << RESET << std::endl;
-	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
-		&& this->getHost() == otherServer.getHost()
-		&& this->getPort() == otherServer.getPort());
-}
-
-void	Block::setVirtualHost(Block* server)
+void	Block::setVirtualHost(blockPtr server)
 {
 	blockPtr	virtualHost;
 
 	virtualHost = new Block(*server);
 	_virtualHosts.push_back(virtualHost);
 	delete server;
+}
+
+Block::listOfServers	Block::getVirtualHosts() const
+{
+	return (_virtualHosts);
+}
+
+/******************************************************************************/
+/*                           OPERATOR OVERLOAD                                */
+/******************************************************************************/
+
+bool	Block::operator==(Block const& otherServer)
+{
+	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
+		&& this->getHost() == otherServer.getHost()
+		&& this->getPort() == otherServer.getPort());
 }

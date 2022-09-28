@@ -27,7 +27,9 @@ Request::Request(const std::string& buffer):
 	_httpProtocol(""),
 	_bodySize(0),
 	_statusCode(OK),
-	_chunkedTransfer(false)
+	_chunkedTransfer(false),
+	_host(""),
+	_port(UNDEFINED_PORT)
 {
 	_initParsingFunct();
 }
@@ -41,7 +43,9 @@ Request::Request(const Request &other):
 	_bodySize(other.getBodySize()),
 	_statusCode(other.getStatusCode()),
 	_parsingFunct(other.getParsingFunct()),
-	_chunkedTransfer(other.getChunkedTransfer())
+	_chunkedTransfer(other.getChunkedTransfer()),
+	_host(other.getHost()),
+	_port(other.getPort())
 {
 	*this = other;
 }
@@ -61,6 +65,8 @@ Request&	Request::operator=(const Request &other)
 		_statusCode = other.getStatusCode(),
 		_parsingFunct = other.getParsingFunct();
 		_chunkedTransfer = other.getChunkedTransfer();
+		_host = other.getHost();
+		_port = other.getPort();
 	}
 	return (*this);
 }
@@ -147,16 +153,31 @@ void	Request::_parseHeaders()
 	_getNextWord(headerName, "\r\n");
 }
 
+bool	Request::_parseHostHeader()
+{
+	Request::listOfHeaders::const_iterator	ite;
+	size_t									pos;
+
+	ite = _headers.find("host");
+	if (ite == _headers.end())
+		return (false);
+	_host = ite->second;
+	pos = _host.find(":");
+	if (pos != std::string::npos)
+		_host = _host.substr(0, pos);
+	if (pos + 1 != std::string::npos)
+		_port = atoi(ite->second.substr(pos + 1).c_str());
+	return (true);
+}
+
 void	Request::_checkHeaders()
 {
 	Request::listOfHeaders::const_iterator	ite;
 	std::string								contentLength;
 	size_t									size;
 
-	ite = _headers.find("host");
-	if (ite == _headers.end())
+	if (!_parseHostHeader())
 		return (_requestIsInvalid(BAD_REQUEST));
-	_host = ite->second;
 	if (_method != POST)
 		return ;
 	ite = _headers.find("transfer-encoding");
@@ -288,6 +309,11 @@ std::string		Request::getBody() const
 std::string		Request::getHost() const
 {
 	return (_host);
+}
+
+int		Request::getPort() const
+{
+	return (_port);
 }
 
 /******************************************************************************/

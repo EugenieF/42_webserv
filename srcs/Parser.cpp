@@ -147,7 +147,7 @@ void	Parser::parseTokens()
 		_currentServer = _servers.insert(_servers.end(), newServer);
 		_updateContext(NONE, NULL);
 	}
-	_parseVirtualHosts();
+	_configureVirtualHosts();
 }
 
 /******************************************************************************/
@@ -306,7 +306,7 @@ void	Parser::_parseUploadPathRule()
 }
 
 /* Context: Server */
-void	Parser::_parseVirtualHosts()
+void	Parser::_configureVirtualHosts()
 {
 	listOfServers::iterator		currentServer;
 	listOfServers::iterator		nextServer;

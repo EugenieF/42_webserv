@@ -12,14 +12,14 @@ are done in a non-blocking manner. */
 
 Client::Client() {}
 
-Client::Client(Client::listOfServers servers):
-    _servers(servers),
+Client::Client(Block* server):
+    _runningServer(server),
     _request(0),
     _response(0)
 {}
 
 Client::Client(Client const& other):
-    _servers(other.getServers()),
+    _runningServer(other.getRunningServer()),
     _request(other.getRequest()),
     _response(other.getResponse())
 {
@@ -38,7 +38,7 @@ Client&     Client::operator=(Client const& other)
 {
     if (this != &other)
     {
-        _servers = other.getServers();
+        _runningServer = other.getRunningServer();
         _request = other.getRequest();
         _response = other.getResponse();
     }
@@ -61,7 +61,7 @@ std::string     Client::generateResponse()
 {
     Block*  matchingServer;
 
-    matchingServer = findMatchingServer(_request->getHost());
+    matchingServer = selectVirtualServer();
     if (_response)
         delete _response;
     _response = new Response(matchingServer, _request);
@@ -83,85 +83,47 @@ void	Client::clear()
 	}
 }
 
-void	Client::_parseHostHeader(std::string const& hostHeader, std::string& host, int& port)
+bool	Client::_matchingServerName(listOfStrings serverNames, int listeningPort)
 {
-	size_t	pos;
-
-	host = hostHeader;
-	port = UNDEFINED_PORT;
-	pos = hostHeader.find(":");
-	if (pos != std::string::npos)
-		host = host.substr(0, pos);
-	if (pos + 1 != std::string::npos)
+	listOfStrings::iterator	currentName;
+	int						requestedPort;
+	
+	requestedPort = _request->getPort();
+    for (currentName = serverNames.begin(); currentName != serverNames.end(); currentName++)
 	{
-		port = atoi(hostHeader.substr(pos + 1).c_str());
-		std::cout << "**************************" << std::endl;
+		if (_request->getHost() == *currentName
+			&& requestedPort == UNDEFINED_PORT || requestedPort == listeningPort)
+			return (true);
 	}
+    return (false);
 }
 
-Client::listOfServers	Client::_evaluateServerListen(std::string const& host, int const& port)
+Block*  Client::selectVirtualServer()
 {
-	listOfServers				matchingServers;
+	listOfServers				virtualHosts;
 	listOfServers::iterator		currentServer;
 
-    for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
-    {
-		if (host == (*currentServer)->getHost() && (port == (*currentServer)->getPort() || port == UNDEFINED_PORT))
-		{
-			matchingServers.push_back(*currentServer);
-			std::cout << BLUE << "host: '" << host << "' | serverHost: '" << (*currentServer)->getHost() << "'" << RESET << std::endl;
-		}
-    }
-	return (matchingServers);
-}
-
-Block*	Client::_evaluateServerNames(listOfServers matchingServers, std::string const& host)
-{
-	listOfServers::iterator			currentServer;
-	Block::listOfStrings::iterator	currentName;
-
-	for (currentServer = matchingServers.begin(); currentServer != matchingServers.end(); currentServer++)
+	virtualHosts = _runningServer->getVirtualHosts();
+	if (virtualHosts.empty())
+		return (_runningServer);
+	for (currentServer = virtualHosts.begin(); currentServer != virtualHosts.end(); currentServer++)
 	{
-    	for (currentName = (*currentServer)->getServerNames().begin(); currentName != (*currentServer)->getServerNames().end(); currentName++)
+		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()))
 		{
-			if (host == *currentName)
-				return (*currentServer);
+			std::cout << YELLOW << "---- Matching server name ----" << RESET << std::endl;
+			return (*currentServer);
 		}
 	}
-    return (matchingServers[0]);
-}
-
-Block*  Client::findMatchingServer(std::string hostHeader)
-{
-	Block*							matchingServer;
-	listOfServers					matchingServers;
-	std::string						host;
-	int								port;
-
-	// Check listen -> host and listen
-	// If multiple -> check server_names
-	// Default server
-	
-	matchingServer = _servers[0];
-	_parseHostHeader(hostHeader, host, port);
-	matchingServers = _evaluateServerListen(host, port);
-	std::cout << "size : " << matchingServers.size() << std::endl;
-	if (matchingServers.size() == 1)
-		matchingServer = matchingServers.front();
-	if (matchingServers.size() > 1)
-		matchingServer = _evaluateServerNames(matchingServers, host);
-	std::cout << YELLOW << "Host: " << host << " | Port: " << port << std::endl;
-	std::cout << "Matching server first name : " << matchingServer->getServerNames()[0] << RESET << std::endl;
-	return (matchingServer);
+	return (_runningServer);
 }
 
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
 
-Client::listOfServers   Client::getServers() const
+Block*	Client::getRunningServer() const
 {
-    return (_servers);
+    return (_runningServer);
 }
 
 Request*    Client::getRequest() const

@@ -10,6 +10,8 @@
 #include "StatusCode.hpp"
 #include "HttpMethod.hpp"
 
+# define UNDEFINED_PORT -1
+
 extern HttpMethod	g_httpMethod;
 
 typedef enum t_requestStatus
@@ -42,6 +44,7 @@ class   Request
 		listOfHeaders				_headers;
 		bool						_chunkedTransfer;
 		std::string					_host;
+		int							_port;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -70,6 +73,7 @@ class   Request
 		size_t						getBodySize() const;
 		std::string					getBody() const;
 		std::string					getHost() const;
+		int							getPort() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
@@ -85,6 +89,7 @@ class   Request
 		void						_checkHeaders();
 		void						_parseBody();
 		void						_parseChunks();
+		bool						_parseHostHeader();
 
 						/*------   Utils  ------*/
 		void						_initParsingFunct();
