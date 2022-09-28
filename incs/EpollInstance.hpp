@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/09/26 15:19:38 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/28 16:32:01 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class EpollInstance {
 		typedef		Parser::listOfServers				listOfServers;
 /****************************************************************************************/
 
-		EpollInstance(Block* x, listOfServers _servers);
+		EpollInstance(listOfServers _servers);
 		virtual ~EpollInstance();
 
 		/* -- Epoll manipulation ------------------------------------------- */

@@ -118,40 +118,113 @@ std::string		Response::_generateErrorPage()
 /*                                 METHODS                                    */
 /******************************************************************************/
 
+bool	Response::_fileExists(const std::string& path)
+{
+	int	ret;
+
+	ret = access(path.c_str(), F_OK); 
+	return (!ret);
+}
+
+bool	Response::_isDirectory(const std::string& path)
+{
+	struct stat s;
+
+	if( stat(path.c_str(), &s) == 0 )
+	{
+    	if(s.st_mode & S_IFDIR) 
+    	{
+			return (true);
+        //it's a directory
+    	}
+    	else if(s.st_mode & S_IFREG)
+    	{
+        	//it's a file
+			return (false);
+    	}
+    	else
+    	{
+        //something else
+			return (false);
+    	}
+	}
+	return (false);
+
+}
+
+void	Response::_checkFilePath(std::string& path)
+{
+	(void)path;
+	// If it's a directory {
+		// check index files -> get_index
+		// check Autoindex ??
+}
+
+/*  Transfer a current representation of the target resource. */
 void	Response::_getMethod(std::string& path)
 {
+	std::ifstream	ifs;
+
 	(void)path;
 	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
 	// Do redirection if necessary
-	// Get_file_path
+	_checkFilePath(path);
 	// _body = get_file_content
+	setStatusCode(OK);
 }
 
+/* Perform resource-specific processing on the request payload. */
 void	Response::_postMethod(std::string& path)
 {
+	std::ofstream	ofs;
+
 	(void)path;
 	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
 	// cgi_path ?
 	// handle_upload -> create_file
 }
 
+/* Remove all current representations of the target resource. */
 void	Response::_deleteMethod(std::string& path)
 {
-	(void)path;
+	int	ret;
+
 	std::cout << GREEN << "DELETE METHOD" << RESET << std::endl;
-	// remove_path
+	ret = remove(path.c_str());
+	if (ret) /* Error case */
+		return (_setErrorCodeWithErrno());
+	setStatusCode(NO_CONTENT); /* Successfull case */
+
+}
+
+void	Response::_handleUploadFile()
+{
+	std::cout << GREEN << "handleUploadFile()" << RESET << std::endl;
+}
+
+void	Response::_handleCgi()
+{
+	std::cout << GREEN << "handleCgi()" << RESET << std::endl;
 }
 
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
 
+void	Response::_setErrorCodeWithErrno()
+{
+	if (errno == ENOENT || errno == ENOTDIR)
+		return (setStatusCode(NOT_FOUND));
+	else if (errno == EACCES || errno == EPERM)
+		return (setStatusCode(FORBIDDEN));
+	setStatusCode(INTERNAL_SERVER_ERROR);
+}
 
 std::string		Response::_buildPath()
 {
 	std::string		path;
 
-	if (_uploadPathDirective())
+	if (_hasUploadPathDirective())
 		path = _matchingBlock->getUploadPath();
 	else
 		path = _matchingBlock->getRoot();
@@ -162,7 +235,7 @@ std::string		Response::_buildPath()
 	return (path);
 }
 
-bool	Response::_uploadPathDirective()
+bool	Response::_hasUploadPathDirective()
 {
 	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
 }

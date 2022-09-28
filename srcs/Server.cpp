@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/09/26 15:20:06 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/28 16:32:25 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 Server::Server(Block& x, Server::listOfServers servers) :
 	_socket(socket(PF_INET, SOCK_STREAM, 0)),
-	_epoll(&x, servers),
+	_epoll(servers),
 	_servers(servers) {
 		_socket.setToReusable();
 		memset(&_addr, 0, sizeof(_addr)); 
