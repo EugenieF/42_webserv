@@ -305,6 +305,7 @@ void	Parser::_parseUploadPathRule()
 	_currentBlock->setUploadPath(_currentToken->getValue());
 }
 
+/* Context: Server */
 void	Parser::_parseVirtualHosts()
 {
 	listOfServers::const_iterator	nextServer;
