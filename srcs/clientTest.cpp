@@ -17,8 +17,8 @@ int main()
     
     // char hello[] = "POST /data HTTP/1.1\r\nhost:    www.yoursite.com  	\r\nTransfer-Encoding: chunked	\r\nContent-TYPE: application/json \r\n\r\n26\r\nVoici les données du premier morceau \r\n";
     // char hello[] = "1F\r\net voici deux derniers morceaux\r\n0\r\n\r\n";
-    char hello[] = "POST /www/test/page HTTP/1.1\r\nhost:    www.yoursite.com  \r\nContent-Length: 8\r\nContent-TYPE: application/json \r\n\r\nRESPONSE\r\n\r\n";
-    // char hello[] = "POST /data HTTP/1.1\r\nHOST:    www.yoursite.com  	 	\r\nTransfer-Encoding: chunked		\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
+    // char hello[] = "POST /www/test/page HTTP/1.1\r\nhost:    www.yoursite.com  \r\nContent-Length: 8\r\nContent-TYPE: application/json \r\n\r\nRESPONSE\r\n\r\n";
+    char hello[] = "POST /www/test HTTP/1.1\r\nHOST: bibi:9000	\r\nContent-length: 17\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
     char buffer[1024] = {0};
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
