@@ -59,12 +59,9 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
 
 std::string     Client::generateResponse()
 {
-    Block*  matchingServer;
-
-    matchingServer = selectVirtualServer();
     if (_response)
         delete _response;
-    _response = new Response(matchingServer, _request);
+    _response = new Response(selectVirtualServer(), _request);
     _response->generateResponse();
     return (_response->getResponse());
 }
