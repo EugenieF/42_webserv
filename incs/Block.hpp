@@ -154,7 +154,7 @@ class	Block
 		void								displayServerNames();
 
 		bool								operator==(Block const& otherServer);
-		bool								isEqual(Block const& otherServer);
+		void								setVirtualHost(Block* server);
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

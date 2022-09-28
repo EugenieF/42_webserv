@@ -317,14 +317,14 @@ void	Parser::_parseVirtualHosts()
 			if (**_currentServer == **nextServer)
 			{
 				std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
-				_servers.erase(*nextServer);
+				(*_currentServer)->setVirtualHost(*nextServer);
+				// delete *nextServer;
+				_servers.erase(nextServer);
+				nextServer--;
 			}
-			// if ((*_currentServer)->isEqual(**nextServer))
 		}
-
-
-		
 	}
+	std::cout << RED << "_servers.size() : " << _servers.size() << RESET << std::endl;
 }
 
 /******************************************************************************/

@@ -412,10 +412,7 @@ bool	Block::operator==(Block const& otherServer)
 		&& this->getPort() == otherServer.getPort());
 }
 
-bool	Block::isEqual(Block const& otherServer)
+void	Block::setVirtualHost(Block* server)
 {
-	std::cout << BLUE << "***********************" << RESET << std::endl;
-	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
-		&& this->getHost() == otherServer.getHost()
-		&& this->getPort() == otherServer.getPort());
+	_virtualHosts.push_back(server);
 }
