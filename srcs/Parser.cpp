@@ -308,16 +308,17 @@ void	Parser::_parseUploadPathRule()
 /* Context: Server */
 void	Parser::_parseVirtualHosts()
 {
-	listOfServers::const_iterator	nextServer;
+	listOfServers::iterator		currentServer;
+	listOfServers::iterator		nextServer;
 
-	for (_currentServer = _servers.begin(); _currentServer != _servers.end(); _currentServer++)
+	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
 	{
-		for (nextServer = _currentServer + 1; nextServer != _servers.end(); nextServer++)
+		for (nextServer = currentServer + 1; nextServer != _servers.end(); nextServer++)
 		{
-			if (**_currentServer == **nextServer)
+			if (**currentServer == **nextServer)
 			{
 				std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
-				(*_currentServer)->setVirtualHost(*nextServer);
+				(*currentServer)->setVirtualHost(*nextServer);
 				// delete *nextServer;
 				_servers.erase(nextServer);
 				nextServer--;
