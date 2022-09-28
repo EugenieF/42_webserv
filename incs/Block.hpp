@@ -154,6 +154,7 @@ class	Block
 		void								displayServerNames();
 
 		bool								operator==(Block const& otherServer);
+		bool								isEqual(Block const& otherServer);
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
@@ -162,7 +163,5 @@ class	Block
 		void								_deleteLocations();
 };
 
-namespace ft {
-}
 
 #endif

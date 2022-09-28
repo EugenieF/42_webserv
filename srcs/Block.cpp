@@ -405,6 +405,16 @@ void	Block::displayListOfStrings(listOfStrings list)
 
 bool	Block::operator==(Block const& otherServer)
 {
+
+	std::cout << GREEN << "***********************" << RESET << std::endl;
+	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
+		&& this->getHost() == otherServer.getHost()
+		&& this->getPort() == otherServer.getPort());
+}
+
+bool	Block::isEqual(Block const& otherServer)
+{
+	std::cout << BLUE << "***********************" << RESET << std::endl;
 	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
 		&& this->getHost() == otherServer.getHost()
 		&& this->getPort() == otherServer.getPort());

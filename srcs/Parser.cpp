@@ -68,7 +68,6 @@ void	Parser::parseFile(std::string configFile)
 	_lexer.openFile(configFile);
 	_currentToken = _lexer.getTokens().begin();
 	parseTokens();
-	parseVirtualHosts();
 }
 
 void	Parser::_parseRule()
@@ -148,6 +147,7 @@ void	Parser::parseTokens()
 		_currentServer = _servers.insert(_servers.end(), newServer);
 		_updateContext(NONE, NULL);
 	}
+	_parseVirtualHosts();
 }
 
 /******************************************************************************/
@@ -314,9 +314,16 @@ void	Parser::_parseVirtualHosts()
 	{
 		for (nextServer = _currentServer + 1; nextServer != _servers.end(); nextServer++)
 		{
-			if (_currentServer == nextServer)
-				std::cout << RED << "**** VIRTUAL HOST ****" << RESET << std::endl;
+			if (**_currentServer == **nextServer)
+			{
+				std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
+				_servers.erase(*nextServer);
+			}
+			// if ((*_currentServer)->isEqual(**nextServer))
 		}
+
+
+		
 	}
 }
 
