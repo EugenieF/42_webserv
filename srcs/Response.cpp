@@ -124,14 +124,15 @@ void	Response::_getMethod(std::string& path)
 	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
 	// Do redirection if necessary
 	// Get_file_path
+	// _body = get_file_content
 }
 
 void	Response::_postMethod(std::string& path)
 {
 	(void)path;
 	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
-	// cgi_pass
-	// handle_upload
+	// cgi_path ?
+	// handle_upload -> create_file
 }
 
 void	Response::_deleteMethod(std::string& path)
