@@ -40,6 +40,7 @@ class	Block
 		typedef	std::vector<std::string>			listOfStrings;
 		typedef std::map<std::string, blockPtr>		listOfLocations;
 		typedef std::map<int, std::string>			listOfErrorPages;
+		typedef std::vector<Block*>					listOfVirtualHosts;
 
 	
 	private :
@@ -50,6 +51,7 @@ class	Block
 		listOfStrings						_serverNames;
 		int									_port;
 		std::string							_host;
+		listOfVirtualHosts					_virtualHosts;
 
 					/*---- Server / Location block ----*/
 		std::string							_root;
@@ -151,11 +153,16 @@ class	Block
 		void								displayParams(int num);
 		void								displayServerNames();
 
+		bool								operator==(Block const& otherServer);
+
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 						/*-------     Utils    -------*/
 		void								_deleteLocations();
 };
+
+namespace ft {
+}
 
 #endif

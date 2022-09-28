@@ -14,6 +14,7 @@ class Client
     private:
 	/**********************     MEMBER VARIABLES     ********************/
         listOfServers       _servers;
+		Block*				_runningServer;
         Request*            _request;
         Response*           _response;
 

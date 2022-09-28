@@ -68,6 +68,7 @@ void	Parser::parseFile(std::string configFile)
 	_lexer.openFile(configFile);
 	_currentToken = _lexer.getTokens().begin();
 	parseTokens();
+	parseVirtualHosts();
 }
 
 void	Parser::_parseRule()
@@ -302,6 +303,20 @@ void	Parser::_parseUploadPathRule()
 	_expectNbOfArguments(1, EQUAL, SEMICOLON);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setUploadPath(_currentToken->getValue());
+}
+
+void	Parser::_parseVirtualHosts()
+{
+	listOfServers::const_iterator	nextServer;
+
+	for (_currentServer = _servers.begin(); _currentServer != _servers.end(); _currentServer++)
+	{
+		for (nextServer = _currentServer + 1; nextServer != _servers.end(); nextServer++)
+		{
+			if (_currentServer == nextServer)
+				std::cout << RED << "**** VIRTUAL HOST ****" << RESET << std::endl;
+		}
+	}
 }
 
 /******************************************************************************/

@@ -402,3 +402,10 @@ void	Block::displayListOfStrings(listOfStrings list)
 		std::cout << *ite << " ";
 	std::cout << std::endl;
 }
+
+bool	Block::operator==(Block const& otherServer)
+{
+	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
+		&& this->getHost() == otherServer.getHost()
+		&& this->getPort() == otherServer.getPort());
+}

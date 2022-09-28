@@ -89,6 +89,7 @@ class Parser
 		void								_parseRedirectRule();
 		void								_parseAllowedMethodRule();
 		void								_parseUploadPathRule();
+		void								_parseVirtualHosts();
 
 						/*-------    Check    ------*/
 		void								_checkDelimiter(Lexer::listOfTokens::const_iterator token);
