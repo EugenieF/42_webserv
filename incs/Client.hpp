@@ -32,7 +32,7 @@ class Client
 		void			    	clear();
         Block*              	selectVirtualServer();
 
-						/*-------     Getter      ------*/
+						/*-------   Getter   ------*/
         Block*      			getRunningServer() const;
         Request*            	getRequest() const;
         Response*           	getResponse() const;
