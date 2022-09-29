@@ -52,6 +52,8 @@ void	Response::_processMethod()
 	if (!_matchingBlock->isAllowedMethod(_method))
 		return (setStatusCode(METHOD_NOT_ALLOWED));
 	path = _buildPath();
+	if (path.empty())
+		return ;
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 			return (setStatusCode(METHOD_NOT_ALLOWED));
@@ -166,45 +168,53 @@ bool	Response::_searchOfIndexPage(listOfStrings indexes, std::string* path)
 	return (indexFound);
 }
 
-std::string		Response::_buildFilePath(std::string& path)
+std::string		Response::_readFileContent(std::string& path)
 {
-	// if (*(path.rbegin()) == '/')
-	// {
-	// 		/* get index page */
-	// 	if (!_searchOfIndexPage(_matchingBlock->getIndexes(), &path))
-	// 	{
-
-	// 	}
-	// }
+	std::ifstream		file;
+	std::stringstream	ss;
+	std::string			fileContent;
 	
-	if (_pathIsFile(path))
-	{
-		/* read content file */
-	}
-	else if (_pathIsDirectory(path) && _matchingBlock->getAutoindex())
-	{
-		/* generate index page */
-	}
-	else
+	file.open(path.c_str(), std::ifstream::in);
+	if (!file.is_open())
 	{
 		/* error */
 	}
-	std::cout << BLUE << "PATH = " << path << RESET << std::endl;
-	return (path);
+	ss << file.rdbuf();
+	fileContent = ss.str();
+	file.close();
+	// std::cout << BLUE << "FILE CONTENT = " << fileContent << RESET << std::endl;
+	return (fileContent);
 }
 
 /*  Transfer a current representation of the target resource. */
 void	Response::_getMethod(std::string& path)
 {
-	std::ifstream	ifs;
 	std::string		filePath;
 
-	(void)path;
 	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
-	// Do redirection if necessary
-	filePath = _buildFilePath(path);
-	// _body = get_file_content
-	setStatusCode(OK);
+	if (!_matchingBlock->getRedirectUri().empty())
+	{
+		/* Do redirection */
+	}
+	if (_pathIsFile(path))
+	{
+		/* read file content */
+		_body = _readFileContent();
+		return ;
+	}
+	else if (_pathIsDirectory(path)
+	{
+		if (_searchOfIndexPage(_matchingBlock->getIndexes(), &path))
+		{
+			_body = _readFileContent(path);
+			return ;
+		}
+		if (_matchingBlock->getAutoindex())
+		{
+			/* generate index page */
+		}
+	}
+	setStatusCode(NOT_FOUND);
 }
 
 /* Perform resource-specific processing on the request payload. */
