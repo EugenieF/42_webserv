@@ -53,7 +53,7 @@ void	Response::_processMethod()
 		return (setStatusCode(METHOD_NOT_ALLOWED));
 	path = _buildPath();
 	if (path.empty())
-		return ;
+		return (setStatusCode(NOT_FOUND));
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 			return (setStatusCode(METHOD_NOT_ALLOWED));
@@ -117,21 +117,14 @@ std::string		Response::_generateErrorPage()
 }
 
 /******************************************************************************/
-/*                                 METHODS                                    */
+/*                               GET METHOD                                   */
 /******************************************************************************/
 
-bool	Response::_fileExists(const std::string& path)
+void	Response::_handleRedirection()
 {
-	int	ret;
-
-	ret = access(path.c_str(), F_OK); 
-	return (!ret);
+	setStatusCode(_matchingBlock->getRedirectCode());
+	_headers["Location"] = _matchingBlock->getRedirectUri();
 }
-
-
-	// If it's a directory {
-		// check index files -> get_index
-		// check Autoindex ??
 
 bool	Response::_foundIndexPage(DIR* dir, std::string indexPage)
 {
@@ -149,9 +142,9 @@ bool	Response::_searchOfIndexPage(listOfStrings indexes, std::string* path)
 {
 	listOfStrings::iterator	currentIndex;
 	DIR*					dir;
-	bool					indexFound;
+	bool					foundIndexPage;
 
-	indexFound = false;
+	foundIndexPage = false;
 	dir = opendir(path->c_str());
 	if (dir) /* error */
 		return false;
@@ -160,61 +153,78 @@ bool	Response::_searchOfIndexPage(listOfStrings indexes, std::string* path)
 		if (_foundIndexPage(dir, *currentIndex))
 		{
 			*path += "/" + *currentIndex;
-			indexFound = true;
+			foundIndexPage = true;
 			break ;
 		}
 	}
 	closedir(dir);
-	return (indexFound);
+	return (foundIndexPage);
 }
 
-std::string		Response::_readFileContent(std::string& path)
+void	Response::_readFileContent(std::string& path)
 {
 	std::ifstream		file;
-	std::stringstream	ss;
-	std::string			fileContent;
+	std::stringstream	fileContent;
 	
 	file.open(path.c_str(), std::ifstream::in);
 	if (!file.is_open())
 	{
 		/* error */
 	}
-	ss << file.rdbuf();
-	fileContent = ss.str();
+	fileContent << file.rdbuf();
+	_body = fileContent.str();
 	file.close();
-	// std::cout << BLUE << "FILE CONTENT = " << fileContent << RESET << std::endl;
-	return (fileContent);
 }
 
-/*  Transfer a current representation of the target resource. */
+void	Response::_generateAutoindex(std::string& path)
+{
+	Autoindex	autoindex(path);
+
+	_body = autoindex.getIndexPage();
+	_headers["Content-type"] = "text/html";
+}
+
+/*  GET method : "Transfer a current representation of the target resource." */
 void	Response::_getMethod(std::string& path)
 {
 	std::string		filePath;
 
 	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
-	if (!_matchingBlock->getRedirectUri().empty())
+	if (_matchingBlock->redirectDirective())
 	{
 		/* Do redirection */
+		return (_handleRedirection());
 	}
 	if (_pathIsFile(path))
+		return (_readFileContent(path));
+	if (_pathIsDirectory(path))
 	{
-		/* read file content */
-		_body = _readFileContent();
-		return ;
-	}
-	else if (_pathIsDirectory(path)
-	{
-		if (_searchOfIndexPage(_matchingBlock->getIndexes(), &path))
-		{
-			_body = _readFileContent(path);
-			return ;
-		}
+		/* Directory case */
+		if (*(path.rbegin()) == '/' && _searchOfIndexPage(_matchingBlock->getIndexes(), &path))
+			return (_readFileContent(path));
+		if (*(path.rbegin()) != '/')
+			path += "/";
 		if (_matchingBlock->getAutoindex())
 		{
-			/* generate index page */
+			/* generate autoindex page */
+			return (_generateAutoindex(path));
 		}
 	}
 	setStatusCode(NOT_FOUND);
+}
+
+/******************************************************************************/
+/*                               POST METHOD                                  */
+/******************************************************************************/
+
+void	Response::_handleUploadFile()
+{
+	std::cout << GREEN << "handleUploadFile()" << RESET << std::endl;
+}
+
+void	Response::_handleCgi()
+{
+	std::cout << GREEN << "handleCgi()" << RESET << std::endl;
 }
 
 /* Perform resource-specific processing on the request payload. */
@@ -224,9 +234,19 @@ void	Response::_postMethod(std::string& path)
 
 	(void)path;
 	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
-	// cgi_path ?
-	// handle_upload -> create_file
+	if (_matchingBlock->cgiDirective())
+	{
+		/* process cgi */
+	}
+	if (_matchingBlock->uploadPathDirective())
+	{
+		/* process upload --> create_file ? */
+	}
 }
+
+/******************************************************************************/
+/*                               DELETE METHOD                                */
+/******************************************************************************/
 
 /* Remove all current representations of the target resource. */
 void	Response::_deleteMethod(std::string& path)
@@ -239,16 +259,6 @@ void	Response::_deleteMethod(std::string& path)
 		return (_setErrorCodeWithErrno());
 	setStatusCode(NO_CONTENT); /* Successfull case */
 
-}
-
-void	Response::_handleUploadFile()
-{
-	std::cout << GREEN << "handleUploadFile()" << RESET << std::endl;
-}
-
-void	Response::_handleCgi()
-{
-	std::cout << GREEN << "handleCgi()" << RESET << std::endl;
 }
 
 /******************************************************************************/
@@ -323,6 +333,11 @@ void	Response::setStatusCode(t_statusCode status)
 	_statusCode = status;
 }
 
+void	Response::setStatusCode(int status)
+{
+	_statusCode = (t_statusCode)status;
+}
+
 bool	Response::_pathIsFile(const std::string& path)
 {
 	struct stat s;
@@ -335,6 +350,14 @@ bool	Response::_pathIsDirectory(const std::string& path)
 	struct stat s;
 
 	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFDIR));
+}
+
+bool	Response::_fileExists(const std::string& path)
+{
+	int	ret;
+
+	ret = access(path.c_str(), F_OK); 
+	return (!ret);
 }
 
 /******************************************************************************/

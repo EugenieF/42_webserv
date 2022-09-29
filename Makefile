@@ -18,7 +18,8 @@ SRCS			= main.cpp \
 				Client.cpp \
 				StatusCode.cpp \
 				MimeType.cpp \
-				HttpMethod.cpp
+				HttpMethod.cpp \
+				Autoindex.cpp 
 
 OBJS_DIR		= ./objs
 

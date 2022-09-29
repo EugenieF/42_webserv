@@ -18,6 +18,7 @@
 
 # include "Request.hpp"
 # include "MimeType.hpp"
+# include "Autoindex.hpp"
 
 extern StatusCode	g_statusCode;
 extern MimeType		g_mimeType;
@@ -34,16 +35,16 @@ class   Response
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
-		listOfHttpMethodsFunct				_httpMethods;
+		listOfHttpMethodsFunct			_httpMethods;
 
-		Block*								_server;
-		Request*							_request;
-		std::string							_response;
-		t_statusCode						_statusCode;
-		std::string							_body;
-		Block*								_matchingBlock;
-		listOfHeaders						_headers;
-		t_method							_method;
+		Block*							_server;
+		Request*						_request;
+		std::string						_response;
+		t_statusCode					_statusCode;
+		std::string						_body;
+		Block*							_matchingBlock;
+		listOfHeaders					_headers;
+		t_method						_method;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -52,54 +53,62 @@ class   Response
         Response(Block* server, Request* request);
         Response(const Response& other);
         ~Response();
-        Response&    						operator=(const Response& other);
+        Response&    					operator=(const Response& other);
 
-		void								generateResponse();
+		void							generateResponse();
 
 						/*-------   Getter  ------*/
-		Request*							getRequest() const;
-		std::string							getResponse() const;
-		t_statusCode						getStatusCode() const;
-		std::string							getStatusCodeStr() const;
-		std::string							getBody() const;
+		Request*						getRequest() const;
+		std::string						getResponse() const;
+		t_statusCode					getStatusCode() const;
+		std::string						getStatusCodeStr() const;
+		std::string						getBody() const;
 
 						/*-------   Setter  ------*/
-		void								setStatusCode(t_statusCode status);
+		void							setStatusCode(t_statusCode status);
+		void							setStatusCode(int status);
 
 	private:
 						/*-------   Init    ------*/
-		void								_initHttpMethods();
+		void							_initHttpMethods();
 
 
-        std::string							_generateErrorPage();
-		void								_fillResponseLine();
-		void								_fillHeaders();
-		void								_selectMatchingBlock();
-		std::string							_buildPath();
+        std::string						_generateErrorPage();
+		void							_fillResponseLine();
+		void							_fillHeaders();
+		void							_selectMatchingBlock();
+		std::string						_buildPath();
+		void							_processMethod();
 
-						/*-------  Methods   ------*/
-		void								_processMethod();
-		void								_getMethod(std::string& path);
-		void								_postMethod(std::string& path);
-		void								_deleteMethod(std::string& path);
-		void								_handleUploadFile();
-		void								_handleCgi();
+						/*------  Get Method  -----*/
+		void							_getMethod(std::string& path);
+		void							_readFileContent(std::string& path);
+		bool							_searchOfIndexPage(listOfStrings indexes, std::string* path);
+		bool							_foundIndexPage(DIR* dir, std::string indexPage);
+		void							_handleRedirection();
+		void							_generateAutoindex(std::string& path);
+
+						/*------  Post Method -----*/
+		void							_postMethod(std::string& path);
+		void							_handleUploadFile();
+		void							_handleCgi();
+
+						/*-----  Delete Method ----*/
+		void							_deleteMethod(std::string& path);
 
 						/*-------   Utils    ------*/
-		void								_setErrorCodeWithErrno();
-		bool								_hasUploadPathDirective();
-		std::string							_getDateHeader();
-		std::string							_getContentTypeHeader();
-		bool								_requestIsValid();
-		bool								_checkBodyLimit();
+		void							_setErrorCodeWithErrno();
+		bool							_hasUploadPathDirective();
+		std::string						_getDateHeader();
+		std::string						_getContentTypeHeader();
+		bool							_requestIsValid();
+		bool							_checkBodyLimit();
 
 						/*------- Get utils ------*/
-		bool								_pathIsFile(const std::string& path);
-		bool								_pathIsDirectory(const std::string& path);
-		bool								_fileExists(const std::string& path);
-		std::string							_buildFilePath(std::string& path);
-		bool								_searchOfIndexPage(listOfStrings indexes, std::string* path);
-		bool								_foundIndexPage(DIR* dir, std::string indexPage);
+		bool							_pathIsFile(const std::string& path);
+		bool							_pathIsDirectory(const std::string& path);
+		bool							_fileExists(const std::string& path);
+		std::string						_buildFilePath(std::string& path);
 
 };
 
