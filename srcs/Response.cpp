@@ -299,8 +299,12 @@ std::string		Response::_getContentTypeHeader()
 	size_t			pos;
 	std::string		typeExtension;
 
+	/* Check if request is valid */
 	if (!_requestIsValid())
 		return (g_mimeType[".html"]);
+	/* Check if header is already set */
+	if (_headers.find("Content-Type") != _headers.end())
+		return (_headers["Content-Type"]);
 	pos = _request->getPath().find(".");
 	if (pos != std::string::npos)
 		typeExtension = _request->getPath().substr(pos);
