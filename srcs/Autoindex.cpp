@@ -97,14 +97,15 @@ void    Autoindex::_generateIndexPage()
 	struct dirent*	file;
 
 	directory = opendir(_directoryPath.c_str());
-	if (directory)
+	if (!directory)
 	{
 		/* error case */
-		std::cerr << RED << "Webserv error: opendir() failed" << RESET << std::endl;
+		std::cerr << RED << "Webserv error: unable to read directory " << _directoryPath << RESET << std::endl;
 		return ;
 	}
     _indexPage += _generateHtmlHeader();
-	while ((file = readdir(directory)))
+	// while ((file = readdir(directory)))
+	for (file = readdir(directory); file != NULL; file = readdir(directory))
 	{
 		/* We generate a link for all files in the directory */
 		_indexPage += _generateHtmlLink(file->d_type, std::string(file->d_name));
