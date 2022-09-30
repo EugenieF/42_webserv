@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/09/30 11:04:11 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/30 11:09:51 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,6 @@ bool			getTriggeredValue();
 
 std::string		convertSizeToString(size_t size);
 std::string		convertNbToString(int nb);
-std::string		convertNbToString(char* ptr);
+std::string		convertCharPtrToString(char* ptr);
 
 #endif

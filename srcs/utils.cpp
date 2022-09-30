@@ -20,7 +20,7 @@ std::string	convertNbToString(int nb)
 	return (ss.str());
 }
 
-std::string	convertNbToString(char* ptr)
+std::string	convertCharPtrToString(char* ptr)
 {
 	std::stringstream	ss;
 

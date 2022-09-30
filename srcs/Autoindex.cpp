@@ -126,7 +126,7 @@ std::string		Autoindex::_getFileSize(struct stat	fileInfos)
 {
 	std::string		size;
 
-	if (s.st_mode & S_IFDIR) /* Is directory */
+	if (fileInfos.st_mode & S_IFDIR) /* Is directory */
 		size = "-";
 	else
 		size = convertSizeToString(fileInfos.st_size);

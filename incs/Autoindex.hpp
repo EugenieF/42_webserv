@@ -42,7 +42,7 @@ class Autoindex
         void            _generateIndexPage();
         std::string	    _generateHtmlHeader();
         std::string	    _generateHtmlFooter();
-		std::string		_generateHtmlLink(const unsigned char fileType, const char* name);
+		std::string		_generateHtmlLink(const unsigned char fileType, const std::string& fileName);
 		std::string		_getFileLink(const unsigned char fileType, std::string fileName);
 
 						/*-------    Utils   ------*/
