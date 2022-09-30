@@ -92,6 +92,7 @@ class   Response
 		void							_postMethod(std::string& path);
 		void							_handleUploadFile();
 		void							_handleCgi();
+		void							_writeFileContent(std::string& path);
 
 						/*-----  Delete Method ----*/
 		void							_deleteMethod(std::string& path);
@@ -107,7 +108,7 @@ class   Response
 						/*------- Get utils ------*/
 		bool							_pathIsFile(const std::string& path);
 		bool							_pathIsDirectory(const std::string& path);
-		bool							_fileExists(const std::string& path);
+		bool							_pathIsAccessible(const std::string& path);
 		std::string						_buildFilePath(std::string& path);
 
 };

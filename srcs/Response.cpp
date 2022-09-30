@@ -217,6 +217,31 @@ void	Response::_getMethod(std::string& path)
 /*                               POST METHOD                                  */
 /******************************************************************************/
 
+void	Response::_writeFileContent(std::string& path)
+{
+	std::ofstream	file;
+
+	if (_pathIsAccessible(path))
+	{
+		/* File already exist */
+		return(setStatusCode(CONFLICT));
+	}
+	file.open(path.c_str(), std::ofstream::out);
+	if (!file.is_open())
+	{
+		/* error */
+		// setStatusCode();
+	}
+	file << _request->getBody();
+	if (file.bad())
+	{
+		/* error */
+		// setStatusCode();
+	}
+	file.close();
+	setStatusCode(CREATED);
+}
+
 void	Response::_handleUploadFile()
 {
 	std::cout << GREEN << "handleUploadFile()" << RESET << std::endl;
@@ -356,7 +381,7 @@ bool	Response::_pathIsDirectory(const std::string& path)
 	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFDIR));
 }
 
-bool	Response::_fileExists(const std::string& path)
+bool	Response::_pathIsAccessible(const std::string& path)
 {
 	int	ret;
 
