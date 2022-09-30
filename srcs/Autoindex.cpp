@@ -104,7 +104,6 @@ void    Autoindex::_generateIndexPage()
 		return ;
 	}
     _indexPage += _generateHtmlHeader();
-	// while ((file = readdir(directory)))
 	for (file = readdir(directory); file != NULL; file = readdir(directory))
 	{
 		/* We generate a link for all files in the directory */
