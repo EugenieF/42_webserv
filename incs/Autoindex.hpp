@@ -3,12 +3,12 @@
 
 # include <iostream>
 # include <fstream>
+# include <ctime>
 
 # include <dirent.h>
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/stat.h>
-# include <time.h>
 
 # include "utils.hpp"
 

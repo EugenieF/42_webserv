@@ -70,10 +70,12 @@ std::string		Autoindex::_getFileInfos(const std::string& filePath)
 	std::string		size;
 
 	if (stat(filePath.c_str(), &s) != 0)
-		return ;
+		return ("");
 	time = _getFileModificationTime(s);
+	_formatCell(&time);
 	size = _getFileSize(s);
-	fileInfos = _formatCell(&time) + _formatCell(&size);
+	_formatCell(&size);
+	fileInfos = time + size;
 	return (fileInfos);
 }
 
@@ -84,7 +86,7 @@ std::string		Autoindex::_getFileLink(const unsigned char fileType, std::string f
 	fileLink = "<a href=\"" + fileName;
 	if (fileType == DT_DIR) /* file is directory */
 		fileLink += "/";
-	fileLink += "\">" + filename + "</a>";
+	fileLink += "\">" + fileName + "</a>";
 	_formatCell(&fileLink);
 	return (fileLink);
 }
@@ -93,11 +95,11 @@ std::string		Autoindex::_getFileLink(const unsigned char fileType, std::string f
 std::string		Autoindex::_generateHtmlLink(const unsigned char fileType, const char* name)
 {
 	std::string	link;
-	std::string	filename(name);
+	std::string	fileName(name);
 
 	link = "<tr>\n";
-	link += _getFileLink(fileType, filename);
-	link += _getFileInfos(_path + fileName);
+	link += _getFileLink(fileType, fileName);
+	link += _getFileInfos(_directoryPath + fileName);
 	link += "</tr>\n";
 	return (link);
 }
@@ -151,7 +153,7 @@ std::string		Autoindex::_getFileModificationTime(struct stat	s)
     char				date[100];
 	std::stringstream	modificationTime;
 
-	if (!std::strftime(date, sizeof(date)), "%d-%b-%Y %H:%M", std::localtime(&s.st_mtime))
+	if (!std::strftime(date, sizeof(date), "%d-%b-%Y %H:%M", std::localtime(&s.st_mtime)))
 	{
 		/* Error */
 		std::cerr << RED << "Webserv error: strftime() failed" << RESET << std::endl;
