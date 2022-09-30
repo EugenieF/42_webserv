@@ -19,3 +19,11 @@ std::string	convertNbToString(int nb)
 	ss << nb;
 	return (ss.str());
 }
+
+std::string	convertNbToString(char* ptr)
+{
+	std::stringstream	ss;
+
+	ss << ptr;
+	return (ss.str());
+}

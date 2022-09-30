@@ -2,7 +2,6 @@
 # define AUTOINDEX_HPP
 
 # include <iostream>
-# include <fstream>
 # include <ctime>
 
 # include <dirent.h>
@@ -45,7 +44,6 @@ class Autoindex
         std::string	    _generateHtmlFooter();
 		std::string		_generateHtmlLink(const unsigned char fileType, const char* name);
 		std::string		_getFileLink(const unsigned char fileType, std::string fileName);
-		std::string		_getFileInfos(const std::string& filePath);
 
 						/*-------    Utils   ------*/
 		void			_formatCell(std::string* data);

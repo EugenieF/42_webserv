@@ -62,23 +62,6 @@ std::string    Autoindex::_generateHtmlFooter()
 	return (footer);
 }
 
-std::string		Autoindex::_getFileInfos(const std::string& filePath)
-{
-	struct stat		s;
-	std::string		fileInfos;
-	std::string		time;
-	std::string		size;
-
-	if (stat(filePath.c_str(), &s) != 0)
-		return ("");
-	time = _getFileModificationTime(s);
-	_formatCell(&time);
-	size = _getFileSize(s);
-	_formatCell(&size);
-	fileInfos = time + size;
-	return (fileInfos);
-}
-
 std::string		Autoindex::_getFileLink(const unsigned char fileType, std::string fileName)
 {
 	std::string	fileLink;
@@ -92,14 +75,18 @@ std::string		Autoindex::_getFileLink(const unsigned char fileType, std::string f
 }
 
 // file link + file info
-std::string		Autoindex::_generateHtmlLink(const unsigned char fileType, const char* name)
+std::string		Autoindex::_generateHtmlLink(const unsigned char fileType, const std::string& fileName)
 {
-	std::string	link;
-	std::string	fileName(name);
+	struct stat		fileInfos;
+	std::string		link;
+	std::string		filePath(_directoryPath + fileName);
 
+	if (fileName == "." || stat(filePath.c_str(), &fileInfos) != 0)
+		return ("");
 	link = "<tr>\n";
 	link += _getFileLink(fileType, fileName);
-	link += _getFileInfos(_directoryPath + fileName);
+	link += _getFileModificationTime(fileInfos);
+	link += _getFileSize(fileInfos);
 	link += "</tr>\n";
 	return (link);
 }
@@ -120,7 +107,7 @@ void    Autoindex::_generateIndexPage()
 	while ((file = readdir(directory)))
 	{
 		/* We generate a link for all files in the directory */
-		_indexPage += _generateHtmlLink(file->d_type, file->d_name);
+		_indexPage += _generateHtmlLink(file->d_type, std::string(file->d_name));
 	}
 	_indexPage += _generateHtmlFooter();
     closedir(directory);
@@ -135,32 +122,32 @@ void	Autoindex::_formatCell(std::string* data)
 	*data = "<td>" + *data + "</td>\n";
 }
 
-std::string		Autoindex::_getFileSize(struct stat	s)
+std::string		Autoindex::_getFileSize(struct stat	fileInfos)
 {
-	std::stringstream	fileSize;
+	std::string		size;
 
-	if (s.st_mode & S_IFDIR)
-	{
-		/* Is directory */
-		return ("-");
-	}
-	fileSize << s.st_size;
-	return (fileSize.str());
+	if (s.st_mode & S_IFDIR) /* Is directory */
+		size = "-";
+	else
+		size = convertSizeToString(fileInfos.st_size);
+	_formatCell(&size);
+	return (size);
 }
 
-std::string		Autoindex::_getFileModificationTime(struct stat	s)
+std::string		Autoindex::_getFileModificationTime(struct stat	fileInfos)
 {
     char				date[100];
-	std::stringstream	modificationTime;
+	std::string			time;
 
-	if (!std::strftime(date, sizeof(date), "%d-%b-%Y %H:%M", std::localtime(&s.st_mtime)))
+	if (!std::strftime(date, sizeof(date), "%d-%b-%Y %H:%M", std::localtime(&fileInfos.st_mtime)))
 	{
 		/* Error */
 		std::cerr << RED << "Webserv error: strftime() failed" << RESET << std::endl;
 		return ("");
 	}
-	modificationTime << date;
-	return(modificationTime.str());
+	time = convertCharPtrToString(date);
+	_formatCell(&time);
+	return(time);
 }
 
 /******************************************************************************/
