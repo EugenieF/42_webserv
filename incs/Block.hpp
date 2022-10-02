@@ -78,7 +78,7 @@ class	Block
 		Block(const Block& other);
 		~Block();
 		Block&								operator=(const Block& other);
-		Block*								getMatchingBlock(std::string const& host, std::string const& path);
+		Block*								getMatchingBlock(std::string* path);
 
 						/*-------  Server_name  ------*/
 		void								setName(const std::string &name);

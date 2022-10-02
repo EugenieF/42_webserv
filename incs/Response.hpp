@@ -9,9 +9,6 @@
 # include <iostream>
 # include <fstream>
 
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/stat.h>
 # include <dirent.h>
 
 # define WEBSERV_VERSION	"Cutie Webserv 1.0"
@@ -55,6 +52,7 @@ class   Response
         ~Response();
         Response&    					operator=(const Response& other);
 
+						/*-------  Generate  ------*/
 		void							generateResponse();
 
 						/*-------   Getter  ------*/
@@ -69,14 +67,14 @@ class   Response
 		void							setStatusCode(int status);
 
 	private:
+	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 						/*-------   Init    ------*/
 		void							_initHttpMethods();
 
-
+						/*-------  Generate  ------*/
         std::string						_generateErrorPage();
 		void							_fillResponseLine();
 		void							_fillHeaders();
-		void							_selectMatchingBlock();
 		std::string						_buildPath();
 		void							_processMethod();
 
@@ -97,19 +95,19 @@ class   Response
 						/*-----  Delete Method ----*/
 		void							_deleteMethod(std::string& path);
 
+						/*--------   Error  -------*/
+		void							_throwErrorMsg(t_statusCode errorCode, const std::string& message);
+		void							_throwErrorMsg(const std::string& message);
+		t_statusCode					_getErrorCodeWithErrno();
+
 						/*-------   Utils    ------*/
-		void							_setErrorCodeWithErrno();
 		bool							_hasUploadPathDirective();
 		std::string						_getDateHeader();
 		std::string						_getContentTypeHeader();
 		bool							_requestIsValid();
-		bool							_checkBodyLimit();
-
-						/*------- Get utils ------*/
-		bool							_pathIsFile(const std::string& path);
-		bool							_pathIsDirectory(const std::string& path);
-		bool							_pathIsAccessible(const std::string& path);
+		void							_checkBodyLimit();
 		std::string						_buildFilePath(std::string& path);
+
 
 };
 

@@ -4,6 +4,10 @@ StatusCode		g_statusCode;
 MimeType		g_mimeType;
 HttpMethod		g_httpMethod;
 
+/******************************************************************************/
+/*                              STRING RELATED                                */
+/******************************************************************************/
+
 std::string	convertSizeToString(size_t size)
 {
 	std::stringstream	ss;
@@ -26,4 +30,30 @@ std::string	convertCharPtrToString(char* ptr)
 
 	ss << ptr;
 	return (ss.str());
+}
+
+/******************************************************************************/
+/*                               FILE RELATED                                 */
+/******************************************************************************/
+
+bool	pathIsFile(const std::string& path)
+{
+	struct stat s;
+
+	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFREG));
+}
+
+bool	pathIsDirectory(const std::string& path)
+{
+	struct stat s;
+
+	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFDIR));
+}
+
+bool	pathIsAccessible(const std::string& path)
+{
+	int	ret;
+
+	ret = access(path.c_str(), F_OK); 
+	return (!ret);
 }

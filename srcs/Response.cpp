@@ -38,10 +38,9 @@ Response&	Response::operator=(const Response &other)
 	return (*this);
 }
 
-void	Response::_selectMatchingBlock()
-{
-	_matchingBlock = _server->getMatchingBlock(_request->getHost(), _request->getPath());
-}
+/******************************************************************************/
+/*                                 GENERATE                                   */
+/******************************************************************************/
 
 void	Response::_processMethod()
 {
@@ -50,25 +49,30 @@ void	Response::_processMethod()
 
 	// /* Check method validity */
 	if (!_matchingBlock->isAllowedMethod(_method))
-		return (setStatusCode(METHOD_NOT_ALLOWED));
+		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
 	if (path.empty())
-		return (setStatusCode(NOT_FOUND));
+		throw(NOT_FOUND);
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
-			return (setStatusCode(METHOD_NOT_ALLOWED));
+			throw(METHOD_NOT_ALLOWED);
 	(this->*ite->second)(path);
-	_body = "That's the response body for testing";
 }
 
 void	Response::generateResponse()
 {
+	_matchingBlock = _server->getMatchingBlock(&_request->getPath());
 	if (_requestIsValid()) /* Handle valid request */
 	{
-		_selectMatchingBlock();
-		if (!_checkBodyLimit())
-			return (setStatusCode(PAYLOAD_TOO_LARGE));
-		_processMethod();
+		try
+		{
+			_checkBodyLimit();
+			_processMethod();
+		}
+		catch(const t_statusCode& errorCode)
+		{
+			setStatusCode(errorCode);
+		}
 	}
 	else /*	Handle invalid request */
 	{
@@ -78,6 +82,27 @@ void	Response::generateResponse()
 	_fillHeaders();
 	_response += _body;
 }
+
+std::string		Response::_generateErrorPage()
+{
+	std::string	errorPage;
+
+	errorPage = _matchingBlock->getErrorPage(_statusCode);
+	if (errorPage.empty())
+	{
+		errorPage = "<!DOCTYPE html>\n\
+	  		<html><head>\n\
+	  		<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
+	  		</head>\n\
+	  		<body><p>- Error Page -</p></body>\n\
+	  		</html>";
+	}
+	return (errorPage);
+}
+
+/******************************************************************************/
+/*                              FILL RESPONSE                                   */
+/******************************************************************************/
 
 void	Response::_fillResponseLine()
 {
@@ -97,23 +122,6 @@ void	Response::_fillHeaders()
 	_headers["Date"] = _getDateHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
-}
-
-std::string		Response::_generateErrorPage()
-{
-	std::string	errorPage;
-
-	errorPage = _server->getErrorPage(_statusCode);
-	if (errorPage.empty())
-	{
-		errorPage = "<!DOCTYPE html>\n\
-	  		<html><head>\n\
-	  		<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
-	  		</head>\n\
-	  		<body><p>Hello world!</p></body>\n\
-	  		</html>";
-	}
-	return (errorPage);
 }
 
 /******************************************************************************/
@@ -170,6 +178,7 @@ void	Response::_readFileContent(std::string& path)
 	if (!file.is_open())
 	{
 		/* error */
+		_throwErrorMsg("Can't open file '" + path + "'");
 	}
 	fileContent << file.rdbuf();
 	_body = fileContent.str();
@@ -195,9 +204,9 @@ void	Response::_getMethod(std::string& path)
 		/* Do redirection */
 		return (_handleRedirection());
 	}
-	if (_pathIsFile(path))
+	if (pathIsFile(path))
 		return (_readFileContent(path));
-	if (_pathIsDirectory(path))
+	if (pathIsDirectory(path))
 	{
 		/* Directory case */
 		if (*(path.rbegin()) == '/' && _searchOfIndexPage(_matchingBlock->getIndexes(), &path))
@@ -221,30 +230,25 @@ void	Response::_writeFileContent(std::string& path)
 {
 	std::ofstream	file;
 
-	if (_pathIsAccessible(path))
+	if (!pathIsAccessible(path))
 	{
-		/* File already exist */
-		return(setStatusCode(CONFLICT));
+		/* New file will be created */
+		setStatusCode(CREATED);
 	}
-	file.open(path.c_str(), std::ofstream::out);
+	file.open(path.c_str(), std::ofstream::app);
 	if (!file.is_open())
 	{
 		/* error */
-		// setStatusCode();
+		return (_throwErrorMsg("Can't open file '" + path + "'"));
 	}
 	file << _request->getBody();
 	if (file.bad())
 	{
 		/* error */
-		// setStatusCode();
+		return (_throwErrorMsg("An error occurred while writing '" + path + "'"));
 	}
 	file.close();
-	setStatusCode(CREATED);
-}
-
-void	Response::_handleUploadFile()
-{
-	std::cout << GREEN << "handleUploadFile()" << RESET << std::endl;
+	// setStatusCode(NO_CONTENT); ?? 
 }
 
 void	Response::_handleCgi()
@@ -263,10 +267,8 @@ void	Response::_postMethod(std::string& path)
 	{
 		/* process cgi */
 	}
-	if (_matchingBlock->uploadPathDirective())
-	{
-		/* process upload --> create_file ? */
-	}
+	// if (_matchingBlock->uploadPathDirective()) ??
+	_writeFileContent(path);
 }
 
 /******************************************************************************/
@@ -281,23 +283,41 @@ void	Response::_deleteMethod(std::string& path)
 	std::cout << GREEN << "DELETE METHOD" << RESET << std::endl;
 	ret = remove(path.c_str());
 	if (ret) /* Error case */
-		return (_setErrorCodeWithErrno());
+	{
+		_throwErrorMsg(_getErrorCodeWithErrno(), "Can't remove '" + path + "' in DELETE method");
+	}
 	setStatusCode(NO_CONTENT); /* Successfull case */
 
 }
 
 /******************************************************************************/
-/*                                  UTILS                                     */
+/*                                  ERROR                                     */
 /******************************************************************************/
 
-void	Response::_setErrorCodeWithErrno()
+void	Response::_throwErrorMsg(t_statusCode errorCode, const std::string& message)
+{
+	std::cerr << RED << "Webserv error: " << message << RESET << std::endl;
+	throw(errorCode);
+}
+
+void	Response::_throwErrorMsg(const std::string& message)
+{
+	std::cerr << RED << "Webserv error: " << message << RESET << std::endl;
+	throw(INTERNAL_SERVER_ERROR);
+}
+
+t_statusCode	Response::_getErrorCodeWithErrno()
 {
 	if (errno == ENOENT || errno == ENOTDIR)
-		return (setStatusCode(NOT_FOUND));
+		return (NOT_FOUND);
 	else if (errno == EACCES || errno == EPERM)
-		return (setStatusCode(FORBIDDEN));
-	setStatusCode(INTERNAL_SERVER_ERROR);
+		return (FORBIDDEN);
+	return (INTERNAL_SERVER_ERROR);
 }
+
+/******************************************************************************/
+/*                                  UTILS                                     */
+/******************************************************************************/
 
 std::string		Response::_buildPath()
 {
@@ -306,10 +326,17 @@ std::string		Response::_buildPath()
 	if (_hasUploadPathDirective())
 		path = _matchingBlock->getUploadPath();
 	else
-		path = _matchingBlock->getRoot();
+	{
+		if (_matchingBlock->getRoot() != "")
+			path = _matchingBlock->getRoot();
+		else
+			path = _server->getRoot(); // --> Temporary, to be handled in parsing+++
+	}
 	if (_request->getPath()[0] != '/')
 		path += "/";
 	path += _request->getPath();
+	if (path[0] == '/')
+		path.insert(path.begin(), '.');
 	std::cout << BLUE << "PATH = " << path << RESET << std::endl;
 	return (path);
 }
@@ -339,12 +366,15 @@ std::string		Response::_getContentTypeHeader()
 std::string		Response::_getDateHeader()
 {
 	std::time_t	time;
-    char		mbstr[100];
+    char		date[100];
 
 	time = std::time(NULL);
-    if (!std::strftime(mbstr, sizeof(mbstr), "%a, %d %b %Y %X GMT", std::localtime(&time)))
-	{ /* Error Date */ }
-	return(std::string(mbstr));
+    if (!std::strftime(date, sizeof(date), "%a, %d %b %Y %X GMT", std::localtime(&time)))
+	{
+		/* Error */
+		_throwErrorMsg("strftime() function failed");
+	}
+	return(std::string(date));
 }
 
 bool	Response::_requestIsValid()
@@ -352,10 +382,15 @@ bool	Response::_requestIsValid()
 	return (_request && _request->getStatusCode() < 400);
 }
 
-bool	Response::_checkBodyLimit()
+void	Response::_checkBodyLimit()
 {
-	return (_request->getBodySize() < _matchingBlock->getClientBodyLimit());
+	if (_request->getBodySize() >= _matchingBlock->getClientBodyLimit())
+		throw(PAYLOAD_TOO_LARGE);
 }
+
+/******************************************************************************/
+/*                                  SETTER                                    */
+/******************************************************************************/
 
 void	Response::setStatusCode(t_statusCode status)
 {
@@ -365,28 +400,6 @@ void	Response::setStatusCode(t_statusCode status)
 void	Response::setStatusCode(int status)
 {
 	_statusCode = (t_statusCode)status;
-}
-
-bool	Response::_pathIsFile(const std::string& path)
-{
-	struct stat s;
-
-	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFREG));
-}
-
-bool	Response::_pathIsDirectory(const std::string& path)
-{
-	struct stat s;
-
-	return (stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFDIR));
-}
-
-bool	Response::_pathIsAccessible(const std::string& path)
-{
-	int	ret;
-
-	ret = access(path.c_str(), F_OK); 
-	return (!ret);
 }
 
 /******************************************************************************/
