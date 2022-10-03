@@ -81,7 +81,7 @@ void	Response::generateResponse()
 	}
 	_fillResponseLine();
 	_fillHeaders();
-	_response += _body;
+	_response += _body + "\r\n";
 }
 
 std::string		Response::_generateErrorPage()
@@ -123,6 +123,9 @@ void	Response::_fillHeaders()
 	_headers["Date"] = _getDateHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
+	/* An empty line is placed after the series of HTTP headers,
+	to divide the headers from the message body */
+	_response += "\r\n";
 }
 
 /******************************************************************************/
