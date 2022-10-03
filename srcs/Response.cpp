@@ -61,7 +61,7 @@ void	Response::_processMethod()
 
 void	Response::generateResponse()
 {
-	_matchingBlock = _server->getMatchingBlock(&_request->getPath());
+	_matchingBlock = _server->getMatchingBlock(_request->getPath());
 	if (_requestIsValid()) /* Handle valid request */
 	{
 		try
