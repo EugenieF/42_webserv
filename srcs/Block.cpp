@@ -75,13 +75,13 @@ Block*		Block::getMatchingBlock(const std::string& path)
 	size_t		pos;
 	std::string	prefix;
 
-	pos = path->find("/", 1);
-	prefix = path->substr(0, pos);
-	std::cout << BLUE << "Path : " << *path << " | prefix : " << prefix << RESET << std::endl;
+	pos = path.find("/", 1);
+	prefix = path.substr(0, pos);
+	std::cout << BLUE << "Path : " << path << " | prefix : " << prefix << RESET << std::endl;
 	_currentLocation = _locations.find(prefix);
 	if (_currentLocation != _locations.end())
 	{
-		// path->erase(0, pos); ??
+		// path.erase(0, pos); ??
 		return (_currentLocation->second);
 	}
 	return (this);
