@@ -78,10 +78,10 @@ class	Block
 		Block(const Block& other);
 		~Block();
 		Block&								operator=(const Block& other);
-		Block*								getMatchingBlock(std::string* path);
+		Block*								getMatchingBlock(const std::string& path);
 
 						/*-------  Server_name  ------*/
-		void								setName(const std::string &name);
+		void								setName(const std::string& name);
 		listOfStrings						getServerNames() const;	
 
 						/*-------    Listen    -------*/
