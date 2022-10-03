@@ -330,12 +330,16 @@ void	Parser::_configureVirtualHosts()
 
 void	Parser::_completeLocationsBlock(const blockPtr server)
 {
-	Block::listOfLocations::const_iterator	location;
+	Block::listOfLocations::const_iterator	currentLocation;
+	Block::listOfLocations					locations;
 
-	for (location = server->getLocations().begin(); location != server->getLocations().end(); location++)
+	locations = server->getLocations();
+	if (locations.empty())
+		return ;
+	for (currentLocation = locations.begin(); currentLocation != locations.end(); currentLocation++)
 	{
 		/* We complete empty directives with server directives */
-		location->second->completeLocationDirectives(*server);
+		currentLocation->second->completeLocationDirectives(*server);
 	}
 }
 
