@@ -78,6 +78,7 @@ class	Block
 		Block(const Block& other);
 		~Block();
 		Block&								operator=(const Block& other);
+		void								completeLocationDirectives(const Block& server);
 		Block*								getMatchingBlock(const std::string& path);
 
 						/*-------  Server_name  ------*/

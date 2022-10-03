@@ -144,6 +144,7 @@ void	Parser::parseTokens()
 		_expectNextToken(KEYWORD_SERVER, _keywordServerError());
 		newServer = _createNewServer();
 		_parseBlock();
+		_completeLocationsBlock(newServer);
 		_currentServer = _servers.insert(_servers.end(), newServer);
 		_updateContext(NONE, NULL);
 	}
@@ -325,6 +326,17 @@ void	Parser::_configureVirtualHosts()
 		}
 	}
 	std::cout << RED << "_servers.size() : " << _servers.size() << RESET << std::endl;
+}
+
+void	Parser::_completeLocationsBlock(const blockPtr server)
+{
+	Block::listOfLocations::const_iterator	location;
+
+	for (location = server->getLocations().begin(); location != server->getLocations().end(); location++)
+	{
+		/* We complete empty directives with server directives */
+		location->second->completeLocationDirectives(*server);
+	}
 }
 
 /******************************************************************************/

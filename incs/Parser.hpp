@@ -76,6 +76,7 @@ class Parser
 		blockPtr							_createNewServer();
 		void								_createNewLocation();
 		void								_parseRule();
+		void								_completeLocationsBlock(const blockPtr server);
 
 						/*-----  Parsing rules -----*/
 		void								_parseServerNameRule();

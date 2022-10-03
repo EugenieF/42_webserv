@@ -70,6 +70,26 @@ Block&	Block::operator=(const Block& other)
 	return (*this);
 }
 
+void	Block::completeLocationDirectives(const Block& server)
+{
+	if (this == &server)
+		return ;
+	if (_root.empty())
+		_root = server.getRoot();
+	if (_indexes.empty())
+		_indexes = server.getIndexes();
+	if (_clientBodyLimit == DEFAULT_CLIENT_BODY_LIMIT)
+		_clientBodyLimit = server.getClientBodyLimit();
+	if (_cgiExt.empty())
+		_cgiExt = server.getCgiExt();
+	if (_cgiPath.empty())
+		_cgiPath = server.getCgiPath();
+	if (!_redirectCode)
+		_redirectCode = server.getRedirectCode();
+	if (_redirectUri.empty())
+		_redirectUri = server.getRedirectUri();
+}
+
 Block*		Block::getMatchingBlock(const std::string& path)
 {
 	size_t		pos;
@@ -424,7 +444,7 @@ void	Block::displayListOfStrings(listOfStrings list)
 }
 
 /******************************************************************************/
-/*                                 DISPLAY                                    */
+/*                               VIRTUAL HOST                                 */
 /******************************************************************************/
 
 void	Block::setVirtualHost(blockPtr server)
