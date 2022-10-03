@@ -90,7 +90,7 @@ void	Block::completeLocationDirectives(const Block& server)
 		_redirectUri = server.getRedirectUri();
 }
 
-Block*		Block::getMatchingBlock(const std::string& path)
+Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPath)
 {
 	size_t		pos;
 	std::string	prefix;
@@ -102,6 +102,7 @@ Block*		Block::getMatchingBlock(const std::string& path)
 	if (_currentLocation != _locations.end())
 	{
 		// path.erase(0, pos); ??
+		*locationPath = _currentLocation->first;
 		return (_currentLocation->second);
 	}
 	return (this);

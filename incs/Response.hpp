@@ -42,6 +42,7 @@ class   Response
 		Block*							_matchingBlock;
 		listOfHeaders					_headers;
 		t_method						_method;
+		std::string						_locationPath;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/

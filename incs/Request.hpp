@@ -74,6 +74,7 @@ class   Request
 		std::string					getBody() const;
 		std::string					getHost() const;
 		int							getPort() const;
+		std::string					getHeader(const std::string& headerName);
 
 						/*------   Display  ------*/
 		void						printRequestInfo();

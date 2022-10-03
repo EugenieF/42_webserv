@@ -316,6 +316,13 @@ int		Request::getPort() const
 	return (_port);
 }
 
+std::string		Request::getHeader(const std::string& headerName)
+{
+	if (_headers.find(headerName) != _headers.end())
+		return (_headers[headerName]);
+	return ("");
+}
+
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/

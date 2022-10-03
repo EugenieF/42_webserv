@@ -79,7 +79,7 @@ class	Block
 		~Block();
 		Block&								operator=(const Block& other);
 		void								completeLocationDirectives(const Block& server);
-		Block*								getMatchingBlock(const std::string& path);
+		Block*								getMatchingBlock(const std::string& path, std::string* locationPath);
 
 						/*-------  Server_name  ------*/
 		void								setName(const std::string& name);

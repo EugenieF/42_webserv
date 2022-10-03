@@ -10,7 +10,8 @@ Response::Response(Block *server, Request* request):
 	_response(""),
 	_statusCode(_request->getStatusCode()),
 	_body(""),
-	_method(_request->getMethod())
+	_method(_request->getMethod()),
+	_locationPath("")
 {
 	_initHttpMethods();
 }
@@ -61,7 +62,7 @@ void	Response::_processMethod()
 
 void	Response::generateResponse()
 {
-	_matchingBlock = _server->getMatchingBlock(_request->getPath());
+	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
 		try
@@ -268,6 +269,7 @@ void	Response::_postMethod(std::string& path)
 		/* process cgi */
 	}
 	// if (_matchingBlock->uploadPathDirective()) ??
+	_request->getHeader("content-type");
 	_writeFileContent(path);
 }
 
@@ -322,22 +324,21 @@ t_statusCode	Response::_getErrorCodeWithErrno()
 std::string		Response::_buildPath()
 {
 	std::string		path;
+	std::string		uri;
 
+	uri = _request->getPath();
+	if (_locationPath != "")
+		uri.erase(0, _locationPath.length());
 	if (_hasUploadPathDirective())
 		path = _matchingBlock->getUploadPath();
 	else
-	{
-		if (_matchingBlock->getRoot() != "")
-			path = _matchingBlock->getRoot();
-		else
-			path = _server->getRoot(); // --> Temporary, to be handled in parsing+++
-	}
+		path = _matchingBlock->getRoot(); 
 	if (_request->getPath()[0] != '/')
 		path += "/";
-	path += _request->getPath();
+	path += uri;
 	if (path[0] == '/')
 		path.insert(path.begin(), '.');
-	std::cout << BLUE << "PATH = " << path << RESET << std::endl;
+	std::cout << BLUE << "*** PATH = " << path << " ***" << RESET << std::endl;
 	return (path);
 }
 
@@ -352,7 +353,7 @@ std::string		Response::_getContentTypeHeader()
 	std::string		typeExtension;
 
 	/* Check if request is valid */
-	if (!_requestIsValid())
+	if (_statusCode >= 400)
 		return (g_mimeType[".html"]);
 	/* Check if header is already set */
 	if (_headers.find("Content-Type") != _headers.end())
