@@ -70,7 +70,7 @@ Block&	Block::operator=(const Block& other)
 	return (*this);
 }
 
-Block*		Block::getMatchingBlock(std::string* path)
+Block*		Block::getMatchingBlock(const std::string& path)
 {
 	size_t		pos;
 	std::string	prefix;
@@ -81,7 +81,7 @@ Block*		Block::getMatchingBlock(std::string* path)
 	_currentLocation = _locations.find(prefix);
 	if (_currentLocation != _locations.end())
 	{
-		path->erase(0, pos);
+		// path->erase(0, pos); ??
 		return (_currentLocation->second);
 	}
 	return (this);
