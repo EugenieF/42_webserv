@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 11:37:53 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 17:43:39 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 # include "TcpSocket.hpp"
 # include "utils.hpp"
 # include "Client.hpp"
-# include "Parser.hpp"
 
 # define BUFSIZE 2048
 # define MAX_EVENT 100
@@ -37,16 +36,19 @@ class EpollInstance {
 		typedef		Parser::listOfServers				listOfServers;
 		typedef		Client*								ClientPtr;
 		typedef		std::map<int, ClientPtr>::iterator	it;
+		typedef		std::map<TcpSocket, Block*>			listOfSockets;
 
-		EpollInstance(listOfServers _servers);
+		EpollInstance();
 		virtual ~EpollInstance();
 
 		/* -- Epoll manipulation ------------------------------------------- */
-		void						startMonitoring(int servsocket, char* const* env);
+		void						startMonitoring(char* const* env);
 
 		/* -- Getter ------------------------------------------------------- */
 		int							getFd() const;
 		ClientPtr					getClient(int fd);
+
+		void						setSocketList(listOfSockets sockets);
 
 	private:
 		/* -- Epoll manipulation ------------------------------------------- */
@@ -54,21 +56,24 @@ class EpollInstance {
 
 		/* -- Socket management -------------------------------------------- */
 		void						_addSocket(int socket, int flag);
+		void						_addSockets();
 		void						_editSocket(int socket, int flag);
 		void						_removeSocket(int socket);
 		void						_clearClients();
 		void						_clearClient(int fd, Client* client);
 
+		Block*						_findServer(int fd);
+
 		/* -- Connection management ---------------------------------------- */
-		void						_processConnections();
+		void						_processConnections(int serverSocket, Block* server);
 		void						_handleRequest(int index);
 		void						_handleResponse(int index, char* const* env);
 
 		int							_efd;
-		int							_serversocket;
+		// int							_serversocket;
 		struct epoll_event			_events[MAX_EVENT];
 		std::map<int, ClientPtr>	_clientlist;
-		listOfServers				_servers;
+		listOfSockets				_socketList;
 };
 
 #endif

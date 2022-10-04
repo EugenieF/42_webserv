@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 16:32:07 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 17:42:05 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,37 +24,40 @@
 # include <sys/socket.h>
 # include <string.h>
 
-# include "TcpSocket.hpp"
 # include "Block.hpp"
 # include "EpollInstance.hpp"
+# include "Parser.hpp"
+# include "utils.hpp"
 
 class Server {
 	public:
-		typedef Parser::listOfServers	listOfServers;
+		typedef Parser::listOfServers			listOfServers;
+		typedef EpollInstance::listOfSockets	listOfSockets;
 
-		Server(const Block& x, listOfServers servers, char* const* env);
+		Server(listOfServers servers, char* const* env);
 		virtual ~Server();
 
 		/* -- Server management -------------------------------------------- */
 		void							launchServer();
 
 		/* -- Getter ------------------------------------------------------- */
-		int								getPort() const;
-		const std::string&				getHost() const;
+		// int								getPort() const;
+		// const std::string&				getHost() const;
 		int								getEpoll() const;
-		int								getSocket() const;
-		const struct sockaddr_in&		getAddr() const;
+		// int								getSocket() const;
+		// const struct sockaddr_in&		getAddr() const;
 
 	private:
 		/* -- Debug -------------------------------------------------------- */
-		void							_displayServer() const;
+		// void							_displayServer() const;
 
-		// void							_createSocketList();	
+		void							_createSocketList();	
+		TcpSocket						_createSocket(int port, std::string ipAddress);
 
-		TcpSocket						_socket;
-		// std::map<TcpSocket, Block*>		_socketList;
+		// TcpSocket						_socket;
+		listOfSockets					_socketList;
 		EpollInstance					_epoll;
-		struct sockaddr_in				_addr;
+		// struct sockaddr_in				_addr;
 		std::string						_ip;
 		char* const*					_env;
 		listOfServers					_servers;

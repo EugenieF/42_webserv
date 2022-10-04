@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 15:30:51 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 11:52:24 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 16:53:37 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv, char* const* env)
 	{
 		Webserv	webserv(configFile);
 		setupSignal(INIT_SIGNAL);
-		Server	serv(*webserv.getServers()[0], webserv.getServers(), env);
+		Server	serv(webserv.getServers(), env);
 		serv.launchServer();
 		// webserv.displayServers();
 	}
