@@ -28,10 +28,7 @@ Client::Client(Client const& other):
 
 Client::~Client()
 {
-    if (_request)
-        delete _request;
-    if (_response)
-        delete _response;
+    clear();
 }
 
 Client&     Client::operator=(Client const& other)

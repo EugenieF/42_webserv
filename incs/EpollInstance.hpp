@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/03 23:10:31 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 10:27:30 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,10 @@
 class EpollInstance {
 	public:
 		/* -- Typedef ------------------------------------------------------ */
-		typedef		std::set<int>::iterator				it;
 /****************************************************************************************/
 		typedef		Parser::listOfServers				listOfServers;
+		typedef		Client*								ClientPtr;
+		typedef		std::map<int, ClientPtr>::iterator	it;
 /****************************************************************************************/
 
 		EpollInstance(listOfServers _servers);
@@ -47,6 +48,7 @@ class EpollInstance {
 
 		/* -- Getter ------------------------------------------------------- */
 		int							getFd() const;
+		ClientPtr					getClient(int fd);							/**** eug ****/
 
 	private:
 		/* -- Epoll manipulation ------------------------------------------- */
@@ -56,7 +58,8 @@ class EpollInstance {
 		void						_addSocket(int socket, int flag);
 		void						_editSocket(int socket, int flag);
 		void						_removeSocket(int socket);
-		void						_clearClients();
+		void						_clearClients();							/**** eug ****/
+		void						_clearClient(int fd, Client* client);
 
 		/* -- Connection management ---------------------------------------- */
 		void						_processConnections();
@@ -66,12 +69,13 @@ class EpollInstance {
 		int							_efd;
 		int							_serversocket;
 		struct epoll_event			_events[MAX_EVENT];
-		std::set<int>				_clientlist;
+		// std::set<int>				_clientlist;
 
 /****************************************************************************************/
-		Client						_client;
+		std::map<int, ClientPtr>	_clientlist;
+		listOfServers				_servers;
 		// std::map<int, Client*>		_clients; ?? --> combine with _clientlist
-		// *client = _client[fd]
+		// *client = _clientlist[fd]
 /****************************************************************************************/
 };
 

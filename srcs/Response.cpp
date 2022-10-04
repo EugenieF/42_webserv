@@ -96,7 +96,7 @@ std::string		Response::_generateErrorPage()
 	  		<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
 	  		</head>\n\
 	  		<body><p>- Error Page -</p></body>\n\
-	  		</html>";
+	  		</html>\n";
 	}
 	return (errorPage);
 }
