@@ -10,7 +10,10 @@
 # include <fcntl.h>
 
 # include "Parser.hpp"
+# include "Server.hpp"
+# include "utils.hpp"
 
+# define NL '\n'
 # define PORT	8080
 
 /******************************************************************************/

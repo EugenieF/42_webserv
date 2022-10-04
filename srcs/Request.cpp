@@ -2,12 +2,10 @@
 
 /* The HTTP GET request method is used to request a resource from the server.
 The GET request should only receive data (the server must not change its state).
-
 The HTTP POST method is used to create or add a resource on the server.
 The POST method asks the web server to accept the data contained in the
 body of the message. The data type in the HTTP POST body is indicated by the
 Content-Type header.
-
 - request line / status line
 - HTTP headers [Header: value]
 - HTTP body
@@ -23,7 +21,7 @@ Request::Request(const std::string& buffer):
 	_request(buffer),
 	_requestStatus(INCOMPLETE_REQUEST),
 	_method(NO_METHOD),
-	_uri(""),
+	_path(""),
 	_httpProtocol(""),
 	_bodySize(0),
 	_statusCode(OK),
@@ -38,7 +36,7 @@ Request::Request(const Request &other):
 	_request(other.getRequest()),
 	_requestStatus(other.getRequestStatus()),
 	_method(other.getMethod()),
-	_uri(other.getUri()),
+	_path(other.getPath()),
 	_httpProtocol(other.getHttpProtocol()),
 	_bodySize(other.getBodySize()),
 	_statusCode(other.getStatusCode()),
@@ -59,7 +57,7 @@ Request&	Request::operator=(const Request &other)
 		_request = other.getRequest();
 		_requestStatus = other.getRequestStatus();
 		_method = other.getMethod();
-		_uri = other.getUri();
+		_path = other.getPath();
 		_httpProtocol = other.getHttpProtocol();
 		_bodySize = other.getBodySize();
 		_statusCode = other.getStatusCode(),
@@ -106,14 +104,14 @@ void	Request::_parseMethod()
 	_method = g_httpMethod.getMethod(method);
 }
 
-void	Request::_parseUri()
+void	Request::_parsePath()
 {
-	std::string uri;
+	std::string path;
 	
-	_getNextWord(uri, " ");
-	if (uri == "" || uri[0] != '/')
+	_getNextWord(path, " ");
+	if (path == "" || path[0] != '/')
 		return (_requestIsInvalid(BAD_REQUEST));
-	if (uri.length() > 2048)
+	if (path.length() > 2048)
 		return (_requestIsInvalid(URI_TOO_LONG));
 	/*  Handle query "?" in URI  */
 	_path = path;
@@ -141,7 +139,7 @@ void	Request::_parseHeaders()
 	while (pos != std::string::npos)
 	{
 		pos = _getNextWord(headerName, ":");
-		_toLowerStr(&headerName);
+		_toLowerStr(&headerName); /* Case-insensitive */
 		if (pos == std::string::npos)
 			break ;
 		_getNextWord(headerValue, "\r\n");
@@ -247,27 +245,6 @@ void	Request::_parseChunks()
 	}
 }
 
-/* Pseudo-code RFC 7230 for decoding chunked : */
-
-	// length := 0
-    //  read chunk-size, chunk-ext (if any), and CRLF
-    //  while (chunk-size > 0) {
-    //     read chunk-data and CRLF
-    //     append chunk-data to decoded-body
-    //     length := length + chunk-size
-    //     read chunk-size, chunk-ext (if any), and CRLF
-    //  }
-    //  read trailer field
-    //  while (trailer field is not empty) {
-    //     if (trailer field is allowed to be sent in a trailer) {
-    //         append trailer field to existing header fields
-    //     }
-    //     read trailer-field
-    //  }
-    //  Content-Length := length
-    //  Remove "chunked" from Transfer-Encoding
-    //  Remove Trailer from existing header fields
-
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
@@ -282,9 +259,9 @@ t_method	Request::getMethod() const
 	return (_method);
 }
 
-std::string		Request::getUri() const
+std::string		Request::getPath() const
 {
-	return (_uri);
+	return (_path);
 }
 
 std::string		Request::getHttpProtocol() const
@@ -403,7 +380,7 @@ std::string	Request::_trimSpaceStr(std::string *str, const char *toTrim)
 void	Request::_initParsingFunct()
 {
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseMethod);
-	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseUri);
+	_parsingFunct.insert(_parsingFunct.end(), &Request::_parsePath);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHttpProtocol);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHeaders);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_checkHeaders);

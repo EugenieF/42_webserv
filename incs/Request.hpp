@@ -1,8 +1,10 @@
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
-#include <sys/time.h>
+# include <cstdlib>
+# include <climits>
 # include <sstream>
+# include <sys/time.h>
 
 #include "Block.hpp"
 #include "StatusCode.hpp"
@@ -33,7 +35,7 @@ class   Request
 		std::string					_request;
 		t_requestStatus				_requestStatus;
 		t_method					_method;
-		std::string					_uri;
+		std::string					_path;
 		std::string					_httpProtocol;
 		std::string					_body;
 		size_t						_bodySize;
@@ -61,7 +63,7 @@ class   Request
 						/*------   Getter  ------*/
 		std::string					getRequest() const;
 		t_method					getMethod() const;
-		std::string					getUri() const;
+		std::string					getPath() const;
 		std::string					getHttpProtocol() const;
 		t_statusCode				getStatusCode() const;
 		std::string					getStatusCodeStr() const;
@@ -82,7 +84,7 @@ class   Request
 
 						/*------   Parsing  ------*/
 		void						_parseMethod();
-		void						_parseUri();
+		void						_parsePath();
 		void						_parseHttpProtocol();
 		void						_parseHeaders();
 		void						_checkHeaders();

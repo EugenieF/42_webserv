@@ -6,26 +6,26 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 11:00:06 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 11:08:49 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+/* Class will control
+   - sockadd_in structure
+   - epoll instance (and everything monitoring related)
+   - socket connections
+*/
+
+# include <exception>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <string.h>
+
 # include "TcpSocket.hpp"
 # include "EpollInstance.hpp"
-
-/******************************************************************************/
-/*                                CLASS SERVER                                */
-/******************************************************************************/
-
-class Server
-{
-	private:
-	/**********************     MEMBER VARIABLES     ********************/
-		int			_fd;
-
 
 class Server {
 	public:
