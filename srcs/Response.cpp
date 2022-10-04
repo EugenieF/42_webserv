@@ -331,13 +331,16 @@ std::string		Response::_buildPath()
 	std::string		uri;
 
 	uri = _request->getPath();
+	std::cout << RED << "uri: " << uri << " | root: " << _matchingBlock->getRoot() << RESET << std::endl;
 	if (_locationPath != "")
 		uri.erase(0, _locationPath.length());
 	if (_hasUploadPathDirective())
 		path = _matchingBlock->getUploadPath();
 	else
 		path = _matchingBlock->getRoot(); 
-	if (_request->getPath()[0] != '/')
+	if (*(path.rbegin()) == '/' && *(uri.begin()) == '/')
+		path.erase(path.length() - 1);
+	else if (*(path.rbegin()) != '/' && *(uri.begin()) != '/')
 		path += "/";
 	path += uri;
 	if (path[0] == '/')

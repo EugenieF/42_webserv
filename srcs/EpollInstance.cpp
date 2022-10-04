@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 11:53:12 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 15:03:16 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ EpollInstance::EpollInstance(EpollInstance::listOfServers servers) :
 
 EpollInstance::~EpollInstance() {
 	_clearClients();
-	_removeSocket(_serversocket);
 	_closeFd();
 	DEBUG("Epoll destructor");
 }
@@ -97,8 +96,12 @@ void EpollInstance::_editSocket(int sock, int flag) {
 	memset(&event, 0, sizeof(epoll_event));
 	event.data.fd = sock;
 	event.events = flag;
+	// if (epoll_ctl(_efd, EPOLL_CTL_MOD, sock, &event) < 0)
 	if (epoll_ctl(_efd, EPOLL_CTL_MOD, sock, &event) < 0)
+	{
+		std::cout << YELLOW << "> editSocket() errno = " << strerror(errno) << RESET << std::endl;
 		throw std::runtime_error("editing socket in epoll led to error");
+	}
 }
 
 void EpollInstance::_removeSocket(int sock) {
@@ -131,6 +134,8 @@ void EpollInstance::_processConnections() {
 		newsocket.unlockSocket();
 		_addSocket(newsocket.getFd(), EPOLLIN); // newsocket waiting for a response
 		_clientlist.insert(std::make_pair(newsocket.getFd(), new Client(_servers[0])));
+
+		std::cout << RED << "New Client --> fd: " << newsocket.getFd() << RESET << std::endl;
 	}
 }
 
@@ -170,10 +175,14 @@ void EpollInstance::_handleRequest(int index) {
 	}
 	// std::cout << "Msg read from " << _events[index].data.fd << ": \n" << str << NL;
 	requestStatus = client->parseRequest(str);
-	// if (requestStatus == INVALID_REQUEST)
-	// 	_removeSocket(_events[index].data.fd);
-	// else if (requestStatus == COMPLETE_REQUEST)
+	if (requestStatus == INVALID_REQUEST)
+	{
+		_clearClient(_events[index].data.fd, client);
+	}
+	else if (requestStatus == COMPLETE_REQUEST)
+	{
 		_editSocket(_events[index].data.fd, EPOLLOUT);
+	}
 }
 
 // void EpollInstance::_handleResponse(int index, char* const* env) {
@@ -214,16 +223,17 @@ void EpollInstance::_handleResponse(int index, char* const* env) {
 
 	if (write(_events[index].data.fd, responseMsg.c_str(), responseMsg.size()) < 0)
 		throw std::runtime_error("handleResponse (write) error");
+	_editSocket(_events[index].data.fd, EPOLLIN);	/* PROBLEM HERE */
 	_clearClient(_events[index].data.fd, client);
-	_removeSocket(_events[index].data.fd);
-	_editSocket(_events[index].data.fd, EPOLLIN);
 }
 
 void	EpollInstance::_clearClient(int fd, Client* client)
 {
+	_removeSocket(fd);
 	if (close(fd) < 0)
 		throw std::runtime_error("clearlist (close) error");
 	delete client;
+	_clientlist.erase(fd);
 }
 
 void EpollInstance::_clearClients()

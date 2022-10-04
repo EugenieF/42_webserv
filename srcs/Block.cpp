@@ -101,7 +101,6 @@ Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPa
 	_currentLocation = _locations.find(prefix);
 	if (_currentLocation != _locations.end())
 	{
-		// path.erase(0, pos); ??
 		*locationPath = _currentLocation->first;
 		return (_currentLocation->second);
 	}

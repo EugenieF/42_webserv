@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 11:37:06 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 16:22:23 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,8 @@
 
 # include "Server.hpp"
 
-Server::Server(const Block& x, Server::listOfServers servers, char* const* env) :
-	_socket(socket(PF_INET, SOCK_STREAM, 0)),
+Server::Server(Server::listOfServers servers, char* const* env) :
 	_epoll(servers),
-	_ip(x.getHost()),
 	_env(env),
 	_servers(servers) {
 		_socket.setToReusable();
@@ -44,7 +42,7 @@ Server::~Server() {
 // Server management -----------------------------
 
 void Server::launchServer() {
-	_epoll.startMonitoring(_socket.getFd(), _env);
+	_epoll.startMonitoring(_socketList, _env);
 }
 
 // Getter ----------------------------------------
@@ -78,4 +76,9 @@ void Server::_displayServer() const {
 				<< "fd: " << getSocket() << NL
 				<< "ip: " << getHost() << NL
 				<< "port: " << getPort() << NL;
+}
+
+void	Server::_createSocketList()
+{
+
 }
