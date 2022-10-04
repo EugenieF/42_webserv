@@ -186,6 +186,7 @@ void	Response::_readFileContent(std::string& path)
 	}
 	fileContent << file.rdbuf();
 	_body = fileContent.str();
+	std::cout << GREEN << "readFileContent()" << RESET << std::endl;
 	file.close();
 }
 
@@ -341,7 +342,7 @@ std::string		Response::_buildPath()
 	path += uri;
 	if (path[0] == '/')
 		path.insert(path.begin(), '.');
-	std::cout << BLUE << "*** PATH = " << path << " ***" << RESET << std::endl;
+	std::cout << BLUE << "buildPath() --> " << path << RESET << std::endl;
 	return (path);
 }
 

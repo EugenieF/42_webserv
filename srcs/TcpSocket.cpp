@@ -6,7 +6,7 @@
 /*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:34:52 by etran             #+#    #+#             */
-/*   Updated: 2022/09/20 17:09:50 by etran            ###   ########.fr       */
+/*   Updated: 2022/09/22 13:54:41 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,17 @@
 
 TcpSocket::TcpSocket() :
 	_sockfd(-1),
-	_autoclosing(true) {
-		DEBUG("Tcp default constructor");
-	}
+	_autoclosing(true) {}
 
 TcpSocket::TcpSocket(int val, bool autoclose) :
 	_sockfd(val),
 	_autoclosing(autoclose) {
 		if (val < 0)
 			throw std::runtime_error("socket open error");
-		DEBUG("Tcp val constructor");
 	}
 
 TcpSocket::~TcpSocket() {
 	_closeFd();
-	DEBUG("Tcp val destructor");
 }
 
 /* PUBLIC ================================================================== */
@@ -54,39 +50,10 @@ void TcpSocket::listenSocket() {
 		throw std::runtime_error("listen error");
 }
 
-// Setter ---------------------------------------
-
-void TcpSocket::setSockaddr(const struct sockaddr_in& addr) {
-	_sockaddr = addr;
-}
-
-void TcpSocket::setAutoclosing(bool val) {
-	_autoclosing = val;
-}
-
 // Getter ---------------------------------------
 
 int TcpSocket::getFd() const {
 	return (_sockfd);
-}
-
-const struct sockaddr_in& TcpSocket::getSockaddr() const {
-	return (_sockaddr);
-}
-
-// DEBUG ----------------------------------------
-
-void TcpSocket::displaySocketInfo() const {
-	char				addr_buf[INET_ADDRSTRLEN + 1];
-
-	memset(&addr_buf, 0, INET_ADDRSTRLEN + 1);
-	// !! FORBIDDEN FUNCTION
-	if (inet_ntop(AF_INET, &_sockaddr.sin_addr, addr_buf, INET_ADDRSTRLEN) == 0)
-		throw std::runtime_error("inet ntop error");
-	std::cout	<< "== Connection socket information ==" << NL
-				<< " - fd: " << getFd() << NL
-				<< " - host address: " << addr_buf << NL
-				<< " - port: " << ntohs(_sockaddr.sin_port) << NL;
 }
 
 /* PRIVATE ================================================================= */

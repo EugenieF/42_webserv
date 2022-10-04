@@ -1,26 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CgiHandler.hpp                                     :+:      :+:    :+:   */
+/*   PyHandler.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/22 14:06:06 by etran             #+#    #+#             */
-/*   Updated: 2022/09/24 17:42:34 by etran            ###   ########.fr       */
+/*   Created: 2022/09/26 08:49:17 by eli               #+#    #+#             */
+/*   Updated: 2022/09/30 12:39:48 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CGIHANDLER_HPP
-# define  CGIHANDLER_HPP
+#ifndef PYHANDLER_HPP
+# define PYHANDLER_HPP
 
-class CgiHandler {
+# include "ACgiHandler.hpp"
+
+# define PYTHON_PATH ""
+
+class PyHandler : public virtual ACgiHandler {
 	public:
-		bla();
-		virtual ~bla();
+		PyHandler(const int sock);
+		virtual ~PyHandler();
 
-	private:
-		int			_in;
-		int			_out;
+		void		execute(const char* file, char* const* env);
 };
 
 #endif

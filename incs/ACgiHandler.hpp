@@ -1,25 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   debug.hpp                                          :+:      :+:    :+:   */
+/*   ACgiHandler.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/15 10:51:59 by etran             #+#    #+#             */
-/*   Updated: 2022/09/19 15:24:26 by etran            ###   ########.fr       */
+/*   Created: 2022/09/22 14:06:06 by etran             #+#    #+#             */
+/*   Updated: 2022/09/30 12:42:02 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/* Debug hpp */
+#ifndef ACGIHANDLER_HPP
+# define ACGIHANDLER_HPP
 
-#ifndef DEBUG_HPP
-# define DEBUG_HPP
-
+# include <stdexcept>
+# include <unistd.h>
 # include <string>
-# include <iostream>
-# include <string.h>
 
-# define NL '\n'
-# define DEBUG(x) std::cout << " ### Debug ### : " << x << NL
+class ACgiHandler {
+	public:
+		explicit ACgiHandler(const int sock, const std::string& program);
+		virtual ~ACgiHandler();
+
+		const char*		getProgram() const;
+		virtual void	execute(const char* file, char* const* env) = 0;
+
+	private:
+		void			_restore();
+
+		const char*		_program;
+		int				_in;
+		int				_out;
+};
 
 #endif

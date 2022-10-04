@@ -318,14 +318,14 @@ void	Parser::_configureVirtualHosts()
 		{
 			if (**currentServer == **nextServer)
 			{
-				std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
+				// std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
 				(*currentServer)->setVirtualHost(*nextServer);
 				_servers.erase(nextServer);
 				nextServer--;
 			}
 		}
 	}
-	std::cout << RED << "_servers.size() : " << _servers.size() << RESET << std::endl;
+	// std::cout << RED << "_servers.size() : " << _servers.size() << RESET << std::endl;
 }
 
 void	Parser::_completeLocationsBlock(const blockPtr server)

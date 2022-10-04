@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 11:08:49 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/04 11:31:00 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,14 @@
 # include <string.h>
 
 # include "TcpSocket.hpp"
+# include "Block.hpp"
 # include "EpollInstance.hpp"
 
 class Server {
 	public:
-	/**********************************************************************************/
 		typedef Parser::listOfServers	listOfServers;
-	/**********************************************************************************/
 
-		Server(Block& x, listOfServers servers);
+		Server(const Block& x, listOfServers servers, char* const* env);
 		virtual ~Server();
 
 		/* -- Server management -------------------------------------------- */
@@ -41,19 +40,21 @@ class Server {
 
 		/* -- Getter ------------------------------------------------------- */
 		int								getPort() const;
-		in_addr_t						getHost() const;
+		const std::string&				getHost() const;
 		int								getEpoll() const;
 		int								getSocket() const;
 		const struct sockaddr_in&		getAddr() const;
-
+		
 	private:
+		/* -- Debug -------------------------------------------------------- */
+		void							_displayServer() const;
+
 		TcpSocket						_socket;
 		EpollInstance					_epoll;
 		struct sockaddr_in				_addr;
-	/**********************************************************************************/
+		std::string						_ip;
+		char* const*					_env;
 		listOfServers					_servers;
-	/**********************************************************************************/
-
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:35:13 by etran             #+#    #+#             */
-/*   Updated: 2022/09/20 17:04:41 by etran            ###   ########.fr       */
+/*   Updated: 2022/09/22 13:55:04 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,16 +35,8 @@ class TcpSocket {
 		void						unlockSocket();
 		void						listenSocket();
 
-		/* -- Setter ------------------------------------------------------- */
-		void						setSockaddr(const struct sockaddr_in& addr);
-		void						setAutoclosing(bool val);
-
 		/* -- Getter ------------------------------------------------------- */
-		const struct sockaddr_in&	getSockaddr() const;
 		int							getFd() const;
-
-		/* -- DEBUG -------------------------------------------------------- */
-		void						displaySocketInfo() const;
 
 	private:
 		/* -- Socket manipulation ------------------------------------------ */
@@ -52,6 +44,5 @@ class TcpSocket {
 
 		int							_sockfd;
 		bool						_autoclosing;
-		struct sockaddr_in			_sockaddr;
 };
 #endif
