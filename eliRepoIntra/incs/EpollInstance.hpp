@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   EpollInstance.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 10:27:30 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/24 16:39:46 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@
 
 # include "TcpSocket.hpp"
 # include "utils.hpp"
-# include "Client.hpp"
-# include "Parser.hpp"
 
 # define BUFSIZE 2048
 # define MAX_EVENT 100
@@ -34,21 +32,16 @@
 class EpollInstance {
 	public:
 		/* -- Typedef ------------------------------------------------------ */
-/****************************************************************************************/
-		typedef		Parser::listOfServers				listOfServers;
-		typedef		Client*								ClientPtr;
-		typedef		std::map<int, ClientPtr>::iterator	it;
-/****************************************************************************************/
+		typedef		std::set<int>::iterator				it;
 
-		EpollInstance(listOfServers _servers);
+		EpollInstance();
 		virtual ~EpollInstance();
 
 		/* -- Epoll manipulation ------------------------------------------- */
-		void						startMonitoring(int servsocket);
+		void						startMonitoring(int servsocket, char* const* env);
 
 		/* -- Getter ------------------------------------------------------- */
 		int							getFd() const;
-		ClientPtr					getClient(int fd);							/**** eug ****/
 
 	private:
 		/* -- Epoll manipulation ------------------------------------------- */
@@ -58,25 +51,17 @@ class EpollInstance {
 		void						_addSocket(int socket, int flag);
 		void						_editSocket(int socket, int flag);
 		void						_removeSocket(int socket);
-		void						_clearClients();							/**** eug ****/
-		void						_clearClient(int fd, Client* client);
+		void						_clearClients();
 
 		/* -- Connection management ---------------------------------------- */
 		void						_processConnections();
 		void						_handleRequest(int index);
-		void						_handleResponse(int index);
+		void						_handleResponse(int index, char* const* env);
 
 		int							_efd;
 		int							_serversocket;
 		struct epoll_event			_events[MAX_EVENT];
-		// std::set<int>				_clientlist;
-
-/****************************************************************************************/
-		std::map<int, ClientPtr>	_clientlist;
-		listOfServers				_servers;
-		// std::map<int, Client*>		_clients; ?? --> combine with _clientlist
-		// *client = _clientlist[fd]
-/****************************************************************************************/
+		std::set<int>				_clientlist;
 };
 
 #endif

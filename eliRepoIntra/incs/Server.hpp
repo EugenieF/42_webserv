@@ -3,37 +3,34 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 11:00:06 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/09/24 16:40:08 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+/* Class will control
+   - sockadd_in structure
+   - epoll instance (and everything monitoring related)
+   - socket connections
+*/
+
+# include <exception>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <string.h>
+
 # include "TcpSocket.hpp"
+# include "Block.hpp"
 # include "EpollInstance.hpp"
-
-/******************************************************************************/
-/*                                CLASS SERVER                                */
-/******************************************************************************/
-
-class Server
-{
-	private:
-	/**********************     MEMBER VARIABLES     ********************/
-		int			_fd;
-
 
 class Server {
 	public:
-	/**********************************************************************************/
-		typedef Parser::listOfServers	listOfServers;
-	/**********************************************************************************/
-
-		Server(Block& x, listOfServers servers);
+		Server(const Block& x, char* const* env);
 		virtual ~Server();
 
 		/* -- Server management -------------------------------------------- */
@@ -41,19 +38,20 @@ class Server {
 
 		/* -- Getter ------------------------------------------------------- */
 		int								getPort() const;
-		in_addr_t						getHost() const;
+		const std::string&				getHost() const;
 		int								getEpoll() const;
 		int								getSocket() const;
 		const struct sockaddr_in&		getAddr() const;
-
+		
 	private:
+		/* -- Debug -------------------------------------------------------- */
+		void							_displayServer() const;
+
 		TcpSocket						_socket;
 		EpollInstance					_epoll;
 		struct sockaddr_in				_addr;
-	/**********************************************************************************/
-		listOfServers					_servers;
-	/**********************************************************************************/
-
+		std::string						_ip;
+		char* const*					_env;
 };
 
 #endif

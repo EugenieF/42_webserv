@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/09/19 15:30:51 by etran             #+#    #+#             */
+/*   Updated: 2022/10/04 10:58:32 by efrancon         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Webserv.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
@@ -125,6 +137,9 @@ int main(int argc, char **argv)
 	try
 	{
 		Webserv	webserv(configFile);
+		setupSignal(INIT_SIGNAL);
+		Server	serv(*webserv.getServers()[0], webserv.getServers());
+		serv.launchServer();
 		// webserv.displayServers();
 		runServer(webserv);
 	}

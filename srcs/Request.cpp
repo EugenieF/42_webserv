@@ -19,20 +19,17 @@ Content-Type header.
 
 Request::Request() {}
 
-Request::Request(Block* server, const std::string& buffer):
-	_server(server),
+Request::Request(const std::string& buffer):
 	_request(buffer),
 	_requestStatus(INCOMPLETE_REQUEST),
 	_method(NO_METHOD),
 	_uri(""),
 	_httpProtocol(""),
-<<<<<<< HEAD
-	_requestIsValid(true)
-=======
 	_bodySize(0),
 	_statusCode(OK),
-	_chunkedTransfer(false)
->>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
+	_chunkedTransfer(false),
+	_host(""),
+	_port(UNDEFINED_PORT)
 {
 	_initParsingFunct();
 }
@@ -43,15 +40,12 @@ Request::Request(const Request &other):
 	_method(other.getMethod()),
 	_uri(other.getUri()),
 	_httpProtocol(other.getHttpProtocol()),
-<<<<<<< HEAD
-	_requestIsValid(other.getRequestValidity()),
-	_parsingFunct(other.getParsingFunct())
-=======
 	_bodySize(other.getBodySize()),
 	_statusCode(other.getStatusCode()),
 	_parsingFunct(other.getParsingFunct()),
-	_chunkedTransfer(other.getChunkedTransfer())
->>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
+	_chunkedTransfer(other.getChunkedTransfer()),
+	_host(other.getHost()),
+	_port(other.getPort())
 {
 	*this = other;
 }
@@ -70,6 +64,9 @@ Request&	Request::operator=(const Request &other)
 		_bodySize = other.getBodySize();
 		_statusCode = other.getStatusCode(),
 		_parsingFunct = other.getParsingFunct();
+		_chunkedTransfer = other.getChunkedTransfer();
+		_host = other.getHost();
+		_port = other.getPort();
 	}
 	return (*this);
 }
@@ -104,9 +101,9 @@ void	Request::_parseMethod()
 	std::string method;
 
 	_getNextWord(method, " ");
-	if (!_server->isMethod(method))
+	if (g_httpMethod.isHttpMethod(method) == false)
 		return (_requestIsInvalid(NOT_IMPLEMENTED));
-	_method = _server->getMethod(method);
+	_method = g_httpMethod.getMethod(method);
 }
 
 void	Request::_parseUri()
@@ -118,7 +115,8 @@ void	Request::_parseUri()
 		return (_requestIsInvalid(BAD_REQUEST));
 	if (uri.length() > 2048)
 		return (_requestIsInvalid(URI_TOO_LONG));
-	_uri = uri;
+	/*  Handle query "?" in URI  */
+	_path = path;
 }
 
 void	Request::_parseHttpProtocol()
@@ -147,17 +145,29 @@ void	Request::_parseHeaders()
 		if (pos == std::string::npos)
 			break ;
 		_getNextWord(headerValue, "\r\n");
-<<<<<<< HEAD
-		_trimSpaceStr(&headerValue);
-		std::cout << YELLOW << headerName << ": '" << headerValue << "'" << RESET << std::endl;
-=======
 		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
->>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
 		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
 			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		_headers[headerName] = headerValue;
 	}
 	_getNextWord(headerName, "\r\n");
+}
+
+bool	Request::_parseHostHeader()
+{
+	Request::listOfHeaders::const_iterator	ite;
+	size_t									pos;
+
+	ite = _headers.find("host");
+	if (ite == _headers.end())
+		return (false);
+	_host = ite->second;
+	pos = _host.find(":");
+	if (pos != std::string::npos)
+		_host = _host.substr(0, pos);
+	if (pos + 1 != std::string::npos)
+		_port = atoi(ite->second.substr(pos + 1).c_str());
+	return (true);
 }
 
 void	Request::_checkHeaders()
@@ -166,10 +176,8 @@ void	Request::_checkHeaders()
 	std::string								contentLength;
 	size_t									size;
 
-	ite = _headers.find("host");
-	if (ite == _headers.end())
+	if (!_parseHostHeader())
 		return (_requestIsInvalid(BAD_REQUEST));
-	_host = ite->second;
 	if (_method != POST)
 		return ;
 	ite = _headers.find("transfer-encoding");
@@ -239,6 +247,27 @@ void	Request::_parseChunks()
 	}
 }
 
+/* Pseudo-code RFC 7230 for decoding chunked : */
+
+	// length := 0
+    //  read chunk-size, chunk-ext (if any), and CRLF
+    //  while (chunk-size > 0) {
+    //     read chunk-data and CRLF
+    //     append chunk-data to decoded-body
+    //     length := length + chunk-size
+    //     read chunk-size, chunk-ext (if any), and CRLF
+    //  }
+    //  read trailer field
+    //  while (trailer field is not empty) {
+    //     if (trailer field is allowed to be sent in a trailer) {
+    //         append trailer field to existing header fields
+    //     }
+    //     read trailer-field
+    //  }
+    //  Content-Length := length
+    //  Remove "chunked" from Transfer-Encoding
+    //  Remove Trailer from existing header fields
+
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
@@ -248,7 +277,7 @@ std::string		Request::getRequest() const
 	return (_request);
 }
 
-Request::t_method	Request::getMethod() const
+t_method	Request::getMethod() const
 {
 	return (_method);
 }
@@ -283,8 +312,6 @@ std::string		Request::getStatusCodeStr() const
 	return (convertNbToString(_statusCode));
 }
 
-<<<<<<< HEAD
-=======
 bool	Request::getChunkedTransfer() const
 {
 	return (_chunkedTransfer);
@@ -305,7 +332,18 @@ std::string		Request::getHost() const
 	return (_host);
 }
 
->>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
+int		Request::getPort() const
+{
+	return (_port);
+}
+
+std::string		Request::getHeader(const std::string& headerName)
+{
+	if (_headers.find(headerName) != _headers.end())
+		return (_headers[headerName]);
+	return ("");
+}
+
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
@@ -382,11 +420,7 @@ void	Request::printRequestInfo()
 
 	std::cout <<  BLUE << "------------ INFO REQUEST -------------" << std::endl;
 	std::cout << "          method : " << GREEN << _method << std::endl;
-<<<<<<< HEAD
-	std::cout << BLUE << "             uri : " << GREEN << _uri << std::endl;
-=======
 	std::cout << BLUE << "            path : " << GREEN << _path << std::endl;
->>>>>>> 169e86489e0238e7c9e25ce89df5f56bfa26412c
 	std::cout << BLUE << "    httpProtocol : " << GREEN << _httpProtocol << std::endl;
 	std::cout << BLUE << "      statusCode : " << GREEN << _statusCode << std::endl;
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)

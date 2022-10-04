@@ -19,8 +19,9 @@ Block::Block():
 	_redirectUri(""),
 	_uploadPath("")
 {
+	_initAllowedMethods();
 	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
-		_methods[i] = true; // Need to think about this, init to false or true ?
+		_methods[i] = false;
 	if (!getuid())
 		setPort(80);
 }
@@ -68,44 +69,6 @@ Block&	Block::operator=(const Block& other)
 		_uploadPath = other.getUploadPath();
 	}
 	return (*this);
-}
-
-void	Block::completeLocationDirectives(const Block& server)
-{
-	if (this == &server)
-		return ;
-	if (_root.empty())
-		_root = server.getRoot();
-	if (_indexes.empty())
-		_indexes = server.getIndexes();
-	if (_clientBodyLimit == DEFAULT_CLIENT_BODY_LIMIT)
-		_clientBodyLimit = server.getClientBodyLimit();
-	if (_cgiExt.empty())
-		_cgiExt = server.getCgiExt();
-	if (_cgiPath.empty())
-		_cgiPath = server.getCgiPath();
-	if (!_redirectCode)
-		_redirectCode = server.getRedirectCode();
-	if (_redirectUri.empty())
-		_redirectUri = server.getRedirectUri();
-}
-
-Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPath)
-{
-	size_t		pos;
-	std::string	prefix;
-
-	pos = path.find("/", 1);
-	prefix = path.substr(0, pos);
-	std::cout << BLUE << "Path : " << path << " | prefix : " << prefix << RESET << std::endl;
-	_currentLocation = _locations.find(prefix);
-	if (_currentLocation != _locations.end())
-	{
-		// path.erase(0, pos); ??
-		*locationPath = _currentLocation->first;
-		return (_currentLocation->second);
-	}
-	return (this);
 }
 
 /******************************************************************************/
@@ -226,11 +189,6 @@ const std::string&	Block::getCgiPath() const
 	return (_cgiPath);
 }
 
-bool	Block::cgiDirective()
-{
-	return (!_cgiPath.empty() && !_cgiExt.empty());
-}
-
 /******************************************************************************/
 /*                                ERROR_PAGE                                  */
 /******************************************************************************/
@@ -243,18 +201,6 @@ void	Block::setErrorPage(int code, const std::string& page)
 Block::listOfErrorPages		Block::getErrorPages()
 {
 	return (_errorPages);
-}
-
-std::string		Block::getErrorPage(int statusCode)
-{
-	Block::listOfErrorPages::const_iterator	ite;
-	std::string								errorPage;
-
-	errorPage = "";
-	ite = _errorPages.find(statusCode);
-	if (ite != _errorPages.end())
-		errorPage = ite->second;
-	return (errorPage);
 }
 
 /******************************************************************************/
@@ -282,11 +228,6 @@ int		Block::getRedirectCode() const
 	return (_redirectCode);
 }
 
-bool	Block::redirectDirective()
-{
-	return (!_redirectUri.empty() && _redirectCode != 0);
-}
-
 /******************************************************************************/
 /*                              UPLOAD_PATH                                   */
 /******************************************************************************/
@@ -301,11 +242,6 @@ const std::string	&Block::getUploadPath() const
 	return (_uploadPath);
 }
 
-bool	Block::uploadPathDirective()
-{
-	return (!_uploadPath.empty());
-}
-
 /******************************************************************************/
 /*                             ALLOWED_METHOD                                 */
 /******************************************************************************/
@@ -317,15 +253,26 @@ void	Block::setMethod(t_method method)
 
 void	Block::setMethod(const std::string& str)
 {
-	t_method	method;
-
-	method = g_httpMethod.getMethod(str);
-	_methods[method] = true;
+	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
+	{
+		if (str == _allowedMethods[i])
+			_methods[i] = true;
+	}
 }
 
 bool	Block::isAllowedMethod(t_method method)
 {
 	return (_methods[method]);
+}
+
+bool	Block::isAllowedMethod(const std::string& str)
+{
+	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
+	{
+		if (str == _allowedMethods[i])
+			return (true);
+	}
+	return (false);
 }
 
 /******************************************************************************/
@@ -390,6 +337,13 @@ bool	Block::isLocationBlock()
 	return (_context == LOCATION);
 }
 
+void	Block::_initAllowedMethods()
+{
+	_allowedMethods[GET] = "GET";
+	_allowedMethods[POST] = "POST";
+	_allowedMethods[DELETE] = "DELETE";
+}
+
 void	Block::_deleteLocations()
 {
 	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
@@ -442,33 +396,4 @@ void	Block::displayListOfStrings(listOfStrings list)
 	for (ite = list.begin(); ite != list.end(); ite++)
 		std::cout << *ite << " ";
 	std::cout << std::endl;
-}
-
-/******************************************************************************/
-/*                               VIRTUAL HOST                                 */
-/******************************************************************************/
-
-void	Block::setVirtualHost(blockPtr server)
-{
-	blockPtr	virtualHost;
-
-	virtualHost = new Block(*server);
-	_virtualHosts.push_back(virtualHost);
-	delete server;
-}
-
-Block::listOfServers	Block::getVirtualHosts() const
-{
-	return (_virtualHosts);
-}
-
-/******************************************************************************/
-/*                           OPERATOR OVERLOAD                                */
-/******************************************************************************/
-
-bool	Block::operator==(Block const& otherServer)
-{
-	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
-		&& this->getHost() == otherServer.getHost()
-		&& this->getPort() == otherServer.getPort());
 }

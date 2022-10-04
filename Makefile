@@ -3,6 +3,7 @@ NAME    		= webserv
 SRCS_DIR		= ./srcs
 
 SRCS			= main.cpp \
+				utils.cpp \
 				Token.cpp \
 				Lexer.cpp \
 				Parser.cpp \
@@ -15,9 +16,10 @@ SRCS			= main.cpp \
 				TcpSocket.cpp \
 				Server.cpp \
 				Client.cpp \
-				utils.cpp \
 				StatusCode.cpp \
-				MimeType.cpp
+				MimeType.cpp \
+				HttpMethod.cpp \
+				Autoindex.cpp 
 
 OBJS_DIR		= ./objs
 
@@ -29,8 +31,8 @@ DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
 CXX				= c++
 
-#CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
-CXXFLAGS		= -Wall -Wextra -std=c++98 -MMD -MP -I$(INCLUDE)
+CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
+# CXXFLAGS		= -Wall -Wextra -std=c++98 -MMD -MP -I$(INCLUDE)
 
 RM				= rm -rf
 

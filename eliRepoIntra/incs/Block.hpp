@@ -9,10 +9,6 @@
 # include <utility>
 
 # include "Colors.hpp"
-# include "utils.hpp"
-# include "HttpMethod.hpp"
-
-extern HttpMethod	g_httpMethod;
 
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
 # define DEFAULT_ROOT ""
@@ -20,6 +16,14 @@ extern HttpMethod	g_httpMethod;
 /******************************************************************************/
 /*                                 ENUMS                                      */
 /******************************************************************************/
+
+typedef enum e_method
+{
+	GET	= 0,
+	POST,
+	DELETE,
+	ALLOWED_METHODS_COUNT,
+}	t_method;
 
 typedef enum e_context
 {
@@ -34,14 +38,14 @@ typedef enum e_context
 
 class	Block
 {
-	public :
+	public:
 	/***********************      MEMBER TYPES      *********************/
 		typedef Block*								blockPtr;
 		typedef	std::vector<std::string>			listOfStrings;
 		typedef std::map<std::string, blockPtr>		listOfLocations;
 		typedef std::map<int, std::string>			listOfErrorPages;
-		typedef std::vector<Block*>					listOfServers;
 
+	
 	private :
 	/**********************     MEMBER VARIABLES     ********************/
 
@@ -50,7 +54,6 @@ class	Block
 		listOfStrings						_serverNames;
 		int									_port;
 		std::string							_host;
-		listOfServers						_virtualHosts;
 
 					/*---- Server / Location block ----*/
 		std::string							_root;
@@ -67,6 +70,7 @@ class	Block
 		listOfLocations						_locations;
 		listOfLocations::const_iterator		_currentLocation;
 		bool								_methods[ALLOWED_METHODS_COUNT];
+		std::string							_allowedMethods[ALLOWED_METHODS_COUNT];
 		std::string							_uploadPath;
 
 
@@ -78,11 +82,9 @@ class	Block
 		Block(const Block& other);
 		~Block();
 		Block&								operator=(const Block& other);
-		void								completeLocationDirectives(const Block& server);
-		Block*								getMatchingBlock(const std::string& path, std::string* locationPath);
 
 						/*-------  Server_name  ------*/
-		void								setName(const std::string& name);
+		void								setName(const std::string &name);
 		listOfStrings						getServerNames() const;	
 
 						/*-------    Listen    -------*/
@@ -112,29 +114,26 @@ class	Block
 		void								setCgiPath(const std::string& path);
 		const std::string&					getCgiExt() const;
 		const std::string&					getCgiPath() const;
-		bool								cgiDirective();
 
 						/*-------  Error_page  -------*/
 		void								setErrorPage(int code, const std::string& page);
 		listOfErrorPages					getErrorPages();
-		std::string							getErrorPage(int statusCode);
 
 						/*-------    Redirect  -------*/
 		void								setRedirection(int code, const std::string& uri);
 		int									getRedirectCode();
 		const std::string&					getRedirectUri() const;
 		int									getRedirectCode() const;
-		bool								redirectDirective();
 
 						/*-------  Upload_path  -------*/
 		void								setUploadPath(const std::string& path);
 		const std::string&					getUploadPath() const;
-		bool								uploadPathDirective();
 
 						/*------- Allowed_method ------*/
 		void								setMethod(t_method method);
 		void								setMethod(const std::string& str);
 		bool								isAllowedMethod(t_method method);
+		bool								isAllowedMethod(const std::string& str);
 
 						/*-------    Location   ------*/
 		bool								insertLocation(const std::string& path, blockPtr newLocation);
@@ -156,18 +155,12 @@ class	Block
 		void								displayParams(int num);
 		void								displayServerNames();
 
-						/*------ Virtual hosts -----*/
-		void								setVirtualHost(blockPtr server);
-		listOfServers						getVirtualHosts() const;
-
-		bool								operator==(Block const& otherServer);
-
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 						/*-------     Utils    -------*/
+		void								_initAllowedMethods();
 		void								_deleteLocations();
 };
-
 
 #endif

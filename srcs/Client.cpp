@@ -28,10 +28,7 @@ Client::Client(Client const& other):
 
 Client::~Client()
 {
-    if (_request)
-        delete _request;
-    if (_response)
-        delete _response;
+    clear();
 }
 
 Client&     Client::operator=(Client const& other)
@@ -50,7 +47,7 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-        _request = new Request(_runningServer, buffer);
+        _request = new Request(buffer);
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
@@ -61,7 +58,7 @@ std::string     Client::generateResponse()
 {
     if (_response)
         delete _response;
-    _response = new Response(_runningServer, _request);
+    _response = new Response(selectVirtualServer(), _request);
     _response->generateResponse();
     return (_response->getResponse());
 }
@@ -80,11 +77,45 @@ void	Client::clear()
 	}
 }
 
+bool	Client::_matchingServerName(listOfStrings serverNames, int listeningPort)
+{
+	listOfStrings::iterator	currentName;
+	int						requestedPort;
+	
+	requestedPort = _request->getPort();
+    for (currentName = serverNames.begin(); currentName != serverNames.end(); currentName++)
+	{
+		if (_request->getHost() == *currentName
+			&& (requestedPort == UNDEFINED_PORT || requestedPort == listeningPort))
+			return (true);
+	}
+    return (false);
+}
+
+Block*  Client::selectVirtualServer()
+{
+	listOfServers				virtualHosts;
+	listOfServers::iterator		currentServer;
+
+	virtualHosts = _runningServer->getVirtualHosts();
+	if (virtualHosts.empty())
+		return (_runningServer);
+	for (currentServer = virtualHosts.begin(); currentServer != virtualHosts.end(); currentServer++)
+	{
+		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()))
+		{
+			std::cout << YELLOW << "---- Matching server name ----" << RESET << std::endl;
+			return (*currentServer);
+		}
+	}
+	return (_runningServer);
+}
+
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
 
-Block*  Client::getRunningServer() const
+Block*	Client::getRunningServer() const
 {
     return (_runningServer);
 }
