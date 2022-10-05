@@ -25,7 +25,6 @@ class   Request
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		// typedef Block::t_method						t_method;
 		typedef void (Request::*parsingFunction)();
 		typedef std::vector<parsingFunction>		listOfParsingFunctions;
 		typedef std::map<std::string, std::string>	listOfHeaders;
@@ -34,14 +33,14 @@ class   Request
 	/**********************     MEMBER VARIABLES     ********************/
 		std::string					_request;
 		t_requestStatus				_requestStatus;
+		t_statusCode				_statusCode;
 		t_method					_method;
 		std::string					_path;
 		std::string					_httpProtocol;
-		std::string					_body;
-		size_t						_bodySize;
-		t_statusCode				_statusCode;
-		listOfParsingFunctions		_parsingFunct;
 		listOfHeaders				_headers;
+		size_t						_bodySize;
+		std::string					_body;
+		listOfParsingFunctions		_parsingFunct;
 		bool						_chunkedTransfer;
 		std::string					_host;
 		int							_port;
@@ -65,16 +64,17 @@ class   Request
 		t_method					getMethod() const;
 		std::string					getPath() const;
 		std::string					getHttpProtocol() const;
+		listOfHeaders				getHeaders() const;
+		std::string					getHeader(const std::string& headerName);
+		size_t						getBodySize() const;
+		std::string					getBody() const;
 		t_statusCode				getStatusCode() const;
 		std::string					getStatusCodeStr() const;
 		t_requestStatus				getRequestStatus() const;
 		listOfParsingFunctions		getParsingFunct() const;
 		bool						getChunkedTransfer() const;
-		size_t						getBodySize() const;
-		std::string					getBody() const;
 		std::string					getHost() const;
 		int							getPort() const;
-		std::string					getHeader(const std::string& headerName);
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
@@ -101,7 +101,6 @@ class   Request
 		std::string					_toLowerStr(std::string* str);
 		std::string					_trimSpaceStr(std::string *str, const char *toTrim = " \t");
 		bool						_reachedEndOfChunkedBody();
-
 };
 
 #endif

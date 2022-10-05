@@ -15,16 +15,31 @@ Content-Type header.
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Request::Request() {}
-
-Request::Request(const std::string& buffer):
-	_request(buffer),
+Request::Request():
+	_request(""),
 	_requestStatus(INCOMPLETE_REQUEST),
+	_statusCode(OK),
 	_method(NO_METHOD),
 	_path(""),
 	_httpProtocol(""),
 	_bodySize(0),
+	_body(""),
+	_chunkedTransfer(false),
+	_host(""),
+	_port(UNDEFINED_PORT)
+{
+	_initParsingFunct();
+}
+
+Request::Request(const std::string& buffer):
+	_request(buffer),
+	_requestStatus(INCOMPLETE_REQUEST),
 	_statusCode(OK),
+	_method(NO_METHOD),
+	_path(""),
+	_httpProtocol(""),
+	_bodySize(0),
+	_body(""),
 	_chunkedTransfer(false),
 	_host(""),
 	_port(UNDEFINED_PORT)
@@ -35,11 +50,13 @@ Request::Request(const std::string& buffer):
 Request::Request(const Request &other):
 	_request(other.getRequest()),
 	_requestStatus(other.getRequestStatus()),
+	_statusCode(other.getStatusCode()),
 	_method(other.getMethod()),
 	_path(other.getPath()),
 	_httpProtocol(other.getHttpProtocol()),
+	_headers(other.getHeaders()),
 	_bodySize(other.getBodySize()),
-	_statusCode(other.getStatusCode()),
+	_body(other.getBody()),
 	_parsingFunct(other.getParsingFunct()),
 	_chunkedTransfer(other.getChunkedTransfer()),
 	_host(other.getHost()),
@@ -56,11 +73,13 @@ Request&	Request::operator=(const Request &other)
 	{
 		_request = other.getRequest();
 		_requestStatus = other.getRequestStatus();
+		_statusCode = other.getStatusCode(),
 		_method = other.getMethod();
 		_path = other.getPath();
 		_httpProtocol = other.getHttpProtocol();
+		_headers = other.getHeaders();
 		_bodySize = other.getBodySize();
-		_statusCode = other.getStatusCode(),
+		_body = other.getBody();
 		_parsingFunct = other.getParsingFunct();
 		_chunkedTransfer = other.getChunkedTransfer();
 		_host = other.getHost();
@@ -277,26 +296,6 @@ std::string		Request::getRequest() const
 	return (_request);
 }
 
-t_method	Request::getMethod() const
-{
-	return (_method);
-}
-
-std::string		Request::getPath() const
-{
-	return (_path);
-}
-
-std::string		Request::getHttpProtocol() const
-{
-	return (_httpProtocol);
-}
-
-Request::listOfParsingFunctions		Request::getParsingFunct() const
-{
-	return (_parsingFunct);
-}
-
 t_requestStatus		Request::getRequestStatus() const
 {
 	return (_requestStatus);
@@ -312,9 +311,31 @@ std::string		Request::getStatusCodeStr() const
 	return (convertNbToString(_statusCode));
 }
 
-bool	Request::getChunkedTransfer() const
+t_method	Request::getMethod() const
 {
-	return (_chunkedTransfer);
+	return (_method);
+}
+
+std::string		Request::getPath() const
+{
+	return (_path);
+}
+
+std::string		Request::getHttpProtocol() const
+{
+	return (_httpProtocol);
+}
+
+Request::listOfHeaders	Request::getHeaders() const
+{
+	return (_headers);
+}
+
+std::string		Request::getHeader(const std::string& headerName)
+{
+	if (_headers.find(headerName) != _headers.end())
+		return (_headers[headerName]);
+	return ("");
 }
 
 size_t	Request::getBodySize() const
@@ -327,6 +348,16 @@ std::string		Request::getBody() const
 	return (_body);
 }
 
+Request::listOfParsingFunctions		Request::getParsingFunct() const
+{
+	return (_parsingFunct);
+}
+
+bool	Request::getChunkedTransfer() const
+{
+	return (_chunkedTransfer);
+}
+
 std::string		Request::getHost() const
 {
 	return (_host);
@@ -335,13 +366,6 @@ std::string		Request::getHost() const
 int		Request::getPort() const
 {
 	return (_port);
-}
-
-std::string		Request::getHeader(const std::string& headerName)
-{
-	if (_headers.find(headerName) != _headers.end())
-		return (_headers[headerName]);
-	return ("");
 }
 
 /******************************************************************************/

@@ -32,16 +32,15 @@ class   Response
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
-		listOfHttpMethodsFunct			_httpMethods;
-
 		Block*							_server;
+		Block*							_matchingBlock;
 		Request*						_request;
 		std::string						_response;
 		t_statusCode					_statusCode;
-		std::string						_body;
-		Block*							_matchingBlock;
-		listOfHeaders					_headers;
 		t_method						_method;
+		listOfHeaders					_headers;
+		std::string						_body;
+		listOfHttpMethodsFunct			_httpMethods;
 		std::string						_locationPath;
 
     public:
@@ -56,16 +55,22 @@ class   Response
 						/*-------  Generate  ------*/
 		void							generateResponse();
 
+						/*-------   Setter  ------*/
+		void							setStatusCode(t_statusCode status);
+		void							setStatusCode(int status);
+
 						/*-------   Getter  ------*/
+		Block*							getServer() const;
+		Block*							getMatchingBlock() const;
 		Request*						getRequest() const;
 		std::string						getResponse() const;
 		t_statusCode					getStatusCode() const;
 		std::string						getStatusCodeStr() const;
+		t_method						getMethod() const;
+		listOfHeaders					getHeaders() const;	
 		std::string						getBody() const;
-
-						/*-------   Setter  ------*/
-		void							setStatusCode(t_statusCode status);
-		void							setStatusCode(int status);
+		listOfHttpMethodsFunct			getHttpMethods() const;
+		std::string						getLocationPath() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
@@ -76,25 +81,28 @@ class   Response
         std::string						_generateErrorPage();
 		void							_fillResponseLine();
 		void							_fillHeaders();
-		std::string						_buildPath();
 		void							_processMethod();
 
 						/*------  Get Method  -----*/
-		void							_getMethod(std::string& path);
-		void							_readFileContent(std::string& path);
-		bool							_searchOfIndexPage(listOfStrings indexes, std::string* path);
-		bool							_foundIndexPage(DIR* dir, std::string indexPage);
-		void							_handleRedirection();
-		void							_generateAutoindex(std::string& path);
+		void							_runGetMethod(std::string& path);
+		void							_readFileContent(const std::string& path);
 
 						/*------  Post Method -----*/
-		void							_postMethod(std::string& path);
+		void							_runPostMethod(std::string& path);
+		void							_writeFileContent(const std::string& path);
 		void							_handleUploadFile();
 		void							_handleCgi();
-		void							_writeFileContent(std::string& path);
 
 						/*-----  Delete Method ----*/
-		void							_deleteMethod(std::string& path);
+		void							_runDeleteMethod(std::string& path);
+
+						/*--------   Index  -------*/
+		bool							_searchOfIndexPage(listOfStrings indexes, std::string* path);
+		bool							_foundIndexPage(DIR* dir, const std::string& indexPage);
+		void							_generateAutoindex(const std::string& path);
+
+						/*-----   Redirection  ----*/
+		void							_handleRedirection();
 
 						/*--------   Error  -------*/
 		void							_throwErrorMsg(t_statusCode errorCode, const std::string& message);
@@ -102,12 +110,12 @@ class   Response
 		t_statusCode					_getErrorCodeWithErrno();
 
 						/*-------   Utils    ------*/
+		std::string						_buildPath();
 		bool							_hasUploadPathDirective();
 		std::string						_getDateHeader();
 		std::string						_getContentTypeHeader();
 		bool							_requestIsValid();
 		void							_checkBodyLimit();
-		std::string						_buildFilePath(std::string& path);
 
 
 };

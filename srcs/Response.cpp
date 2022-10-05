@@ -9,18 +9,24 @@ Response::Response(Block *server, Request* request):
 	_request(request),
 	_response(""),
 	_statusCode(_request->getStatusCode()),
-	_body(""),
 	_method(_request->getMethod()),
+	_body(""),
 	_locationPath("")
 {
 	_initHttpMethods();
 }
 
 Response::Response(const Response &other):
+	_server(other.getServer()),
+	_matchingBlock(other.getMatchingBlock()),
 	_request(other.getRequest()),
 	_response(other.getResponse()),
 	_statusCode(other.getStatusCode()),
-	_body(other.getBody())
+	_method(other.getMethod()),
+	_headers(other.getHeaders()),
+	_body(other.getBody()),
+	_httpMethods(other.getHttpMethods()),
+	_locationPath(other.getLocationPath())
 {
 	*this = other;
 }
@@ -31,10 +37,16 @@ Response&	Response::operator=(const Response &other)
 {
 	if (this != &other)
 	{
+		_server = other.getServer();
+		_matchingBlock = other.getMatchingBlock();
 		_request = other.getRequest();
 		_response = other.getResponse();
 		_statusCode = other.getStatusCode();
+		_method = other.getMethod();
+		_headers = other.getHeaders();
 		_body = other.getBody();
+		_httpMethods = other.getHttpMethods();
+		_locationPath = other.getLocationPath();
 	}
 	return (*this);
 }
@@ -138,7 +150,7 @@ void	Response::_handleRedirection()
 	_headers["Location"] = _matchingBlock->getRedirectUri();
 }
 
-bool	Response::_foundIndexPage(DIR* dir, std::string indexPage)
+bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
 {
 	struct dirent*	diread;
 
@@ -173,7 +185,7 @@ bool	Response::_searchOfIndexPage(listOfStrings indexes, std::string* path)
 	return (foundIndexPage);
 }
 
-void	Response::_readFileContent(std::string& path)
+void	Response::_readFileContent(const std::string& path)
 {
 	std::ifstream		file;
 	std::stringstream	fileContent;
@@ -190,7 +202,7 @@ void	Response::_readFileContent(std::string& path)
 	file.close();
 }
 
-void	Response::_generateAutoindex(std::string& path)
+void	Response::_generateAutoindex(const std::string& path)
 {
 	Autoindex	autoindex(path);
 
@@ -199,7 +211,7 @@ void	Response::_generateAutoindex(std::string& path)
 }
 
 /*  GET method : "Transfer a current representation of the target resource." */
-void	Response::_getMethod(std::string& path)
+void	Response::_runGetMethod(std::string& path)
 {
 	std::string		filePath;
 
@@ -231,7 +243,7 @@ void	Response::_getMethod(std::string& path)
 /*                               POST METHOD                                  */
 /******************************************************************************/
 
-void	Response::_writeFileContent(std::string& path)
+void	Response::_writeFileContent(const std::string& path)
 {
 	std::ofstream	file;
 
@@ -262,7 +274,7 @@ void	Response::_handleCgi()
 }
 
 /* Perform resource-specific processing on the request payload. */
-void	Response::_postMethod(std::string& path)
+void	Response::_runPostMethod(std::string& path)
 {
 	std::ofstream	ofs;
 
@@ -282,7 +294,7 @@ void	Response::_postMethod(std::string& path)
 /******************************************************************************/
 
 /* Remove all current representations of the target resource. */
-void	Response::_deleteMethod(std::string& path)
+void	Response::_runDeleteMethod(std::string& path)
 {
 	int	ret;
 
@@ -414,6 +426,16 @@ void	Response::setStatusCode(int status)
 /*                                  GETTER                                    */
 /******************************************************************************/
 
+Block*		Response::getServer() const
+{
+	return (_server);
+}
+
+Block*		Response::getMatchingBlock() const
+{
+	return (_matchingBlock);
+}
+
 Request*	Response::getRequest() const
 {
 	return (_request);
@@ -434,9 +456,29 @@ std::string		Response::getStatusCodeStr() const
 	return (convertNbToString(_statusCode));
 }
 
+t_method	Response::getMethod() const
+{
+	return (_method);
+}
+
+Response::listOfHeaders	Response::getHeaders() const
+{
+	return (_headers);
+}
+
 std::string		Response::getBody() const
 {
 	return (_body);
+}
+
+Response::listOfHttpMethodsFunct	Response::getHttpMethods() const
+{
+	return (_httpMethods);
+}
+
+std::string		Response::getLocationPath() const
+{
+	return (_locationPath);
 }
 
 /******************************************************************************/
@@ -445,7 +487,7 @@ std::string		Response::getBody() const
 
 void	Response::_initHttpMethods()
 {
-	_httpMethods[GET] = &Response::_getMethod;
-	_httpMethods[POST] = &Response::_postMethod;
-	_httpMethods[DELETE] = &Response::_deleteMethod;
+	_httpMethods[GET] = &Response::_runGetMethod;
+	_httpMethods[POST] = &Response::_runPostMethod;
+	_httpMethods[DELETE] = &Response::_runDeleteMethod;
 }

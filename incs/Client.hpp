@@ -27,19 +27,25 @@ class Client
         ~Client();
         Client&             	operator=(Client const& other);
 
+						/*-------  Request  ------*/
         t_requestStatus     	parseRequest(std::string const& buffer);
+
+						/*-------  Response ------*/
         std::string         	generateResponse();
-		void			    	clear();
-        Block*              	selectVirtualServer();
 
 						/*-------   Getter   ------*/
         Block*      			getRunningServer() const;
         Request*            	getRequest() const;
         Response*           	getResponse() const;
 
+						/*-------    Utils   ------*/
+		void			    	clear();
+
 	private :
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
-		void					_parseHostHeader(std::string const& hostHeader, std::string& host, int& port);
+
+						/*-------  Response ------*/
+        Block*              	_selectVirtualServer();
 		bool					_matchingServerName(listOfStrings serverNames, int listeningPort);
 };
 

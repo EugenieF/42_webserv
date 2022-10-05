@@ -44,6 +44,10 @@ Client&     Client::operator=(Client const& other)
     return (*this);
 }
 
+/******************************************************************************/
+/*                                 REQUEST                                    */
+/******************************************************************************/
+
 t_requestStatus     Client::parseRequest(std::string const& buffer)
 {
     t_requestStatus requestStatus;
@@ -56,27 +60,17 @@ t_requestStatus     Client::parseRequest(std::string const& buffer)
     return (requestStatus);
 }
 
+/******************************************************************************/
+/*                                 RESPONSE                                   */
+/******************************************************************************/
+
 std::string     Client::generateResponse()
 {
     if (_response)
         delete _response;
-    _response = new Response(selectVirtualServer(), _request);
+    _response = new Response(_selectVirtualServer(), _request);
     _response->generateResponse();
     return (_response->getResponse());
-}
-
-void	Client::clear()
-{
-	if (_request)
-	{
-		delete _request;
-		_request = NULL;
-	}
-	if (_response)
-	{
-		delete _response;
-		_response = NULL;
-	}
 }
 
 bool	Client::_matchingServerName(listOfStrings serverNames, int listeningPort)
@@ -94,7 +88,7 @@ bool	Client::_matchingServerName(listOfStrings serverNames, int listeningPort)
     return (false);
 }
 
-Block*  Client::selectVirtualServer()
+Block*  Client::_selectVirtualServer()
 {
 	listOfServers				virtualHosts;
 	listOfServers::iterator		currentServer;
@@ -106,7 +100,7 @@ Block*  Client::selectVirtualServer()
 	{
 		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()))
 		{
-			std::cout << YELLOW << "---- Matching server name ----" << RESET << std::endl;
+			// std::cout << YELLOW << "---- Matching server name ----" << RESET << std::endl;
 			return (*currentServer);
 		}
 	}
@@ -130,4 +124,22 @@ Request*    Client::getRequest() const
 Response*   Client::getResponse() const
 {
     return (_response);
+}
+
+/******************************************************************************/
+/*                                   UTILS                                    */
+/******************************************************************************/
+
+void	Client::clear()
+{
+	if (_request)
+	{
+		delete _request;
+		_request = NULL;
+	}
+	if (_response)
+	{
+		delete _response;
+		_response = NULL;
+	}
 }
