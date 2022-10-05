@@ -97,9 +97,9 @@ Block*  Client::selectVirtualServer()
 	listOfServers				virtualHosts;
 	listOfServers::iterator		currentServer;
 
-	virtualHosts = _runningServer->getVirtualHosts();
-	if (virtualHosts.empty())
+    if (!_runningServer->hasVirtualHosts())
 		return (_runningServer);
+	virtualHosts = _runningServer->getVirtualHosts();
 	for (currentServer = virtualHosts.begin(); currentServer != virtualHosts.end(); currentServer++)
 	{
 		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()))

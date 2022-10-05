@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 17:43:39 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/05 11:49:12 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class EpollInstance {
 		typedef		Client*								ClientPtr;
 		typedef		std::map<int, ClientPtr>::iterator	it;
 		typedef		std::map<TcpSocket, Block*>			listOfSockets;
+		typedef		std::map<int, ClientPtr>			listOfClients;
 
 		EpollInstance();
 		virtual ~EpollInstance();
@@ -63,6 +64,8 @@ class EpollInstance {
 		void						_clearClient(int fd, Client* client);
 
 		Block*						_findServer(int fd);
+		bool						_findServerConnection(int fd, Block* server);
+
 
 		/* -- Connection management ---------------------------------------- */
 		void						_processConnections(int serverSocket, Block* server);

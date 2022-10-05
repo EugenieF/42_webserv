@@ -159,6 +159,7 @@ class	Block
 						/*------ Virtual hosts -----*/
 		void								setVirtualHost(blockPtr server);
 		listOfServers						getVirtualHosts() const;
+		bool								hasVirtualHosts();
 
 		bool								operator==(Block const& otherServer);
 

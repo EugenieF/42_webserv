@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 17:44:07 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/05 12:15:26 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ void	EpollInstance::setSocketList(EpollInstance::listOfSockets sockets)
 }
 
 void EpollInstance::startMonitoring(char* const* env) {
+	Block*	server = NULL;
+
 	memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
 	_efd = epoll_create1(0);
 	_addSockets(); // waiting for requests
@@ -55,9 +57,10 @@ void EpollInstance::startMonitoring(char* const* env) {
 				continue ;
 			// } else if (_events[i].data.fd == _serversocket) {
 			} else if (_events[i].events & EPOLLIN) {
-				Block* server = _findServer(_events[i].data.fd);
-				_processConnections(_events[i].data.fd, server);
-				_handleRequest(i);
+				if (_findServerConnection(_events[i].data.fd, server))
+					_processConnections(_events[i].data.fd, server);
+				else
+					_handleRequest(i);
 			} else if (_events[i].events & EPOLLOUT) {
 				_handleResponse(i, env); 
 			}
@@ -65,9 +68,19 @@ void EpollInstance::startMonitoring(char* const* env) {
 	}
 }
 
-Block*	EpollInstance::_findServer(int fd)
+bool	EpollInstance::_findServerConnection(int fd, Block* server)
 {
-	listOfSockets::iterator it = _socketList.find(fd);
+	listOfSockets::iterator	it;
+
+	for (it = _socketList.begin(); it != _socketList.end(); it++)
+	{
+		if (it->first.getFd() == fd)
+		{
+			server = it->second;
+			return (true);
+		}
+	}
+	return (false);
 }
 
 // Getter ---------------------------------------

@@ -456,6 +456,11 @@ void	Block::setVirtualHost(blockPtr server)
 	delete server;
 }
 
+bool	Block::hasVirtualHosts()
+{
+	return (!_virtualHosts.empty());
+}
+
 Block::listOfServers	Block::getVirtualHosts() const
 {
 	return (_virtualHosts);

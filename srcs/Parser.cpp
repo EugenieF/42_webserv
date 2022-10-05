@@ -318,7 +318,7 @@ void	Parser::_configureVirtualHosts()
 		{
 			if (**currentServer == **nextServer)
 			{
-				// std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
+				std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
 				(*currentServer)->setVirtualHost(*nextServer);
 				_servers.erase(nextServer);
 				nextServer--;

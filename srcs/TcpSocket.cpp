@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpSocket.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:34:52 by etran             #+#    #+#             */
-/*   Updated: 2022/09/22 13:54:41 by etran            ###   ########.fr       */
+/*   Updated: 2022/10/05 12:22:34 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ TcpSocket::TcpSocket(int val, bool autoclose) :
 	}
 
 TcpSocket::~TcpSocket() {
-	_closeFd();
+	// _closeFd(); // Problem here
 }
 
 /* PUBLIC ================================================================== */
@@ -62,4 +62,9 @@ void TcpSocket::_closeFd() {
 	if (getFd() != -1 && _autoclosing)
 		if (close(_sockfd) < 0)
 			throw std::runtime_error("close socket error");
+}
+
+bool	operator<(const TcpSocket& lhs, const TcpSocket& rhs)
+{
+	return (lhs.getFd() < rhs.getFd());
 }

@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 17:14:30 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/05 12:17:00 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ Server::~Server() {
 // Server management -----------------------------
 
 void Server::launchServer() {
-	_epoll.startMonitoring(_socketList, _env);
+	_epoll.startMonitoring(_env);
 }
 
 // Getter ----------------------------------------
@@ -95,5 +95,6 @@ void	Server::_createSocketList()
 	{
 		newSocket = _createSocket((*currentServer)->getPort(), (*currentServer)->getHost());		
 		_socketList.insert(std::make_pair(newSocket, *currentServer));
+		std::cout << RED << "*** DEBUG ***" << RESET << std::endl;
 	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpSocket.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:35:13 by etran             #+#    #+#             */
-/*   Updated: 2022/09/22 13:55:04 by etran            ###   ########.fr       */
+/*   Updated: 2022/10/05 12:14:53 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 # include <fcntl.h>
 # include <arpa/inet.h>
 # include <iostream>
+
+# include "utils.hpp"
 
 # define LISTEN_VAL 10
 
@@ -38,6 +40,7 @@ class TcpSocket {
 		/* -- Getter ------------------------------------------------------- */
 		int							getFd() const;
 
+
 	private:
 		/* -- Socket manipulation ------------------------------------------ */
 		void						_closeFd();
@@ -45,4 +48,7 @@ class TcpSocket {
 		int							_sockfd;
 		bool						_autoclosing;
 };
+
+bool	operator<(const TcpSocket& lhs, const TcpSocket& rhs);
+
 #endif

@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 17:42:05 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/05 12:02:20 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <exception>
 # include <sys/types.h>
 # include <sys/socket.h>
-# include <string.h>
 
 # include "Block.hpp"
 # include "EpollInstance.hpp"
