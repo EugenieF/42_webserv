@@ -325,7 +325,6 @@ void	Parser::_configureVirtualHosts()
 			}
 		}
 	}
-	// std::cout << RED << "_servers.size() : " << _servers.size() << RESET << std::endl;
 }
 
 void	Parser::_completeLocationsBlock(const blockPtr server)

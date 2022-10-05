@@ -16,7 +16,9 @@ Client::Client(Block* server):
     _runningServer(server),
     _request(0),
     _response(0)
-{}
+{
+	std::cout << RED << "getPort() : " << _runningServer->getPort() << RESET << std::endl;
+}
 
 Client::Client(Client const& other):
     _runningServer(other.getRunningServer()),
@@ -97,9 +99,9 @@ Block*  Client::selectVirtualServer()
 	listOfServers				virtualHosts;
 	listOfServers::iterator		currentServer;
 
-    if (!_runningServer->hasVirtualHosts())
-		return (_runningServer);
 	virtualHosts = _runningServer->getVirtualHosts();
+    if (virtualHosts.empty())
+		return (_runningServer);
 	for (currentServer = virtualHosts.begin(); currentServer != virtualHosts.end(); currentServer++)
 	{
 		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()))

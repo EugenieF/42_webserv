@@ -30,6 +30,7 @@ Block::Block(const Block& other):
 	_serverNames(other.getServerNames()),
 	_port(other.getPort()),
 	_host(other.getHost()),
+	_virtualHosts(other.getVirtualHosts()),
 	_root(other.getRoot()),
 	_indexes(other.getIndexes()),
 	_autoindex(other.getAutoindex()),
@@ -57,6 +58,7 @@ Block&	Block::operator=(const Block& other)
 		_serverNames = other.getServerNames();
 		_port = other.getPort();
 		_host = other.getHost();
+		_virtualHosts = other.getVirtualHosts();
 		_root = other.getRoot();
 		_indexes = other.getIndexes();
 		_autoindex = other.getAutoindex();
@@ -454,11 +456,6 @@ void	Block::setVirtualHost(blockPtr server)
 	virtualHost = new Block(*server);
 	_virtualHosts.push_back(virtualHost);
 	delete server;
-}
-
-bool	Block::hasVirtualHosts()
-{
-	return (!_virtualHosts.empty());
 }
 
 Block::listOfServers	Block::getVirtualHosts() const

@@ -215,6 +215,28 @@ void	Request::_parseBody()
 	// if (_request.length() < _bodySize) {}
 }
 
+/* DECODING CHUNKED pseudo-code :
+
+     length := 0
+     read chunk-size, chunk-ext (if any), and CRLF
+     while (chunk-size > 0) {
+        read chunk-data and CRLF
+        append chunk-data to decoded-body
+        length := length + chunk-size
+        read chunk-size, chunk-ext (if any), and CRLF
+     }
+     read trailer field
+     while (trailer field is not empty) {
+        if (trailer field is allowed to be sent in a trailer) {
+            append trailer field to existing header fields
+        }
+        read trailer-field
+     }
+     Content-Length := length
+     Remove "chunked" from Transfer-Encoding
+     Remove Trailer from existing header fields
+*/
+
 void	Request::_parseChunks()
 {
 	long			chunkSize;
@@ -223,13 +245,14 @@ void	Request::_parseChunks()
 
 	if (!_reachedEndOfChunkedBody())
 	{
-		_bodySize = _request.length();
+		_bodySize = _request.length(); // Not sure about this...
 		std::cout << RED << "*****  CHUNKS, INCOMPLETE REQUEST  *****" << std::endl;
 		std::cout << "request = " << _request << RESET << std::endl;
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
 	}
 	while (1)
 	{
+		std::cout << GREEN << "***** COMPLETE CHUNKED  *****" << RESET << std::endl;
 		chunkSize = 0;
 		pos = _getNextWord(chunk, "\r\n");
 		if (pos == std::string::npos)

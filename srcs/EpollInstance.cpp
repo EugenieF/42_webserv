@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 12:15:26 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/05 17:39:34 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	EpollInstance::setSocketList(EpollInstance::listOfSockets sockets)
 }
 
 void EpollInstance::startMonitoring(char* const* env) {
-	Block*	server = NULL;
+	Block	server;
 
 	memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
 	_efd = epoll_create1(0);
@@ -57,8 +57,8 @@ void EpollInstance::startMonitoring(char* const* env) {
 				continue ;
 			// } else if (_events[i].data.fd == _serversocket) {
 			} else if (_events[i].events & EPOLLIN) {
-				if (_findServerConnection(_events[i].data.fd, server))
-					_processConnections(_events[i].data.fd, server);
+				if (_findServerConnection(_events[i].data.fd, &server))
+					_processConnections(_events[i].data.fd, &server);
 				else
 					_handleRequest(i);
 			} else if (_events[i].events & EPOLLOUT) {

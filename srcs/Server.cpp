@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 12:17:00 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/05 18:20:21 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int Server::getEpoll() const {
 
 // Debug -----------------------------------------
 
-// void Server::_displayServer() const {
+// void Server::_displayServer(Block* server) const {
 // 	std::cout	<< "== Connection infos ==" << NL
 // 				<< "fd: " << getSocket() << NL
 // 				<< "ip: " << getHost() << NL

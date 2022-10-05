@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 12:02:20 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/05 18:17:41 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ class Server {
 
 	private:
 		/* -- Debug -------------------------------------------------------- */
-		// void							_displayServer() const;
+		void							_displayServer(Block *server) const;
 
 		void							_createSocketList();	
 		TcpSocket						_createSocket(int port, std::string ipAddress);
