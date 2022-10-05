@@ -288,12 +288,13 @@ void	Parser::_parseAllowedMethodRule()
 {
 	_expectContext(LOCATION);
 	_expectNbOfArguments(1, MINIMUM, SEMICOLON);
+	_currentBlock->initMethods(false);
 	while (!_reachedEndOfDirective())
 	{
 		_getNextToken();
 		if (g_httpMethod.isHttpMethod(_currentToken->getValue()) == false)
 			_throwErrorParsing(_unknownMethodMsg(_currentToken));
-		_currentBlock->setMethod(_currentToken->getValue());
+		_currentBlock->setMethod(_currentToken->getValue(), true);
 	}
 }
 

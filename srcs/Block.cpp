@@ -19,8 +19,8 @@ Block::Block():
 	_redirectUri(""),
 	_uploadPath("")
 {
-	for (int i = 0; i < ALLOWED_METHODS_COUNT; i++)
-		_methods[i] = true; // Need to think about this, init to false or true ?
+	initMethods(true);
+	/* if I'm root user, I use port 80 */
 	if (!getuid())
 		setPort(80);
 }
@@ -37,8 +37,12 @@ Block::Block(const Block& other):
 	_clientBodyLimit(other.getClientBodyLimit()),
 	_cgiExt(other.getCgiExt()),
 	_cgiPath(other.getCgiPath()),
+	_errorPages(other.getErrorPages()),
 	_redirectCode(other.getRedirectCode()),
 	_redirectUri(other.getRedirectUri()),
+	_locations(other.getLocations()),
+	_currentLocation(other.getCurrentLocation()),
+	_methods(other.getMethods()),
 	_uploadPath(other.getUploadPath())
 {
 	*this = other;
@@ -49,6 +53,10 @@ Block::~Block()
 	if (isServerBlock())
 		_deleteLocations();
 }
+
+/******************************************************************************/
+/*                           OPERATOR OVERLOAD                                */
+/******************************************************************************/
 
 Block&	Block::operator=(const Block& other)
 {
@@ -65,48 +73,22 @@ Block&	Block::operator=(const Block& other)
 		_clientBodyLimit = other.getClientBodyLimit();
 		_cgiExt = other.getCgiExt();
 		_cgiPath = other.getCgiPath();
+		_errorPages = other.getErrorPages();
 		_redirectCode = other.getRedirectCode();
 		_redirectUri = other.getRedirectUri();
+		_locations = other.getLocations();
+		_currentLocation = other.getCurrentLocation();
+		_methods = other.getMethods();
 		_uploadPath = other.getUploadPath();
 	}
 	return (*this);
 }
 
-void	Block::completeLocationDirectives(const Block& server)
+bool	Block::operator==(Block const& otherServer)
 {
-	if (this == &server)
-		return ;
-	if (_root.empty())
-		_root = server.getRoot();
-	if (_indexes.empty())
-		_indexes = server.getIndexes();
-	if (_clientBodyLimit == DEFAULT_CLIENT_BODY_LIMIT)
-		_clientBodyLimit = server.getClientBodyLimit();
-	if (_cgiExt.empty())
-		_cgiExt = server.getCgiExt();
-	if (_cgiPath.empty())
-		_cgiPath = server.getCgiPath();
-	if (!_redirectCode)
-		_redirectCode = server.getRedirectCode();
-	if (_redirectUri.empty())
-		_redirectUri = server.getRedirectUri();
-}
-
-Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPath)
-{
-	size_t		pos;
-	std::string	prefix;
-
-	pos = path.find("/", 1);
-	prefix = path.substr(0, pos);
-	std::cout << BLUE << "Request uri : " << path << " | prefix : " << prefix << RESET << std::endl;
-	_currentLocation = _locations.find(prefix);
-	if (_currentLocation != _locations.end())
-	{
-		*locationPath = _currentLocation->first;
-		return (_currentLocation->second);
-	}
-	return (this);
+	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
+		&& this->getHost() == otherServer.getHost()
+		&& this->getPort() == otherServer.getPort());
 }
 
 /******************************************************************************/
@@ -241,12 +223,12 @@ void	Block::setErrorPage(int code, const std::string& page)
 	_errorPages[code] = page;
 }
 
-Block::listOfErrorPages		Block::getErrorPages()
+Block::listOfErrorPages		Block::getErrorPages() const
 {
 	return (_errorPages);
 }
 
-std::string		Block::getErrorPage(int statusCode)
+std::string		Block::getErrorPage(int statusCode) const
 {
 	Block::listOfErrorPages::const_iterator	ite;
 	std::string								errorPage;
@@ -266,11 +248,6 @@ void	Block::setRedirection(int code, const std::string& uri)
 {
 	_redirectCode = code;
 	_redirectUri = uri;
-}
-
-int		Block::getRedirectCode()
-{
-	return (_redirectCode);
 }
 
 const std::string&	Block::getRedirectUri() const
@@ -311,17 +288,17 @@ bool	Block::uploadPathDirective()
 /*                             ALLOWED_METHOD                                 */
 /******************************************************************************/
 
-void	Block::setMethod(t_method method)
+void	Block::setMethod(t_method method, bool value)
 {
-	_methods[method] = true;
+	_methods[method] = value;
 }
 
-void	Block::setMethod(const std::string& str)
+void	Block::setMethod(const std::string& str, bool value)
 {
 	t_method	method;
 
 	method = g_httpMethod.getMethod(str);
-	_methods[method] = true;
+	_methods[method] = value;
 }
 
 bool	Block::isAllowedMethod(t_method method)
@@ -329,6 +306,17 @@ bool	Block::isAllowedMethod(t_method method)
 	return (_methods[method]);
 }
 
+Block::listOfMethods	Block::getMethods() const
+{
+	return (_methods);
+}
+
+void	Block::initMethods(bool value)
+{
+	setMethod(GET, value);
+	setMethod(POST, value);
+	setMethod(DELETE, value);
+}
 /******************************************************************************/
 /*                                LOCATION                                    */
 /******************************************************************************/
@@ -342,9 +330,9 @@ bool	Block::insertLocation(const std::string& path, blockPtr newLocation)
 	return (ret.second);
 }
 
-Block::blockPtr		Block::getCurrentLocation()
+Block::listOfLocations::const_iterator	Block::getCurrentLocation() const
 {
-	return (_currentLocation->second);
+	return (_currentLocation);
 }
 
 Block::listOfLocations	Block::getLocations() const
@@ -378,8 +366,65 @@ void	Block::setContext(t_context context)
 }
 
 /******************************************************************************/
+/*                               VIRTUAL HOST                                 */
+/******************************************************************************/
+
+void	Block::setVirtualHost(blockPtr server)
+{
+	blockPtr	virtualHost;
+
+	virtualHost = new Block(*server);
+	_virtualHosts.push_back(virtualHost);
+	delete server;
+}
+
+Block::listOfServers	Block::getVirtualHosts() const
+{
+	return (_virtualHosts);
+}
+
+/******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
+
+void	Block::completeLocationDirectives(const Block& server)
+{
+	if (this == &server)
+		return ;
+	if (_root.empty())
+		_root = server.getRoot();
+	if (_indexes.empty())
+		_indexes = server.getIndexes();
+	if (_clientBodyLimit == DEFAULT_CLIENT_BODY_LIMIT)
+		_clientBodyLimit = server.getClientBodyLimit();
+	if (_cgiExt.empty())
+		_cgiExt = server.getCgiExt();
+	if (_cgiPath.empty())
+		_cgiPath = server.getCgiPath();
+	if (_errorPages.empty())
+		_errorPages = server.getErrorPages();
+	if (!_redirectCode)
+		_redirectCode = server.getRedirectCode();
+	if (_redirectUri.empty())
+		_redirectUri = server.getRedirectUri();
+}
+
+Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPath)
+{
+	size_t		pos;
+	std::string	prefix;
+
+	pos = path.find("/", 1);
+	prefix = path.substr(0, pos);
+	std::cout << BLUE << "Request uri : " << path << " | prefix : " << prefix << RESET << std::endl;
+	_currentLocation = _locations.find(prefix);
+	if (_currentLocation != _locations.end())
+	{
+		*locationPath = _currentLocation->first;
+		return (_currentLocation->second);
+	}
+	return (this);
+}
 
 bool	Block::isServerBlock()
 {
@@ -443,33 +488,4 @@ void	Block::displayListOfStrings(listOfStrings list)
 	for (ite = list.begin(); ite != list.end(); ite++)
 		std::cout << *ite << " ";
 	std::cout << std::endl;
-}
-
-/******************************************************************************/
-/*                               VIRTUAL HOST                                 */
-/******************************************************************************/
-
-void	Block::setVirtualHost(blockPtr server)
-{
-	blockPtr	virtualHost;
-
-	virtualHost = new Block(*server);
-	_virtualHosts.push_back(virtualHost);
-	delete server;
-}
-
-Block::listOfServers	Block::getVirtualHosts() const
-{
-	return (_virtualHosts);
-}
-
-/******************************************************************************/
-/*                           OPERATOR OVERLOAD                                */
-/******************************************************************************/
-
-bool	Block::operator==(Block const& otherServer)
-{
-	return (this->getContext() == SERVER && otherServer.getContext() == SERVER
-		&& this->getHost() == otherServer.getHost()
-		&& this->getPort() == otherServer.getPort());
 }

@@ -15,7 +15,7 @@
 extern HttpMethod	g_httpMethod;
 
 # define DEFAULT_CLIENT_BODY_LIMIT 1000000
-# define DEFAULT_ROOT ""
+# define DEFAULT_ROOT "/"
 
 /******************************************************************************/
 /*                                 ENUMS                                      */
@@ -41,6 +41,7 @@ class	Block
 		typedef std::map<std::string, blockPtr>		listOfLocations;
 		typedef std::map<int, std::string>			listOfErrorPages;
 		typedef std::vector<Block*>					listOfServers;
+		typedef	std::map<t_method, bool>			listOfMethods;
 
 	private :
 	/**********************     MEMBER VARIABLES     ********************/
@@ -66,9 +67,8 @@ class	Block
 					/*-----  Location block only  -----*/
 		listOfLocations						_locations;
 		listOfLocations::const_iterator		_currentLocation;
-		bool								_methods[ALLOWED_METHODS_COUNT];
+		listOfMethods						_methods;
 		std::string							_uploadPath;
-
 
 	public :
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -77,9 +77,10 @@ class	Block
 		Block();
 		Block(const Block& other);
 		~Block();
+
+						/*----- Operator overloads ----*/
 		Block&								operator=(const Block& other);
-		void								completeLocationDirectives(const Block& server);
-		Block*								getMatchingBlock(const std::string& path, std::string* locationPath);
+		bool								operator==(Block const& otherServer);
 
 						/*-------  Server_name  ------*/
 		void								setName(const std::string& name);
@@ -116,12 +117,11 @@ class	Block
 
 						/*-------  Error_page  -------*/
 		void								setErrorPage(int code, const std::string& page);
-		listOfErrorPages					getErrorPages();
-		std::string							getErrorPage(int statusCode);
+		listOfErrorPages					getErrorPages() const;
+		std::string							getErrorPage(int statusCode) const;
 
 						/*-------    Redirect  -------*/
 		void								setRedirection(int code, const std::string& uri);
-		int									getRedirectCode();
 		const std::string&					getRedirectUri() const;
 		int									getRedirectCode() const;
 		bool								redirectDirective();
@@ -132,35 +132,37 @@ class	Block
 		bool								uploadPathDirective();
 
 						/*------- Allowed_method ------*/
-		void								setMethod(t_method method);
-		void								setMethod(const std::string& str);
+		void								initMethods(bool value);
+		void								setMethod(t_method method, bool value);
+		void								setMethod(const std::string& str, bool value);
 		bool								isAllowedMethod(t_method method);
+		listOfMethods						getMethods() const;
 
 						/*-------    Location   ------*/
 		bool								insertLocation(const std::string& path, blockPtr newLocation);
 		int									getNbOfLocations() const;
-		blockPtr							getCurrentLocation();
+		listOfLocations::const_iterator		getCurrentLocation() const;
 		listOfLocations						getLocations() const;
 
 						/*-------    Context    ------*/
 		void								setContext(t_context context);
 		t_context							getContext() const;
 
+						/*------ Virtual hosts -----*/
+		void								setVirtualHost(blockPtr server);
+		listOfServers						getVirtualHosts() const;
+
 						/*-------     Utils    -------*/
 		bool								isServerBlock();
 		bool								isLocationBlock();
+		void								completeLocationDirectives(const Block& server);
+		Block*								getMatchingBlock(const std::string& path, std::string* locationPath);
 
 						/*-------    Display    ------*/
 		void								displayListOfStrings(listOfStrings list);
 		void								displayBlockDirectives(t_context context);
 		void								displayParams(int num);
 		void								displayServerNames();
-
-						/*------ Virtual hosts -----*/
-		void								setVirtualHost(blockPtr server);
-		listOfServers						getVirtualHosts() const;
-
-		bool								operator==(Block const& otherServer);
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
