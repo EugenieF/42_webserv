@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:34:52 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 12:22:34 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 12:19:44 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ TcpSocket::TcpSocket(int val, bool autoclose) :
 	}
 
 TcpSocket::~TcpSocket() {
-	// _closeFd(); // Problem here
+	_closeFd();
 }
 
 /* PUBLIC ================================================================== */
@@ -63,6 +63,10 @@ void TcpSocket::_closeFd() {
 		if (close(_sockfd) < 0)
 			throw std::runtime_error("close socket error");
 }
+
+/* NON-MEMBER ============================================================== */
+
+// Operator overload -----------------------------
 
 bool	operator<(const TcpSocket& lhs, const TcpSocket& rhs)
 {

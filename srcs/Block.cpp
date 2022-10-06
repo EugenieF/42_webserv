@@ -481,7 +481,7 @@ void	Block::displayBlockDirectives(t_context context)
 	// std::cout << "  ‣ Error page: " << getErrorCode() << " " << getErrorPage() << std::endl;
 }
 
-void	Block::displayListOfStrings(listOfStrings list)
+void	Block::displayListOfStrings(const listOfStrings& list)
 {
 	listOfStrings::const_iterator	ite;
 

@@ -25,10 +25,10 @@ class Client
         Client(Block* server);
         Client(Client const& other);
         ~Client();
-        Client&             	operator=(Client const& other);
+        Client&             	operator=(const Client& other);
 
 						/*-------  Request  ------*/
-        t_requestStatus     	parseRequest(std::string const& buffer);
+        t_requestStatus     	parseRequest(const std::string& buffer);
 
 						/*-------  Response ------*/
         std::string         	generateResponse();
@@ -46,7 +46,7 @@ class Client
 
 						/*-------  Response ------*/
         Block*              	_selectVirtualServer();
-		bool					_matchingServerName(listOfStrings serverNames, int listeningPort);
+		bool					_matchingServerName(const listOfStrings& serverNames, int listeningPort);
 };
 
 #endif

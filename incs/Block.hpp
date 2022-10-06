@@ -159,7 +159,7 @@ class	Block
 		Block*								getMatchingBlock(const std::string& path, std::string* locationPath);
 
 						/*-------    Display    ------*/
-		void								displayListOfStrings(listOfStrings list);
+		void								displayListOfStrings(const listOfStrings& list);
 		void								displayBlockDirectives(t_context context);
 		void								displayParams(int num);
 		void								displayServerNames();

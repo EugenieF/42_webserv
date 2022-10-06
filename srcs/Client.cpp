@@ -16,9 +16,7 @@ Client::Client(Block* server):
     _runningServer(server),
     _request(0),
     _response(0)
-{
-	std::cout << RED << "getPort() : " << _runningServer->getPort() << RESET << std::endl;
-}
+{}
 
 Client::Client(Client const& other):
     _runningServer(other.getRunningServer()),
@@ -33,7 +31,7 @@ Client::~Client()
     clear();
 }
 
-Client&     Client::operator=(Client const& other)
+Client&     Client::operator=(const Client& other)
 {
     if (this != &other)
     {
@@ -48,7 +46,7 @@ Client&     Client::operator=(Client const& other)
 /*                                 REQUEST                                    */
 /******************************************************************************/
 
-t_requestStatus     Client::parseRequest(std::string const& buffer)
+t_requestStatus     Client::parseRequest(const std::string& buffer)
 {
     t_requestStatus requestStatus;
 
@@ -73,10 +71,10 @@ std::string     Client::generateResponse()
     return (_response->getResponse());
 }
 
-bool	Client::_matchingServerName(listOfStrings serverNames, int listeningPort)
+bool	Client::_matchingServerName(const listOfStrings& serverNames, int listeningPort)
 {
-	listOfStrings::iterator	currentName;
-	int						requestedPort;
+	listOfStrings::const_iterator	currentName;
+	int								requestedPort;
 	
 	requestedPort = _request->getPort();
     for (currentName = serverNames.begin(); currentName != serverNames.end(); currentName++)

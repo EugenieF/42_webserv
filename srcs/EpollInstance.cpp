@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 17:39:34 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 12:15:43 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ EpollInstance::~EpollInstance() {
 
 // Epoll manipulation ---------------------------
 
-void	EpollInstance::setSocketList(EpollInstance::listOfSockets sockets)
+void	EpollInstance::setSocketList(const EpollInstance::listOfSockets& sockets)
 {
 	_socketList = sockets;
 }

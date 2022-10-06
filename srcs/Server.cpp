@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 18:20:21 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 11:41:42 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int Server::getEpoll() const {
 // 				<< "port: " << getPort() << NL;
 // }
 
-TcpSocket	Server::_createSocket(int port, std::string ipAddress)
+TcpSocket	Server::_createSocket(int port, const std::string& ipAddress)
 {
 	struct sockaddr_in	addr;
 	

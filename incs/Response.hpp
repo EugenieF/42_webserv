@@ -97,7 +97,7 @@ class   Response
 		void							_runDeleteMethod(std::string& path);
 
 						/*--------   Index  -------*/
-		bool							_searchOfIndexPage(listOfStrings indexes, std::string* path);
+		bool							_searchOfIndexPage(const listOfStrings& indexes, std::string* path);
 		bool							_foundIndexPage(DIR* dir, const std::string& indexPage);
 		void							_generateAutoindex(const std::string& path);
 

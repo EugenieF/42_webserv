@@ -162,11 +162,11 @@ bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
 	return (false);
 }
 
-bool	Response::_searchOfIndexPage(listOfStrings indexes, std::string* path)
+bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* path)
 {
-	listOfStrings::iterator	currentIndex;
-	DIR*					dir;
-	bool					foundIndexPage;
+	listOfStrings::const_iterator	currentIndex;
+	DIR*							dir;
+	bool							foundIndexPage;
 
 	foundIndexPage = false;
 	dir = opendir(path->c_str());

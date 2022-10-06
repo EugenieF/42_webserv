@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 11:49:12 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 12:15:56 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ class EpollInstance {
 		int							getFd() const;
 		ClientPtr					getClient(int fd);
 
-		void						setSocketList(listOfSockets sockets);
+		void						setSocketList(const listOfSockets& sockets);
 
 	private:
 		/* -- Epoll manipulation ------------------------------------------- */
@@ -75,7 +75,7 @@ class EpollInstance {
 		int							_efd;
 		// int							_serversocket;
 		struct epoll_event			_events[MAX_EVENT];
-		std::map<int, ClientPtr>	_clientlist;
+		listOfClients				_clientlist;
 		listOfSockets				_socketList;
 };
 
