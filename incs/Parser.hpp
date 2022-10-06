@@ -132,6 +132,7 @@ class Parser
 		std::string							_invalidPortMsg();
 		std::string							_invalidPathMsg();
 		std::string							_invalidNbOfArgumentsMsg();
+		std::string							_duplicatePortMsg(int port);
 		void								_throwErrorParsing(std::string errorMsg);
 		void								_throwErrorParsing(std::string errorMsg, std::string lineNbr);
 

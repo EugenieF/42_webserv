@@ -148,8 +148,8 @@ void	Parser::parseTokens()
 		_currentServer = _servers.insert(_servers.end(), newServer);
 		_updateContext(NONE, NULL);
 	}
-	_checkDuplicatePorts();
 	_configureVirtualHosts();
+	_checkDuplicatePorts();
 }
 
 void	Parser::_checkDuplicatePorts()
@@ -164,7 +164,7 @@ void	Parser::_checkDuplicatePorts()
 			if ((*currentServer)->getPort() == (*nextServer)->getPort())
 			{
 				// std::cout << RED << "[**** DUPLICATE PORT ****]" << RESET << std::endl;
-				_throwErrorParsing("Duplicate port " + (*currentServer)->getPort());
+				_throwErrorParsing(_duplicatePortMsg((*currentServer)->getPort()));
 			}
 		}
 	}	
@@ -676,6 +676,11 @@ std::string	Parser::_invalidPathMsg()
 	if ((_currentToken) != _lexer.getTokens().end())
 		incorrectValue = (_currentToken)->getValue();
 	return ("invalid path '" + incorrectValue + "'");
+}
+
+std::string	Parser::_duplicatePortMsg(int port)
+{
+	return ("duplicate port '" + convertNbToString(port) + "'");
 }
 
 void	Parser::_throwErrorParsing(std::string errorMsg)
