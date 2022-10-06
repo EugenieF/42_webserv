@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/06 11:41:42 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 14:50:41 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ Server::Server(Server::listOfServers servers, char* const* env) :
 	}
 
 Server::~Server() {
+	_clear();
 	DEBUG("Server Block destructor");
 }
 
@@ -68,32 +69,40 @@ int Server::getEpoll() const {
 // 				<< "port: " << getPort() << NL;
 // }
 
-TcpSocket	Server::_createSocket(int port, const std::string& ipAddress)
+TcpSocket*	Server::_createSocket(int port, const std::string& ipAddress)
 {
 	struct sockaddr_in	addr;
 	
-	TcpSocket	newSocket(socket(PF_INET, SOCK_STREAM, 0));
-	newSocket.setToReusable();
+	TcpSocket *newSocket = new TcpSocket(socket(PF_INET, SOCK_STREAM, 0));
+	newSocket->setToReusable();
 	memset(&addr, 0, sizeof(addr)); 
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
 	addr.sin_addr.s_addr = inet_addr(ipAddress.c_str());
 
-	if (bind(newSocket.getFd(), reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0)
+	if (bind(newSocket->getFd(), reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0)
 		throw std::runtime_error("bind error");
-	newSocket.unlockSocket();
-	newSocket.listenSocket();
+	newSocket->unlockSocket();
+	newSocket->listenSocket();
 	return (newSocket);
 }
 
 void	Server::_createSocketList()
 {
 	listOfServers::const_iterator	currentServer;
-	TcpSocket						newSocket;
+	TcpSocket*						newSocket;
 
 	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
 	{
-		newSocket = _createSocket((*currentServer)->getPort(), (*currentServer)->getHost());		
+		newSocket = _createSocket((*currentServer)->getPort(), (*currentServer)->getHost());
 		_socketList.insert(std::make_pair(newSocket, *currentServer));
 	}
+}
+
+void	Server::_clear()
+{
+	listOfSockets::const_iterator	socket;
+
+	for (socket = _socketList.begin(); socket != _socketList.end(); socket++)
+		delete socket->first;
 }

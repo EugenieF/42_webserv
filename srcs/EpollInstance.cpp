@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/06 12:15:43 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 15:18:32 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ bool	EpollInstance::_findServerConnection(int fd, Block* server)
 
 	for (it = _socketList.begin(); it != _socketList.end(); it++)
 	{
-		if (it->first.getFd() == fd)
+		if (it->first->getFd() == fd)
 		{
 			server = it->second;
 			return (true);
@@ -118,7 +118,7 @@ void	EpollInstance::_addSockets()
 
 	for (socket = _socketList.begin(); socket != _socketList.end(); socket++)
 	{
-		_addSocket(socket->first.getFd(), EPOLLIN); // waiting for requests
+		_addSocket(socket->first->getFd(), EPOLLIN); // waiting for requests
 	}
 }
 
@@ -130,10 +130,7 @@ void EpollInstance::_editSocket(int sock, int flag) {
 	event.events = flag;
 	// if (epoll_ctl(_efd, EPOLL_CTL_MOD, sock, &event) < 0)
 	if (epoll_ctl(_efd, EPOLL_CTL_MOD, sock, &event) < 0)
-	{
-		std::cout << YELLOW << "> editSocket() errno = " << strerror(errno) << RESET << std::endl;
 		throw std::runtime_error("editing socket in epoll led to error");
-	}
 }
 
 void EpollInstance::_removeSocket(int sock) {
@@ -263,7 +260,10 @@ void	EpollInstance::_clearClient(int fd, Client* client)
 {
 	_removeSocket(fd);
 	if (close(fd) < 0)
+	{
+		std::cout << RED << "clearClient fd = " << fd << RESET << std::endl;
 		throw std::runtime_error("clearlist (close) error");
+	}
 	delete client;
 	_clientlist.erase(fd);
 }

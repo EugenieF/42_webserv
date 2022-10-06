@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/06 12:15:56 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 13:43:00 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class EpollInstance {
 		typedef		Parser::listOfServers				listOfServers;
 		typedef		Client*								ClientPtr;
 		typedef		std::map<int, ClientPtr>::iterator	it;
-		typedef		std::map<TcpSocket, Block*>			listOfSockets;
+		typedef		std::map<TcpSocket*, Block*>		listOfSockets;
 		typedef		std::map<int, ClientPtr>			listOfClients;
 
 		EpollInstance();

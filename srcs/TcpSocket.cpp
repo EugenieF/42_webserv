@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:34:52 by etran             #+#    #+#             */
-/*   Updated: 2022/10/06 12:19:44 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 14:48:24 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ TcpSocket::TcpSocket(int val, bool autoclose) :
 	}
 
 TcpSocket::~TcpSocket() {
-	// _closeFd(); // Segfault here
+	_closeFd();
 }
 
 /* PUBLIC ================================================================== */

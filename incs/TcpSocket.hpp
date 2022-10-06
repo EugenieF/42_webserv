@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:35:13 by etran             #+#    #+#             */
-/*   Updated: 2022/10/05 12:14:53 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 14:44:12 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class TcpSocket {
 		/* -- Getter ------------------------------------------------------- */
 		int							getFd() const;
 
+		void						createSocket();
 
 	private:
 		/* -- Socket manipulation ------------------------------------------ */
@@ -47,6 +48,8 @@ class TcpSocket {
 
 		int							_sockfd;
 		bool						_autoclosing;
+		int							_port;
+		std::string					_ip;
 };
 
 bool	operator<(const TcpSocket& lhs, const TcpSocket& rhs);
