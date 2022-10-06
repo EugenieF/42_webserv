@@ -110,6 +110,7 @@ t_requestStatus	Request::parseRequest()
 	
 void	Request::completeRequest(const std::string& buffer)
 {
+	std::cout << GREEN << "COMPLETE REQUEST" << RESET << std::endl;
 	_request += buffer;
 }
 

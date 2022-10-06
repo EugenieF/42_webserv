@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/06 15:18:32 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 15:43:25 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ bool	EpollInstance::_findServerConnection(int fd, Block* server)
 
 	for (it = _socketList.begin(); it != _socketList.end(); it++)
 	{
+		// std::cout << YELLOW << it->first->getFd() << " | " << fd << RESET << std::endl;
 		if (it->first->getFd() == fd)
 		{
 			server = it->second;
@@ -164,7 +165,7 @@ void EpollInstance::_processConnections(int serverSocket, Block* server) {
 		_addSocket(newsocket.getFd(), EPOLLIN); // newsocket waiting for a response
 		_clientlist.insert(std::make_pair(newsocket.getFd(), new Client(server)));
 
-		// std::cout << RED << "New Client --> fd: " << newsocket.getFd() << RESET << std::endl;
+		std::cout << RED << "New Client --> fd: " << newsocket.getFd() << RESET << std::endl;
 	}
 }
 
@@ -206,10 +207,12 @@ void EpollInstance::_handleRequest(int index) {
 	requestStatus = client->parseRequest(str);
 	if (requestStatus == INVALID_REQUEST)
 	{
+		std::cout << GREEN << "CLEAR CLIENT" << RESET << std::endl;
 		_clearClient(_events[index].data.fd, client);
 	}
 	else if (requestStatus == COMPLETE_REQUEST)
 	{
+		std::cout << GREEN << "EDIT SOCKET" << RESET << std::endl;
 		_editSocket(_events[index].data.fd, EPOLLOUT);
 	}
 }

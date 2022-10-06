@@ -243,6 +243,24 @@ void	Response::_runGetMethod(std::string& path)
 /*                               POST METHOD                                  */
 /******************************************************************************/
 
+void	Response::_handleMultipartContent(std::string& path)
+{
+	(void)path;
+	std::string	boundary;
+	std::string	content;
+	std::string	contentDisposition;
+	size_t		pos;
+
+	pos = _request->getHeader("content-type").find("boundary=");
+	if (pos != std::string::npos)
+		boundary = _request->getHeader("content-type").substr(pos);
+	content = _request->getBody();
+	while (content.find(boundary + "\r\n") != std::string::npos)
+	{
+		content.erase(content.find(boundary), content.find("\r\n"));
+	}
+}
+
 void	Response::_writeFileContent(const std::string& path)
 {
 	std::ofstream	file;
@@ -276,16 +294,18 @@ void	Response::_handleCgi()
 /* Perform resource-specific processing on the request payload. */
 void	Response::_runPostMethod(std::string& path)
 {
-	std::ofstream	ofs;
+	std::ofstream							ofs;
 
-	(void)path;
 	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
 	if (_matchingBlock->cgiDirective())
 	{
 		/* process cgi */
 	}
 	// if (_matchingBlock->uploadPathDirective()) ??
-	_request->getHeader("content-type");
+	if (_isMultipartContentRequest())
+	{
+		_handleMultipartContent(path);
+	}
 	_writeFileContent(path);
 }
 
@@ -406,6 +426,14 @@ void	Response::_checkBodyLimit()
 {
 	if (_request->getBodySize() >= _matchingBlock->getClientBodyLimit())
 		throw(PAYLOAD_TOO_LARGE);
+}
+
+bool	Response::_isMultipartContentRequest()
+{
+	size_t pos;
+
+	pos = _request->getHeader("content-type").find("multipart/form-data");
+	return (pos != std::string::npos);
 }
 
 /******************************************************************************/

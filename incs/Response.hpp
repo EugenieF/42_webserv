@@ -92,6 +92,7 @@ class   Response
 		void							_writeFileContent(const std::string& path);
 		void							_handleUploadFile();
 		void							_handleCgi();
+		void							_handleMultipartContent(std::string& path);
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod(std::string& path);
@@ -116,6 +117,7 @@ class   Response
 		std::string						_getContentTypeHeader();
 		bool							_requestIsValid();
 		void							_checkBodyLimit();
+		bool							_isMultipartContentRequest();
 
 
 };

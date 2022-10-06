@@ -148,6 +148,7 @@ void	Parser::parseTokens()
 		_currentServer = _servers.insert(_servers.end(), newServer);
 		_updateContext(NONE, NULL);
 	}
+	// _checkPorts();
 	_configureVirtualHosts();
 }
 
