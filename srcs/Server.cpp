@@ -95,6 +95,5 @@ void	Server::_createSocketList()
 	{
 		newSocket = _createSocket((*currentServer)->getPort(), (*currentServer)->getHost());		
 		_socketList.insert(std::make_pair(newSocket, *currentServer));
-		std::cout << RED << "*** DEBUG ***" << RESET << std::endl;
 	}
 }

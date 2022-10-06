@@ -26,7 +26,7 @@ TcpSocket::TcpSocket(int val, bool autoclose) :
 	}
 
 TcpSocket::~TcpSocket() {
-	_closeFd();
+	// _closeFd(); // Segfault here
 }
 
 /* PUBLIC ================================================================== */
