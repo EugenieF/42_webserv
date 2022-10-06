@@ -97,7 +97,9 @@ class Parser
 						/*-------    Check    ------*/
 		void								_checkDelimiter(Lexer::listOfTokens::const_iterator token);
 		void								_checkEndOfFile(Lexer::listOfTokens::const_iterator token);
-		void								_checkHost(const std::string &token);
+		void								_checkDuplicatePorts();
+
+		void								_setHost(const std::string &token);
 
 						/*-------    Expect    ------*/
 		void								_expectNextToken(Token::tokenType expectedType, std::string errorMsg);

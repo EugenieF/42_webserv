@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/06 14:50:41 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 22:20:55 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ TcpSocket*	Server::_createSocket(int port, const std::string& ipAddress)
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
 	addr.sin_addr.s_addr = inet_addr(ipAddress.c_str());
+	// addr.sin_addr.s_addr = htonl(INADDR_ANY); let automatically select an address ?
 
 	if (bind(newSocket->getFd(), reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0)
 		throw std::runtime_error("bind error");
