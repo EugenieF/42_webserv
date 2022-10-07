@@ -108,7 +108,7 @@ void	Response::_fillHeaders()
 	_headers["Date"] = _getDateHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
-	_headers["Connection"] = "keep-alive"; /* when should we say 'close' ? */
+	_headers["Connection"] = _getConnectionHeader();
 
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
@@ -277,7 +277,7 @@ void	Response::_runPostMethod(std::string& path)
 		/* process cgi */
 	}
 	// if (_matchingBlock->uploadPathDirective()) ??
-	if (_isMultipartContentRequest())
+	if (_isMultipartFormRequest())
 	{
 		_handleMultipartContent(path);
 	}
@@ -392,6 +392,20 @@ std::string		Response::_getDateHeader()
 	return(std::string(date));
 }
 
+std::string		Response::_getConnectionHeader()
+{
+	std::string						connection;
+	listOfHeaders::const_iterator	headerRequest;
+
+	if (!_request)
+		return ("close");
+	connection = "keep-alive";
+	headerRequest = _request->getHeaders().find("connection");
+	if (headerRequest != _request->getHeaders().end())  /* when else should we 'close' the conenction ? */
+		connection = headerRequest->second;
+	return (connection);
+}
+
 bool	Response::_requestIsValid()
 {
 	return (_request && _request->getStatusCode() < 400);
@@ -403,7 +417,7 @@ void	Response::_checkBodyLimit()
 		throw(PAYLOAD_TOO_LARGE);
 }
 
-bool	Response::_isMultipartContentRequest()
+bool	Response::_isMultipartFormRequest()
 {
 	size_t pos;
 
