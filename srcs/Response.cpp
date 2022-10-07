@@ -106,9 +106,9 @@ void	Response::_fillHeaders()
 	_headers["Content-Type"] = _getContentTypeHeader();
 	_headers["Content-Length"] = convertSizeToString(_body.length());
 	_headers["Date"] = _getDateHeader();
+	_headers["Connection"] = _getConnectionHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
-	_headers["Connection"] = _getConnectionHeader();
 
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
@@ -401,8 +401,8 @@ std::string		Response::_getConnectionHeader()
 		return ("close");
 	connection = "keep-alive";
 	headerRequest = _request->getHeaders().find("connection");
-	if (headerRequest != _request->getHeaders().end())  /* when else should we 'close' the conenction ? */
-		connection = headerRequest->second;
+	if (headerRequest != _request->getHeaders().end() && headerRequest->second == "close")
+		connection = "close";
 	return (connection);
 }
 
