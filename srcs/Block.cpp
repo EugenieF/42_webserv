@@ -356,6 +356,8 @@ void	Block::setVirtualHost(blockPtr server)
 	blockPtr	virtualHost;
 
 	virtualHost = new Block(*server);
+	if (!virtualHost)
+		throw (std::runtime_error("memory allocation failed"));
 	_virtualHosts.push_back(virtualHost);
 	delete server;
 }

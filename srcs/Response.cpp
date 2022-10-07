@@ -137,29 +137,6 @@ bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
 	return (false);
 }
 
-bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* path)
-{
-	listOfStrings::const_iterator	currentIndex;
-	DIR*							dir;
-	bool							foundIndexPage;
-
-	foundIndexPage = false;
-	dir = opendir(path->c_str());
-	if (dir) /* error */
-		return false;
-	for (currentIndex = indexes.begin(); currentIndex != indexes.end(); currentIndex++)
-	{
-		if (_foundIndexPage(dir, *currentIndex))
-		{
-			*path += "/" + *currentIndex;
-			foundIndexPage = true;
-			break ;
-		}
-	}
-	closedir(dir);
-	return (foundIndexPage);
-}
-
 void	Response::_readFileContent(const std::string& path)
 {
 	std::ifstream		file;
@@ -380,16 +357,39 @@ std::string		Response::_getConnectionHeader()
 }
 
 /******************************************************************************/
-/*                                  UTILS                                     */
+/*                                  PATH                                      */
 /******************************************************************************/
 
+bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* path)
+{
+	listOfStrings::const_iterator	currentIndex;
+	DIR*							dir;
+	bool							foundIndexPage;
+
+	foundIndexPage = false;
+	dir = opendir(path->c_str());
+	if (dir) /* error */
+		return false;
+	for (currentIndex = indexes.begin(); currentIndex != indexes.end(); currentIndex++)
+	{
+		if (_foundIndexPage(dir, *currentIndex))
+		{
+			*path += "/" + *currentIndex;
+			foundIndexPage = true;
+			break ;
+		}
+	}
+	closedir(dir);
+	return (foundIndexPage);
+}
+
+/* If a request ends with a slash, NGINX treats it as a request for a directory and tries to find an index file in the directory. */
 std::string		Response::_buildPath()
 {
 	std::string		path;
 	std::string		uri;
 
 	uri = _request->getPath();
-	std::cout << RED << "uri: " << uri << " | root: " << _matchingBlock->getRoot() << RESET << std::endl;
 	if (_locationPath != "")
 		uri.erase(0, _locationPath.length());
 	if (_hasUploadPathDirective())
@@ -402,10 +402,14 @@ std::string		Response::_buildPath()
 		path += "/";
 	path += uri;
 	if (path[0] == '/')
-		path.insert(path.begin(), '.');
-	std::cout << BLUE << "buildPath() --> " << path << RESET << std::endl;
+		path.insert(path.begin(), '.'); // Is it necessary ?
+	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
 	return (path);
 }
+
+/******************************************************************************/
+/*                                  UTILS                                     */
+/******************************************************************************/
 
 bool	Response::_hasUploadPathDirective()
 {

@@ -48,7 +48,11 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-        _request = new Request(buffer);
+	{
+		_request = new Request(buffer);
+		if (!_request)
+			throw (std::runtime_error("memory allocation failed"));
+	}
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
@@ -64,6 +68,8 @@ std::string     Client::generateResponse()
     if (_response)
         delete _response;
     _response = new Response(_selectVirtualServer(), _request);
+	if (!_response)
+		throw (std::runtime_error("memory allocation failed"));
     _response->generateResponse();
     return (_response->getResponse());
 }

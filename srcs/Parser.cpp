@@ -97,6 +97,8 @@ void	Parser::_createNewLocation()
 
 	locationPath = _currentToken->getValue();
 	newLocation = new Block;
+	if (!newLocation)
+		throw (std::runtime_error("memory allocation failed"));
 	_updateContext(LOCATION, newLocation);
 	_parseBlock();
 	_directive = "";
@@ -112,6 +114,8 @@ Parser::blockPtr	Parser::_createNewServer()
 	if (_context != NONE)
 		_throwErrorParsing("nested server");
 	newServer = new Block;
+	if (!newServer)
+		throw (std::runtime_error("memory allocation failed"));
 	_updateContext(SERVER, newServer);
 	return (newServer);
 }
