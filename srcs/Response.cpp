@@ -16,17 +16,7 @@ Response::Response(Block *server, Request* request):
 	_initHttpMethods();
 }
 
-Response::Response(const Response &other):
-	_server(other.getServer()),
-	_matchingBlock(other.getMatchingBlock()),
-	_request(other.getRequest()),
-	_response(other.getResponse()),
-	_statusCode(other.getStatusCode()),
-	_method(other.getMethod()),
-	_headers(other.getHeaders()),
-	_body(other.getBody()),
-	_httpMethods(other.getHttpMethods()),
-	_locationPath(other.getLocationPath())
+Response::Response(const Response &other)
 {
 	*this = other;
 }
@@ -96,23 +86,6 @@ void	Response::generateResponse()
 	_response += _body + "\r\n";
 }
 
-std::string		Response::_generateErrorPage()
-{
-	std::string	errorPage;
-
-	errorPage = _matchingBlock->getErrorPage(_statusCode);
-	if (errorPage.empty())
-	{
-		errorPage = "<!DOCTYPE html>\n\
-	  		<html><head>\n\
-	  		<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
-	  		</head>\n\
-	  		<body><p>- Error Page -</p></body>\n\
-	  		</html>\n";
-	}
-	return (errorPage);
-}
-
 /******************************************************************************/
 /*                              FILL RESPONSE                                   */
 /******************************************************************************/
@@ -135,6 +108,8 @@ void	Response::_fillHeaders()
 	_headers["Date"] = _getDateHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
+	_headers["Connection"] = "keep-alive"; /* when should we say 'close' ? */
+
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
 	_response += "\r\n";

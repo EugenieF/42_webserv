@@ -18,10 +18,7 @@ Client::Client(Block* server):
     _response(0)
 {}
 
-Client::Client(Client const& other):
-    _runningServer(other.getRunningServer()),
-    _request(other.getRequest()),
-    _response(other.getResponse())
+Client::Client(Client const& other)
 {
     *this = other;
 }

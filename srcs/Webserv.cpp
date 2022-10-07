@@ -8,7 +8,7 @@ Webserv::Webserv(): _parser() {}
 
 Webserv::Webserv(std::string configFile): _parser(configFile) {}
 
-Webserv::Webserv(const Webserv& other): _parser(other.getParser())
+Webserv::Webserv(const Webserv& other)
 {
 	*this = other;
 }
