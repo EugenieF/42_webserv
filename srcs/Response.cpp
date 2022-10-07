@@ -329,37 +329,8 @@ t_statusCode	Response::_getErrorCodeWithErrno()
 }
 
 /******************************************************************************/
-/*                                  UTILS                                     */
+/*                                 HEADERS                                    */
 /******************************************************************************/
-
-std::string		Response::_buildPath()
-{
-	std::string		path;
-	std::string		uri;
-
-	uri = _request->getPath();
-	std::cout << RED << "uri: " << uri << " | root: " << _matchingBlock->getRoot() << RESET << std::endl;
-	if (_locationPath != "")
-		uri.erase(0, _locationPath.length());
-	if (_hasUploadPathDirective())
-		path = _matchingBlock->getUploadPath();
-	else
-		path = _matchingBlock->getRoot(); 
-	if (*(path.rbegin()) == '/' && *(uri.begin()) == '/')
-		path.erase(path.length() - 1);
-	else if (*(path.rbegin()) != '/' && *(uri.begin()) != '/')
-		path += "/";
-	path += uri;
-	if (path[0] == '/')
-		path.insert(path.begin(), '.');
-	std::cout << BLUE << "buildPath() --> " << path << RESET << std::endl;
-	return (path);
-}
-
-bool	Response::_hasUploadPathDirective()
-{
-	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
-}
 
 std::string		Response::_getContentTypeHeader()
 {
@@ -392,6 +363,8 @@ std::string		Response::_getDateHeader()
 	return(std::string(date));
 }
 
+/* The keep-alive directive indicates that the client wants the HTTP Connection to persist and remain
+open after the current transaction is complete. This is the default setting for HTTP/1.1 requests. */
 std::string		Response::_getConnectionHeader()
 {
 	std::string						connection;
@@ -404,6 +377,39 @@ std::string		Response::_getConnectionHeader()
 	if (headerRequest != _request->getHeaders().end())  /* when else should we 'close' the conenction ? */
 		connection = headerRequest->second;
 	return (connection);
+}
+
+/******************************************************************************/
+/*                                  UTILS                                     */
+/******************************************************************************/
+
+std::string		Response::_buildPath()
+{
+	std::string		path;
+	std::string		uri;
+
+	uri = _request->getPath();
+	std::cout << RED << "uri: " << uri << " | root: " << _matchingBlock->getRoot() << RESET << std::endl;
+	if (_locationPath != "")
+		uri.erase(0, _locationPath.length());
+	if (_hasUploadPathDirective())
+		path = _matchingBlock->getUploadPath();
+	else
+		path = _matchingBlock->getRoot(); 
+	if (*(path.rbegin()) == '/' && *(uri.begin()) == '/')
+		path.erase(path.length() - 1);
+	else if (*(path.rbegin()) != '/' && *(uri.begin()) != '/')
+		path += "/";
+	path += uri;
+	if (path[0] == '/')
+		path.insert(path.begin(), '.');
+	std::cout << BLUE << "buildPath() --> " << path << RESET << std::endl;
+	return (path);
+}
+
+bool	Response::_hasUploadPathDirective()
+{
+	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
 }
 
 bool	Response::_requestIsValid()
