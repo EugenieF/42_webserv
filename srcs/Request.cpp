@@ -47,7 +47,20 @@ Request::Request(const std::string& buffer):
 	_initParsingFunct();
 }
 
-Request::Request(const Request &other)
+Request::Request(const Request &other):
+	_request(other.getRequest()),
+	_requestStatus(other.getRequestStatus()),
+	_statusCode(other.getStatusCode()),
+	_method(other.getMethod()),
+	_path(other.getPath()),
+	_httpProtocol(other.getHttpProtocol()),
+	_headers(other.getHeaders()),
+	_bodySize(other.getBodySize()),
+	_body(other.getBody()),
+	_parsingFunct(other.getParsingFunct()),
+	_chunkedTransfer(other.getChunkedTransfer()),
+	_host(other.getHost()),
+	_port(other.getPort())
 {
 	*this = other;
 }
@@ -97,7 +110,6 @@ t_requestStatus	Request::parseRequest()
 	
 void	Request::completeRequest(const std::string& buffer)
 {
-	std::cout << GREEN << "COMPLETE REQUEST" << RESET << std::endl;
 	_request += buffer;
 }
 
@@ -152,8 +164,7 @@ void	Request::_parseHeaders()
 		_getNextWord(headerValue, "\r\n");
 		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
 		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
-			return (_requestIsInvalid(BAD_REQUEST));
-			// return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
+			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		_headers[headerName] = headerValue;
 	}
 	_getNextWord(headerName, "\r\n");

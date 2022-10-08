@@ -25,7 +25,25 @@ Block::Block():
 		setPort(80);
 }
 
-Block::Block(const Block& other)
+Block::Block(const Block& other):
+	_context(other.getContext()),
+	_serverNames(other.getServerNames()),
+	_port(other.getPort()),
+	_host(other.getHost()),
+	_virtualHosts(other.getVirtualHosts()),
+	_root(other.getRoot()),
+	_indexes(other.getIndexes()),
+	_autoindex(other.getAutoindex()),
+	_clientBodyLimit(other.getClientBodyLimit()),
+	_cgiExt(other.getCgiExt()),
+	_cgiPath(other.getCgiPath()),
+	_errorPages(other.getErrorPages()),
+	_redirectCode(other.getRedirectCode()),
+	_redirectUri(other.getRedirectUri()),
+	_locations(other.getLocations()),
+	_currentLocation(other.getCurrentLocation()),
+	_methods(other.getMethods()),
+	_uploadPath(other.getUploadPath())
 {
 	*this = other;
 }
@@ -356,8 +374,6 @@ void	Block::setVirtualHost(blockPtr server)
 	blockPtr	virtualHost;
 
 	virtualHost = new Block(*server);
-	if (!virtualHost)
-		throw (std::runtime_error("memory allocation failed"));
 	_virtualHosts.push_back(virtualHost);
 	delete server;
 }

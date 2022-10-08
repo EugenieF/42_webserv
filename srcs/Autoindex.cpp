@@ -14,7 +14,9 @@ Autoindex::Autoindex(const std::string& path):
     _generateIndexPage();
 }
 
-Autoindex::Autoindex(const Autoindex& other)
+Autoindex::Autoindex(const Autoindex& other):
+    _directoryPath(other.getDirectoryPath()),
+    _indexPage(other.getIndexPage())
 {
     *this = other;
 }

@@ -14,7 +14,10 @@ Token::Token(tokenType type, tokenValue value, unsigned int line):
 	_value(value),
 	_line(line)	{}
 
-Token::Token(Token const &other)
+Token::Token(Token const &other):
+	_type(other.getType()),
+	_value(other.getValue()),
+	_line(other.getLineNbr())
 {
 	*this = other;
 }
