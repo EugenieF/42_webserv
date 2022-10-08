@@ -180,15 +180,17 @@ void	Parser::_parseListenRule()
 			if (_reachedEndOfDirective())
 				break;	
 			_expectNextToken(COLON, _invalidParameterMsg());
-			// __attribute__ ((fallthrough));
+			/* fall through */
 		case COLON:
 			_expectNextToken(NUMBER, _invalidPortMsg());
+			/* fall through */
 		case NUMBER:
 			port = atoi(_currentToken->getValue().c_str());
 			_currentBlock->setPort(port);
 			break;
 		case SEMICOLON:
 			_throwErrorParsing(_invalidNbOfArgumentsMsg());
+			/* fall through */
 		default:
 			_throwErrorParsing(_invalidValueMsg(_currentToken + 1));
 			break;	
