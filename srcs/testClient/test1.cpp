@@ -19,7 +19,7 @@ int main()
     // char hello[] = "1F\r\net voici deux derniers morceaux\r\n0\r\n\r\n";
     // char hello[] = "POST /www/test/page HTTP/1.1\r\nhost:    www.yoursite.com  \r\nContent-Length: 8\r\nContent-TYPE: application/json \r\n\r\nRESPONSE\r\n\r\n";
     // char hello[] = "POST /www/test HTTP/1.1\r\nHOST: exemple.com:8080	\r\nContent-length: 17\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
-    char hello[] = "GET /test/infos.txt HTTP/1.1\r\nHOST: www/ \r\nContent-length: 0\r\nContent-TYPE: text/plain \r\n\r\n";
+    char hello[] = "GET /test/infos.txt HTTP/1.1\r\nHOST: www/ \r\nContent-length: 0\r\nContent-TYPE: text/plain \r\n\r\nHello World!\r\n\r\n";
     char buffer[1024] = {0};
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
