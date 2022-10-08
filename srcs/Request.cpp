@@ -151,7 +151,8 @@ void	Request::_parseHeaders()
 		_getNextWord(headerValue, "\r\n");
 		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
 		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
-			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
+			return (_requestIsInvalid(BAD_REQUEST));
+			// return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		_headers[headerName] = headerValue;
 	}
 	_getNextWord(headerName, "\r\n");

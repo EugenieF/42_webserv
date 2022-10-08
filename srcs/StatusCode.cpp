@@ -20,8 +20,6 @@ void	StatusCode::_initStatusCodesMap()
 /* Informational response */	
 	_statusCodes[CONTINUE] = "Continue";
 	_statusCodes[SWITCHING_PROTOCOLS] = "Switching Protocols";
-	_statusCodes[PROCESSING] = "Processing";
-	_statusCodes[EARLY_HINTS] = "Early Hints";
 /* Success */
 	_statusCodes[OK] = "OK";
 	_statusCodes[CREATED] = "Created";
@@ -30,9 +28,6 @@ void	StatusCode::_initStatusCodesMap()
 	_statusCodes[NO_CONTENT] = "No Content";
 	_statusCodes[RESET_CONTENT] = "Reset Content";
 	_statusCodes[PARTIAL_CONTENT] = "Partial Content";
-	_statusCodes[MULTI_STATUS] = "Multi-Status";
-	_statusCodes[ALREADY_REPORTED] = "Already Reported";
-	_statusCodes[IM_USED] = "IM Used";
 /* Redirection */
 	_statusCodes[MULTIPLE_CHOICES] = "Multiple Choices";
 	_statusCodes[MOVED_PERMANENTLY] = "Moved Permanently";
@@ -40,9 +35,7 @@ void	StatusCode::_initStatusCodesMap()
 	_statusCodes[SEE_OTHER] = "See Other";
 	_statusCodes[NOT_MODIFIED] = "Not Modified";
 	_statusCodes[USE_PROXY] = "Use Proxy";
-	_statusCodes[SWITCH_PROXY] = "Switch Proxy";
 	_statusCodes[TEMPORARY_REDIRECT] = "Temporary Redirect";
-	_statusCodes[PERMANENT_REDIRECT] = "Permanent Redirect";
 /* Client errors */
 	_statusCodes[BAD_REQUEST] = "Bad Request";
 	_statusCodes[UNAUTHORIZED] = "Unauthorized";
@@ -62,17 +55,7 @@ void	StatusCode::_initStatusCodesMap()
 	_statusCodes[UNSUPPORTED_MEDIA_TYPE] = "Unsupported Media Type";
 	_statusCodes[RANGE_NOT_SATISFIABLE] = "Range Not Satisfiable";
 	_statusCodes[EXPECTATION_FAILED] = "Expectation Failed";
-	_statusCodes[IM_A_TEAPOT] = "I'm a teapot";
-	_statusCodes[MISDIRECTED_REQUEST] = "Misdirected Request";
-	_statusCodes[UNPROCESSABLE_ENTITY] = "Unprocessable Entity";
-	_statusCodes[LOCKED] = "Locked";
-	_statusCodes[FAILED_DEPENDENCY] = "Failed Dependency";
-	_statusCodes[TOO_EARLY] = "Too Early";
 	_statusCodes[UPGRADE_REQUIRED] = "Upgrade Required";
-	_statusCodes[PRECONDITION_REQUIRED] = "Precondition Required";
-	_statusCodes[TOO_MANY_REQUESTS] = "Too Many Requests";
-	_statusCodes[REQUEST_HEADER_FIELDS_TOO_LARGE] = "Request Header Fields Too Large";
-	_statusCodes[UNAVAILABLE_FOR_LEGAL_REASONS] = "Unavailable For Legal Reasons";
 /* Server errors */
 	_statusCodes[INTERNAL_SERVER_ERROR] = "Internal Server Error";
 	_statusCodes[NOT_IMPLEMENTED] = "Not Implemented";
@@ -80,9 +63,4 @@ void	StatusCode::_initStatusCodesMap()
 	_statusCodes[SERVICE_UNAVAILABLE] = "Service Unavailable";
 	_statusCodes[GATEWAY_TIMEOUT] = "Gateway Timeout";
 	_statusCodes[HTTP_VERSION_NOT_SUPPORTED] = "HTTP Version Not Supported";
-	_statusCodes[VARIANT_ALSO_NEGOTIATES] = "Variant Also Negotiates";
-	_statusCodes[INSUFFICIENT_STORAGE] = "Insufficient Storage";
-	_statusCodes[LOOP_DETECTED] = "Loop Detected";
-	_statusCodes[NOT_EXTENDED] = "Not Extended";
-	_statusCodes[NETWORK_AUTHENTICATION_REQUIRED] = "Network Authentication Required";
 }

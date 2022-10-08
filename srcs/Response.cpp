@@ -52,17 +52,13 @@ void	Response::_processMethod()
 
 	// /* Check method validity */
 	if (!_matchingBlock->isAllowedMethod(_method))
-	{
 		throw(METHOD_NOT_ALLOWED);
-	}
 	path = _buildPath();
 	if (path.empty())
 		throw(NOT_FOUND);
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
-	{
-		throw(METHOD_NOT_ALLOWED);
-	}
+			throw(METHOD_NOT_ALLOWED);
 	(this->*ite->second)(path);
 }
 
@@ -90,23 +86,6 @@ void	Response::generateResponse()
 	_response += _body + "\r\n";
 }
 
-std::string		Response::_generateErrorPage()
-{
-	std::string	errorPage;
-
-	errorPage = _matchingBlock->getErrorPage(_statusCode);
-	if (errorPage.empty())
-	{
-		errorPage = "<!DOCTYPE html>\n\
-	  		<html><head>\n\
-	  		<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
-	  		</head>\n\
-	  		<body><p>- Error Page -</p></body>\n\
-	  		</html>\n";
-	}
-	return (errorPage);
-}
-
 /******************************************************************************/
 /*                              FILL RESPONSE                                   */
 /******************************************************************************/
@@ -127,8 +106,10 @@ void	Response::_fillHeaders()
 	_headers["Content-Type"] = _getContentTypeHeader();
 	_headers["Content-Length"] = convertSizeToString(_body.length());
 	_headers["Date"] = _getDateHeader();
+	_headers["Connection"] = _getConnectionHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
+
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
 	_response += "\r\n";
@@ -154,29 +135,6 @@ bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
 			return (true);
 	}
 	return (false);
-}
-
-bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* path)
-{
-	listOfStrings::const_iterator	currentIndex;
-	DIR*							dir;
-	bool							foundIndexPage;
-
-	foundIndexPage = false;
-	dir = opendir(path->c_str());
-	if (dir) /* error */
-		return false;
-	for (currentIndex = indexes.begin(); currentIndex != indexes.end(); currentIndex++)
-	{
-		if (_foundIndexPage(dir, *currentIndex))
-		{
-			*path += "/" + *currentIndex;
-			foundIndexPage = true;
-			break ;
-		}
-	}
-	closedir(dir);
-	return (foundIndexPage);
 }
 
 void	Response::_readFileContent(const std::string& path)
@@ -237,6 +195,24 @@ void	Response::_runGetMethod(std::string& path)
 /*                               POST METHOD                                  */
 /******************************************************************************/
 
+void	Response::_handleMultipartContent(std::string& path)
+{
+	(void)path;
+	std::string	boundary;
+	std::string	content;
+	std::string	contentDisposition;
+	size_t		pos;
+
+	pos = _request->getHeader("content-type").find("boundary=");
+	if (pos != std::string::npos)
+		boundary = _request->getHeader("content-type").substr(pos);
+	content = _request->getBody();
+	while (content.find(boundary + "\r\n") != std::string::npos)
+	{
+		content.erase(content.find(boundary), content.find("\r\n"));
+	}
+}
+
 void	Response::_writeFileContent(const std::string& path)
 {
 	std::ofstream	file;
@@ -270,16 +246,18 @@ void	Response::_handleCgi()
 /* Perform resource-specific processing on the request payload. */
 void	Response::_runPostMethod(std::string& path)
 {
-	std::ofstream	ofs;
+	std::ofstream							ofs;
 
-	(void)path;
 	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
 	if (_matchingBlock->cgiDirective())
 	{
 		/* process cgi */
 	}
 	// if (_matchingBlock->uploadPathDirective()) ??
-	_request->getHeader("content-type");
+	if (_isMultipartFormRequest())
+	{
+		_handleMultipartContent(path);
+	}
 	_writeFileContent(path);
 }
 
@@ -328,37 +306,8 @@ t_statusCode	Response::_getErrorCodeWithErrno()
 }
 
 /******************************************************************************/
-/*                                  UTILS                                     */
+/*                                 HEADERS                                    */
 /******************************************************************************/
-
-std::string		Response::_buildPath()
-{
-	std::string		path;
-	std::string		uri;
-
-	uri = _request->getPath();
-	std::cout << RED << "uri: " << uri << " | root: " << _matchingBlock->getRoot() << RESET << std::endl;
-	if (_locationPath != "")
-		uri.erase(0, _locationPath.length());
-	if (_hasUploadPathDirective())
-		path = _matchingBlock->getUploadPath();
-	else
-		path = _matchingBlock->getRoot(); 
-	if (*(path.rbegin()) == '/' && *(uri.begin()) == '/')
-		path.erase(path.length() - 1);
-	else if (*(path.rbegin()) != '/' && *(uri.begin()) != '/')
-		path += "/";
-	path += uri;
-	if (path[0] == '/')
-		path.insert(path.begin(), '.');
-	std::cout << BLUE << "buildPath() --> " << path << RESET << std::endl;
-	return (path);
-}
-
-bool	Response::_hasUploadPathDirective()
-{
-	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
-}
 
 std::string		Response::_getContentTypeHeader()
 {
@@ -391,6 +340,82 @@ std::string		Response::_getDateHeader()
 	return(std::string(date));
 }
 
+/* The keep-alive directive indicates that the client wants the HTTP Connection to persist and remain
+open after the current transaction is complete. This is the default setting for HTTP/1.1 requests. */
+std::string		Response::_getConnectionHeader()
+{
+	std::string						connection;
+	listOfHeaders::const_iterator	headerRequest;
+
+	if (!_request)
+		return ("close");
+	connection = "keep-alive";
+	headerRequest = _request->getHeaders().find("connection");
+	if (headerRequest != _request->getHeaders().end() && headerRequest->second == "close")
+		connection = "close";
+	return (connection);
+}
+
+/******************************************************************************/
+/*                                  PATH                                      */
+/******************************************************************************/
+
+bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* path)
+{
+	listOfStrings::const_iterator	currentIndex;
+	DIR*							dir;
+	bool							foundIndexPage;
+
+	foundIndexPage = false;
+	dir = opendir(path->c_str());
+	if (dir) /* error */
+		return false;
+	for (currentIndex = indexes.begin(); currentIndex != indexes.end(); currentIndex++)
+	{
+		if (_foundIndexPage(dir, *currentIndex))
+		{
+			*path += "/" + *currentIndex;
+			foundIndexPage = true;
+			break ;
+		}
+	}
+	closedir(dir);
+	return (foundIndexPage);
+}
+
+/* If a request ends with a slash, NGINX treats it as a request for a directory and tries to find an index file in the directory. */
+std::string		Response::_buildPath()
+{
+	std::string		path;
+	std::string		uri;
+
+	uri = _request->getPath();
+	if (_locationPath != "")
+		uri.erase(0, _locationPath.length());
+	if (_hasUploadPathDirective())
+		path = _matchingBlock->getUploadPath();
+	else
+		path = _matchingBlock->getRoot(); 
+	if (*(path.rbegin()) == '/' && *(uri.begin()) == '/')
+		path.erase(path.length() - 1);
+	else if (*(path.rbegin()) != '/' && *(uri.begin()) != '/')
+		path += "/";
+	path += uri;
+	if (path[0] == '/')
+		path.insert(path.begin(), '.'); // Is it necessary ?
+	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
+	return (path);
+}
+
+/******************************************************************************/
+/*                                  UTILS                                     */
+/******************************************************************************/
+
+bool	Response::_hasUploadPathDirective()
+{
+	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
+}
+
 bool	Response::_requestIsValid()
 {
 	return (_request && _request->getStatusCode() < 400);
@@ -400,6 +425,14 @@ void	Response::_checkBodyLimit()
 {
 	if (_request->getBodySize() >= _matchingBlock->getClientBodyLimit())
 		throw(PAYLOAD_TOO_LARGE);
+}
+
+bool	Response::_isMultipartFormRequest()
+{
+	size_t pos;
+
+	pos = _request->getHeader("content-type").find("multipart/form-data");
+	return (pos != std::string::npos);
 }
 
 /******************************************************************************/

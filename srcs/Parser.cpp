@@ -146,6 +146,25 @@ void	Parser::parseTokens()
 		_updateContext(NONE, NULL);
 	}
 	_configureVirtualHosts();
+	_checkDuplicatePorts();
+}
+
+void	Parser::_checkDuplicatePorts()
+{
+	listOfServers::iterator		currentServer;
+	listOfServers::iterator		nextServer;
+
+	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
+	{
+		for (nextServer = currentServer + 1; nextServer != _servers.end(); nextServer++)
+		{
+			if ((*currentServer)->getPort() == (*nextServer)->getPort())
+			{
+				// std::cout << RED << "[**** DUPLICATE PORT ****]" << RESET << std::endl;
+				_throwErrorParsing(_duplicatePortMsg((*currentServer)->getPort()));
+			}
+		}
+	}	
 }
 
 /******************************************************************************/
@@ -175,8 +194,7 @@ void	Parser::_parseListenRule()
 	switch (_currentToken->getType())
 	{
 		case VALUE:
-			_checkHost(_currentToken->getValue());
-			_currentBlock->setHost(_currentToken->getValue());
+			_setHost(_currentToken->getValue());
 			if (_reachedEndOfDirective())
 				break;	
 			_expectNextToken(COLON, _invalidParameterMsg());
@@ -186,7 +204,7 @@ void	Parser::_parseListenRule()
 			/* fall through */
 		case NUMBER:
 			port = atoi(_currentToken->getValue().c_str());
-			_currentBlock->setPort(port);
+			_currentBlock->setPort(port); // Need to check port number --> 0 < port <= 65535
 			break;
 		case SEMICOLON:
 			_throwErrorParsing(_invalidNbOfArgumentsMsg());
@@ -363,14 +381,16 @@ void	Parser::_checkEndOfFile(Lexer::listOfTokens::const_iterator token)
 		_throwErrorParsing(_unexpectedValueMsg(token));
 }
 
-void	Parser::_checkHost(const std::string &token)
+void	Parser::_setHost(const std::string &token)
 {
 	size_t		found;
 	size_t		pos;
 
 	pos = 0;
 	if (token == "localhost")
-		return ;
+		return (_currentBlock->setHost("127.0.0.1"));
+	if (token == "*")
+		return (_currentBlock->setHost("0.0.0.0"));
 	for (int i = 0; i < 4; i++)
 	{
 		found = token.find_first_not_of("0123456789", pos);
@@ -380,6 +400,7 @@ void	Parser::_checkHost(const std::string &token)
 			_throwErrorParsing("host not found in '" + token + "' of the 'listen' directive");
 		pos = found + 1;
 	}
+	_currentBlock->setHost(_currentToken->getValue());
 }
 
 /******************************************************************************/
@@ -656,6 +677,11 @@ std::string	Parser::_invalidPathMsg()
 	if ((_currentToken) != _lexer.getTokens().end())
 		incorrectValue = (_currentToken)->getValue();
 	return ("invalid path '" + incorrectValue + "'");
+}
+
+std::string	Parser::_duplicatePortMsg(int port)
+{
+	return ("duplicate port '" + convertNbToString(port) + "'");
 }
 
 void	Parser::_throwErrorParsing(std::string errorMsg)

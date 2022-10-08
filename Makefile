@@ -19,7 +19,8 @@ SRCS			= main.cpp \
 				StatusCode.cpp \
 				MimeType.cpp \
 				HttpMethod.cpp \
-				Autoindex.cpp 
+				Autoindex.cpp \
+				generateErrorPage.cpp
 
 OBJS_DIR		= ./objs
 
