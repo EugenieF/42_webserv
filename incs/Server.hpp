@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/08 15:58:38 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/06 14:50:32 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,40 +24,44 @@
 # include <sys/socket.h>
 
 # include "Block.hpp"
-# include "TcpSocket.hpp"
+# include "EpollInstance.hpp"
 # include "Parser.hpp"
 # include "utils.hpp"
 
 class Server {
 	public:
 		typedef Parser::listOfServers			listOfServers;
+		typedef EpollInstance::listOfSockets	listOfSockets;
 
-		Server(Block* x);
+		Server(listOfServers servers, char* const* env);
 		virtual ~Server();
 
-		/* -- Getter ------------------------------------------------------- */
-		int								getPort() const;
-		const std::string&				getHost() const;
-		int								getSocket() const;
-		const struct sockaddr_in&		getAddr() const;
+		/* -- Server management -------------------------------------------- */
+		void							launchServer();
 
-		/* -- Boolean operator --------------------------------------------- */
-		bool							operator==(int fd) const;
-		bool							operator!=(int fd) const;
-		bool							operator==(const Server& rhs) const;
-		bool							operator!=(const Server& rhs) const;
-		bool							operator<(const Server& rhs) const;
-		bool							operator>(const Server& rhs) const;
-		bool							operator<=(const Server& rhs) const;
-		bool							operator>=(const Server& rhs) const;
+		/* -- Getter ------------------------------------------------------- */
+		// int								getPort() const;
+		// const std::string&				getHost() const;
+		int								getEpoll() const;
+		// int								getSocket() const;
+		// const struct sockaddr_in&		getAddr() const;
+
 
 	private:
 		/* -- Debug -------------------------------------------------------- */
-		void							_displayServer() const;
+		void							_displayServer(Block *server) const;
 
-		TcpSocket						_socket;
-		struct sockaddr_in				_addr;
+		void							_createSocketList();	
+		TcpSocket*						_createSocket(int port, const std::string& ipAddress);
+		void							_clear();
+
+		// TcpSocket						_socket;
+		listOfSockets					_socketList;
+		EpollInstance					_epoll;
+		// struct sockaddr_in				_addr;
 		std::string						_ip;
+		char* const*					_env;
+		listOfServers					_servers;
 };
 
 #endif

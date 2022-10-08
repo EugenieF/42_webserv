@@ -13,7 +13,6 @@ class Client
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
-		int						_sockfd;
 		Block*					_runningServer;
         Request*            	_request;
         Response*           	_response;
@@ -23,7 +22,7 @@ class Client
 
 						/*-------    Main    ------*/
         Client();
-        Client(Block* server, int sockfd);
+        Client(Block* server);
         Client(Client const& other);
         ~Client();
         Client&             	operator=(const Client& other);
@@ -38,7 +37,6 @@ class Client
         Block*      			getRunningServer() const;
         Request*            	getRequest() const;
         Response*           	getResponse() const;
-		int						getFd() const;
 
 						/*-------    Utils   ------*/
 		void			    	clear();

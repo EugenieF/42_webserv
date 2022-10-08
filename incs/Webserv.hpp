@@ -11,7 +11,6 @@
 
 # include "Parser.hpp"
 # include "Server.hpp"
-# include "EpollInstance.hpp"
 # include "utils.hpp"
 
 # define NL '\n'
@@ -34,43 +33,30 @@ typedef enum e_define
 
 class Webserv
 {
-	private: 
-		typedef	std::map<Server*, Block*>			serverMap;
-		//typedef	std::pair<Server, Block*>			serverMapNode;
-		typedef	serverMap::iterator					it;
-		typedef	Parser::listOfServers				listOfServers;
-
+	private:
 	/**********************     MEMBER VARIABLES     ********************/
 		Parser							_parser;
-		char* const*					_env;
-		serverMap						_servers;
-		EpollInstance					_epoll;
 
 	public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------    Main    ------*/
-		Webserv(std::string configFile, char* const* env);
+		Webserv();
+		Webserv(std::string configFile);
 		Webserv(const Webserv& other);
 		~Webserv();
 		Webserv&						operator=(const Webserv& other);
 
+						/*-------   Parser   ------*/
+		void							parse(std::string configFile);
+
 						/*-------   Getter   ------*/
-		Parser							getParser() const;
-		serverMap						getServers() const;
-		EpollInstance					getEpoll() const;
-		char* const*					getEnv() const;
-		listOfServers					getConfigServers();
+		Parser::listOfServers			getServers();
 		int								getNbOfServers();
+		Parser							getParser() const;
 
 						/*-------   Display   ------*/
 		void							displayServers();
-	
-	private:
-	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
-
-						/*-------    Setup   ------*/
-		void							_setupServerMap(listOfServers configServers);
 };
 
 #endif

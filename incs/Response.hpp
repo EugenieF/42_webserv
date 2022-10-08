@@ -92,6 +92,7 @@ class   Response
 		void							_writeFileContent(const std::string& path);
 		void							_handleUploadFile();
 		void							_handleCgi();
+		void							_handleMultipartContent(std::string& path);
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod(std::string& path);
@@ -109,13 +110,17 @@ class   Response
 		void							_throwErrorMsg(const std::string& message);
 		t_statusCode					_getErrorCodeWithErrno();
 
+						/*-------  Headers   ------*/
+		std::string						_getDateHeader();
+		std::string						_getContentTypeHeader();
+		std::string						_getConnectionHeader();
+
 						/*-------   Utils    ------*/
 		std::string						_buildPath();
 		bool							_hasUploadPathDirective();
-		std::string						_getDateHeader();
-		std::string						_getContentTypeHeader();
 		bool							_requestIsValid();
 		void							_checkBodyLimit();
+		bool							_isMultipartFormRequest();
 
 
 };

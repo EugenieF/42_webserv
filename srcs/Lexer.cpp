@@ -17,7 +17,10 @@ Lexer::Lexer(std::string configFile): _lineCount(1)
 	openFile(configFile);
 }
 
-Lexer::Lexer(const Lexer& other)
+Lexer::Lexer(const Lexer& other):
+	_tokens(other.getTokens()),
+	_tokenTypes(other.getTokenTypes()),
+	_lineCount(other.getLineCount())
 {
 	*this = other;
 }

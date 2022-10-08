@@ -97,6 +97,7 @@ t_requestStatus	Request::parseRequest()
 	
 void	Request::completeRequest(const std::string& buffer)
 {
+	std::cout << GREEN << "COMPLETE REQUEST" << RESET << std::endl;
 	_request += buffer;
 }
 
@@ -119,7 +120,7 @@ void	Request::_parsePath()
 		return (_requestIsInvalid(BAD_REQUEST));
 	if (path.length() > 2048)
 		return (_requestIsInvalid(URI_TOO_LONG));
-	/*  we need to handle query "?" in URI  */
+	/*  Handle query "?" in URI  */
 	_path = path;
 }
 
@@ -151,7 +152,8 @@ void	Request::_parseHeaders()
 		_getNextWord(headerValue, "\r\n");
 		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
 		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
-			return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
+			return (_requestIsInvalid(BAD_REQUEST));
+			// return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		_headers[headerName] = headerValue;
 	}
 	_getNextWord(headerName, "\r\n");
