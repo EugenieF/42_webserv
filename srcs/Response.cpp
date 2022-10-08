@@ -63,7 +63,6 @@ void	Response::_processMethod()
 	// /* Check method validity */
 	if (!_matchingBlock->isAllowedMethod(_method))
 	{
-		// std::cout << RED << "NOT ALLOWED" << RESET << std::endl;
 		throw(METHOD_NOT_ALLOWED);
 	}
 	path = _buildPath();
