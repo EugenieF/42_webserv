@@ -28,15 +28,7 @@ Parser::Parser(std::string configFile):
 	DEBUG("Parsing done");
 }
 
-Parser::Parser(const Parser& other):
-	_configFile(other.getConfigFile()),
-	_lexer(other.getLexer()),
-	_currentToken(other.getCurrentToken()),
-	_currentServer(other.getCurrentServer()),
-	_currentBlock(other.getCurrentBlock()),
-	_parsingFunct(other.getParsingFunct()),
-	_context(other.getContext()),
-	_directive(other.getDirective())
+Parser::Parser(const Parser& other)
 {
 	*this = other;
 }
@@ -53,6 +45,7 @@ Parser&		Parser::operator=(const Parser& other)
 		_configFile = other.getConfigFile();
 		_lexer = other.getLexer();
 		_currentToken = other.getCurrentToken();
+		_servers = other.getServers();
 		_currentServer = other.getCurrentServer();
 		_currentBlock = other.getCurrentBlock();
 		_parsingFunct = other.getParsingFunct();

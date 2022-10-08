@@ -47,20 +47,7 @@ Request::Request(const std::string& buffer):
 	_initParsingFunct();
 }
 
-Request::Request(const Request &other):
-	_request(other.getRequest()),
-	_requestStatus(other.getRequestStatus()),
-	_statusCode(other.getStatusCode()),
-	_method(other.getMethod()),
-	_path(other.getPath()),
-	_httpProtocol(other.getHttpProtocol()),
-	_headers(other.getHeaders()),
-	_bodySize(other.getBodySize()),
-	_body(other.getBody()),
-	_parsingFunct(other.getParsingFunct()),
-	_chunkedTransfer(other.getChunkedTransfer()),
-	_host(other.getHost()),
-	_port(other.getPort())
+Request::Request(const Request &other)
 {
 	*this = other;
 }

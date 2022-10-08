@@ -19,11 +19,7 @@ Client::Client(Block* server, int sockfd):
     _response(0)
 {}
 
-Client::Client(Client const& other):
-	_sockfd(other.getFd()),
-    _runningServer(other.getRunningServer()),
-    _request(other.getRequest()),
-    _response(other.getResponse())
+Client::Client(Client const& other)
 {
     *this = other;
 }

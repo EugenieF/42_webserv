@@ -16,17 +16,7 @@ Response::Response(Block *server, Request* request):
 	_initHttpMethods();
 }
 
-Response::Response(const Response &other):
-	_server(other.getServer()),
-	_matchingBlock(other.getMatchingBlock()),
-	_request(other.getRequest()),
-	_response(other.getResponse()),
-	_statusCode(other.getStatusCode()),
-	_method(other.getMethod()),
-	_headers(other.getHeaders()),
-	_body(other.getBody()),
-	_httpMethods(other.getHttpMethods()),
-	_locationPath(other.getLocationPath())
+Response::Response(const Response &other)
 {
 	*this = other;
 }
