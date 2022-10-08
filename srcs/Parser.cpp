@@ -180,6 +180,7 @@ void	Parser::_parseListenRule()
 			if (_reachedEndOfDirective())
 				break;	
 			_expectNextToken(COLON, _invalidParameterMsg());
+			// __attribute__ ((fallthrough));
 		case COLON:
 			_expectNextToken(NUMBER, _invalidPortMsg());
 		case NUMBER:

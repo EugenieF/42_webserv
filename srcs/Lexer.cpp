@@ -31,7 +31,6 @@ Lexer&	Lexer::operator=(const Lexer& other)
 {
 	if (this != &other)
 	{
-		_file = other.getFile();
 		_tokens = other.getTokens();
 		_tokenTypes = other.getTokenTypes();
 		_lineCount = other.getLineCount();

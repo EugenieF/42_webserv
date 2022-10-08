@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/08 15:41:19 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/08 16:45:15 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,6 +190,7 @@ void EpollInstance::_handleRequest(Client& client) {
 	while (count)
 	{
 		if (count < 0 /* && errno != EAGAIN */) {
+			_eraseClient(&client);
 			throw std::runtime_error("handleRequest (read) error");
 		}
 		str += buf;
@@ -201,11 +202,7 @@ void EpollInstance::_handleRequest(Client& client) {
 		}
 	}
 	requestStatus = client.parseRequest(str);
-
-	if (requestStatus == INVALID_REQUEST) {
-		// To verify: Erase client OR send error page
-		_eraseClient(&client);
-	} else if (requestStatus == COMPLETE_REQUEST) {
+	if (requestStatus == COMPLETE_REQUEST) {
 		_editSocket(client.getFd(), EPOLLOUT);
 	}
 }
