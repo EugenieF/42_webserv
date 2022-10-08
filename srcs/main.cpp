@@ -6,11 +6,12 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 15:30:51 by etran             #+#    #+#             */
-/*   Updated: 2022/10/04 16:53:37 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/08 15:37:17 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Webserv.hpp"
+# include "debug.hpp"
 
 int main(int argc, char **argv, char* const* env)
 {
@@ -18,19 +19,21 @@ int main(int argc, char **argv, char* const* env)
 
 	if (argc != 2)
 	{
+		DEBUG("no File");
 		std::cerr << "usage : ./webserv [a configuration file]" << std::endl;
 		if (argc > 2)
 			return (EXIT_FAILURE);
 		std::cout << "Using default configuration file" << std::endl;
 	}
-	else
-		std::string configFile(argv[1]);
+	else {
+		DEBUG("File");
+		configFile = argv[1];
+	}
+		//std::string configFile(argv[1]);
 	try
 	{
-		Webserv	webserv(configFile);
 		setupSignal(INIT_SIGNAL);
-		Server	serv(webserv.getServers(), env);
-		serv.launchServer();
+		Webserv	webserv(configFile, env);
 		// webserv.displayServers();
 	}
 	catch(const std::exception& e)

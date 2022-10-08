@@ -12,7 +12,8 @@ are done in a non-blocking manner. */
 
 Client::Client() {}
 
-Client::Client(Block* server):
+Client::Client(Block* server, int sockfd):
+	_sockfd(sockfd),
     _runningServer(server),
     _request(0),
     _response(0)
@@ -32,6 +33,7 @@ Client&     Client::operator=(const Client& other)
 {
     if (this != &other)
     {
+		_sockfd = other.getFd();
         _runningServer = other.getRunningServer();
         _request = other.getRequest();
         _response = other.getResponse();
@@ -48,11 +50,7 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-	{
-		_request = new Request(buffer);
-		if (!_request)
-			throw (std::runtime_error("memory allocation failed"));
-	}
+        _request = new Request(buffer);
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
@@ -68,8 +66,6 @@ std::string     Client::generateResponse()
     if (_response)
         delete _response;
     _response = new Response(_selectVirtualServer(), _request);
-	if (!_response)
-		throw (std::runtime_error("memory allocation failed"));
     _response->generateResponse();
     return (_response->getResponse());
 }
@@ -125,6 +121,10 @@ Request*    Client::getRequest() const
 Response*   Client::getResponse() const
 {
     return (_response);
+}
+
+int	Client::getFd() const {
+	return (_sockfd);
 }
 
 /******************************************************************************/

@@ -1,12 +1,22 @@
+# include "debug.hpp"
 #include "Webserv.hpp"
 
 /******************************************************************************/
 /*                                  MAIN                                      */
 /******************************************************************************/
 
-Webserv::Webserv(): _parser() {}
+Webserv::Webserv(std::string configFile, char* const* env):
+	_parser(configFile),
+	_env(env) {
+	(void)_env;
+	DEBUG("Getting servers ...");
+	_setupServerMap(getConfigServers());
 
-Webserv::Webserv(std::string configFile): _parser(configFile) {}
+	// Launching servers
+	DEBUG("Launching ...");
+	_epoll.startMonitoring(_servers, env);
+	DEBUG("Webserv created");
+}
 
 Webserv::Webserv(const Webserv& other)
 {
@@ -20,24 +30,49 @@ Webserv&	Webserv::operator=(const Webserv& other)
 	if (this != &other)
 	{
 		_parser = other.getParser();
+		_env = other.getEnv();
+		_servers = other.getServers();
+		_epoll = other.getEpoll();
 	}
 	return (*this);
 }
 
 /******************************************************************************/
-/*                                  PARSER                                    */
+/*                                  SETUP                                     */
 /******************************************************************************/
 
-void	Webserv::parse(std::string configFile)
-{
-	_parser.parseFile(configFile);
+void	Webserv::_setupServerMap(Webserv::listOfServers configServers) {
+	listOfServers::const_iterator	ite;
+
+	for (ite = configServers.begin(); ite != configServers.end(); ite++)
+		_servers.insert(std::pair<Server*, Block*>(new Server(*ite), *ite));
 }
 
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
 
-Parser::listOfServers	Webserv::getServers()
+Parser	Webserv::getParser() const
+{
+	return (_parser);
+}
+
+Webserv::serverMap	Webserv::getServers() const
+{
+	return (_servers);
+}
+
+EpollInstance	Webserv::getEpoll() const
+{
+	return (_epoll);
+}
+
+char* const*	Webserv::getEnv() const
+{
+	return (_env);
+}
+
+Parser::listOfServers	Webserv::getConfigServers()
 {
 	return (_parser.getServers());
 }
@@ -48,14 +83,11 @@ int		Webserv::getNbOfServers()
 	Parser::listOfServers::const_iterator	ite;
 
 	count = 0;
-	for (ite = getServers().begin(); ite != getServers().end(); ite++)
+	for (ite = getConfigServers().begin(); ite != getConfigServers().end(); ite++){
 		count++;
+		// std::cout << "server nb is " << count << NL;
+	}
 	return (count);
-}
-
-Parser	Webserv::getParser() const
-{
-	return (_parser);
 }
 
 /******************************************************************************/
