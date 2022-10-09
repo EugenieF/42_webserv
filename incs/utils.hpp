@@ -22,6 +22,7 @@
 # include "StatusCode.hpp"
 # include "MimeType.hpp"
 # include "HttpMethod.hpp"
+# include "Colors.hpp"
 
 # define INIT_SIGNAL 0
 # define RESET_SIGNAL 1

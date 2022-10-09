@@ -54,7 +54,7 @@ void	Webserv::parse(std::string configFile) {
 void	Webserv::run() {
 	// Launching servers
 	DEBUG("Launching ...");
-	_epoll.startMonitoring(_servers, env);
+	_epoll.startMonitoring(_servers, _env);
 	DEBUG("Webserv created");
 }
 

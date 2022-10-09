@@ -3,7 +3,6 @@
 
 # include "Lexer.hpp"
 # include "Block.hpp"
-# include "HttpMethod.hpp"
 
 extern HttpMethod	g_httpMethod;
 

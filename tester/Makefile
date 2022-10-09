@@ -31,7 +31,11 @@ DEP					= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
 WEBSERV_OBJS_DIR	= ../objs
 WEBSERV_SRCS_DIR	= ../srcs
-WEBSERV_SRCS		= Token.cpp Lexer.cpp Parser.cpp Block.cpp Webserv.cpp
+WEBSERV_SRCS		= Token.cpp Lexer.cpp Parser.cpp Block.cpp Webserv.cpp \
+						utils.cpp Request.cpp Response.cpp EpollInstance.cpp \
+						signal.cpp TcpSocket.cpp Server.cpp Client.cpp \
+						StatusCode.cpp MimeType.cpp HttpMethod.cpp \
+						Autoindex.cpp generateErrorPage.cpp
 WEBSERV_OBJS		= $(addprefix $(WEBSERV_OBJS_DIR)/, $(WEBSERV_SRCS:.cpp=.o))
 WEBSERV_DEP			= $(addprefix $(WEBSERV_OBJS_DIR)/, $(WEBSERV_SRCS:.cpp=.d))
 

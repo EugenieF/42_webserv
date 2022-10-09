@@ -23,14 +23,12 @@
 # include <sys/types.h>
 # include <sys/socket.h>
 
-# include "Block.hpp"
 # include "TcpSocket.hpp"
 # include "Parser.hpp"
-# include "utils.hpp"
 
 class Server {
 	public:
-		typedef Parser::listOfServers			listOfServers;
+		typedef Parser::listOfServers	listOfServers;
 
 		Server(Block* x);
 		virtual ~Server();

@@ -8,9 +8,7 @@
 # include <iostream>
 # include <utility>
 
-# include "Colors.hpp"
 # include "utils.hpp"
-# include "HttpMethod.hpp"
 
 extern HttpMethod	g_httpMethod;
 
