@@ -169,6 +169,8 @@ class	Block
 
 						/*-------     Utils    -------*/
 		void								_deleteLocations();
+		void								_deleteVirtualHosts();
+
 };
 
 

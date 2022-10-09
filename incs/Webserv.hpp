@@ -50,10 +50,15 @@ class Webserv
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------    Main    ------*/
+		Webserv();
 		Webserv(std::string configFile, char* const* env);
 		Webserv(const Webserv& other);
 		~Webserv();
 		Webserv&						operator=(const Webserv& other);
+
+						/*-------    Run     ------*/
+		void							parse(std::string configFile);
+		void							run();
 
 						/*-------   Getter   ------*/
 		Parser							getParser() const;

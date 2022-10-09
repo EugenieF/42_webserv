@@ -5,17 +5,15 @@
 /*                                  MAIN                                      */
 /******************************************************************************/
 
+Webserv::Webserv() {}
+
 Webserv::Webserv(std::string configFile, char* const* env):
 	_parser(configFile),
 	_env(env) {
 	(void)_env;
 	DEBUG("Getting servers ...");
 	_setupServerMap(getConfigServers());
-
-	// Launching servers
-	DEBUG("Launching ...");
-	_epoll.startMonitoring(_servers, env);
-	DEBUG("Webserv created");
+	run();	
 }
 
 Webserv::Webserv(const Webserv& other)
@@ -46,6 +44,18 @@ void	Webserv::_setupServerMap(Webserv::listOfServers configServers) {
 
 	for (ite = configServers.begin(); ite != configServers.end(); ite++)
 		_servers.insert(std::pair<Server*, Block*>(new Server(*ite), *ite));
+}
+
+void	Webserv::parse(std::string configFile) {
+	_parser.parseFile(configFile);
+	_setupServerMap(getConfigServers());
+}
+
+void	Webserv::run() {
+	// Launching servers
+	DEBUG("Launching ...");
+	_epoll.startMonitoring(_servers, env);
+	DEBUG("Webserv created");
 }
 
 /******************************************************************************/

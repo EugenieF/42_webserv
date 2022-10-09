@@ -13,4 +13,6 @@
 # include "parsing/classParsingErrorTest.cpp"
 # include "parsing/parsingTest.cpp"
 
+# include "http/classHttpTest.cpp"
+
 #endif

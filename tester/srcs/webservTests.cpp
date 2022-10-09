@@ -95,3 +95,8 @@ TEST_F(parsingErrorTest, errorClientMaxBodySize)
 {
 	checkErrorCase(invalidClientMaxBodySize);
 }
+
+TEST_F(clientTest, requestClient)
+{
+	
+}

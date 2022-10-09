@@ -33,7 +33,10 @@ Block::Block(const Block& other)
 Block::~Block()
 {
 	if (isServerBlock())
+	{
 		_deleteLocations();
+		_deleteVirtualHosts();
+	}
 }
 
 /******************************************************************************/
@@ -333,6 +336,15 @@ int		Block::getNbOfLocations() const
 	return (count);
 }
 
+void	Block::_deleteLocations()
+{
+	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
+	{
+		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
+		delete (_currentLocation->second);
+	}
+}
+
 /******************************************************************************/
 /*                                 CONTEXT                                    */
 /******************************************************************************/
@@ -363,6 +375,17 @@ void	Block::setVirtualHost(blockPtr server)
 Block::listOfServers	Block::getVirtualHosts() const
 {
 	return (_virtualHosts);
+}
+
+void	Block::_deleteVirtualHosts()
+{
+	listOfServers::const_iterator	ite;
+
+	for (ite = _virtualHosts.begin(); ite != _virtualHosts.end(); ite++)
+	{
+		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
+		delete (*ite);
+	}
 }
 
 /******************************************************************************/
@@ -416,15 +439,6 @@ bool	Block::isServerBlock()
 bool	Block::isLocationBlock()
 {
 	return (_context == LOCATION);
-}
-
-void	Block::_deleteLocations()
-{
-	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
-	{
-		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
-		delete (_currentLocation->second);
-	}
 }
 
 /******************************************************************************/
