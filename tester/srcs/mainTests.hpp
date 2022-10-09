@@ -6,13 +6,14 @@
 # define RESET "\033[0m"
 
 
-# include "Webserv.hpp"
 # include "gtest/gtest.h"
+# include "Webserv.hpp"
 
 # include "parsing/classParsingTest.cpp"
 # include "parsing/classParsingErrorTest.cpp"
 # include "parsing/parsingTest.cpp"
 
+# include "http/ClientTest.hpp"
 # include "http/classHttpTest.cpp"
 
 #endif

@@ -2,7 +2,6 @@
 # define LEXER_HPP
 
 # include "Token.hpp"
-# include "Colors.hpp"
 
 /******************************************************************************/
 /*                                CLASS LEXER                                 */
