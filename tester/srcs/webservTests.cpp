@@ -98,5 +98,5 @@
 
 TEST_F(clientTest, requestClient)
 {
-	
+	checkRequest(webserv, client);	
 }

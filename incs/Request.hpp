@@ -44,6 +44,7 @@ class   Request
 		bool						_chunkedTransfer;
 		std::string					_host;
 		int							_port;
+		std::string					_query;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -75,6 +76,7 @@ class   Request
 		bool						getChunkedTransfer() const;
 		std::string					getHost() const;
 		int							getPort() const;
+		std::string					getQuery() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();

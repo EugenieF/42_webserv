@@ -15,5 +15,6 @@
 
 # include "http/ClientTest.hpp"
 # include "http/classHttpTest.cpp"
+# include "http/httpTest.cpp"
 
 #endif

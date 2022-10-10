@@ -13,6 +13,10 @@
 
 class	ClientTest
 {
+	public:
+		std::string		request;
+		std::string		expectedResponse;
+
 	private:
 		std::string		_ip;
 		int				_port;
@@ -43,14 +47,13 @@ class	ClientTest
 			if (connect(_sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 				throwErrorMsg("Connection Failed");
 			send(_sock, request.c_str(), strlen(request.c_str()) , 0 );
-			printf("Message sent\n");
 		}
 
-		void	readResponse()
+		std::string	readResponse()
 		{
-    		char buffer[1024] = {0};
+    		char buffer[2048] = {0};
 			read(_sock , buffer, 1024);
-			printf("%s\n",buffer);
+			return (std::string(buffer));
 		}
 
 		void	throwErrorMsg(std::string msg)

@@ -26,7 +26,8 @@ Request::Request():
 	_body(""),
 	_chunkedTransfer(false),
 	_host(""),
-	_port(UNDEFINED_PORT)
+	_port(UNDEFINED_PORT),
+	_query("")
 {
 	_initParsingFunct();
 }
@@ -42,7 +43,8 @@ Request::Request(const std::string& buffer):
 	_body(""),
 	_chunkedTransfer(false),
 	_host(""),
-	_port(UNDEFINED_PORT)
+	_port(UNDEFINED_PORT),
+	_query("")
 {
 	_initParsingFunct();
 }
@@ -71,6 +73,7 @@ Request&	Request::operator=(const Request &other)
 		_chunkedTransfer = other.getChunkedTransfer();
 		_host = other.getHost();
 		_port = other.getPort();
+		_query = other.getQuery();
 	}
 	return (*this);
 }
@@ -112,14 +115,22 @@ void	Request::_parseMethod()
 
 void	Request::_parsePath()
 {
-	std::string path;
-	
+	std::string		path;
+	size_t			pos;
+
 	_getNextWord(path, " ");
 	if (path == "" || path[0] != '/')
 		return (_requestIsInvalid(BAD_REQUEST));
 	if (path.length() > 2048)
 		return (_requestIsInvalid(URI_TOO_LONG));
-	/*  we need to handle query "?" in URI  and cgi extension */
+	/* Search for query */
+	pos = path.find("?");
+	if (pos != std::string::npos)
+	{
+		_query = path.substr(pos + 1);
+		path.erase(pos);
+	}
+	/* We need to handle cgi extension */
 	_path = path;
 }
 
@@ -354,6 +365,11 @@ std::string		Request::getHost() const
 int		Request::getPort() const
 {
 	return (_port);
+}
+
+std::string		Request::getQuery() const
+{
+	return (_query);
 }
 
 /******************************************************************************/

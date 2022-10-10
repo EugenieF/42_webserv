@@ -225,11 +225,13 @@ void	Response::_handleMultipartContent(std::string& path)
 	std::string	boundary;
 	std::string	content;
 	std::string	contentDisposition;
+	std::string	contentType;
 	size_t		pos;
 
-	pos = _request->getHeader("content-type").find("boundary=");
+	contentType = _request->getHeader("content-type");
+	pos = contentType.find("boundary=");
 	if (pos != std::string::npos)
-		boundary = _request->getHeader("content-type").substr(pos);
+		boundary = contentType.substr(pos + 1, contentType.find("\r\n"));
 	content = _request->getBody();
 	while (content.find(boundary + "\r\n") != std::string::npos)
 	{
