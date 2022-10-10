@@ -4,17 +4,7 @@ std::string		Response::_generateErrorPage()
 {
 	std::string	errorPage;
 
-	errorPage = _matchingBlock->getErrorPage(_statusCode);
-	if (errorPage.empty())
-	{
-		errorPage = "<!DOCTYPE html>\n\
-	  		<html><head>\n\
-	  		<title>" + getStatusCodeStr() + " - " + g_statusCode[_statusCode] + "</title>\n\
-	  		</head>\n\
-	  		<body><p>- Error Page -</p></body>\n\
-	  		</html>\n";
-
-		errorPage = \
+	errorPage = \
 		"<!DOCTYPE html>\n\
 		<html>\n\
 				<head>\n\
@@ -51,6 +41,5 @@ std::string		Response::_generateErrorPage()
 				</div>\n\
 			</body>\n\
 		</html>\n";
-	}
 	return (errorPage);
 }

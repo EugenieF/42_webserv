@@ -66,6 +66,8 @@ void	Response::_processMethod()
 
 void	Response::generateResponse()
 {
+	std::string	errorPage;
+
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
@@ -77,11 +79,12 @@ void	Response::generateResponse()
 		catch(const t_statusCode& errorCode)
 		{
 			setStatusCode(errorCode);
+			_fillErrorBody();
 		}
 	}
 	else /*	Handle invalid request */
 	{
-		_body = _generateErrorPage();
+		_fillErrorBody();
 	}
 	_fillResponseLine();
 	_fillHeaders();
@@ -91,6 +94,16 @@ void	Response::generateResponse()
 /******************************************************************************/
 /*                              FILL RESPONSE                                   */
 /******************************************************************************/
+
+void	Response::_fillErrorBody()
+{
+	std::string		errorFile;
+
+	errorFile = _matchingBlock->getErrorPage(_statusCode);
+	if (!errorFile.empty())
+		return (_readFileContent(errorFile));
+	_body = _generateErrorPage();
+}
 
 void	Response::_fillResponseLine()
 {
@@ -144,7 +157,14 @@ void	Response::_readFileContent(const std::string& path)
 	std::ifstream		file;
 	std::stringstream	fileContent;
 	
-	file.open(path.c_str(), std::ifstream::in);
+	 /* We try to access the file */
+	if (!pathIsAccessible(path))
+	{
+		/* error */
+		_throwErrorMsg("File '" + path + "' isn't accessible");
+	}
+	/* We try to open the file */
+	file.open(path.c_str(), std::ifstream::in); 
 	if (!file.is_open())
 	{
 		/* error */
@@ -152,7 +172,6 @@ void	Response::_readFileContent(const std::string& path)
 	}
 	fileContent << file.rdbuf();
 	_body = fileContent.str();
-	std::cout << GREEN << "readFileContent()" << RESET << std::endl;
 	file.close();
 }
 
@@ -191,7 +210,7 @@ void	Response::_runGetMethod(std::string& path)
 		}
 	}
 	//DEBUG("Not Found");
-	setStatusCode(NOT_FOUND);
+	throw(NOT_FOUND);
 	// 404 ERROR PATH
 // -   return (_readFileContent("www/error_404.html"));
 }
@@ -231,13 +250,13 @@ void	Response::_writeFileContent(const std::string& path)
 	if (!file.is_open())
 	{
 		/* error */
-		return (_throwErrorMsg("Can't open file '" + path + "'"));
+		_throwErrorMsg("Can't open file '" + path + "'");
 	}
 	file << _request->getBody();
 	if (file.bad())
 	{
 		/* error */
-		return (_throwErrorMsg("An error occurred while writing '" + path + "'"));
+		_throwErrorMsg("An error occurred while writing '" + path + "'");
 	}
 	file.close();
 	// setStatusCode(NO_CONTENT); ?? 
@@ -350,13 +369,15 @@ open after the current transaction is complete. This is the default setting for 
 std::string		Response::_getConnectionHeader()
 {
 	std::string						connection;
-	listOfHeaders::const_iterator	headerRequest;
+	listOfHeaders::const_iterator	connectionHeader;
+	listOfHeaders					requestHeaders;
 
 	if (!_request)
 		return ("close");
 	connection = "keep-alive";
-	headerRequest = _request->getHeaders().find("connection");
-	if (headerRequest != _request->getHeaders().end() && headerRequest->second == "close")
+	requestHeaders = _request->getHeaders();
+	connectionHeader = requestHeaders.find("connection");
+	if (connectionHeader != requestHeaders.end() && connectionHeader->second == "close")
 		connection = "close";
 	return (connection);
 }
@@ -373,7 +394,7 @@ bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* pat
 
 	foundIndexPage = false;
 	dir = opendir(path->c_str());
-	if (dir) /* error */
+	if (!dir) /* error */
 		return false;
 	for (currentIndex = indexes.begin(); currentIndex != indexes.end(); currentIndex++)
 	{

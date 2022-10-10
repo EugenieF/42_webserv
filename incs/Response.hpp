@@ -78,9 +78,10 @@ class   Response
 
 						/*-------  Generate  ------*/
         std::string						_generateErrorPage();
+		void							_processMethod();
 		void							_fillResponseLine();
 		void							_fillHeaders();
-		void							_processMethod();
+		void							_fillErrorBody();
 
 						/*------  Get Method  -----*/
 		void							_runGetMethod(std::string& path);

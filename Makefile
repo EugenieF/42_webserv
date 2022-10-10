@@ -65,7 +65,7 @@ fclean:		clean
 re:			fclean all
 
 test:  all
-               valgrind -s --track-fds=yes --leak-check=full ./$(NAME)
+			valgrind -s --track-fds=yes --leak-check=full ./$(NAME)
 
 .PHONY:		all clean fclean re
 
