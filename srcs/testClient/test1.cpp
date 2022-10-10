@@ -15,11 +15,11 @@ int main()
     (void)valread;
     struct sockaddr_in serv_addr;
     
-    // char hello[] = "POST /test/test.txt HTTP/1.1\r\nhost: :8080 \r\nTransfer-Encoding: chunked\r\nContent-TYPE: application/json \r\n\r\n26\r\nVoici les données du premier morceau \r\n";
-    // char hello[] = "1F\r\net voici deux derniers morceaux\r\n0\r\n\r\n";
+    char hello[] = "POST /test/test.txt HTTP/1.1\r\nhost: :8080 \r\nTransfer-Encoding: chunked\r\nContent-TYPE: application/json \r\n\r\n26\r\nVoici les données du premier morceau \r\n";
+    char hello2[] = "1F\r\net voici deux derniers morceaux\r\n0\r\n\r\n";
     // char hello[] = "POST /www/test/page HTTP/1.1\r\nhost:    www.yoursite.com  \r\nContent-Length: 8\r\nContent-TYPE: application/json \r\n\r\nRESPONSE\r\n\r\n";
     // char hello[] = "POST /www/test HTTP/1.1\r\nHOST: exemple.com:8080	\r\nContent-length: 17\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
-    char hello[] = "GET /media/a HTTP/1.1\r\nHOST: www/ \r\nContent-length: 0\r\nContent-TYPE: text/plain \r\n\r\nHello World!\r\n\r\n";
+    // char hello[] = "GET /media/a HTTP/1.1\r\nHOST: www/ \r\nContent-length: 0\r\nContent-TYPE: text/plain \r\n\r\nHello World!\r\n\r\n";
     char buffer[8024] = {0};
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -46,6 +46,7 @@ int main()
         return -1;
     }
     send(sock , hello , strlen(hello) , 0 );
+    send(sock , hello2 , strlen(hello2) , 0 );
     printf("Hello message sent\n");
     valread = read( sock , buffer, 8024);
     printf("%s\n",buffer);

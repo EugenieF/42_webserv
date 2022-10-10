@@ -119,7 +119,7 @@ void	Request::_parsePath()
 		return (_requestIsInvalid(BAD_REQUEST));
 	if (path.length() > 2048)
 		return (_requestIsInvalid(URI_TOO_LONG));
-	/*  we need to handle query "?" in URI  */
+	/*  we need to handle query "?" in URI  and cgi extension */
 	_path = path;
 }
 
