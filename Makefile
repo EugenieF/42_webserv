@@ -64,6 +64,9 @@ fclean:		clean
 
 re:			fclean all
 
+test:  all
+               valgrind -s --track-fds=yes --leak-check=full ./$(NAME)
+
 .PHONY:		all clean fclean re
 
 RESET		= \033[0m

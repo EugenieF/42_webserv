@@ -1,4 +1,5 @@
-#include "Response.hpp"
+# include "debug.hpp"
+# include "Response.hpp"
 
 /******************************************************************************/
 /*                                   MAIN                                     */
@@ -50,12 +51,13 @@ void	Response::_processMethod()
 	Response::listOfHttpMethodsFunct::const_iterator	ite;
 	std::string											path;
 
-	// /* Check method validity */
+	/* Check method validity */
 	if (!_matchingBlock->isAllowedMethod(_method))
 		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
 	if (path.empty())
 		throw(NOT_FOUND);
+	/* Finds corresponding http method */
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 			throw(METHOD_NOT_ALLOWED);
@@ -188,7 +190,10 @@ void	Response::_runGetMethod(std::string& path)
 			return (_generateAutoindex(path));
 		}
 	}
+	//DEBUG("Not Found");
 	setStatusCode(NOT_FOUND);
+	// 404 ERROR PATH
+// -   return (_readFileContent("www/error_404.html"));
 }
 
 /******************************************************************************/

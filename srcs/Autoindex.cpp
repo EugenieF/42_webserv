@@ -8,8 +8,8 @@ Autoindex::Autoindex(const std::string& path):
     _directoryPath(""),
     _indexPage("")
 {
-    if (path[0] != '/')
-        _directoryPath += "/"; 
+    // if (path[0] != '/')
+    //     _directoryPath += "/"; 
     _directoryPath += path;
     _generateIndexPage();
 }

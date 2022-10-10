@@ -21,7 +21,16 @@ Webserv::Webserv(const Webserv& other)
 	*this = other;
 }
 
-Webserv::~Webserv() {}
+Webserv::~Webserv() {
+	serverMap::iterator     it = _servers.begin();
+
+//     for (it = _servers.begin(); it != _servers.end(); it++) {
+	while (it != _servers.end()) {
+		delete it->first;
+		_servers.erase(it);
+		it = _servers.begin();
+	}
+}
 
 Webserv&	Webserv::operator=(const Webserv& other)
 {

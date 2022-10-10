@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/08 16:45:15 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/10 14:06:53 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,6 +242,10 @@ void EpollInstance::_handleResponse(Client& client, char* const* env) {
 	// Case: PAGE
 	(void)env;
 	std::string responseMsg = client.generateResponse();
+
+	std::cout << "Response msg : -----------------------------" << NL;
+    std::cout << responseMsg << NL;
+    std::cout << "--------------------------------------------" << NL;
 
 	if (write(client.getFd(), responseMsg.c_str(), responseMsg.size()) < 0)
 		throw std::runtime_error("handleResponse (write) error");
