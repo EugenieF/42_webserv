@@ -200,13 +200,11 @@ void	Request::_checkHeaders()
 	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos) // not really sure about this
 	{
 		_chunkedTransfer = true;
-		std::cout << "CHUNKED" << std::endl;	
 	}
 	else if (_headers.find("content-length") != _headers.end())
 	{
 		contentLength = _headers["content-length"];
 		size = std::strtoul(contentLength.c_str(), NULL, 10);
-		std::cout << "size = " << size << std::endl;
 		if (contentLength.find_first_not_of("0123456789") != std::string::npos || !size || size >= ULONG_MAX)
 			return (_requestIsInvalid(BAD_REQUEST));
 		_bodySize = size;
@@ -264,13 +262,12 @@ void	Request::_parseChunks()
 	if (!_reachedEndOfChunkedBody())
 	{
 		_bodySize = _request.length(); // Not sure about this...
-		std::cout << RED << "*****  CHUNKS, INCOMPLETE REQUEST  *****" << std::endl;
-		std::cout << "request = " << _request << RESET << std::endl;
+		DEBUG("Incomplete chunked body");
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
 	}
 	while (1)
 	{
-		std::cout << GREEN << "***** COMPLETE CHUNKED  *****" << RESET << std::endl;
+		DEBUG("Complete chunked body");
 		chunkSize = 0;
 		pos = _getNextWord(chunk, "\r\n");
 		if (pos == std::string::npos)
@@ -281,7 +278,7 @@ void	Request::_parseChunks()
 		if (!chunkSize)
 			return (_setRequestStatus(COMPLETE_REQUEST));
 		chunk = _getNextWord(chunkSize);
-		std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
+		// std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
 		_body += chunk;
 	}
 }
@@ -446,7 +443,11 @@ void	Request::printRequestInfo()
 {
 	Request::listOfHeaders::const_iterator ite;
 
-	std::cout <<  BLUE << "------------ INFO REQUEST -------------" << std::endl;
+	#ifndef DISPLAY
+		return;
+	#endif
+
+	std::cout << std::endl << BLUE << "------------ INFO REQUEST -------------" << std::endl;
 	std::cout << "          method : " << GREEN << _method << std::endl;
 	std::cout << BLUE << "            path : " << GREEN << _path << std::endl;
 	std::cout << BLUE << "    httpProtocol : " << GREEN << _httpProtocol << std::endl;

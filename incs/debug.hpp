@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   debug.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 10:51:59 by etran             #+#    #+#             */
-/*   Updated: 2022/09/19 15:24:26 by etran            ###   ########.fr       */
+/*   Updated: 2022/10/11 13:48:05 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include <string.h>
 
 # define NL '\n'
-# define DEBUG(x) std::cout << " ### Debug ### : " << x << NL
+
+// # define DEBUG(x) std::cout << " ### Debug ### : " << x << NL
+# define PRINT(x) std::cout << " ### Debug ### : " << x << NL
 
 #endif

@@ -15,7 +15,6 @@ class	ClientTest
 {
 	public:
 		std::string		request;
-		std::string		expectedResponse;
 
 	private:
 		std::string		_ip;
@@ -53,6 +52,7 @@ class	ClientTest
 		{
     		char buffer[2048] = {0};
 			read(_sock , buffer, 1024);
+			close(_sock);
 			return (std::string(buffer));
 		}
 

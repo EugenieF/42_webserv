@@ -18,28 +18,35 @@ std::string		connectToServer(Webserv& webserv, ClientTest& client)
 	else if (pid == 0)
 	{
 		webserv.run();
-		return ;
+		exit(EXIT_SUCCESS);
 	}
-    client.sendRequest(client.request);
-	response = client.readResponse();
+	else
+	{
+		client.sendRequest(client.request);
+		response = client.readResponse();
+	}
 	return (response);
 }
 
-void	checkErrorRequest(Webserv& webserv, ClientTest& client)
-{
-	try
-	{
-		connectToServer(webserv, client);
-		FAIL() << "Error " << client.request << std::endl;
-	}
-	catch(const std::exception& e)
-	{
-		EXPECT_STREQ(client.expectedResponse.c_str(), e.what());
-	}
-}
+// void	checkErrorRequest(Webserv& webserv, ClientTest& client, const std::string& expectedResponse)
+// {
+// 	try
+// 	{
+// 		connectToServer(webserv, client);
+// 		FAIL() << "Error " << client.request << std::endl;
+// 	}
+// 	catch(const std::exception& e)
+// 	{
+// 		EXPECT_STREQ(client.expectedResponse.c_str(), e.what());
+// 	}
+// }
 
-void	checkRequest(Webserv& webserv, ClientTest& client)
+void	checkRequest(Webserv& webserv, ClientTest& client, const std::string& expectedResponse)
 {
-	std::string response = connectToServer(webserv, client);
-	EXPECT_EQ(response, client.expectedResponse);
+	std::string response;
+	response = connectToServer(webserv, client);
+	// std::cout << BLUE << std::endl << response << std::endl;
+	// std::cout << GREEN << std::endl << expectedResponse << RESET << std::endl;
+
+	EXPECT_EQ(response, expectedResponse);
 }

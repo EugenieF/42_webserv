@@ -6,10 +6,11 @@
 
 void	checkServer(Webserv& webserv, expectedBlock& expectedServer)
 {
+	(void)expectedServer;
 	Block*	server;
 
 	EXPECT_EQ(webserv.getNbOfServers(), 1);
-	server = webserv.getServers()[0];
+	server = webserv.getConfigServers()[0];
 	EXPECT_EQ(server->getNbOfLocations(), expectedServer.nbOfLocations);
 	EXPECT_EQ(server->getServerNames(), expectedServer.serverNames);
 	EXPECT_EQ(server->getHost(), expectedServer.host);
@@ -27,7 +28,7 @@ void	checkLocation(Webserv& webserv, expectedBlock& expectedLocation)
 {
 	Block*	location;
 
-	location = webserv.getServers()[0]->getLocations()[expectedLocation.locationPath];
+	location = webserv.getConfigServers()[0]->getLocations()[expectedLocation.locationPath];
 
 	EXPECT_EQ(location->getRoot(), expectedLocation.root);
 	EXPECT_EQ(location->getIndexes(), expectedLocation.indexes);

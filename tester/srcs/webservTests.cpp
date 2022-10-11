@@ -4,6 +4,8 @@
 /*                      RUN WEBSERV TEST                      */
 /**************************************************************/
 
+/*------------------------  PARSING  ------------------------ */
+
 // TEST_F(parsingSimpleTest, simpleConfig)
 // {
 // 	std::cout << std::endl << BLUE_B;
@@ -14,7 +16,7 @@
 // 	checkLocation(webservSimple, expectedLocation1);
 // }
 
-/* ERROR TEST */
+/*---------------------  ERROR PARSING  -------------------- */
 
 // TEST_F(parsingErrorTest, errorFile) //Problem test
 // {
@@ -96,7 +98,9 @@
 // 	checkErrorCase(invalidClientMaxBodySize);
 // }
 
+/*------------------------  REQUEST  ------------------------ */
+
 TEST_F(clientTest, requestClient)
 {
-	checkRequest(webserv, client);	
+	checkRequest(webserv, client, expectedResponse);	
 }

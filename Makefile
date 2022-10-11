@@ -33,7 +33,11 @@ DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 CXX				= c++
 
 # EXTRA			= -Werror=implicit-fallthrough=0
-CXXFLAGS		= -Wall -Wextra -Werror $(EXTRA) -std=c++98 -MMD -MP -I$(INCLUDE)
+CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
+
+ifndef CLEAR
+	CXXFLAGS		+= -D DISPLAY=1
+endif
 
 RM				= rm -rf
 
@@ -41,7 +45,7 @@ INCLUDE			= ./incs
 
 
 $(NAME):	$(OBJS)
-		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 -include $(DEP)

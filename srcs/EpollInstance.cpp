@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/10 17:50:33 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/11 13:48:48 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,6 @@ EpollInstance::~EpollInstance() {
 }
 
 /* == PUBLIC =============================================================== */
-
-// Epoll manipulation ---------------------------
-
-/*
-void	EpollInstance::setSocketList(const EpollInstance::listOfSockets& sockets)
-{
-	_socketList = sockets;
-}
-*/
 
 void EpollInstance::startMonitoring(serverMap& servers, char* const* env) {
 	memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
@@ -152,7 +143,7 @@ void EpollInstance::_processConnections(serverMap::const_iterator it) {
 			else
 				throw std::runtime_error("accept error");
 		}
-		//DEBUG("New connection accepted !!");
+		DEBUG("New connection accepted !!");
 		TcpSocket newsocket(_sock, false);
 
 		newsocket.setToReusable();
@@ -273,18 +264,6 @@ void EpollInstance::_handleResponse(Client& client, char* const* env) {
 	_eraseClient(&client);
 }
  
-//void	EpollInstance::_clearClient(int fd, Client* client)
-//{
-//	_removeSocket(fd);
-//	if (close(fd) < 0)
-//	{
-//		std::cout << RED << "clearClient fd = " << fd << RESET << std::endl;
-//		throw std::runtime_error("clearlist (close) error");
-//	}
-//	delete client;
-//	_clientlist.erase(fd);
-//}
-
 void EpollInstance::_eraseClient(Client* client) {
 	int clientfd;
 
@@ -300,8 +279,5 @@ void EpollInstance::_clearClients()
 {
 	for (listOfClients::const_iterator client = _clientlist.begin(); client != _clientlist.end(); client++) {
 		_eraseClient(client->second);
-		// _eraseClient(client->second.getFd());
-		//client->first.close();
-		//_clearClient(client->first, client->second);
 	}
 }

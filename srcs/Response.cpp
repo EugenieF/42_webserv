@@ -56,7 +56,8 @@ void	Response::_processMethod()
 		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
 	if (path.empty())
-		throw(NOT_FOUND);
+	{	std::cout << RED << "PATH EMPTY" << RESET <<std::endl;
+		throw(NOT_FOUND); }
 	/* Finds corresponding http method */
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
@@ -68,6 +69,7 @@ void	Response::generateResponse()
 {
 	std::string	errorPage;
 
+	std::cout << RED << "GENERATE RESPONSE" << RESET << std::endl;
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
@@ -188,7 +190,7 @@ void	Response::_runGetMethod(std::string& path)
 {
 	std::string		filePath;
 
-	std::cout << GREEN << "GET METHOD" << RESET << std::endl;
+	DEBUG("Get method");
 	if (_matchingBlock->redirectDirective())
 	{
 		/* Do redirection */
@@ -209,7 +211,8 @@ void	Response::_runGetMethod(std::string& path)
 			return (_generateAutoindex(path));
 		}
 	}
-	//DEBUG("Not Found");
+	DEBUG("Not Found");
+	std::cout << RED << "END GET METHOD" << RESET << std::endl;
 	throw(NOT_FOUND);
 	// 404 ERROR PATH
 // -   return (_readFileContent("www/error_404.html"));
@@ -266,7 +269,7 @@ void	Response::_writeFileContent(const std::string& path)
 
 void	Response::_handleCgi()
 {
-	std::cout << GREEN << "handleCgi()" << RESET << std::endl;
+	DEBUG("handleCgi()");
 }
 
 /* Perform resource-specific processing on the request payload. */
@@ -274,7 +277,7 @@ void	Response::_runPostMethod(std::string& path)
 {
 	std::ofstream							ofs;
 
-	std::cout << GREEN << "POST METHOD" << RESET << std::endl;
+	DEBUG("Post method");
 	if (_matchingBlock->cgiDirective())
 	{
 		/* process cgi */
@@ -296,7 +299,7 @@ void	Response::_runDeleteMethod(std::string& path)
 {
 	int	ret;
 
-	std::cout << GREEN << "DELETE METHOD" << RESET << std::endl;
+	DEBUG("Delete method");
 	ret = remove(path.c_str());
 	if (ret) /* Error case */
 	{
@@ -325,7 +328,8 @@ void	Response::_throwErrorMsg(const std::string& message)
 t_statusCode	Response::_getErrorCodeWithErrno()
 {
 	if (errno == ENOENT || errno == ENOTDIR)
-		return (NOT_FOUND);
+	{ std::cout << RED << "CHECK ERRNO" << RESET << std::endl;
+		return (NOT_FOUND); }
 	else if (errno == EACCES || errno == EPERM)
 		return (FORBIDDEN);
 	return (INTERNAL_SERVER_ERROR);

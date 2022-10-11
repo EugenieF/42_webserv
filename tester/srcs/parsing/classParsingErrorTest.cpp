@@ -18,8 +18,8 @@ class parsingErrorTest: public ::testing::Test
 		t_invalidFile	absentFile;
 		t_invalidFile	incorrectExt;
 		t_invalidFile	noPermission;
-		t_invalidFile	directory;
-		std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission, &directory};
+		t_invalidFile	directory; // problem to push on repo
+		std::vector<t_invalidFile *> invalidFile = {&absentFile, &incorrectExt, &noPermission};
 
 /* brackets */
 		t_invalidFile	endBracket;

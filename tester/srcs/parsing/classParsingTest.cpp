@@ -82,15 +82,15 @@ class parsingSimpleTest: public ::testing::Test
 		initServer(&expectedServer1);
 		expectedServer1.nbOfLocations = 1;
 		expectedServer1.serverNames = {"localhost", "efrancon"};
-		expectedServer1.host = "127.0.0.0";
-		expectedServer1.port = 9000;
+		expectedServer1.host = "127.0.0.1";
+		expectedServer1.port = 8080;
 		expectedServer1.root = "./www";
 		expectedServer1.indexes = {"index.html", "index.htm", "index.php"};
 		expectedServer1.autoindex = true;
 		expectedServer1.clientBodyLimit = (size_t)600000000;
 		expectedServer1.cgiExt = "php";
 		expectedServer1.cgiPath = "/usr/bin/php-cgi";
-		expectedServer1.errorPages.insert(std::make_pair(404, "./www/404.html"));
+		expectedServer1.errorPages.insert(std::make_pair(404, "./www/error_404.html"));
 
 		initLocation(&expectedLocation1);
 		expectedLocation1.locationPath = "/www/";
@@ -102,5 +102,7 @@ class parsingSimpleTest: public ::testing::Test
 		expectedLocation1.redirectUri = "/www/redirection.html";
 		expectedLocation1.methods[POST] = true;
 		expectedLocation1.methods[DELETE] = true;
+		expectedLocation1.clientBodyLimit = (size_t)600000000;
+		expectedLocation1.errorPages.insert(std::make_pair(404, "./www/error_404.html"));
 	}
 };

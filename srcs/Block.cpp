@@ -421,7 +421,7 @@ Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPa
 
 	pos = path.find("/", 1);
 	prefix = path.substr(0, pos);
-	std::cout << BLUE << "Request uri : " << path << " | prefix : " << prefix << RESET << std::endl;
+	// std::cout << BLUE << "Request uri : " << path << " | prefix : " << prefix << RESET << std::endl;
 	_currentLocation = _locations.find(prefix);
 	if (_currentLocation != _locations.end())
 	{
