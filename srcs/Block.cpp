@@ -85,6 +85,8 @@ bool	Block::directiveIsSet(Token::tokenType directive)
 {
 	std::vector<Token::tokenType>::const_iterator	ite;
 
+	if (directive == KEYWORD_LOCATION || directive == KEYWORD_ERROR_PAGE)
+		return (false);
 	for (ite = _setDirectives.begin(); ite != _setDirectives.end(); ite++)
 	{
 		if (*ite == directive)
