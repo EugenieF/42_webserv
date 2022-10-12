@@ -89,10 +89,12 @@ class   Response
 
 						/*------  Post Method -----*/
 		void							_runPostMethod(std::string& path);
-		void							_writeFileContent(const std::string& path);
+		void							_writeFileContent(const std::string& path, const std::string& content);
 		void							_handleUploadFile();
 		void							_handleCgi();
-		void							_handleMultipartContent(std::string& path);
+		void							_handleMultipartContent(const std::string& path, std::string content);
+		std::string						_getBoundary(const std::string& contentType);
+		std::string						_getFilename(const std::string& content);
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod(std::string& path);

@@ -27,7 +27,8 @@ Request::Request():
 	_chunkedTransfer(false),
 	_host(""),
 	_port(UNDEFINED_PORT),
-	_query("")
+	_query(""),
+	_payloadSize(0)
 {
 	_initParsingFunct();
 }
@@ -44,7 +45,8 @@ Request::Request(const std::string& buffer):
 	_chunkedTransfer(false),
 	_host(""),
 	_port(UNDEFINED_PORT),
-	_query("")
+	_query(""),
+	_payloadSize(0)
 {
 	_initParsingFunct();
 }
@@ -74,6 +76,7 @@ Request&	Request::operator=(const Request &other)
 		_host = other.getHost();
 		_port = other.getPort();
 		_query = other.getQuery();
+		_payloadSize = other.getPayloadSize();
 	}
 	return (*this);
 }
@@ -160,11 +163,12 @@ void	Request::_parseHeaders()
 		if (pos == std::string::npos)
 			break ;
 		_getNextWord(headerValue, "\r\n");
-		_trimSpaceStr(&headerValue); /* We retrieve spaces around the value */
-		if (headerName.length() > 1000 || headerValue.length() > 4000) // NOT OK, TO SEARCH
+		trimSpacesStr(&headerValue); /* We retrieve spaces around the value */
+		if (_headerIsSet(headerName)) /* Check duplicate headers */
 			return (_requestIsInvalid(BAD_REQUEST));
-			// return (_requestIsInvalid(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		_headers[headerName] = headerValue;
+		if (_payloadSize > 8192) /* Check if request header fields is too large (> 8K) */
+			return (_requestIsInvalid(PAYLOAD_TOO_LARGE));
 	}
 	_getNextWord(headerName, "\r\n");
 }
@@ -182,7 +186,10 @@ bool	Request::_parseHostHeader()
 	if (pos != std::string::npos)
 		_host = _host.substr(0, pos);
 	if (pos + 1 != std::string::npos)
-		_port = atoi(ite->second.substr(pos + 1).c_str());
+	{
+		// _port = atoi(ite->second.substr(pos + 1).c_str());
+		return (convertPort(ite->second.substr(pos + 1), &_port));
+	}
 	return (true);
 }
 
@@ -197,21 +204,25 @@ void	Request::_checkHeaders()
 	if (_method != POST)
 		return ;
 	ite = _headers.find("transfer-encoding");
-	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos) // not really sure about this
-	{
+	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos)
 		_chunkedTransfer = true;
-	}
 	else if (_headers.find("content-length") != _headers.end())
 	{
 		contentLength = _headers["content-length"];
+		if (contentLength.find_first_not_of("0123456789") != std::string::npos)
+			return (_requestIsInvalid(BAD_REQUEST));
+		if (contentLength == "0")
+		{
+			_bodySize = 0;
+			return ;
+		}
 		size = std::strtoul(contentLength.c_str(), NULL, 10);
-		if (contentLength.find_first_not_of("0123456789") != std::string::npos || !size || size >= ULONG_MAX)
+		if (!size || size == ULONG_MAX)
 			return (_requestIsInvalid(BAD_REQUEST));
 		_bodySize = size;
 	}
 	else
 		return (_requestIsInvalid(BAD_REQUEST));
-	// _headers.find("Content-Type");
 }
 
 void	Request::_parseBody()
@@ -225,63 +236,70 @@ void	Request::_parseBody()
 	else
 	{
 		_getNextWord(_body, "\r\n\r\n");
-		_bodySize = _body.length();
+		if (_body.length() != _bodySize) // ???
+		// _bodySize = _body.length();
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	}
-	// if (_request.length() < _bodySize) {}
 }
-
-/* DECODING CHUNKED pseudo-code :
-
-     length := 0
-     read chunk-size, chunk-ext (if any), and CRLF
-     while (chunk-size > 0) {
-        read chunk-data and CRLF
-        append chunk-data to decoded-body
-        length := length + chunk-size
-        read chunk-size, chunk-ext (if any), and CRLF
-     }
-     read trailer field
-     while (trailer field is not empty) {
-        if (trailer field is allowed to be sent in a trailer) {
-            append trailer field to existing header fields
-        }
-        read trailer-field
-     }
-     Content-Length := length
-     Remove "chunked" from Transfer-Encoding
-     Remove Trailer from existing header fields
-*/
 
 void	Request::_parseChunks()
 {
-	long			chunkSize;
-	std::string		chunk;
-	size_t			pos;
+	std::string		chunkSize;
+	long			size;
 
 	if (!_reachedEndOfChunkedBody())
 	{
-		_bodySize = _request.length(); // Not sure about this...
 		DEBUG("Incomplete chunked body");
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
 	}
 	while (1)
 	{
 		DEBUG("Complete chunked body");
-		chunkSize = 0;
-		pos = _getNextWord(chunk, "\r\n");
-		if (pos == std::string::npos)
+		size = 0;
+		if (_getNextWord(chunkSize, "\r\n") == std::string::npos)
 			return (_requestIsInvalid(BAD_REQUEST));
-		chunkSize = std::strtol(chunk.c_str(), NULL, 16);
-		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
+		if (chunkSize.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
 			return (_requestIsInvalid(BAD_REQUEST));
-		if (!chunkSize)
+		if (chunkSize == "0")
 			return (_setRequestStatus(COMPLETE_REQUEST));
-		chunk = _getNextWord(chunkSize);
-		// std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
-		_body += chunk;
+		size = std::strtol(chunkSize.c_str(), NULL, 16);
+		if (!size || size == LONG_MAX || size == LONG_MIN)
+			return (_requestIsInvalid(BAD_REQUEST));
+		_body += _getNextWord(size);
+		_bodySize += size;
 	}
 }
+
+// void	Request::_parseChunks()
+// {
+// 	long			chunkSize;
+// 	std::string		chunk;
+// 	size_t			pos;
+
+// 	if (!_reachedEndOfChunkedBody())
+// 	{
+// 		DEBUG("Incomplete chunked body");
+// 		return (_setRequestStatus(INCOMPLETE_REQUEST));
+// 	}
+// 	while (1)
+// 	{
+// 		DEBUG("Complete chunked body");
+// 		chunkSize = 0;
+// 		pos = _getNextWord(chunk, "\r\n");
+// 		if (pos == std::string::npos)
+// 			return (_requestIsInvalid(BAD_REQUEST));
+// 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
+// 			return (_requestIsInvalid(BAD_REQUEST));
+// 		chunkSize = std::strtol(chunk.c_str(), NULL, 16);
+// 		if (!chunkSize)
+// 			return (_setRequestStatus(COMPLETE_REQUEST));
+// 		chunk = _getNextWord(chunkSize);
+// 		if (chunk.length() != chunkSize)
+// 			return (_requestIsInvalid(BAD_REQUEST));
+// 		// std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
+// 		_body += chunk;
+// 	}
+// }
 
 /******************************************************************************/
 /*                                  GETTER                                    */
@@ -369,9 +387,22 @@ std::string		Request::getQuery() const
 	return (_query);
 }
 
+size_t	Request::getPayloadSize() const
+{
+	return (_payloadSize);
+}
+
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
+
+bool	Request::_headerIsSet(const std::string& headerName)
+{
+	listOfHeaders::const_iterator	ite;
+
+	ite = _headers.find(headerName);
+	return (ite != _headers.end());
+}
 
 bool	Request::_reachedEndOfChunkedBody()
 {
@@ -395,11 +426,14 @@ std::string		Request::_toLowerStr(std::string* str)
 size_t	Request::_getNextWord(std::string &word, std::string const& delimiter)
 {
 	size_t	pos;
+	size_t	totalSize;
 
 	pos = _request.find(delimiter);
 	std::string nextWord(_request, 0, pos);
-	_request.erase(0, pos + delimiter.length());
+	totalSize = pos + delimiter.length();
+	_request.erase(0, totalSize);
 	word = nextWord;
+	_payloadSize += totalSize;
 	return (pos);
 }
 
@@ -409,6 +443,7 @@ std::string		Request::_getNextWord(size_t sizeWord)
 
 	nextWord = _request.substr(0, sizeWord);
 	_request.erase(0, sizeWord + 2);
+	_payloadSize += sizeWord + 2;
 	return (nextWord);
 }
 
@@ -416,13 +451,6 @@ void	Request::_requestIsInvalid(t_statusCode code)
 {
 	_statusCode = code;
 	_requestStatus = INVALID_REQUEST;
-}
-
-std::string	Request::_trimSpaceStr(std::string *str, const char *toTrim)
-{
-	str->erase(0, str->find_first_not_of(toTrim));
-	str->erase(str->find_last_not_of(toTrim) + 1);
-	return (*str);
 }
 
 void	Request::_initParsingFunct()

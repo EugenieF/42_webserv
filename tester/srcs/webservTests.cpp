@@ -100,7 +100,16 @@
 
 /*------------------------  REQUEST  ------------------------ */
 
-TEST_F(clientTest, requestClient)
+TEST_F(simpleRequestTest, requestClient)
 {
-	checkRequest(webserv, client, expectedResponse);	
+	getRequest(webserv, client, expectedResponse, "GET /valid/onlyServer.conf HTTP/1.1\r\nHOST:   www.example.com \r\nContent-Length: 0  \r\nContent-TYPE: text/plain \r\n\r\n");	
+	postRequest(webserv, client, expectedResponse2, "POST /valid/testPost.txt HTTP/1.1\r\nhost: www.example.com \r\ncontent-length: 33\r\ncontent-TYPE: text/plain \r\n\r\nThis is a test for a POST request\r\n");	
+	EXPECT_EQ(pathIsAccessible("./testFiles/valid/testPost.txt", true));
+	deleteRequest(webserv, client, expectedResponse3, "DELETE /valid/testPost.txt HTTP/1.1\r\nHost:  www.example.com\r\nconTent-lengTh: 0\r\n\r\n");
+	EXPECT_EQ(pathIsAccessible("./testFiles/valid/testPost.txt", false));
 }
+
+// TEST_F(chunkedRequestTest, requestClient)
+// {
+// 	chunkedPostRequest(webserv, client, expectedResponse3);	
+// }

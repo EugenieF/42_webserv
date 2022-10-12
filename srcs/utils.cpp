@@ -44,6 +44,41 @@ std::string	convertCharPtrToString(char* ptr)
 	return (ss.str());
 }
 
+bool	convertPort(const std::string& str, int* port)
+{
+	size_t	found;
+
+	found = str.find_first_not_of("0123456789");
+	if (found != std::string::npos)
+		return (false);
+	*port = atoi(str.c_str());
+	return (*port >= 0 && *port <= 65535);
+}
+
+bool	convertHttpCode(const std::string& str, int* code)
+{
+	size_t	found;
+
+	found = str.find_first_not_of("0123456789");
+	if (found != std::string::npos)
+		return (false);
+	*code = atoi(str.c_str());
+	return (*code >= 0 && *code <= 505);
+}
+
+std::string	trimSpaceStr(std::string *str, const char *toTrim)
+{
+	str->erase(0, str->find_first_not_of(toTrim));
+	str->erase(str->find_last_not_of(toTrim) + 1);
+	return (*str);
+}
+
+std::string	trimSpacesEndStr(std::string *str, const char *toTrim)
+{
+	str->erase(str->find_last_not_of(toTrim) + 1);
+	return (*str);
+}
+
 /******************************************************************************/
 /*                               FILE RELATED                                 */
 /******************************************************************************/

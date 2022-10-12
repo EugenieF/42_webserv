@@ -219,30 +219,88 @@ void	Response::_runGetMethod(std::string& path)
 }
 
 /******************************************************************************/
-/*                               POST METHOD                                  */
+/*                            MULTIPART/FORM-DATA                             */
 /******************************************************************************/
 
-void	Response::_handleMultipartContent(std::string& path)
+std::string		Response::_getBoundary(const std::string& contentType)
 {
-	(void)path;
 	std::string	boundary;
-	std::string	content;
-	std::string	contentDisposition;
-	std::string	contentType;
 	size_t		pos;
+	int			lastChar;
 
-	contentType = _request->getHeader("content-type");
 	pos = contentType.find("boundary=");
-	if (pos != std::string::npos)
-		boundary = contentType.substr(pos + 1, contentType.find("\r\n"));
-	content = _request->getBody();
-	while (content.find(boundary + "\r\n") != std::string::npos)
+	if (pos == std::string::npos)
+		throw(BAD_REQUEST);
+	boundary = contentType.substr(pos + 1, contentType.find("\r\n"));
+	lastChar = boundary.length() - 1;
+	if (boundary[0] == '\"' && boundary[lastChar] == '\"')
 	{
-		content.erase(content.find(boundary), content.find("\r\n"));
+		boundary.erase(0, 1);
+		boundary.erase(lastChar);
+	}
+	trimSpacesEndStr(&boundary);
+	if (boundary.length() > 70)
+		throw(BAD_REQUEST);
+	boundary = "--" + boundary + "\r\n"; 
+	return (boundary);
+}
+
+std::string		Response::_getFilename(const std::string& content)
+{
+	size_t		pos;
+	std::string	contentDisposition;
+	std::string	filename;
+
+	pos = content.find("Content-Disposition:");
+	if (pos == std::string::npos)
+		throw(BAD_REQUEST);
+	contentDisposition = content.substr(pos, content.find("\r\n"));
+	pos = contentDisposition.find("filename=\"");
+	if (pos == std::string::npos)
+		return ("");
+	contentDisposition.erase(0, pos + 10);
+	filename = contentDisposition.substr(0, contentDisposition.find("\""));
+	return (filename);
+}
+
+/*
+Content-Type: multipart/form-data; boundary=${Boundary}
+
+--${Boundary}
+Content-Disposition: form-data; name="name of pdf"; filename="pdf-file.pdf"
+Content-Type: application/octet-stream
+
+bytes of pdf file
+--${Boundary}
+...
+*/
+
+void	Response::_handleMultipartContent(const std::string& path, std::string body)
+{
+	std::string	boundary;
+	std::string	filename;
+	std::string	fileContent;
+
+	boundary = _getBoundary(_request->getHeader("content-type"));
+	while (body.find(boundary) != std::string::npos)
+	{
+		body.erase(0, body.find(boundary) + boundary.length());
+		filename = _getFilename(body);
+		body.erase(0, body.find("\r\n") + 2);
+		body.erase(0, body.find("\r\n\r\n") + 4);
+		if (filename != "")
+		{
+			fileContent = body.substr(0, body.find("\r\n"));
+			_writeFileContent(path + filename, fileContent);
+		}
 	}
 }
 
-void	Response::_writeFileContent(const std::string& path)
+/******************************************************************************/
+/*                               POST METHOD                                  */
+/******************************************************************************/
+
+void	Response::_writeFileContent(const std::string& path, const std::string& content)
 {
 	std::ofstream	file;
 
@@ -257,7 +315,7 @@ void	Response::_writeFileContent(const std::string& path)
 		/* error */
 		_throwErrorMsg("Can't open file '" + path + "'");
 	}
-	file << _request->getBody();
+	file << content;
 	if (file.bad())
 	{
 		/* error */
@@ -285,9 +343,10 @@ void	Response::_runPostMethod(std::string& path)
 	// if (_matchingBlock->uploadPathDirective()) ??
 	if (_isMultipartFormRequest())
 	{
-		_handleMultipartContent(path);
+		_handleMultipartContent(path, _request->getBody());
+		return ;
 	}
-	_writeFileContent(path);
+	_writeFileContent(path, _request->getBody());
 }
 
 /******************************************************************************/

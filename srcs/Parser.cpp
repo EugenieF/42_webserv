@@ -203,7 +203,9 @@ void	Parser::_parseListenRule()
 			_expectNextToken(NUMBER, _invalidPortMsg());
 			/* fall through */
 		case NUMBER:
-			port = atoi(_currentToken->getValue().c_str());
+			// port = atoi(_currentToken->getValue().c_str());
+			if (!convertPort(_currentToken->getValue(), &port))
+				_throwErrorParsing(_invalidPortMsg());
 			_currentBlock->setPort(port); // Need to check port number --> 0 < port <= 65535
 			break;
 		case SEMICOLON:
@@ -258,8 +260,8 @@ void	Parser::_parseErrorPageRule()
 
 	_expectNbOfArguments(2, EQUAL, SEMICOLON);
 	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
-	code = atoi(_currentToken->getValue().c_str());
-	if (code < 300 || code > 527)
+	// code = atoi(_currentToken->getValue().c_str());
+	if (!convertHttpCode(_currentToken->getValue(), &code) || code < 400 || code > 505)
 		_throwErrorParsing(_invalidErrorCodeMsg(_currentToken));
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	page = _currentToken->getValue();
@@ -296,7 +298,9 @@ void	Parser::_parseRedirectRule()
 	_expectContext(LOCATION);
 	_expectNbOfArguments(2, EQUAL, SEMICOLON);
 	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
-	code = atoi(_currentToken->getValue().c_str());
+	// code = atoi(_currentToken->getValue().c_str());
+	if (!convertHttpCode(_currentToken->getValue(), &code) || code < 300 || code >= 400)
+		_throwErrorParsing(_invalidValueMsg(_currentToken));
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	uri = _currentToken->getValue();
 	_currentBlock->setRedirection(code, uri);

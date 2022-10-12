@@ -45,6 +45,7 @@ class   Request
 		std::string					_host;
 		int							_port;
 		std::string					_query;
+		size_t						_payloadSize;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -77,6 +78,7 @@ class   Request
 		std::string					getHost() const;
 		int							getPort() const;
 		std::string					getQuery() const;
+		size_t						getPayloadSize() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
@@ -101,8 +103,8 @@ class   Request
 		size_t						_getNextWord(std::string& word, std::string const& delimiter);
 		std::string					_getNextWord(size_t sizeWord);
 		std::string					_toLowerStr(std::string* str);
-		std::string					_trimSpaceStr(std::string *str, const char *toTrim = " \t");
 		bool						_reachedEndOfChunkedBody();
+		bool						_headerIsSet(const std::string& headerName);
 };
 
 #endif

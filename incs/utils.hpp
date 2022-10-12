@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/11 12:09:03 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/12 14:24:40 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,10 @@ bool			getTriggeredValue();
 std::string		convertSizeToString(size_t size);
 std::string		convertNbToString(int nb);
 std::string		convertCharPtrToString(char* ptr);
+bool			convertPort(const std::string& str, int* port);
+bool			convertHttpCode(const std::string& str, int* code);
+std::string		trimSpacesStr(std::string *str, const char *toTrim = " \t");
+std::string		trimSpacesEndStr(std::string *str, const char *toTrim = " \t");
 
 		/*--------  File related  -------*/
 
