@@ -13,6 +13,7 @@
 #ifndef UTILS_HPP
 # define UTILS_HPP
 
+# include <cstdlib>
 # include <sstream>
 # include <signal.h>
 # include <unistd.h>

@@ -7,8 +7,7 @@
 # include <sys/time.h>
 
 #include "Block.hpp"
-#include "StatusCode.hpp"
-#include "HttpMethod.hpp"
+#include "utils.hpp"
 
 # define UNDEFINED_PORT -1
 

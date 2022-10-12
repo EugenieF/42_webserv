@@ -66,7 +66,7 @@ bool	convertHttpCode(const std::string& str, int* code)
 	return (*code >= 0 && *code <= 505);
 }
 
-std::string	trimSpaceStr(std::string *str, const char *toTrim)
+std::string	trimSpacesStr(std::string *str, const char *toTrim)
 {
 	str->erase(0, str->find_first_not_of(toTrim));
 	str->erase(str->find_last_not_of(toTrim) + 1);
