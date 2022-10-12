@@ -323,6 +323,10 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		_throwErrorMsg("An error occurred while writing '" + path + "'");
 	}
 	file.close();
+	if (_statusCode == CREATED)
+		displayMsg(" 📝 File " + path + " was created", LIGHT_GREEN);
+	else
+		displayMsg(" 📝 File " + path + " was completed", LIGHT_GREEN);
 	// setStatusCode(NO_CONTENT); ?? 
 }
 
@@ -366,7 +370,7 @@ void	Response::_runDeleteMethod(std::string& path)
 		_throwErrorMsg(_getErrorCodeWithErrno(), "Can't remove '" + path + "' in DELETE method");
 	}
 	setStatusCode(NO_CONTENT); /* Successfull case */
-
+	displayMsg(" 🚫 File " + path + " was deleted", LIGHT_GREEN);
 }
 
 /******************************************************************************/

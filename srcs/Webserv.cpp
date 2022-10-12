@@ -61,8 +61,8 @@ void	Webserv::parse(std::string configFile) {
 }
 
 void	Webserv::run() {
-	// Launching servers
-	DEBUG("Launching ...");
+	// DEBUG("Launching ...");
+	displayMsg(" 🏁 Server is launching...", LIGHT_YELLOW);
 	_epoll.startMonitoring(_servers, _env);
 	DEBUG("Webserv created");
 }

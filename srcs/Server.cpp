@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/11 14:18:24 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/12 23:03:52 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ bool	Server::operator>=(const Server& rhs) const {
 // Debug -----------------------------------------
 
 void Server::_displayServer() const {
+	displayMsg(" 👂 Server is listening on " + getHost() + ":" + convertNbToString(getPort()), LIGHT_BLUE);
 	#ifndef DISPLAY
 		return;
 	#endif
