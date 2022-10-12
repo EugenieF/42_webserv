@@ -1,5 +1,0 @@
-Voici les données du premier morceau et voici deux derniers morceaux--test
-Content-Disposition: form-data; name="file1"; filename="a.txt"
-Content-Type: text/plain
-
-Content of a.txt.

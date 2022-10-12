@@ -63,7 +63,7 @@ all:	debug $(NAME)
 cookie:
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
-bonus:	cookie $(NAME)
+bonus:	cookie re
 
 clean:
 		@$(RM) $(OBJS_DIR)
