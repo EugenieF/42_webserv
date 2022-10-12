@@ -79,7 +79,7 @@ void	Parser::_parseRule()
 	parseFunctIte = _parsingFunct.find(tokenType);
 	if (parseFunctIte == _parsingFunct.end())
 		_throwErrorParsing(_unknownDirectiveMsg(_currentToken));
-	_setDirective();
+	_setDirective(tokenType);
 	(this->*parseFunctIte->second)();
 	if (tokenType != KEYWORD_LOCATION && tokenType != KEYWORD_LISTEN)
 		_expectNextToken(SEMICOLON, _invalidNbOfArgumentsMsg());
@@ -509,7 +509,7 @@ void	Parser::_updateContext(t_context currentContext, blockPtr currentBlock)
 		_currentBlock->setContext(currentContext);
 }
 
-void	Parser::_setDirective()
+void	Parser::_setDirective(Token::tokenType type)
 {
 	Lexer::listOfTokenTypes::const_iterator		ite;
 	Lexer::listOfTokenTypes						tokenTypes;
@@ -520,9 +520,12 @@ void	Parser::_setDirective()
 		if (ite->second == _currentToken->getType())
 		{
 			_directive = ite->first;
-			return;
+			break ;
 		}
 	}
+	if (_currentBlock->directiveIsSet(type))
+		_throwErrorParsing("directive " + _directive + " is already set");
+	_currentBlock->setDirective(type);
 }
 
 bool	Parser::_isDirective(Token::tokenType type)

@@ -76,6 +76,24 @@ bool	Block::operator==(Block const& otherServer)
 		&& this->getPort() == otherServer.getPort());
 }
 
+void	Block::setDirective(Token::tokenType directive)
+{
+	_setDirectives.insert(_setDirectives.end(), directive);
+}
+
+bool	Block::directiveIsSet(Token::tokenType directive)
+{
+	std::vector<Token::tokenType>::const_iterator	ite;
+
+	for (ite = _setDirectives.begin(); ite != _setDirectives.end(); ite++)
+	{
+		if (*ite == directive)
+			return (true);
+	}
+	return (false);
+}
+
+
 /******************************************************************************/
 /*                              SERVER_NAME                                   */
 /******************************************************************************/

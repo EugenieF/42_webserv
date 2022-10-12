@@ -9,6 +9,7 @@
 # include <utility>
 
 # include "utils.hpp"
+# include "Token.hpp"
 
 extern HttpMethod	g_httpMethod;
 
@@ -44,6 +45,7 @@ class	Block
 	private :
 	/**********************     MEMBER VARIABLES     ********************/
 
+
 					/*-----   Server block only   -----*/
 		t_context							_context;
 		listOfStrings						_serverNames;
@@ -61,6 +63,7 @@ class	Block
 		listOfErrorPages					_errorPages;
 		int									_redirectCode;
 		std::string							_redirectUri;
+		std::vector<Token::tokenType>		_setDirectives;
 
 					/*-----  Location block only  -----*/
 		listOfLocations						_locations;
@@ -79,6 +82,10 @@ class	Block
 						/*----- Operator overloads ----*/
 		Block&								operator=(const Block& other);
 		bool								operator==(Block const& otherServer);
+
+						/*------- Set directives -----*/
+		void								setDirective(Token::tokenType directive);
+		bool								directiveIsSet(Token::tokenType directive);
 
 						/*-------  Server_name  ------*/
 		void								setName(const std::string& name);

@@ -35,9 +35,9 @@ CXX				= c++
 # EXTRA			= -Werror=implicit-fallthrough=0
 CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
 
-ifndef CLEAR
-	CXXFLAGS		+= -D DISPLAY=1
-endif
+DEBUG_MODE		= -DDISPLAY
+
+BONUS_MODE		= -DCOOKIE
 
 RM				= rm -rf
 
@@ -55,7 +55,15 @@ $(OBJS_DIR)/%.o: %.cpp
 		@echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"
 		@printf "$(UP)"
 
-all:	$(NAME)
+debug:	
+		$(eval CXXFLAGS += $(DEBUG_MODE))
+
+all:	debug $(NAME)
+
+cookie:
+		$(eval CXXFLAGS += $(BONUS_MODE))
+
+bonus:	cookie $(NAME)
 
 clean:
 		@$(RM) $(OBJS_DIR)

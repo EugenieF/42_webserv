@@ -115,7 +115,7 @@ class Parser
 		bool								_getNextToken();
 		void								_initArrayParsingFunctions();
 		void								_updateContext(t_context currentContext, blockPtr currentBlock);
-		void								_setDirective();
+		void								_setDirective(Token::tokenType type);
 		bool								_isDirective(Token::tokenType type);
 		void								_deleteServers();
 
