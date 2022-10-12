@@ -19,7 +19,7 @@ int main()
     // char hello[] = "1F\r\net voici deux derniers morceaux\r\n0\r\n\r\n";
     // char hello[] = "POST /www/test/page HTTP/1.1\r\nhost:    www.yoursite.com  \r\nContent-Length: 8\r\nContent-TYPE: application/json \r\n\r\nRESPONSE\r\n\r\n";
     // char hello[] = "POST /www/test HTTP/1.1\r\nHOST: exemple.com:8080	\r\nContent-length: 17\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
-    char hello[] = "POST /tester/infos.txt HTTP/1.1\r\nHOST: www/ \r\nContent-length: 0\r\nContent-TYPE: text/plain \r\n\r\n";
+    char hello[] = "POST /test HTTP/1.1\r\nHOST: :8080 \r\nCOntent-length: 70\r\nContent-TYPE: multipart/form-data; boundary=\"test\"\r\n\r\n--test\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"a.txt\"\r\nContent-Type: text/plain\r\n\r\nContent of a.txt.\r\n";
     char buffer[1024] = {0};
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -34,7 +34,7 @@ int main()
     serv_addr.sin_port = htons(PORT);
     
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.2", &serv_addr.sin_addr)<=0)
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
     {
         printf("\nInvalid address/ Address not supported \n");
         return -1;

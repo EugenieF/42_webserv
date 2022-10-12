@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/11 13:48:48 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/12 18:27:27 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ void EpollInstance::_processConnections(serverMap::const_iterator it) {
 				throw std::runtime_error("accept error");
 		}
 		DEBUG("New connection accepted !!");
+		displayMsg("[New connection accepted]", GREEN);
 		TcpSocket newsocket(_sock, false);
 
 		newsocket.setToReusable();

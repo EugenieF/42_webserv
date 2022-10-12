@@ -69,7 +69,6 @@ void	Response::generateResponse()
 {
 	std::string	errorPage;
 
-	std::cout << RED << "GENERATE RESPONSE" << RESET << std::endl;
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
@@ -222,7 +221,7 @@ void	Response::_runGetMethod(std::string& path)
 /*                            MULTIPART/FORM-DATA                             */
 /******************************************************************************/
 
-std::string		Response::_getBoundary(const std::string& contentType)
+std::string		Response::_getBoundary(std::string contentType)
 {
 	std::string	boundary;
 	size_t		pos;
@@ -231,14 +230,15 @@ std::string		Response::_getBoundary(const std::string& contentType)
 	pos = contentType.find("boundary=");
 	if (pos == std::string::npos)
 		throw(BAD_REQUEST);
-	boundary = contentType.substr(pos + 1, contentType.find("\r\n"));
+	contentType.erase(0, pos + 9);
+	boundary = contentType.substr(0, contentType.find("\r\n"));
+	trimSpacesEndStr(&boundary);
 	lastChar = boundary.length() - 1;
 	if (boundary[0] == '\"' && boundary[lastChar] == '\"')
 	{
 		boundary.erase(0, 1);
-		boundary.erase(lastChar);
+		boundary.erase(lastChar - 1);
 	}
-	trimSpacesEndStr(&boundary);
 	if (boundary.length() > 70)
 		throw(BAD_REQUEST);
 	boundary = "--" + boundary + "\r\n"; 
@@ -291,6 +291,7 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 		if (filename != "")
 		{
 			fileContent = body.substr(0, body.find("\r\n"));
+			std::cout << GREEN << "filepath = " << path + filename << RESET << std::endl;
 			_writeFileContent(path + filename, fileContent);
 		}
 	}
@@ -339,12 +340,12 @@ void	Response::_runPostMethod(std::string& path)
 	if (_matchingBlock->cgiDirective())
 	{
 		/* process cgi */
+		return (_handleCgi());
 	}
 	// if (_matchingBlock->uploadPathDirective()) ??
-	if (_isMultipartFormRequest())
+	if (_isMultipartFormRequest() && pathIsDirectory(path))
 	{
-		_handleMultipartContent(path, _request->getBody());
-		return ;
+		return (_handleMultipartContent(path, _request->getBody()));
 	}
 	_writeFileContent(path, _request->getBody());
 }

@@ -284,6 +284,8 @@ void	Parser::_parseCgiRule()
 {
 	_expectNbOfArguments(2, EQUAL, SEMICOLON);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
+	if (_currentToken->getValue() != "php" || _currentToken->getValue() != "py")
+		_throwErrorParsing(_invalidValueMsg(_currentToken));
 	_currentBlock->setCgiExt(_currentToken->getValue());
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setCgiPath(_currentToken->getValue());

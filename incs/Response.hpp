@@ -93,7 +93,7 @@ class   Response
 		void							_handleUploadFile();
 		void							_handleCgi();
 		void							_handleMultipartContent(const std::string& path, std::string content);
-		std::string						_getBoundary(const std::string& contentType);
+		std::string						_getBoundary(std::string contentType);
 		std::string						_getFilename(const std::string& content);
 
 						/*-----  Delete Method ----*/

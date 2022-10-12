@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/12 14:24:40 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/12 18:26:42 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,5 +53,9 @@ std::string		trimSpacesEndStr(std::string *str, const char *toTrim = " \t");
 bool			pathIsFile(const std::string& path);
 bool			pathIsDirectory(const std::string& path);
 bool			pathIsAccessible(const std::string& path);
+
+		/*----------   Display  ---------*/
+
+void			displayMsg(const std::string& msg, const char* colorCode);
 
 #endif

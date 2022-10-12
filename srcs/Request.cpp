@@ -156,12 +156,12 @@ void	Request::_parseHeaders()
 	size_t			pos;
 
 	pos = 0;
-	while (pos != std::string::npos)
+	while (pos != std::string::npos && _request.find("\r\n"))
 	{
 		pos = _getNextWord(headerName, ":");
-		_toLowerStr(&headerName); /* Case-insensitive */
 		if (pos == std::string::npos)
 			break ;
+		_toLowerStr(&headerName); /* Case-insensitive */
 		_getNextWord(headerValue, "\r\n");
 		trimSpacesStr(&headerValue); /* We retrieve spaces around the value */
 		if (_headerIsSet(headerName)) /* Check duplicate headers */
@@ -222,7 +222,9 @@ void	Request::_checkHeaders()
 		_bodySize = size;
 	}
 	else
+	{
 		return (_requestIsInvalid(BAD_REQUEST));
+	}
 }
 
 void	Request::_parseBody()
@@ -235,9 +237,9 @@ void	Request::_parseBody()
 		_parseChunks();
 	else
 	{
-		_getNextWord(_body, "\r\n\r\n");
-		if (_body.length() != _bodySize) // ???
-		// _bodySize = _body.length();
+		// _getNextWord(_body, "\r\n\r\n");
+		// if (_body.length() != _bodySize) // ???
+		_body = _request;
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	}
 }

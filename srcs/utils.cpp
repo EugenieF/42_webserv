@@ -104,3 +104,8 @@ bool	pathIsAccessible(const std::string& path)
 	ret = access(path.c_str(), F_OK); 
 	return (!ret);
 }
+
+void	displayMsg(const std::string& msg, const char* colorCode)
+{
+	std::cout << colorCode << msg << RESET << std::endl;
+}
