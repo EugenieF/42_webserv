@@ -44,7 +44,7 @@ RM				= rm -rf
 INCLUDE			= ./incs
 
 
-$(NAME):	$(OBJS)
+$(NAME):	debug $(OBJS)
 		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
@@ -58,12 +58,12 @@ $(OBJS_DIR)/%.o: %.cpp
 debug:	
 		$(eval CXXFLAGS += $(DEBUG_MODE))
 
-all:	debug $(NAME)
+all:	$(NAME)
 
 cookie:
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
-bonus:	cookie re
+bonus:		cookie re
 
 clean:
 		@$(RM) $(OBJS_DIR)
