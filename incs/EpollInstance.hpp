@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/10 17:50:26 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/13 18:33:44 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,6 @@ class EpollInstance {
 		/* -- Getter ------------------------------------------------------- */
 		int							getFd() const;
 
-		//void						setSocketList(const listOfSockets& sockets);
-		//ClientPtr					getClient(int fd);
-
 	private:
 		/* -- Epoll manipulation ------------------------------------------- */
 		void						_closeFd();
@@ -62,18 +59,11 @@ class EpollInstance {
 		void						_removeSocket(int socket);
 
 		/* -- Client list management --------------------------------------- */
-		//void						_addSockets();
-		//void						_clearClient(int fd, Client* client);
-		//serverMap::iterator			_findServerConnection(int fd, Block* server);
 		serverMap::const_iterator	_findServerConnection(int fd, const serverMap& serv) const;
 		void						_eraseClient(Client* client);
 		void						_clearClients();
 
 		/* -- Server connection management --------------------------------- */
-		//void						_processConnections(int serverSocket,
-		//							Block* server);
-		//void						_handleRequest(int index);
-		//void						_handleResponse(int index, char* const* env);
 		void						_monitorServers(const serverMap& serverlist);
 		void						_processConnections(serverMap::const_iterator it);
 		void						_handleRequest(Client& client);
@@ -82,9 +72,8 @@ class EpollInstance {
 		int							_efd;
 		struct epoll_event			_events[MAX_EVENT];
 		listOfClients				_clientlist;
-		// int							_serversocket;
-		//serverMap&					_servers;
-		//listOfSockets				_socketList;
+
+		std::map<std::pair<std::string, int>, Cookie*>	_savedCookies;
 };
 
 #endif

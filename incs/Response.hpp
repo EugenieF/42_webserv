@@ -112,10 +112,11 @@ class   Response
 		void							_throwErrorMsg(const std::string& message);
 		t_statusCode					_getErrorCodeWithErrno();
 
-					/*-------  Headers   ------*/
+						/*-------  Headers   ------*/
 		std::string						_getDateHeader();
 		std::string						_getContentTypeHeader();
 		std::string						_getConnectionHeader();
+		void							_fillCookieHeader();
 
 						/*-------   Utils    ------*/
 		std::string						_buildPath();

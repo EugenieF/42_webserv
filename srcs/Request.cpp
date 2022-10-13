@@ -16,39 +16,42 @@ Content-Type header.
 /******************************************************************************/
 
 Request::Request():
-	_request(""),
-	_requestStatus(INCOMPLETE_REQUEST),
-	_statusCode(OK),
-	_method(NO_METHOD),
-	_path(""),
-	_httpProtocol(""),
-	_bodySize(0),
-	_body(""),
-	_chunkedTransfer(false),
-	_host(""),
-	_port(UNDEFINED_PORT),
-	_query(""),
-	_payloadSize(0)
+	_request("")
 {
+	_initVariables();
 	_initParsingFunct();
 }
 
 Request::Request(const std::string& buffer):
-	_request(buffer),
-	_requestStatus(INCOMPLETE_REQUEST),
-	_statusCode(OK),
-	_method(NO_METHOD),
-	_path(""),
-	_httpProtocol(""),
-	_bodySize(0),
-	_body(""),
-	_chunkedTransfer(false),
-	_host(""),
-	_port(UNDEFINED_PORT),
-	_query(""),
-	_payloadSize(0)
+	_request(buffer)
 {
+	_initVariables();
 	_initParsingFunct();
+}
+
+Request::Request(const std::string& buffer, Cookie* cookies): // Bonus
+	_request(buffer)
+{
+	_initVariables();
+	_cookies = cookies;
+	_initParsingFunct();
+}
+
+void	Request::_initVariables()
+{
+	_requestStatus = INCOMPLETE_REQUEST;
+	_statusCode = OK;
+	_method = NO_METHOD;
+	_path = "";
+	_httpProtocol = "";
+	_bodySize = 0;
+	_body = "";
+	_chunkedTransfer = false;
+	_host = "";
+	_port = UNDEFINED_PORT;
+	_query = "";
+	_payloadSize = 0;
+	_cookies = NULL;
 }
 
 Request::Request(const Request &other)
@@ -77,6 +80,7 @@ Request&	Request::operator=(const Request &other)
 		_port = other.getPort();
 		_query = other.getQuery();
 		_payloadSize = other.getPayloadSize();
+		_cookies = other.getCookies();
 	}
 	return (*this);
 }
@@ -201,6 +205,7 @@ void	Request::_checkHeaders()
 
 	if (!_parseHostHeader())
 		return (_requestIsInvalid(BAD_REQUEST));
+	_parseCookies();
 	if (_method != POST)
 		return ;
 	ite = _headers.find("transfer-encoding");
@@ -392,6 +397,42 @@ std::string		Request::getQuery() const
 size_t	Request::getPayloadSize() const
 {
 	return (_payloadSize);
+}
+
+/******************************************************************************/
+/*                                 COOKIES                                    */
+/******************************************************************************/
+
+std::string		Request::getSetCookieHeader()
+{
+	if (!_cookies)
+		return ("");
+	return (_cookies->setCookieHeader());
+}
+
+Cookie*		Request::getCookies() const
+{
+	return (_cookies);
+}
+
+void	Request::_parseCookies()
+{
+	listOfHeaders::const_iterator	ite;
+
+	#ifndef COOKIE
+		return ;
+	#endif
+	ite = _headers.find("cookie");
+	if (ite == _headers.end())
+		return;
+	try
+	{
+		_cookies->setCookies(ite->second);
+	}
+	catch(t_statusCode& statusCode)
+	{
+		return (_requestIsInvalid(statusCode));
+	}
 }
 
 /******************************************************************************/

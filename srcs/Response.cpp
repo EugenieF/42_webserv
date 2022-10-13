@@ -61,7 +61,12 @@ void	Response::_processMethod()
 	/* Finds corresponding http method */
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
-			throw(METHOD_NOT_ALLOWED);
+		throw(METHOD_NOT_ALLOWED);
+	if (_matchingBlock->redirectDirective())
+	{
+		/* Do redirection */
+		return (_handleRedirection());
+	}
 	(this->*ite->second)(path);
 }
 
@@ -125,6 +130,7 @@ void	Response::_fillHeaders()
 	_headers["Connection"] = _getConnectionHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
+	_fillCookieHeader();
 
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
@@ -190,11 +196,6 @@ void	Response::_runGetMethod(std::string& path)
 	std::string		filePath;
 
 	DEBUG("Get method");
-	if (_matchingBlock->redirectDirective())
-	{
-		/* Do redirection */
-		return (_handleRedirection());
-	}
 	if (pathIsFile(path))
 		return (_readFileContent(path));
 	if (pathIsDirectory(path))
@@ -211,10 +212,7 @@ void	Response::_runGetMethod(std::string& path)
 		}
 	}
 	DEBUG("Not Found");
-	std::cout << RED << "END GET METHOD" << RESET << std::endl;
 	throw(NOT_FOUND);
-	// 404 ERROR PATH
-// -   return (_readFileContent("www/error_404.html"));
 }
 
 /******************************************************************************/
@@ -450,6 +448,13 @@ std::string		Response::_getConnectionHeader()
 	if (connectionHeader != requestHeaders.end() && connectionHeader->second == "close")
 		connection = "close";
 	return (connection);
+}
+
+void	Response::_fillCookieHeader()
+{
+	#ifdef COOKIE
+		_response += _request->getSetCookieHeader();
+	#endif
 }
 
 /******************************************************************************/

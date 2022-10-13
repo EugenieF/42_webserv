@@ -8,6 +8,7 @@
 
 #include "Block.hpp"
 #include "utils.hpp"
+#include "Cookie.hpp"
 
 # define UNDEFINED_PORT -1
 
@@ -45,6 +46,7 @@ class   Request
 		int							_port;
 		std::string					_query;
 		size_t						_payloadSize;
+		Cookie*						_cookies; // Bonus
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -52,9 +54,11 @@ class   Request
 						/*------    Main    ------*/
         Request();
         Request(const std::string& buffer);
+        Request(const std::string& buffer, Cookie* cookies);
         Request(const Request& other);
         ~Request();
         Request&    				operator=(const Request& other);
+
 
 						/*------   Parsing  ------*/
 		t_requestStatus				parseRequest();
@@ -79,11 +83,17 @@ class   Request
 		std::string					getQuery() const;
 		size_t						getPayloadSize() const;
 
+						/*------   Cookies  ------*/
+		Cookie*						getCookies() const;
+		std::string					getSetCookieHeader();
+
 						/*------   Display  ------*/
 		void						printRequestInfo();
 
 	private:
 	/**********************  PRIVATE MEMBER FUNCTIONS  ******************/
+
+		void						_initVariables();
 
 						/*------   Parsing  ------*/
 		void						_parseMethod();
@@ -94,6 +104,7 @@ class   Request
 		void						_parseBody();
 		void						_parseChunks();
 		bool						_parseHostHeader();
+		void						_parseCookies(); // Bonus
 
 						/*------   Utils  ------*/
 		void						_initParsingFunct();

@@ -300,7 +300,6 @@ void	Parser::_parseRedirectRule()
 	_expectContext(LOCATION);
 	_expectNbOfArguments(2, EQUAL, SEMICOLON);
 	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
-	// code = atoi(_currentToken->getValue().c_str());
 	if (!convertHttpCode(_currentToken->getValue(), &code) || code < 300 || code >= 400)
 		_throwErrorParsing(_invalidValueMsg(_currentToken));
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));

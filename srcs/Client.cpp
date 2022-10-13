@@ -50,7 +50,13 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-        _request = new Request(buffer);
+	{
+		#ifdef COOKIE
+			_request = new Request(buffer, new Cookie);
+		#else
+			_request = new Request(buffer);
+		#endif
+	}
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();

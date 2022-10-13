@@ -20,7 +20,8 @@ SRCS			= main.cpp \
 				MimeType.cpp \
 				HttpMethod.cpp \
 				Autoindex.cpp \
-				generateErrorPage.cpp
+				generateErrorPage.cpp \
+				Cookie.cpp
 
 OBJS_DIR		= ./objs
 
@@ -44,7 +45,7 @@ RM				= rm -rf
 INCLUDE			= ./incs
 
 
-$(NAME):	debug $(OBJS)
+$(NAME):	$(OBJS)
 		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
@@ -63,7 +64,7 @@ all:	$(NAME)
 cookie:
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
-bonus:		cookie re
+bonus:		cookie $(NAME)
 
 clean:
 		@$(RM) $(OBJS_DIR)
