@@ -21,7 +21,7 @@ Cookie*	Session::lookupSession(const Cookie& requestCookies)
 	mapOfSessions::const_iterator	ite;
 	Cookie*							cookies;
 
-	requestCookies.display();
+	// requestCookies.display();
 	sessionId = requestCookies.getSessionId();
 	std::cout << RED << "sessionId = '" << sessionId << "'" << RESET << std::endl;
 	if (sessionId == "")
@@ -31,12 +31,10 @@ Cookie*	Session::lookupSession(const Cookie& requestCookies)
 		ite = _sessions.find(sessionId);
 		if (ite == _sessions.end())
 		{
-			std::cout << RED << " Not found" << std::endl;
 			cookies = _newSession();
 		}
 		else
 		{
-			std::cout << RED << "***** FOUND ID *****" << std::endl;
 			cookies = ite->second;
 		}
 	}
