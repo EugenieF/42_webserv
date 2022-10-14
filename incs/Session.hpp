@@ -4,6 +4,7 @@
 # define SESSION_ID_LENGTH 16
 
 # include "utils.hpp"
+# include "Cookie.hpp"
 
 /******************************************************************************/
 /*                               CLASS SESSION                                */

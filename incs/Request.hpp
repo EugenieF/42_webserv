@@ -9,6 +9,10 @@
 #include "Block.hpp"
 #include "utils.hpp"
 
+#ifdef COOKIE
+	# include "Cookie.hpp"
+#endif
+
 # define UNDEFINED_PORT -1
 
 extern HttpMethod	g_httpMethod;
@@ -97,6 +101,7 @@ class   Request
 		void						_parseBody();
 		void						_parseChunks();
 		bool						_parseHostHeader();
+		void						_parseExtraHeader();
 
 						/*------   Utils  ------*/
 		void						_initParsingFunct();
@@ -109,14 +114,14 @@ class   Request
 		bool						_headerIsSet(const std::string& headerName);
 
 	/**************************     BONUS    **************************/
-	// #ifdef COOKIE
+	#ifdef COOKIE
     public:
 		Cookie						getCookies() const;
 
 	private:
 		Cookie						_cookies;
 		void						_parseCookies();
-	// #endif
+	#endif
 };
 
 #endif

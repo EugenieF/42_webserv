@@ -20,8 +20,10 @@ SRCS			= main.cpp \
 				MimeType.cpp \
 				HttpMethod.cpp \
 				Autoindex.cpp \
-				generateErrorPage.cpp \
-				Cookie.cpp
+				generateErrorPage.cpp
+
+SRCS_BONUS		= Cookie.cpp \
+				Session.cpp
 
 OBJS_DIR		= ./objs
 
@@ -33,7 +35,6 @@ DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
 CXX				= c++
 
-# EXTRA			= -Werror=implicit-fallthrough=0
 CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
 
 DEBUG_MODE		= -DDISPLAY
@@ -62,6 +63,7 @@ debug:
 all:	$(NAME)
 
 cookie:
+		$(eval SRCS += $(SRCS_BONUS))
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
 bonus:		cookie $(NAME)

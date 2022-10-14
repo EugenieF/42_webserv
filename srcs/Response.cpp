@@ -38,6 +38,9 @@ Response&	Response::operator=(const Response &other)
 		_body = other.getBody();
 		_httpMethods = other.getHttpMethods();
 		_locationPath = other.getLocationPath();
+		#ifdef COOKIE
+			_cookies = other.getCookies();
+		#endif
 	}
 	return (*this);
 }
@@ -130,8 +133,7 @@ void	Response::_fillHeaders()
 	_headers["Connection"] = _getConnectionHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
-	_fillCookieHeader();
-
+	_fillExtraHeader();
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
 	_response += "\r\n";
@@ -450,6 +452,13 @@ std::string		Response::_getConnectionHeader()
 	return (connection);
 }
 
+void	Response::_fillExtraHeader()
+{
+	#ifdef COOKIE
+		_fillCookieHeader();
+	#endif
+}
+
 /******************************************************************************/
 /*                                  PATH                                      */
 /******************************************************************************/
@@ -617,7 +626,7 @@ void	Response::_initHttpMethods()
 /*                                  BONUS                                     */
 /******************************************************************************/
 
-// #ifdef COOKIE
+#ifdef COOKIE
 Response::Response(Block *server, Request* request, Cookie* cookies):
 	_server(server),
 	_request(request),
@@ -635,4 +644,10 @@ void	Response::_fillCookieHeader()
 {
 	_response += _cookies->setCookieHeader();
 }
-// #endif
+
+Cookies*	Response::getCookies() const
+{
+	return (_cookies);
+}
+
+#endif
