@@ -4,7 +4,6 @@
 # include <cstdlib>
 # include <climits>
 # include <sstream>
-# include <sys/time.h>
 
 #include "Block.hpp"
 #include "utils.hpp"
