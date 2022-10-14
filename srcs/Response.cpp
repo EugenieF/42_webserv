@@ -450,13 +450,6 @@ std::string		Response::_getConnectionHeader()
 	return (connection);
 }
 
-void	Response::_fillCookieHeader()
-{
-	#ifdef COOKIE
-		_response += _request->getSetCookieHeader();
-	#endif
-}
-
 /******************************************************************************/
 /*                                  PATH                                      */
 /******************************************************************************/
@@ -619,3 +612,27 @@ void	Response::_initHttpMethods()
 	_httpMethods[POST] = &Response::_runPostMethod;
 	_httpMethods[DELETE] = &Response::_runDeleteMethod;
 }
+
+/******************************************************************************/
+/*                                  BONUS                                     */
+/******************************************************************************/
+
+// #ifdef COOKIE
+Response::Response(Block *server, Request* request, Cookie* cookies):
+	_server(server),
+	_request(request),
+	_response(""),
+	_statusCode(_request->getStatusCode()),
+	_method(_request->getMethod()),
+	_body(""),
+	_locationPath(""),
+	_cookies(cookies)
+{
+	_initHttpMethods();
+}
+
+void	Response::_fillCookieHeader()
+{
+	_response += _cookies->setCookieHeader();
+}
+// #endif

@@ -34,7 +34,6 @@ class Webserv
 {
 	private: 
 		typedef	std::map<Server*, Block*>			serverMap;
-		//typedef	std::pair<Server, Block*>			serverMapNode;
 		typedef	serverMap::iterator					it;
 		typedef	Parser::listOfServers				listOfServers;
 

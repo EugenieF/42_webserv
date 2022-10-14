@@ -12,6 +12,8 @@ Cookie::~Cookie() {}
 void	Cookie::setCookie(const std::string& name, const std::string& value)
 {
 	_cookies[name] = value;
+	if (name == "SID" && _sessionId == "")
+		_sessionId = value;
 }
 
 void	Cookie::setCookies(std::string header)
@@ -36,12 +38,27 @@ void	Cookie::setCookies(std::string header)
 	}
 }
 
+void	Cookie::fillCookies(const Cookie& other)
+{
+	mapOfCookies					cookies;
+	mapOfCookies::const_iterator	ite;
+
+	cookies = other.getCookies();
+	for (ite = cookies.begin(); ite != cookies.end(); ite++)
+		setCookie(ite->first, ite->second);
+}
+
 void	Cookie::display()
 {
 	mapOfCookies::const_iterator	ite;
 
 	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
 		std::cout << ite->first << "=" << ite->second << std::endl;
+}
+
+std::string		Cookie::getSessionId() const
+{
+	return (_sessionId);
 }
 
 Cookie::mapOfCookies	Cookie::getCookies() const

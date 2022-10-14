@@ -12,7 +12,7 @@ are done in a non-blocking manner. */
 
 Client::Client() {}
 
-Client::Client(Block* server, int sockfd):
+Client::Client(serverMapNode server, int sockfd):
 	_sockfd(sockfd),
     _runningServer(server),
     _request(0),
@@ -50,13 +50,7 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-	{
-		#ifdef COOKIE
-			_request = new Request(buffer, new Cookie);
-		#else
 			_request = new Request(buffer);
-		#endif
-	}
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
@@ -67,6 +61,7 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
 /*                                 RESPONSE                                   */
 /******************************************************************************/
 
+#ifndef COOKIE
 std::string     Client::generateResponse()
 {
     if (_response)
@@ -75,6 +70,19 @@ std::string     Client::generateResponse()
     _response->generateResponse();
     return (_response->getResponse());
 }
+#else
+std::string     Client::generateResponse()
+{
+	Cookie*		cookies;
+
+    if (_response)
+        delete _response;
+	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
+    _response = new Response(_selectVirtualServer(), _request, cookies);
+    _response->generateResponse();
+    return (_response->getResponse());
+}
+#endif
 
 bool	Client::_matchingServerName(const listOfStrings& serverNames, int listeningPort)
 {
@@ -96,25 +104,22 @@ Block*  Client::_selectVirtualServer()
 	listOfServers				virtualHosts;
 	listOfServers::iterator		currentServer;
 
-	virtualHosts = _runningServer->getVirtualHosts();
+	virtualHosts = _runningServer.second->getVirtualHosts();
     if (virtualHosts.empty())
-		return (_runningServer);
+		return (_runningServer.second);
 	for (currentServer = virtualHosts.begin(); currentServer != virtualHosts.end(); currentServer++)
 	{
 		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()))
-		{
-			// std::cout << YELLOW << "---- Matching server name ----" << RESET << std::endl;
 			return (*currentServer);
-		}
 	}
-	return (_runningServer);
+	return (_runningServer.second);
 }
 
 /******************************************************************************/
 /*                                  GETTER                                    */
 /******************************************************************************/
 
-Block*	Client::getRunningServer() const
+Client::serverMapNode	Client::getRunningServer() const
 {
     return (_runningServer);
 }

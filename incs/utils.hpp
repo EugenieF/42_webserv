@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/12 18:26:42 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/14 17:18:13 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,10 @@
 # include "HttpMethod.hpp"
 # include "Colors.hpp"
 # include "debug.hpp"
+
+// #ifdef COOKIE
+	# include "Cookie.hpp"
+// #endif
 
 # define INIT_SIGNAL 0
 # define RESET_SIGNAL 1

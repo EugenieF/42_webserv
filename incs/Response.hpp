@@ -116,7 +116,6 @@ class   Response
 		std::string						_getDateHeader();
 		std::string						_getContentTypeHeader();
 		std::string						_getConnectionHeader();
-		void							_fillCookieHeader();
 
 						/*-------   Utils    ------*/
 		std::string						_buildPath();
@@ -125,6 +124,15 @@ class   Response
 		void							_checkBodyLimit();
 		bool							_isMultipartFormRequest();
 
+	/***************************     BONUS     *************************/
+	// #ifdef COOKIE
+	public:
+        Response(Block* server, Request* request, Cookie* cookies);
+
+	private:
+		void							_fillCookieHeader();
+		Cookie*							_cookies;
+	// #endif
 };
 
 #endif

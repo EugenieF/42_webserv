@@ -1,20 +1,26 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
+# include "Server.hpp"
 # include "Parser.hpp"
 # include "Response.hpp"
+
+/******************************************************************************/
+/*                                CLASS CLIENT                                */
+/******************************************************************************/
 
 class Client
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef Parser::listOfServers	listOfServers;
-		typedef Block::listOfStrings	listOfStrings;
+		typedef Parser::listOfServers		listOfServers;
+		typedef Block::listOfStrings		listOfStrings;
+		typedef	std::pair<Server*, Block*>	serverMapNode;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
 		int						_sockfd;
-		Block*					_runningServer;
+		serverMapNode			_runningServer;
         Request*            	_request;
         Response*           	_response;
 
@@ -23,7 +29,7 @@ class Client
 
 						/*-------    Main    ------*/
         Client();
-        Client(Block* server, int sockfd);
+        Client(serverMapNode server, int sockfd);
         Client(Client const& other);
         ~Client();
         Client&             	operator=(const Client& other);
@@ -35,7 +41,7 @@ class Client
         std::string         	generateResponse();
 
 						/*-------   Getter   ------*/
-        Block*      			getRunningServer() const;
+        serverMapNode  			getRunningServer() const;
         Request*            	getRequest() const;
         Response*           	getResponse() const;
 		int						getFd() const;

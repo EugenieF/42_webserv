@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/13 18:33:44 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/14 19:30:21 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,8 @@ class EpollInstance {
 		/* -- Typedef ------------------------------------------------------ */
 		typedef		std::map<int, Client*>				listOfClients;
 		//typedef		std::map<int, Client>::iterator		listOfClientsIte;
-		typedef		std::map<Server*, Block*>			serverMap;
 		//typedef		std::map<Server, Block*>::iterator	serverMapIte;
-		//typedef		Client*								ClientPtr;
-		//typedef		Parser::listOfServers				listOfServers;
-		//typedef		std::map<TcpSocket*, Block*>		listOfSockets;
+
 
 		EpollInstance();
 		virtual ~EpollInstance();
@@ -73,7 +70,6 @@ class EpollInstance {
 		struct epoll_event			_events[MAX_EVENT];
 		listOfClients				_clientlist;
 
-		std::map<std::pair<std::string, int>, Cookie*>	_savedCookies;
 };
 
 #endif

@@ -29,14 +29,6 @@ Request::Request(const std::string& buffer):
 	_initParsingFunct();
 }
 
-Request::Request(const std::string& buffer, Cookie* cookies): // Bonus
-	_request(buffer)
-{
-	_initVariables();
-	_cookies = cookies;
-	_initParsingFunct();
-}
-
 void	Request::_initVariables()
 {
 	_requestStatus = INCOMPLETE_REQUEST;
@@ -51,7 +43,6 @@ void	Request::_initVariables()
 	_port = UNDEFINED_PORT;
 	_query = "";
 	_payloadSize = 0;
-	_cookies = NULL;
 }
 
 Request::Request(const Request &other)
@@ -403,14 +394,7 @@ size_t	Request::getPayloadSize() const
 /*                                 COOKIES                                    */
 /******************************************************************************/
 
-std::string		Request::getSetCookieHeader()
-{
-	if (!_cookies)
-		return ("");
-	return (_cookies->setCookieHeader());
-}
-
-Cookie*		Request::getCookies() const
+Cookie		Request::getCookies() const
 {
 	return (_cookies);
 }
@@ -419,15 +403,12 @@ void	Request::_parseCookies()
 {
 	listOfHeaders::const_iterator	ite;
 
-	#ifndef COOKIE
-		return ;
-	#endif
 	ite = _headers.find("cookie");
 	if (ite == _headers.end())
 		return;
 	try
 	{
-		_cookies->setCookies(ite->second);
+		_cookies.setCookies(ite->second);
 	}
 	catch(t_statusCode& statusCode)
 	{
