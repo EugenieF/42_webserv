@@ -13,7 +13,10 @@ void	Cookie::setCookie(const std::string& name, const std::string& value)
 {
 	_cookies[name] = value;
 	if (name == "SID" && _sessionId == "")
+	{
+		std::cout << GREEN << "SESSION ID SET" << RESET << std::endl;
 		_sessionId = value;
+	}
 }
 
 void	Cookie::setCookies(std::string header)
