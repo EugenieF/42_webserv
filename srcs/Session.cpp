@@ -23,7 +23,7 @@ Cookie*	Session::lookupSession(const Cookie& requestCookies)
 
 	requestCookies.display();
 	sessionId = requestCookies.getSessionId();
-	std::cout << RED << "sessionId = " << sessionId << std::endl;
+	std::cout << RED << "sessionId = '" << sessionId << "'" << RESET << std::endl;
 	if (sessionId == "")
 		cookies = _newSession();
 	else
