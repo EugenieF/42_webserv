@@ -48,7 +48,7 @@ void	Cookie::fillCookies(const Cookie& other)
 		setCookie(ite->first, ite->second);
 }
 
-void	Cookie::display()
+void	Cookie::display() const
 {
 	mapOfCookies::const_iterator	ite;
 

@@ -18,21 +18,30 @@ Session::~Session()
 Cookie*	Session::lookupSession(const Cookie& requestCookies)
 {
 	std::string						sessionId;
-	mapOfSession::const_iterator	ite;
+	mapOfSessions::const_iterator	ite;
 	Cookie*							cookies;
 
+	requestCookies.display();
 	sessionId = requestCookies.getSessionId();
+	std::cout << RED << "sessionId = " << sessionId << std::endl;
 	if (sessionId == "")
 		cookies = _newSession();
 	else
 	{
 		ite = _sessions.find(sessionId);
 		if (ite == _sessions.end())
+		{
+			std::cout << RED << " Not found" << std::endl;
 			cookies = _newSession();
+		}
 		else
+		{
+			std::cout << RED << "***** FOUND ID *****" << std::endl;
 			cookies = ite->second;
+		}
 	}
 	cookies->fillCookies(requestCookies);
+	cookies->display();
 	return (cookies);
 }
 
@@ -40,7 +49,7 @@ Cookie*	Session::lookupSession(const Cookie& requestCookies)
 /*                                   SETUP                                    */
 /******************************************************************************/
 
-Cookies*	Session::_newSession()
+Cookie*	Session::_newSession()
 {
 	std::string	newId;
 	Cookie*		newCookie;
@@ -48,11 +57,11 @@ Cookies*	Session::_newSession()
 	newId = _generateSessionId();
 	newCookie = new Cookie;
 	newCookie->setCookie("SID", newId);
-	_sessions.insert(newId, newCookie);
+	_sessions[newId] = newCookie;
 	return (newCookie);
 }
 
-std::string 	Session::_generateRandomString(int length)
+std::string 	Session::_generateRandomString(size_t length)
 {
 	std::string		charset;
 	int				pos;
@@ -74,9 +83,9 @@ std::string		Session::_generateSessionId()
 {
 	std::string		sessionId;
 
-	sessionId = generateRandomString(SESSION_ID_LENGTH);
+	sessionId = _generateRandomString(SESSION_ID_LENGTH);
 	while (_sessions.find(sessionId) != _sessions.end())
-		sessionId = generateRandomString(SESSION_ID_LENGTH);
+		sessionId = _generateRandomString(SESSION_ID_LENGTH);
 	return (sessionId);
 }
 
@@ -84,15 +93,15 @@ std::string		Session::_generateSessionId()
 /*                                  CLEANUP                                   */
 /******************************************************************************/
 
-void	Session::deleteSessions(const std::string& sessionId)
+void	Session::deleteSessions()
 {
-	mapOfSessions::const_iterator	session;
+	mapOfSessions::iterator	session;
 
 	for (session = _sessions.begin(); session != _sessions.end(); session++)
 		_deleteSession(session);
 }
 
-void	Session::_deleteSession(Session::mapOfSessions::const_iterator session)
+void	Session::_deleteSession(Session::mapOfSessions::iterator session)
 {
 	if (session == _sessions.end())
 		return ;
@@ -101,19 +110,19 @@ void	Session::_deleteSession(Session::mapOfSessions::const_iterator session)
 		delete session->second;
 		session->second = NULL;
 	}
-	_sessions.erase(sessionId);
+	_sessions.erase(session);
 }
 
 void	Session::_deleteSession(const std::string& sessionId)
 {
-	mapOfSessions::const_iterator session;
+	mapOfSessions::iterator session;
 
 	session = _sessions.find(sessionId);
 	if (session == _sessions.end())
 		return ;
 	if (session->second)
 	{
-		delete session->second
+		delete session->second;
 		session->second = NULL;
 	}
 	_sessions.erase(sessionId);

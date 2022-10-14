@@ -40,7 +40,7 @@ class Cookie
 						/*-------     Utils   -------*/
 		bool				isEmpty();
 		bool				isSet(const std::string& name);
-		void				display();
+		void				display() const;
 };
 
 #endif

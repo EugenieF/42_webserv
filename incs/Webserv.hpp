@@ -33,7 +33,7 @@ typedef enum e_define
 class Webserv
 {
 	private: 
-		typedef	std::map<Server*, Block*>			serverMap;
+		typedef	EpollInstance::serverMap			serverMap;
 		typedef	serverMap::iterator					it;
 		typedef	Parser::listOfServers				listOfServers;
 

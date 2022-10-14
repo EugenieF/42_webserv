@@ -64,23 +64,23 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
 #ifndef COOKIE
 std::string     Client::generateResponse()
 {
-    if (_response)
-        delete _response;
-    _response = new Response(_selectVirtualServer(), _request);
-    _response->generateResponse();
-    return (_response->getResponse());
+	if (_response)
+		delete _response;
+	_response = new Response(_selectVirtualServer(), _request);
+	_response->generateResponse();
+	return (_response->getResponse());
 }
 #else
 std::string     Client::generateResponse()
 {
-	Cookie*		cookies;
+    Cookie*		cookies;
 
-    if (_response)
-        delete _response;
+	if (_response)
+		delete _response;
 	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
-    _response = new Response(_selectVirtualServer(), _request, cookies);
-    _response->generateResponse();
-    return (_response->getResponse());
+	_response = new Response(_selectVirtualServer(), _request, cookies);
+	_response->generateResponse();
+	return (_response->getResponse());
 }
 #endif
 

@@ -31,18 +31,18 @@ class Session
 		Cookie*				lookupSession(const Cookie& requestCookies);
 
 						/*-------     Cleanup  -------*/
-		void				deleteSessions(const std::string& sessionId);
+		void				deleteSessions();
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 						/*--------     Setup   ------*/
-		void				_newSession();
+		Cookie*				_newSession();
 		std::string			_generateSessionId();
-		std::string			_generateRandomString(int length);
+		std::string			_generateRandomString(size_t length);
 
 						/*-------     Cleanup   -------*/
-		void				_deleteSession(mapOfSessions::const_iterator session);
+		void				_deleteSession(mapOfSessions::iterator session);
 		void				_deleteSession(const std::string& sessionId);
 };
 

@@ -150,7 +150,7 @@ void EpollInstance::_processConnections(serverMap::const_iterator it) {
 		newsocket.setToReusable();
 		newsocket.unlockSocket();
 		_addSocket(newsocket.getFd(), EPOLLIN); // newsocket waiting for a response
-		_clientlist[newsocket.getFd()] = new Client(it->second, newsocket.getFd());
+		_clientlist[newsocket.getFd()] = new Client(*it, newsocket.getFd());
 
 		//_clientlist.insert(std::make_pair(newsocket.getFd(), new Client(server)));
 		// std::cout << RED << "New Client --> fd: " << newsocket.getFd() << RESET << std::endl;

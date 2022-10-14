@@ -32,7 +32,7 @@
 class EpollInstance {
 	public:
 		/* -- Typedef ------------------------------------------------------ */
-		typedef		std::map<Server, Block*>			serverMap;
+		typedef		std::map<Server*, Block*>			serverMap;
 		typedef		std::map<int, Client*>				listOfClients;
 		//typedef		std::map<int, Client>::iterator		listOfClientsIte;
 		//typedef		std::map<Server, Block*>::iterator	serverMapIte;

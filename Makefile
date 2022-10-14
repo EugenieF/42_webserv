@@ -22,7 +22,7 @@ SRCS			= main.cpp \
 				Autoindex.cpp \
 				generateErrorPage.cpp
 
-SRCS_BONUS		= Cookie.cpp \
+SRCS		+= Cookie.cpp \
 				Session.cpp
 
 OBJS_DIR		= ./objs
@@ -63,7 +63,7 @@ debug:
 all:	$(NAME)
 
 cookie:
-		$(eval SRCS += $(SRCS_BONUS))
+		# $(eval SRCS += $(SRCS_BONUS))
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
 bonus:		cookie $(NAME)
