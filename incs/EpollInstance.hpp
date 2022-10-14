@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/14 19:30:21 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/14 21:21:57 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 class EpollInstance {
 	public:
 		/* -- Typedef ------------------------------------------------------ */
+		typedef		std::map<Server, Block*>			serverMap;
 		typedef		std::map<int, Client*>				listOfClients;
 		//typedef		std::map<int, Client>::iterator		listOfClientsIte;
 		//typedef		std::map<Server, Block*>::iterator	serverMapIte;
