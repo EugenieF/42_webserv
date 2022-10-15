@@ -25,6 +25,8 @@ class Session
 
 						/*-------     Main    -------*/
 		Session();
+		Session(const Session& other);
+		Session&			operator=(const Session& other);
 		~Session();
 
 						/*-------     Lookup   -------*/
@@ -33,13 +35,16 @@ class Session
 						/*-------     Cleanup  -------*/
 		void				deleteSessions();
 
+						/*--------    Getter   -------*/
+		mapOfSessions&		getSessions() const;
+
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 						/*--------     Setup   ------*/
 		Cookie*				_newSession();
-		std::string			_generateSessionId();
-		std::string			_generateRandomString(size_t length);
+		std::string&		_generateSessionId();
+		std::string&		_generateRandomString(size_t length);
 
 						/*-------     Cleanup   -------*/
 		void				_deleteSession(mapOfSessions::iterator session);

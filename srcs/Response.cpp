@@ -627,7 +627,7 @@ void	Response::_initHttpMethods()
 /******************************************************************************/
 
 #ifdef COOKIE
-Response::Response(Block *server, Request* request, Cookie* cookies):
+Response::Response(Block *server, Request* request, Cookie& cookies):
 	_server(server),
 	_request(request),
 	_response(""),
@@ -642,10 +642,10 @@ Response::Response(Block *server, Request* request, Cookie* cookies):
 
 void	Response::_fillCookieHeader()
 {
-	_response += _cookies->setCookieHeader();
+	_response += _cookies.setCookieHeader();
 }
 
-Cookie*		Response::getCookies() const
+Cookie&		Response::getCookies() const
 {
 	return (_cookies);
 }

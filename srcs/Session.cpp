@@ -12,6 +12,20 @@ Session::Session()
 	srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
+Session::Session(const Session& other)
+{
+	*this = other;
+}
+
+Session&	Session::operator=(const Session& other)
+{
+	if (this != &other)
+	{
+		_sessions = other.getSessions();
+	}
+	return (*this);
+}
+
 Session::~Session()
 {
 	deleteSessions();
@@ -59,13 +73,12 @@ Cookie*	Session::_newSession()
 	Cookie*		newCookie;
 
 	newId = _generateSessionId();
-	newCookie = new Cookie;
-	newCookie->setCookie("SID", newId);
+	newCookie = new Cookie(newId);
 	_sessions[newId] = newCookie;
 	return (newCookie);
 }
 
-std::string 	Session::_generateRandomString(size_t length)
+std::string& 	Session::_generateRandomString(size_t length)
 {
 	std::string		charset;
 	int				pos;
@@ -83,7 +96,7 @@ std::string 	Session::_generateRandomString(size_t length)
 }
 
 /* Generate unique Identifier for the new Session */
-std::string		Session::_generateSessionId()
+std::string&		Session::_generateSessionId()
 {
 	std::string		sessionId;
 
@@ -130,4 +143,9 @@ void	Session::_deleteSession(const std::string& sessionId)
 		session->second = NULL;
 	}
 	_sessions.erase(sessionId);
+}
+
+Session::mapOfSessions&		Session::getSessions() const
+{
+	return (_sessions);
 }
