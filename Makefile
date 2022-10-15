@@ -29,6 +29,8 @@ OBJS_DIR		= ./objs
 
 OBJS			= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.o))
 
+OBJS_BONUS		= $(addprefix $(OBJS_DIR)/, $(SRCS_BONUS:.cpp=.o))
+
 vpath			%.cpp $(shell find $(SRCS_DIR) -type d)
 
 DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
@@ -59,15 +61,14 @@ $(OBJS_DIR)/%.o: %.cpp
 
 all:	$(NAME)
 
-cookie:
-		$(eval SRCS += $(SRCS_BONUS))
-		$(eval $(OBJS))
-		$(eval CXXFLAGS += $(BONUS_MODE))
-
-bonus:		cookie all
-
 debug:	
 		$(eval CXXFLAGS += $(DEBUG_MODE))
+
+cookie:
+		$(eval SRCS += $(SRCS_BONUS))
+		$(eval CXXFLAGS += $(BONUS_MODE))
+
+bonus:		cookie $(OBJS_BONUS) $(NAME)
 
 clean:
 		@$(RM) $(OBJS_DIR)
