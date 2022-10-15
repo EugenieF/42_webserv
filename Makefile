@@ -22,7 +22,7 @@ SRCS			= main.cpp \
 				Autoindex.cpp \
 				generateErrorPage.cpp
 
-SRCS		+= Cookie.cpp \
+SRCS_BONUS		= Cookie.cpp \
 				Session.cpp
 
 OBJS_DIR		= ./objs
@@ -57,16 +57,17 @@ $(OBJS_DIR)/%.o: %.cpp
 		@echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"
 		@printf "$(UP)"
 
-debug:	
-		$(eval CXXFLAGS += $(DEBUG_MODE))
-
 all:	$(NAME)
 
 cookie:
-		# $(eval SRCS += $(SRCS_BONUS))
+		$(eval SRCS += $(SRCS_BONUS))
+		$(eval $(OBJS))
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
-bonus:		cookie $(NAME)
+bonus:		cookie all
+
+debug:	
+		$(eval CXXFLAGS += $(DEBUG_MODE))
 
 clean:
 		@$(RM) $(OBJS_DIR)

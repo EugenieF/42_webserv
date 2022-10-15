@@ -127,7 +127,6 @@ void	Session::_deleteSession(Session::mapOfSessions::iterator session)
 		delete session->second;
 		session->second = NULL;
 	}
-	_sessions.erase(session);
 }
 
 void	Session::_deleteSession(const std::string& sessionId)
@@ -142,7 +141,6 @@ void	Session::_deleteSession(const std::string& sessionId)
 		delete session->second;
 		session->second = NULL;
 	}
-	_sessions.erase(sessionId);
 }
 
 /******************************************************************************/
