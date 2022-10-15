@@ -503,6 +503,11 @@ void	Request::printRequestInfo()
 /******************************************************************************/
 
 #ifdef COOKIE
+Cookie&		Request::getCookies()
+{
+	return (_cookies);
+}
+
 const Cookie&	Request::getCookies() const
 {
 	return (_cookies);

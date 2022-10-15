@@ -18,7 +18,7 @@ class Session
 
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
-		mapOfSessions		_sessions;
+		mapOfSessions			_sessions;
 
 	public: 
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -26,29 +26,30 @@ class Session
 						/*-------     Main    -------*/
 		Session();
 		Session(const Session& other);
-		Session&			operator=(const Session& other);
+		Session&				operator=(const Session& other);
 		~Session();
 
 						/*-------     Lookup   -------*/
-		Cookie*				lookupSession(const Cookie& requestCookies);
+		Cookie*					lookupSession(const Cookie& requestCookies);
 
 						/*-------     Cleanup  -------*/
-		void				deleteSessions();
+		void					deleteSessions();
 
 						/*--------    Getter   -------*/
-		mapOfSessions&		getSessions() const;
+		mapOfSessions&			getSessions();
+		const mapOfSessions&	getSessions() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 						/*--------     Setup   ------*/
-		Cookie*				_newSession();
-		std::string&		_generateSessionId();
-		std::string&		_generateRandomString(size_t length);
+		Cookie*					_newSession();
+		std::string				_generateSessionId();
+		std::string				_generateRandomString(size_t length);
 
 						/*-------     Cleanup   -------*/
-		void				_deleteSession(mapOfSessions::iterator session);
-		void				_deleteSession(const std::string& sessionId);
+		void					_deleteSession(mapOfSessions::iterator session);
+		void					_deleteSession(const std::string& sessionId);
 };
 
 #endif

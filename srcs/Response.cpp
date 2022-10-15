@@ -645,7 +645,12 @@ void	Response::_fillCookieHeader()
 	_response += _cookies.setCookieHeader();
 }
 
-Cookie&		Response::getCookies() const
+Cookie&		Response::getCookies()
+{
+	return (_cookies);
+}
+
+const Cookie&	Response::getCookies() const
 {
 	return (_cookies);
 }

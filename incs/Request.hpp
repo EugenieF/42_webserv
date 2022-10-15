@@ -115,6 +115,7 @@ class   Request
 	/**************************     BONUS    **************************/
 	#ifdef COOKIE
     public:
+		Cookie&						getCookies();
 		const Cookie&				getCookies() const;
 
 	private:

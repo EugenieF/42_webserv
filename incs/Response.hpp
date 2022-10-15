@@ -129,7 +129,8 @@ class   Response
 	#ifdef COOKIE
 	public:
         Response(Block* server, Request* request, Cookie& cookies);
-		Cookie&							getCookies() const;
+		Cookie&							getCookies();
+		const Cookie&					getCookies() const;
 
 	private:
 		Cookie							_cookies;

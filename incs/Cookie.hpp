@@ -32,12 +32,13 @@ class Cookie
 						/*-------    Setter   -------*/
 		void				setCookie(const std::string& name, const std::string& value);
 		void				setCookies(std::string header);
-		std::string&		setCookieHeader();
+		std::string			setCookieHeader();
 
 						/*-------    Getter   -------*/
-		mapOfCookies&		getCookies() const;
-		std::string&		getCookie(const std::string& name);
-		std::string&		getSessionId() const;
+		mapOfCookies&		getCookies();
+		const mapOfCookies&	getCookies() const;
+		std::string			getCookie(const std::string& name);
+		std::string			getSessionId() const;
 
 						/*-------     Utils   -------*/
 		bool				isEmpty();

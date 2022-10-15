@@ -78,7 +78,7 @@ std::string     Client::generateResponse()
 	if (_response)
 		delete _response;
 	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
-	_response = new Response(_selectVirtualServer(), _request, cookies);
+	_response = new Response(_selectVirtualServer(), _request, *cookies);
 	_response->generateResponse();
 	return (_response->getResponse());
 }

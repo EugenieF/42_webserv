@@ -74,12 +74,17 @@ void	Cookie::display() const
 		std::cout << ite->first << "=" << ite->second << std::endl;
 }
 
-std::string&		Cookie::getSessionId() const
+std::string		Cookie::getSessionId() const
 {
 	return (_sessionId);
 }
 
-Cookie::mapOfCookies&	Cookie::getCookies() const
+Cookie::mapOfCookies&	Cookie::getCookies()
+{
+	return (_cookies);
+}
+
+const Cookie::mapOfCookies&	Cookie::getCookies() const
 {
 	return (_cookies);
 }
@@ -92,7 +97,7 @@ bool	Cookie::isSet(const std::string& name)
 	return (ite != _cookies.end());
 }
 
-std::string&	 Cookie::getCookie(const std::string& name)
+std::string	 Cookie::getCookie(const std::string& name)
 {
 	if (isSet(name))
 		return (_cookies[name]);
@@ -104,7 +109,7 @@ bool	Cookie::isEmpty()
 	return (_cookies.empty());
 }
 
-std::string&	Cookie::setCookieHeader()
+std::string	Cookie::setCookieHeader()
 {
 	std::string						header;
 	mapOfCookies::const_iterator	ite;
