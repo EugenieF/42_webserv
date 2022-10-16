@@ -496,15 +496,7 @@ void	Request::_parseCookies()
 	listOfHeaders::const_iterator	ite;
 
 	ite = _headers.find("cookie");
-	if (ite == _headers.end())
-		return;
-	try
-	{
+	if (ite != _headers.end())
 		_cookies.setCookies(ite->second);
-	}
-	catch(t_statusCode& statusCode)
-	{
-		throw (statusCode);
-	}
 }
 #endif

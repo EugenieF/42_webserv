@@ -1,9 +1,13 @@
 #include "Cookie.hpp"
 
-Cookie::Cookie() {}
+Cookie::Cookie()
+{
+	_time = getTime();
+}
 
 Cookie::Cookie(const std::string& sessionId)
 {
+	_time = getTime();
 	setCookie("SID", sessionId);
 }
 
@@ -24,14 +28,17 @@ Cookie&		Cookie::operator=(const Cookie& other)
 
 Cookie::~Cookie() {}
 
+size_t	Cookie::size() const
+{
+	return (_cookies.size());
+}
+
 void	Cookie::setCookie(const std::string& name, const std::string& value)
 {
+	checkSizeCookie(name, value);
 	_cookies[name] = value;
-	if (name == "SID" && _sessionId == "")
-	{
-		std::cout << GREEN << "SESSION ID SET" << RESET << std::endl;
+	if (name == "SID")
 		_sessionId = value;
-	}
 }
 
 void	Cookie::setCookies(std::string header)
@@ -40,7 +47,8 @@ void	Cookie::setCookies(std::string header)
 	std::string		value;
 	size_t			pos;
 
-	while (1)
+	/* Limit Firefox = 150 cookies */
+	for (size_t nbOfCookies = 0; nbOfCookies < 150; nbOfCookies++)
 	{
 		pos = header.find("=");
 		if (pos == std::string::npos)
@@ -52,8 +60,9 @@ void	Cookie::setCookies(std::string header)
 		header.erase(0, pos + 2);
 		setCookie(name, value);
 		if (pos == std::string::npos)
-			break ;
+			return ;
 	}
+	throw (PAYLOAD_TOO_LARGE);
 }
 
 void	Cookie::fillCookies(const Cookie& other)
@@ -63,7 +72,19 @@ void	Cookie::fillCookies(const Cookie& other)
 
 	cookies = other.getCookies();
 	for (ite = cookies.begin(); ite != cookies.end(); ite++)
-		setCookie(ite->first, ite->second);
+	{
+		if (ite->first != "SID")
+			setCookie(ite->first, ite->second);
+	}
+}
+
+void	Cookie::checkSizeCookie(const std::string& name, const std::string& value)
+{
+	size_t	totalSize;
+
+	totalSize = name.size() + value.size() + 1;
+	if (totalSize > 4096) /* Limit 4096 bytes */
+		throw(BAD_REQUEST);
 }
 
 void	Cookie::display() const
@@ -117,4 +138,14 @@ std::string	Cookie::setCookieHeader()
 	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
 		header += "Set-Cookie: " + ite->first + "=" + ite->second + "\r\n";
 	return (header);
+}
+
+bool	Cookie::sessionIsAlive()
+{
+	return (getTime() - _time < SESSION_TIMEOUT);
+}
+
+void	Cookie::updateTime()
+{
+	_time = getTime();
 }

@@ -3,6 +3,8 @@
 
 # include "utils.hpp"
 
+# define SESSION_TIMEOUT 1000
+
 /******************************************************************************/
 /*                                CLASS COOKIE                                */
 /******************************************************************************/
@@ -17,6 +19,7 @@ class Cookie
 	/**********************     MEMBER VARIABLES     ********************/
 		std::string			_sessionId;
 		mapOfCookies		_cookies;
+		size_t				_time;
 
 	public:
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -40,8 +43,16 @@ class Cookie
 		std::string			getCookie(const std::string& name);
 		std::string			getSessionId() const;
 
-						/*-------     Utils   -------*/
+						/*-------     Size   -------*/
+		size_t				size() const;
 		bool				isEmpty();
+		void				checkSizeCookie(const std::string& name, const std::string& value);
+
+						/*-------     Time   -------*/
+		bool				sessionIsAlive();
+		void				updateTime();
+
+						/*-------     Utils   -------*/
 		bool				isSet(const std::string& name);
 		void				display() const;
 };

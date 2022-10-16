@@ -2,7 +2,6 @@
 # define SESSION_HPP
 
 # define SESSION_ID_LENGTH 16
-# define SESSION_TIMEOUT 1000
 
 # include "utils.hpp"
 # include "Cookie.hpp"
@@ -51,6 +50,8 @@ class Session
 						/*-------     Cleanup   -------*/
 		void					_deleteSession(mapOfSessions::iterator session);
 		void					_deleteSession(const std::string& sessionId);
+
+		Cookie*					_findSession(std::string sessionId);
 };
 
 #endif

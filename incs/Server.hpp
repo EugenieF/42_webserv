@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/14 21:12:27 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/16 16:59:42 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class Server {
 	/* ------ BONUS -------------------------------------------------------- */
 	#ifdef COOKIE
 	private:
-		Session							_sessions;
+		Session							_sessionsHandler;
 
 	public:
 		Cookie*							getSessionCookies(const Cookie& requestCookies);

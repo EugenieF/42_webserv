@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/14 21:10:19 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/16 18:08:13 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,5 +58,9 @@ bool			pathIsAccessible(const std::string& path);
 		/*----------   Display  ---------*/
 
 void			displayMsg(const std::string& msg, const char* colorCode);
+
+		/*------------   Time   ---------*/
+
+size_t			getTime();
 
 #endif
