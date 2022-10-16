@@ -59,8 +59,7 @@ void	Response::_processMethod()
 		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
 	if (path.empty())
-	{	std::cout << RED << "PATH EMPTY" << RESET <<std::endl;
-		throw(NOT_FOUND); }
+		throw(NOT_FOUND);
 	/* Finds corresponding http method */
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
@@ -149,18 +148,6 @@ void	Response::_handleRedirection()
 	_headers["Location"] = _matchingBlock->getRedirectUri();
 }
 
-bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
-{
-	struct dirent*	diread;
-
-	while ((diread = readdir(dir)))
-	{
-		if (diread->d_name == indexPage)
-			return (true);
-	}
-	return (false);
-}
-
 void	Response::_readFileContent(const std::string& path)
 {
 	std::ifstream		file;
@@ -169,8 +156,7 @@ void	Response::_readFileContent(const std::string& path)
 	 /* We try to access the file */
 	if (!pathIsAccessible(path))
 	{
-		/* error */
-		_throwErrorMsg("File '" + path + "' isn't accessible");
+		throw(NOT_FOUND);
 	}
 	/* We try to open the file */
 	file.open(path.c_str(), std::ifstream::in); 
@@ -184,38 +170,43 @@ void	Response::_readFileContent(const std::string& path)
 	file.close();
 }
 
-void	Response::_generateAutoindex(const std::string& path)
-{
-	Autoindex	autoindex(path);
-
-	_body = autoindex.getIndexPage();
-	_headers["Content-type"] = "text/html";
-}
-
 /*  GET method : "Transfer a current representation of the target resource." */
 void	Response::_runGetMethod(std::string& path)
 {
 	std::string		filePath;
 
 	DEBUG("Get method");
-	if (pathIsFile(path))
-		return (_readFileContent(path));
-	if (pathIsDirectory(path))
+	if (_matchingBlock->cgiDirective()) // && check if cgi in request url
 	{
-		/* Directory case */
-		if (*(path.rbegin()) == '/' && _searchOfIndexPage(_matchingBlock->getIndexes(), &path))
-			return (_readFileContent(path));
-		if (*(path.rbegin()) != '/')
-			path += "/";
-		if (_matchingBlock->getAutoindex())
-		{
-			/* generate autoindex page */
-			return (_generateAutoindex(path));
-		}
+		/* process cgi */
+		return (_handleCgi());
 	}
-	DEBUG("Not Found");
-	throw(NOT_FOUND);
+	_readFileContent(path);
 }
+
+// void	Response::_runGetMethod(std::string& path)
+// {
+// 	std::string		filePath;
+
+// 	DEBUG("Get method");
+// 	if (pathIsFile(path))
+// 		return (_readFileContent(path));
+// 	if (pathIsDirectory(path))
+// 	{
+// 		/* Directory case */
+// 		if (*(path.rbegin()) == '/' && _searchOfIndexPage(_matchingBlock->getIndexes(), &path))
+// 			return (_readFileContent(path));
+// 		if (*(path.rbegin()) != '/')
+// 			path += "/";
+// 		if (_matchingBlock->getAutoindex())
+// 		{
+// 			/* generate autoindex page */
+// 			return (_generateAutoindex(path));
+// 		}
+// 	}
+// 	DEBUG("Not Found");
+// 	throw(NOT_FOUND);
+// }
 
 /******************************************************************************/
 /*                            MULTIPART/FORM-DATA                             */
@@ -324,7 +315,7 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 	}
 	file.close();
 	if (_statusCode == CREATED)
-		displayMsg(" 📝 File " + path + " was created", LIGHT_GREEN);
+		displayMsg(" 📝 File " + path + " was successfully created", LIGHT_GREEN);
 	else
 		displayMsg(" 📝 File " + path + " was completed", LIGHT_GREEN);
 	setStatusCode(NO_CONTENT);
@@ -341,15 +332,14 @@ void	Response::_runPostMethod(std::string& path)
 	std::ofstream							ofs;
 
 	DEBUG("Post method");
+	if (_isMultipartFormRequest()) // && pathIsDirectory(path)) ?
+	{
+		_handleMultipartContent(path, _request->getBody());
+	}
 	if (_matchingBlock->cgiDirective()) // && check if cgi in request url
 	{
 		/* process cgi */
 		return (_handleCgi());
-	}
-	// if (_matchingBlock->uploadPathDirective()) ??
-	if (_isMultipartFormRequest() && pathIsDirectory(path))
-	{
-		return (_handleMultipartContent(path, _request->getBody()));
 	}
 	_writeFileContent(path, _request->getBody());
 }
@@ -365,12 +355,14 @@ void	Response::_runDeleteMethod(std::string& path)
 
 	DEBUG("Delete method");
 	ret = remove(path.c_str());
-	if (ret) /* Error case */
+	if (ret)
 	{
-		_throwErrorMsg(_getErrorCodeWithErrno(), "Can't remove '" + path + "' in DELETE method");
+		/* Error case */
+		throw (_findErrorCode());
 	}
-	setStatusCode(NO_CONTENT); /* Successfull case */
-	displayMsg(" 🚫 File " + path + " was deleted", LIGHT_GREEN);
+	 /* Successfull case */
+	setStatusCode(NO_CONTENT);
+	displayMsg(" 🚫 Resource " + path + " was successfully deleted", LIGHT_GREEN);
 }
 
 /******************************************************************************/
@@ -389,11 +381,10 @@ void	Response::_throwErrorMsg(const std::string& message)
 	throw(INTERNAL_SERVER_ERROR);
 }
 
-t_statusCode	Response::_getErrorCodeWithErrno()
+t_statusCode	Response::_findErrorCode()
 {
 	if (errno == ENOENT || errno == ENOTDIR)
-	{ std::cout << RED << "CHECK ERRNO" << RESET << std::endl;
-		return (NOT_FOUND); }
+		return (NOT_FOUND);
 	else if (errno == EACCES || errno == EPERM)
 		return (FORBIDDEN);
 	return (INTERNAL_SERVER_ERROR);
@@ -463,6 +454,26 @@ void	Response::_fillExtraHeader()
 /*                                  PATH                                      */
 /******************************************************************************/
 
+void	Response::_generateAutoindex(const std::string& path)
+{
+	Autoindex	autoindex(path);
+
+	_body = autoindex.getIndexPage();
+	_headers["Content-type"] = "text/html";
+}
+
+bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
+{
+	struct dirent*	diread;
+
+	while ((diread = readdir(dir)))
+	{
+		if (diread->d_name == indexPage)
+			return (true);
+	}
+	return (false);
+}
+
 bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* path)
 {
 	listOfStrings::const_iterator	currentIndex;
@@ -486,6 +497,20 @@ bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* pat
 	return (foundIndexPage);
 }
 
+/* Directory case */
+void	Response::_handleDirectoryPath(std::string* path)
+{
+	if (*(path->rbegin()) == '/' && _searchOfIndexPage(_matchingBlock->getIndexes(), path))
+		return ;
+	if (*(path->rbegin()) != '/')
+		*path += "/";
+	if (_matchingBlock->getAutoindex())
+	{
+		/* generate autoindex page */
+		_generateAutoindex(*path);
+	}
+}
+
 /* If a request ends with a slash, NGINX treats it as a request for a directory and tries to find an index file in the directory. */
 std::string		Response::_buildPath()
 {
@@ -507,6 +532,8 @@ std::string		Response::_buildPath()
 	if (path[0] == '/')
 		path.insert(path.begin(), '.'); // Is it necessary ?
 	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
+	if (pathIsDirectory(path))
+		_handleDirectoryPath(&path);
 	return (path);
 }
 

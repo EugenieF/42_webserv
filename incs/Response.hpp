@@ -99,7 +99,10 @@ class   Response
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod(std::string& path);
 
-						/*--------   Index  -------*/
+						/*-------   Path    ------*/
+		std::string						_buildPath();
+		void							_handleDirectoryPath(std::string* path);
+		bool							_hasUploadPathDirective();
 		bool							_searchOfIndexPage(const listOfStrings& indexes, std::string* path);
 		bool							_foundIndexPage(DIR* dir, const std::string& indexPage);
 		void							_generateAutoindex(const std::string& path);
@@ -110,7 +113,7 @@ class   Response
 						/*--------   Error  -------*/
 		void							_throwErrorMsg(t_statusCode errorCode, const std::string& message);
 		void							_throwErrorMsg(const std::string& message);
-		t_statusCode					_getErrorCodeWithErrno();
+		t_statusCode					_findErrorCode();
 
 						/*-------  Headers   ------*/
 		std::string						_getDateHeader();
@@ -119,8 +122,6 @@ class   Response
 		void							_fillExtraHeader();
 
 						/*-------   Utils    ------*/
-		std::string						_buildPath();
-		bool							_hasUploadPathDirective();
 		bool							_requestIsValid();
 		void							_checkBodyLimit();
 		bool							_isMultipartFormRequest();
