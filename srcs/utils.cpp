@@ -109,3 +109,17 @@ void	displayMsg(const std::string& msg, const char* colorCode)
 {
 	std::cout << colorCode << msg << RESET << std::endl;
 }
+
+/******************************************************************************/
+/*                               FILE RELATED                                 */
+/******************************************************************************/
+
+size_t	getTime()
+{
+	struct timeval	timeval;
+	size_t			time_in_ms;
+
+	gettimeofday(&timeval, NULL);
+	time_in_ms = timeval.tv_sec * 1000 + timeval.tv_usec / 1000;
+	return (time_in_ms);
+}

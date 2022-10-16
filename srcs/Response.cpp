@@ -327,7 +327,7 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		displayMsg(" 📝 File " + path + " was created", LIGHT_GREEN);
 	else
 		displayMsg(" 📝 File " + path + " was completed", LIGHT_GREEN);
-	// setStatusCode(NO_CONTENT); ?? 
+	setStatusCode(NO_CONTENT);
 }
 
 void	Response::_handleCgi()
@@ -341,7 +341,7 @@ void	Response::_runPostMethod(std::string& path)
 	std::ofstream							ofs;
 
 	DEBUG("Post method");
-	if (_matchingBlock->cgiDirective())
+	if (_matchingBlock->cgiDirective()) // && check if cgi in request url
 	{
 		/* process cgi */
 		return (_handleCgi());

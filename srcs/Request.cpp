@@ -84,18 +84,32 @@ Request&	Request::operator=(const Request &other)
 
 t_requestStatus	Request::parseRequest()
 {
-	Request::listOfParsingFunctions::const_iterator	ite;
-
-	if (_chunkedTransfer && _requestStatus != COMPLETE_REQUEST)
-		_parseChunks();
-	else
+	try
 	{
-		for (ite = _parsingFunct.begin();
-			_requestStatus != COMPLETE_REQUEST && ite != _parsingFunct.end(); ite++)
-			(this->**ite)();
+		if (_chunkedTransfer && _requestStatus != COMPLETE_REQUEST)
+			_decodeChunks();
+		else
+			_runParsingFunctions();
 	}
-	printRequestInfo();
+	catch(const t_statusCode& errorCode)
+	{
+		_statusCode = errorCode;
+		_requestStatus = INVALID_REQUEST;
+	}
+	// printRequestInfo();
 	return (_requestStatus);
+}
+
+void	Request::_runParsingFunctions()
+{
+	Request::listOfParsingFunctions::const_iterator	currentFunct;
+
+	for (currentFunct = _parsingFunct.begin();
+		_requestStatus != COMPLETE_REQUEST && currentFunct != _parsingFunct.end();
+			currentFunct++)
+	{
+		(this->**currentFunct)();
+	}
 }
 	
 void	Request::completeRequest(const std::string& buffer)
@@ -109,7 +123,7 @@ void	Request::_parseMethod()
 
 	_getNextWord(method, " ");
 	if (g_httpMethod.isHttpMethod(method) == false)
-		return (_requestIsInvalid(NOT_IMPLEMENTED));
+		throw (NOT_IMPLEMENTED);
 	_method = g_httpMethod.getMethod(method);
 }
 
@@ -120,9 +134,9 @@ void	Request::_parsePath()
 
 	_getNextWord(path, " ");
 	if (path == "" || path[0] != '/')
-		return (_requestIsInvalid(BAD_REQUEST));
+		throw (BAD_REQUEST);
 	if (path.length() > 2048)
-		return (_requestIsInvalid(URI_TOO_LONG));
+		throw (URI_TOO_LONG);
 	/* Search for query */
 	pos = path.find("?");
 	if (pos != std::string::npos)
@@ -140,9 +154,9 @@ void	Request::_parseHttpProtocol()
 	
 	_getNextWord(httpProtocol, "\r\n");
 	if (httpProtocol.find("HTTP") == std::string::npos)
-		return (_requestIsInvalid(BAD_REQUEST));
+		throw (BAD_REQUEST);
 	if (httpProtocol != "HTTP/1.1")
-		return (_requestIsInvalid(HTTP_VERSION_NOT_SUPPORTED));
+		throw (HTTP_VERSION_NOT_SUPPORTED);
 	_httpProtocol = httpProtocol;
 }
 
@@ -162,10 +176,10 @@ void	Request::_parseHeaders()
 		_getNextWord(headerValue, "\r\n");
 		trimSpacesStr(&headerValue); /* We retrieve spaces around the value */
 		if (_headerIsSet(headerName)) /* Check duplicate headers */
-			return (_requestIsInvalid(BAD_REQUEST));
+			throw (BAD_REQUEST);
 		_headers[headerName] = headerValue;
 		if (_payloadSize > 8192) /* Check if request header fields is too large (> 8K) */
-			return (_requestIsInvalid(PAYLOAD_TOO_LARGE));
+			throw (PAYLOAD_TOO_LARGE);
 	}
 	_getNextWord(headerName, "\r\n");
 }
@@ -183,10 +197,7 @@ bool	Request::_parseHostHeader()
 	if (pos != std::string::npos)
 		_host = _host.substr(0, pos);
 	if (pos + 1 != std::string::npos)
-	{
-		// _port = atoi(ite->second.substr(pos + 1).c_str());
 		return (convertPort(ite->second.substr(pos + 1), &_port));
-	}
 	return (true);
 }
 
@@ -197,7 +208,7 @@ void	Request::_checkHeaders()
 	size_t									size;
 
 	if (!_parseHostHeader())
-		return (_requestIsInvalid(BAD_REQUEST));
+		throw (BAD_REQUEST);
 	_parseExtraHeader();
 	if (_method != POST)
 		return ;
@@ -208,7 +219,7 @@ void	Request::_checkHeaders()
 	{
 		contentLength = _headers["content-length"];
 		if (contentLength.find_first_not_of("0123456789") != std::string::npos)
-			return (_requestIsInvalid(BAD_REQUEST));
+			throw (BAD_REQUEST);
 		if (contentLength == "0")
 		{
 			_bodySize = 0;
@@ -216,13 +227,11 @@ void	Request::_checkHeaders()
 		}
 		size = std::strtoul(contentLength.c_str(), NULL, 10);
 		if (!size || size == ULONG_MAX)
-			return (_requestIsInvalid(BAD_REQUEST));
+			throw (BAD_REQUEST);
 		_bodySize = size;
 	}
 	else
-	{
-		return (_requestIsInvalid(BAD_REQUEST));
-	}
+		throw (BAD_REQUEST);
 }
 
 void	Request::_parseExtraHeader()
@@ -239,7 +248,7 @@ void	Request::_parseBody()
 	if (_requestStatus == COMPLETE_REQUEST)
 		return ;
 	if (_chunkedTransfer)
-		_parseChunks();
+		_decodeChunks();
 	else
 	{
 		// _getNextWord(_body, "\r\n\r\n");
@@ -249,7 +258,7 @@ void	Request::_parseBody()
 	}
 }
 
-void	Request::_parseChunks()
+void	Request::_decodeChunks()
 {
 	std::string		chunkSize;
 	long			size;
@@ -264,49 +273,18 @@ void	Request::_parseChunks()
 		DEBUG("Complete chunked body");
 		size = 0;
 		if (_getNextWord(chunkSize, "\r\n") == std::string::npos)
-			return (_requestIsInvalid(BAD_REQUEST));
+			throw (BAD_REQUEST);
 		if (chunkSize.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
-			return (_requestIsInvalid(BAD_REQUEST));
+			throw (BAD_REQUEST);
 		if (chunkSize == "0")
 			return (_setRequestStatus(COMPLETE_REQUEST));
 		size = std::strtol(chunkSize.c_str(), NULL, 16);
 		if (!size || size == LONG_MAX || size == LONG_MIN)
-			return (_requestIsInvalid(BAD_REQUEST));
+			throw (BAD_REQUEST);
 		_body += _getNextWord(size);
 		_bodySize += size;
 	}
 }
-
-// void	Request::_parseChunks()
-// {
-// 	long			chunkSize;
-// 	std::string		chunk;
-// 	size_t			pos;
-
-// 	if (!_reachedEndOfChunkedBody())
-// 	{
-// 		DEBUG("Incomplete chunked body");
-// 		return (_setRequestStatus(INCOMPLETE_REQUEST));
-// 	}
-// 	while (1)
-// 	{
-// 		DEBUG("Complete chunked body");
-// 		chunkSize = 0;
-// 		pos = _getNextWord(chunk, "\r\n");
-// 		if (pos == std::string::npos)
-// 			return (_requestIsInvalid(BAD_REQUEST));
-// 		if (chunk.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
-// 			return (_requestIsInvalid(BAD_REQUEST));
-// 		chunkSize = std::strtol(chunk.c_str(), NULL, 16);
-// 		if (!chunkSize)
-// 			return (_setRequestStatus(COMPLETE_REQUEST));
-// 		chunk = _getNextWord(chunkSize);
-// 		if (chunk.length() != chunkSize)
-// 			return (_requestIsInvalid(BAD_REQUEST));
-// 		// std::cout << RED << "chunkSize : " << chunkSize << " | chunk = '" << chunk << "'" << RESET << std::endl;
-// 		_body += chunk;
-// 	}
-// }
 
 /******************************************************************************/
 /*                                  GETTER                                    */
@@ -454,11 +432,11 @@ std::string		Request::_getNextWord(size_t sizeWord)
 	return (nextWord);
 }
 
-void	Request::_requestIsInvalid(t_statusCode code)
-{
-	_statusCode = code;
-	_requestStatus = INVALID_REQUEST;
-}
+// void	Request::_requestIsInvalid(t_statusCode code)
+// {
+// 	_statusCode = code;
+// 	_requestStatus = INVALID_REQUEST;
+// }
 
 void	Request::_initParsingFunct()
 {
@@ -518,15 +496,7 @@ void	Request::_parseCookies()
 	listOfHeaders::const_iterator	ite;
 
 	ite = _headers.find("cookie");
-	if (ite == _headers.end())
-		return;
-	try
-	{
+	if (ite != _headers.end())
 		_cookies.setCookies(ite->second);
-	}
-	catch(t_statusCode& statusCode)
-	{
-		return (_requestIsInvalid(statusCode));
-	}
 }
 #endif

@@ -18,7 +18,7 @@ int main()
     // char hello[] = "POST /data HTTP/1.1\r\nhost:    www.yoursite.com  	\r\nTransfer-Encoding: chunked	\r\nContent-TYPE: application/json \r\n\r\n26\r\nVoici les données du premier morceau \r\n";
     // char hello[] = "1F\r\net voici deux derniers morceaux\r\n0\r\n\r\n";
     // char hello[] = "POST /www/test/page HTTP/1.1\r\nhost:    www.yoursite.com  \r\nContent-Length: 8\r\nContent-TYPE: application/json \r\n\r\nRESPONSE\r\n\r\n";
-    char hello[] = "POST /www/test HTTP/1.1\r\nHOST: exemple.com:8080	\r\nContent-length: 17\r\nCookie: SID=tyahd20gprc31fdv; surname=bibi; love=hamster\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
+    char hello[] = "POST /www/test HTTP/1.1\r\nHOST: exemple.com:8080	\r\nContent-length: 17\r\nCookie: SID=b07w4b1ypnh1xa7w; surname=bibi; love=hamster\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
     // char hello[] = "POST /www/test HTTP/1.1\r\nHOST: exemple.com:8080	\r\nContent-length: 17\r\nCookie: name=Manu; hamster=Kenya; filename=test\r\nContent-TYPE: 	application/json \r\n\r\nHello from client\r\n";
     // char hello[] = "POST /test HTTP/1.1\r\nHOST: :8080 \r\nCOntent-length: 70\r\nContent-TYPE: multipart/form-data; boundary=\"test\"\r\n\r\n--test\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"a.txt\"\r\nContent-Type: text/plain\r\n\r\nContent of a.txt.\r\n";
     char buffer[1024] = {0};

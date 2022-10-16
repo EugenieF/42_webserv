@@ -110,6 +110,13 @@ Block::listOfStrings	Block::getServerNames() const
 	return (_serverNames);
 }
 
+std::string		Block::getServerName() const
+{
+	if (!_serverNames.empty())
+		return (_serverNames[0]);
+	return (_host);
+}
+
 /******************************************************************************/
 /*                                 LISTEN                                     */
 /******************************************************************************/

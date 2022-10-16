@@ -92,20 +92,21 @@ class   Request
 		void						_initVariables();
 
 						/*------   Parsing  ------*/
+		void						_runParsingFunctions();
 		void						_parseMethod();
 		void						_parsePath();
 		void						_parseHttpProtocol();
 		void						_parseHeaders();
 		void						_checkHeaders();
 		void						_parseBody();
-		void						_parseChunks();
 		bool						_parseHostHeader();
 		void						_parseExtraHeader();
+		void						_decodeChunks();
 
 						/*------   Utils  ------*/
 		void						_initParsingFunct();
 		void						_setRequestStatus(t_requestStatus status);
-		void						_requestIsInvalid(t_statusCode code);
+		// void						_requestIsInvalid(t_statusCode code);
 		size_t						_getNextWord(std::string& word, std::string const& delimiter);
 		std::string					_getNextWord(size_t sizeWord);
 		std::string					_toLowerStr(std::string* str);

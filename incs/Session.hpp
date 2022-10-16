@@ -50,6 +50,8 @@ class Session
 						/*-------     Cleanup   -------*/
 		void					_deleteSession(mapOfSessions::iterator session);
 		void					_deleteSession(const std::string& sessionId);
+
+		Cookie*					_findSession(std::string sessionId);
 };
 
 #endif

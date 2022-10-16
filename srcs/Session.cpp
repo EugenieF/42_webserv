@@ -6,10 +6,7 @@
 
 Session::Session()
 {
-	struct timeval	time;
-
-    gettimeofday(&time,NULL);
-	srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
+	srand(getTime());
 }
 
 Session::Session(const Session& other)
@@ -35,31 +32,40 @@ Session::~Session()
 /*                                   LOOKUP                                   */
 /******************************************************************************/
 
+Cookie*		Session::_findSession(std::string sessionId)
+{
+	mapOfSessions::iterator		ite;
+	Cookie*						cookies;
+	
+	ite = _sessions.find(sessionId);
+	if (ite != _sessions.end())
+	{
+		cookies = ite->second;
+		if (cookies->sessionIsAlive())
+		{
+			cookies->updateTime();
+			return (cookies);
+		}
+		_deleteSession(ite);
+	}
+	return (_newSession());
+}
+
 Cookie*	Session::lookupSession(const Cookie& requestCookies)
 {
 	std::string						sessionId;
-	mapOfSessions::const_iterator	ite;
 	Cookie*							cookies;
 
-	// requestCookies.display();
 	sessionId = requestCookies.getSessionId();
-	std::cout << RED << "sessionId = '" << sessionId << "'" << RESET << std::endl;
+	// std::cout << RED << "sessionId = '" << sessionId << "'" << RESET << std::endl;
 	if (sessionId == "")
 		cookies = _newSession();
 	else
-	{
-		ite = _sessions.find(sessionId);
-		if (ite == _sessions.end())
-		{
-			cookies = _newSession();
-		}
-		else
-		{
-			cookies = ite->second;
-		}
-	}
+		cookies = _findSession(sessionId);
 	cookies->fillCookies(requestCookies);
-	cookies->display();
+	if (cookies->size() > 150)
+		throw(PAYLOAD_TOO_LARGE);
+	// cookies->display();
 	return (cookies);
 }
 
@@ -72,6 +78,7 @@ Cookie*	Session::_newSession()
 	std::string	newId;
 	Cookie*		newCookie;
 
+	/* init creation time */
 	newId = _generateSessionId();
 	newCookie = new Cookie(newId);
 	_sessions[newId] = newCookie;
