@@ -90,6 +90,7 @@ class	Block
 						/*-------  Server_name  ------*/
 		void								setName(const std::string& name);
 		listOfStrings						getServerNames() const;	
+		std::string							getServerName() const;	
 
 						/*-------    Listen    -------*/
 		void								setPort(int port);
