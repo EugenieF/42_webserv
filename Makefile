@@ -35,6 +35,8 @@ vpath			%.cpp $(shell find $(SRCS_DIR) -type d)
 
 DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
+DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS_BONUS:.cpp=.d))
+
 CXX				= c++
 
 CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
@@ -68,7 +70,9 @@ cookie:
 		$(eval SRCS += $(SRCS_BONUS))
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
-bonus:		cookie $(OBJS_BONUS) $(NAME)
+bonus:		cookie $(OBJS_BONUS) $(OBJS)
+		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
+		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 clean:
 		@$(RM) $(OBJS_DIR)
