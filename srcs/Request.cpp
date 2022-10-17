@@ -249,16 +249,18 @@ void	Request::_parseExtraHeader()
 void	Request::_checkSizeBody()
 {
 	listOfHeaders::const_iterator	ite;
-	size_t							pos;
 	size_t							sizeToCheck;
 	
 	sizeToCheck = _body.size();
-	if (_body.substr(_body.length() - 2) == "\r\n")
-		sizeToCheck -= 2;
-	else if (_body.substr(_body.length() - 1) == "\n")
-		sizeToCheck -= 1;
-	else
-		throw (BAD_REQUEST);
+	if (sizeToCheck)
+	{
+		if (_body.substr(_body.length() - 2) == "\r\n")
+			sizeToCheck -= 2;
+		else if (_body.substr(_body.length() - 1) == "\n")
+			sizeToCheck -= 1;
+		else
+			throw (BAD_REQUEST);
+	}
 	ite = _headers.find("content-length");
 	if (_method != POST && ite == _headers.end())
 		return ;

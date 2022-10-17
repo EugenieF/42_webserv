@@ -47,13 +47,13 @@ INCLUDE			= ./incs
 
 $(NAME):	$(OBJS)
 		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
-		echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
+		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 -include $(DEP)
 $(OBJS_DIR)/%.o: %.cpp
 		@mkdir -p $(OBJS_DIR)
 		@$(CXX) $(CXXFLAGS) -c $< -o $@
-		echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"
+		@echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"
 		@printf "$(UP)"
 
 
