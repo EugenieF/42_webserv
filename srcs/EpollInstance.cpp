@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 19:23:35 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/18 00:03:54 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,25 @@
 
 EpollInstance::EpollInstance() :
 	_efd(-1) {
-		DEBUG("Epoll constructor");
-	}
+	memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
+}
 
 EpollInstance::~EpollInstance() {
-	_clearClients();
-	_closeFd();
-	DEBUG("Epoll destructor");
+	_clearClientList();
+	_closeEfd();
 }
 
 /* == PUBLIC =============================================================== */
 
-void EpollInstance::startMonitoring(serverMap& servers, char* const* env) {
-	memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
+// Epoll manipulation ---------------------------
+
+void EpollInstance::startMonitoring(serverMap& servers) {
+	/* Creating fd associated with epoll */
 	_efd = epoll_create1(0);
 	_monitorServers(servers);
 
 	while (getTriggeredValue() == false) {
+		/* Waiting for events on every server sockets */
 		int nb_sockets = epoll_wait(_efd, _events, MAX_EVENT, -1);
 		if (nb_sockets < 0) {
 			if (errno == EINTR)

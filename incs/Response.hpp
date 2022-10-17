@@ -151,7 +151,7 @@ class   Response
 	/***************************     BONUS     *************************/
 	#ifdef COOKIE
 	public:
-        Response(Block* server, Request* request, Cookie& cookies);
+        Response(Block* server, Request* request, Env& env, Cookie& cookies);
 		Cookie&							getCookies();
 		const Cookie&					getCookies() const;
 

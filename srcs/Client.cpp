@@ -10,36 +10,38 @@ are done in a non-blocking manner. */
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Client::Client() {}
+// Client::Client() {}
 
-Client::Client(serverMapNode server, int sockfd):
+Client::Client(serverMapNode server, int sockfd, const Env& env):
 	_sockfd(sockfd),
     _runningServer(server),
     _request(0),
-    _response(0)
+    _response(0),
+	_env(env)
 {}
 
-Client::Client(Client const& other)
-{
-    *this = other;
-}
+// Client::Client(Client const& other)
+// {
+//     *this = other;
+// }
 
 Client::~Client()
 {
     clear();
+	std::cout << "client destroyed: " << getFd() << NL;
 }
 
-Client&     Client::operator=(const Client& other)
-{
-    if (this != &other)
-    {
-		_sockfd = other.getFd();
-        _runningServer = other.getRunningServer();
-        _request = other.getRequest();
-        _response = other.getResponse();
-    }
-    return (*this);
-}
+// Client&     Client::operator=(const Client& other)
+// {
+//     if (this != &other)
+//     {
+// 		_sockfd = other.getFd();
+//         _runningServer = other.getRunningServer();
+//         _request = other.getRequest();
+//         _response = other.getResponse();
+//     }
+//     return (*this);
+// }
 
 /******************************************************************************/
 /*                                 REQUEST                                    */
@@ -50,7 +52,7 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
     t_requestStatus requestStatus;
 
     if (!_request)
-			_request = new Request(buffer);
+		_request = new Request(buffer, getFd());
     else
         _request->completeRequest(buffer);
     requestStatus = _request->parseRequest();
@@ -62,25 +64,25 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
 /******************************************************************************/
 
 #ifndef COOKIE
-std::string     Client::generateResponse()
+void	Client::generateResponse()
 {
 	if (_response)
 		delete _response;
-	_response = new Response(_selectVirtualServer(), _request);
+	_response = new Response(_selectVirtualServer(), _request, _env);
 	_response->generateResponse();
-	return (_response->getResponse());
+	// return (_response->getResponse());
 }
 #else
-std::string     Client::generateResponse()
+void	Client::generateResponse()
 {
     Cookie*		cookies;
 
 	if (_response)
 		delete _response;
 	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
-	_response = new Response(_selectVirtualServer(), _request, *cookies);
+	_response = new Response(_selectVirtualServer(), _request, _env, *cookies);
 	_response->generateResponse();
-	return (_response->getResponse());
+	// return (_response->getResponse());
 }
 #endif
 
@@ -136,6 +138,14 @@ Response*   Client::getResponse() const
 
 int	Client::getFd() const {
 	return (_sockfd);
+}
+
+const Env&	Client::getEnv() const {
+	return (_env);
+}
+
+Env&	Client::getEnv() {
+	return (_env);
 }
 
 /******************************************************************************/

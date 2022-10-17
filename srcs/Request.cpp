@@ -16,14 +16,14 @@ Content-Type header.
 /******************************************************************************/
 
 Request::Request():
-	_request("")
+	_request(""), _fd(-1)
 {
 	_initVariables();
 	_initParsingFunct();
 }
 
-Request::Request(const std::string& buffer):
-	_request(buffer)
+Request::Request(const std::string& buffer, int clientfd):
+	_request(buffer), _fd (clientfd)
 {
 	_initVariables();
 	_initParsingFunct();
@@ -71,6 +71,7 @@ Request&	Request::operator=(const Request &other)
 		_port = other.getPort();
 		_query = other.getQuery();
 		_payloadSize = other.getPayloadSize();
+		_fd = other.getFd();
 		#ifdef COOKIE
 			_cookies = other.getCookies();
 		#endif
@@ -403,6 +404,20 @@ std::string		Request::getQuery() const
 size_t	Request::getPayloadSize() const
 {
 	return (_payloadSize);
+}
+
+int		Request::getFd() const {
+	return (_fd);
+}
+
+std::string		Request::getMethodStr() const {
+	/* Lol flemme de faire un pointeur sur fct */
+	if (getMethod() == GET)
+		return (std::string("GET"));
+	else if (getMethod() == POST)
+		return (std::string("POST"));
+	else
+		return (std::string("DELETE"));
 }
 
 /******************************************************************************/

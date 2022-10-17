@@ -5,45 +5,47 @@
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response(Block *server, Request* request):
+Response::Response(Block *server, Request* request, Env& env):
 	_server(server),
 	_request(request),
 	_response(""),
 	_statusCode(_request->getStatusCode()),
 	_method(_request->getMethod()),
 	_body(""),
-	_locationPath("")
-{
+	_locationPath(""),
+	_fd(request->getFd()),
+	_env(&env) {
 	_initHttpMethods();
 }
 
-Response::Response(const Response &other)
-{
-	*this = other;
-}
+// Response::Response(const Response &other)
+// {
+// 	*this = other;
+// }
 
 Response::~Response() {}
 
-Response&	Response::operator=(const Response &other)
-{
-	if (this != &other)
-	{
-		_server = other.getServer();
-		_matchingBlock = other.getMatchingBlock();
-		_request = other.getRequest();
-		_response = other.getResponse();
-		_statusCode = other.getStatusCode();
-		_method = other.getMethod();
-		_headers = other.getHeaders();
-		_body = other.getBody();
-		_httpMethods = other.getHttpMethods();
-		_locationPath = other.getLocationPath();
-		#ifdef COOKIE
-			_cookies = other.getCookies();
-		#endif
-	}
-	return (*this);
-}
+// Response&	Response::operator=(const Response &other)
+// {
+// 	if (this != &other)
+// 	{
+// 		_server = other.getServer();
+// 		_matchingBlock = other.getMatchingBlock();
+// 		_request = other.getRequest();
+// 		_response = other.getResponse();
+// 		_statusCode = other.getStatusCode();
+// 		_method = other.getMethod();
+// 		_headers = other.getHeaders();
+// 		_body = other.getBody();
+// 		_httpMethods = other.getHttpMethods();
+// 		_locationPath = other.getLocationPath();
+// 		_fd = other.getFd();
+// 		#ifdef COOKIE
+// 			_cookies = other.getCookies();
+// 		#endif
+// 	}
+// 	return (*this);
+// }
 
 /******************************************************************************/
 /*                                 GENERATE                                   */
@@ -74,6 +76,7 @@ void	Response::_processMethod()
 
 void	Response::generateResponse()
 {
+	/* Generate CGI here */
 	std::string	errorPage;
 
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
@@ -658,6 +661,92 @@ Response::listOfHttpMethodsFunct	Response::getHttpMethods() const
 std::string		Response::getLocationPath() const
 {
 	return (_locationPath);
+}
+
+int		Response::getFd() const {
+	return (_fd);
+}
+
+std::string		Response::getCgiProgram() const {
+	return (_matchingBlock->getCgiPath());
+}
+
+std::string		Response::getCgiName() const {
+	return (_cgiscript);
+}
+
+std::string		Response::getCgiExtra() const {
+	return (_cgiextra);
+}
+
+std::string		Response::getCgiQuery() const {
+	return (_cgiquery);
+}
+
+const Env&		Response::getEnv() const {
+	return (*_env);
+}
+
+/******************************************************************************/
+/*                                    CGI                                     */
+/******************************************************************************/
+
+/* Template url:
+	http://domain/cgi_dir_path/cgi_script.cgi_ext/cgi_extra?cgi_query
+*/
+size_t	Response::_parsePosCgiExtension(const std::string& path) const {
+	(void)path;
+	return (1); /*dummy*/
+}
+
+void   Response::_parseCgiUrl() {
+	/* TODO: Retrieve cgi pos_extension and check if matching to block */
+	std::string		path = _request->getPath();
+	size_t			pos_extension = _parsePosCgiExtension(path);
+
+	if (pos_extension == std::string::npos)
+	        return ; /* No cgi in request */
+
+	size_t		pos_end_extension = path.find('/', pos_extension);
+	size_t		pos_cgi = path.find_last_of('/', pos_extension);
+	std::string	cgi = path.substr(pos_cgi + 1, pos_end_extension);
+	if (cgi.empty())
+	        /* Error?: cgi script name empty */;
+	        //return (_requestIsInvalid(BAD_REQUEST));
+	_cgiscript = cgi;
+
+	std::string	cgi_extra = path.substr(pos_end_extension);
+	if (pos_end_extension == std::string::npos)
+	        return ;
+
+	size_t	pos_query = path.find('?');
+	_cgiquery = path.substr(pos_query + 1);
+
+	std::string extra = path.substr(0, pos_query);
+	_cgiextra = extra;
+}
+
+void	Response::_fillCgiMetavariables() {
+	/* Retrieve info from request */
+	_env->addParam("SERVER_PROTOCOL", _request->getHttpProtocol());
+	_env->addParam("CONTENT_LENGTH", convertNbToString(_request->getBodySize()));
+	_env->addParam("CONTENT_TYPE", _request->getHeader("content-type"));
+	_env->addParam("REQUEST_METHOD", _request->getMethodStr());
+	_env->addParam("QUERY_STRING", getCgiQuery());
+	_env->addParam("SCRIPT_NAME", getCgiName());
+	_env->addParam("PATH_INFO", getCgiExtra());
+	_env->addParam("PATH_TRANSLATED", _translateCgiName());
+	_env->addParam("REMOTE_ADDR", "localhost"); // TODO: client ip
+	_env->addParam("SERVER_PORT", convertNbToString(_request->getPort()));
+	_env->addParam("REMOTE_IDENT", ""); // optional
+	_env->addParam("SERVER_PORT", ""); // optional
+}
+
+std::string		Response::_translateCgiName() const {
+	std::string     translation(_env->getEnv("PWD"));
+	translation += _server->getCgiPath();
+	translation += getCgiName();
+	return (translation);
 }
 
 /******************************************************************************/
