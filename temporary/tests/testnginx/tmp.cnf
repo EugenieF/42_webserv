@@ -1,0 +1,11 @@
+http {
+# this is a test
+	server {
+		location / {
+			root /data/www;
+		}
+		location
+	}
+}
+
+
