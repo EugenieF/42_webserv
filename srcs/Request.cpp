@@ -96,7 +96,7 @@ t_requestStatus	Request::parseRequest()
 	catch(const t_statusCode& errorCode)
 	{
 		_statusCode = errorCode;
-		_requestStatus = INVALID_REQUEST;
+		// _requestStatus = INVALID_REQUEST;
 	}
 	// printRequestInfo();
 	return (_requestStatus);
