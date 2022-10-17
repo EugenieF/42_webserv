@@ -53,7 +53,7 @@ class Webserv
 		// Webserv&						operator=(const Webserv& other);
 
 						/*-------    Run     ------*/
-		void							parse(std::string configFile);
+		// void							parse(std::string configFile);
 		void							run();
 
 						/*-------   Getter   ------*/

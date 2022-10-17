@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/16 16:59:49 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/17 23:50:36 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,11 @@
 
 # include "Server.hpp"
 
-Server::Server(Block* x) :
+Server::Server(Block* x, char* const* env) :
 	_socket(socket(PF_INET, SOCK_STREAM, 0)),
-	_ip(x->getHost()) {
+	_ip(x->getHost()),
+	 _env(env) {
+		_setMetaVar(x);
 		_socket.setToReusable();
 		memset(&_addr, 0, sizeof(_addr));
 		_addr.sin_family = AF_INET;
@@ -29,8 +31,7 @@ Server::Server(Block* x) :
 		_socket.unlockSocket();
 		_socket.listenSocket();
 
-		_displayServer();
-		DEBUG("Server Block constructor");
+		_displayServer(); /* DEBUG */
 	}
 
 Server::~Server() {
@@ -55,6 +56,10 @@ int Server::getSocket() const {
 
 const struct sockaddr_in& Server::getAddr() const {
 	return (_addr);
+}
+
+const Env& Server::getEnv() const {
+	return (_env);
 }
 
 // Boolean operator ------------------------------
@@ -93,6 +98,17 @@ bool	Server::operator>=(const Server& rhs) const {
 
 /* PRIVATE ================================================================== */
 
+// Utils -----------------------------------------
+
+void Server::_setMetaVar(const Block* block) {
+	_env.addParam("GATEWAY_INTERFACE", "CGI/1.1");
+	_env.addParam("SERVER_NAME", block->getServerName());
+	_env.addParam("SERVER_SOFTWARE", "webserv");
+	_env.addParam("AUTH_TYPE", "");
+	_env.addParam("DOCUMENT_ROOT", block->getRoot());
+	/* Add other Metavar ? */
+}
+
 // Debug -----------------------------------------
 
 void Server::_displayServer() const {
@@ -100,6 +116,7 @@ void Server::_displayServer() const {
 	#ifndef DISPLAY
 		return;
 	#endif
+	DEBUG(" ** New server created ** ");
 	std::cout	<< "== Connection infos ==" << NL
 				<< "fd: " << getSocket() << NL
 				<< "ip: " << getHost() << NL

@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 15:30:51 by etran             #+#    #+#             */
-/*   Updated: 2022/10/11 15:35:05 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/17 23:32:50 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int main(int argc, char **argv, char* const* env)
 		//std::string configFile(argv[1]);
 	try
 	{
-		setupSignal(INIT_SIGNAL);
+		// setupSignal(INIT_SIGNAL);
 		Webserv	webserv(configFile, env);
 		// webserv.displayServers();
 	}
@@ -40,9 +40,9 @@ int main(int argc, char **argv, char* const* env)
 	{
 		std::cerr << e.what() << '\n';
 		std::cerr << "Errno value: " << errno << NL;
-		setupSignal(RESET_SIGNAL);
+		// setupSignal(RESET_SIGNAL);
 		return (EXIT_FAILURE);
 	}
-	setupSignal(RESET_SIGNAL);
+	// setupSignal(RESET_SIGNAL);
 	return (EXIT_SUCCESS);
 }

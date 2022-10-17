@@ -79,6 +79,38 @@ std::string	trimSpacesEndStr(std::string *str, const char *toTrim)
 	return (*str);
 }
 
+/* Strdup... C++ style */
+char* clone_str(const std::string& str) {
+	if (str.empty())
+		return (0);
+
+	char*   copy = new char[str.size() + 1];
+
+	strcpy(copy, str.c_str());
+	return (copy);
+}
+
+std::string readFd(int fd) {
+	std::string     str;
+	char            buf[BUFSIZE + 1];
+	ssize_t         count;
+
+	count = read(fd, buf, BUFSIZE + 1);
+	memset(buf, 0, BUFSIZE + 1);
+	while (count) {
+		if (count < 0)
+			throw std::runtime_error("readFd (read) error");
+		str += buf;
+		if (count == BUFSIZE) {
+			memset(buf, 0, BUFSIZE + 1);
+			count = read(fd, buf, BUFSIZE + 1);
+		} else {
+			break ;
+		}
+	}
+	return (str);
+}
+
 /******************************************************************************/
 /*                               FILE RELATED                                 */
 /******************************************************************************/
