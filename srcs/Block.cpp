@@ -13,8 +13,6 @@ Block::Block():
 	_indexes(0),
 	_autoindex(false),
 	_clientBodyLimit(DEFAULT_CLIENT_BODY_LIMIT),
-	_cgiExt(""),
-	_cgiPath(""),
 	_redirectCode(0),
 	_redirectUri(""),
 	_uploadPath("")
@@ -56,8 +54,7 @@ Block&	Block::operator=(const Block& other)
 		_indexes = other.getIndexes();
 		_autoindex = other.getAutoindex();
 		_clientBodyLimit = other.getClientBodyLimit();
-		_cgiExt = other.getCgiExt();
-		_cgiPath = other.getCgiPath();
+		_cgi = other.getCgi();
 		_errorPages = other.getErrorPages();
 		_redirectCode = other.getRedirectCode();
 		_redirectUri = other.getRedirectUri();
@@ -81,11 +78,14 @@ void	Block::setDirective(Token::tokenType directive)
 	_setDirectives.insert(_setDirectives.end(), directive);
 }
 
+/* Check if the directive was already set */
 bool	Block::directiveIsSet(Token::tokenType directive)
 {
 	std::vector<Token::tokenType>::const_iterator	ite;
 
-	if (directive == KEYWORD_LOCATION || directive == KEYWORD_ERROR_PAGE)
+	/* Some directives can be called multiple times (location, error_page, cgi) */
+	if (directive == KEYWORD_LOCATION || directive == KEYWORD_ERROR_PAGE
+		|| directive == KEYWORD_CGI)
 		return (false);
 	for (ite = _setDirectives.begin(); ite != _setDirectives.end(); ite++)
 	{
@@ -201,29 +201,19 @@ size_t	Block::getClientBodyLimit() const
 /*                                   CGI                                      */
 /******************************************************************************/
 
-void	Block::setCgiExt(const std::string& extension)
+void	Block::setCgi(const std::string& extension, const std::string& path)
 {
-	_cgiExt = extension;
+	_cgi[extension] = path;
 }
 
-void	Block::setCgiPath(const std::string& path)
+const Block::listOfCgi&		Block::getCgi() const
 {
-	_cgiPath = path;
+	return (_cgi);
 }
 
-const std::string&	Block::getCgiExt() const
+bool	Block::findCgi(const std::string& extension)
 {
-	return (_cgiExt);
-}
-
-const std::string&	Block::getCgiPath() const
-{
-	return (_cgiPath);
-}
-
-bool	Block::cgiDirective()
-{
-	return (!_cgiPath.empty() && !_cgiExt.empty());
+	return (_cgi.find(extension) != _cgi.end());
 }
 
 /******************************************************************************/
@@ -429,10 +419,8 @@ void	Block::completeLocationDirectives(const Block& server)
 		_indexes = server.getIndexes();
 	if (_clientBodyLimit == DEFAULT_CLIENT_BODY_LIMIT)
 		_clientBodyLimit = server.getClientBodyLimit();
-	if (_cgiExt.empty())
-		_cgiExt = server.getCgiExt();
-	if (_cgiPath.empty())
-		_cgiPath = server.getCgiPath();
+	if (_cgi.empty())
+		_cgi = server.getCgi();
 	if (_errorPages.empty())
 		_errorPages = server.getErrorPages();
 	if (!_redirectCode)
@@ -500,7 +488,7 @@ void	Block::displayBlockDirectives(t_context context)
 	std::cout << indent << "‣ Body limit: " << getClientBodyLimit() << std::endl;
 	std::cout << indent << "‣ Upload path: " << getUploadPath() << std::endl;
 	std::cout << indent << "‣ Redirection: " << getRedirectCode() << " " << getRedirectUri() << std::endl;
-	std::cout << indent << "‣ Cgi: " << getCgiExt() << " " << getCgiPath() << std::endl;
+	// std::cout << indent << "‣ Cgi: " << getCgiExt() << " " << getCgiPath() << std::endl;
 	// std::cout << "  ‣ Error page: " << getErrorCode() << " " << getErrorPage() << std::endl;
 }
 

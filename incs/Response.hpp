@@ -125,6 +125,8 @@ class   Response
 		bool							_requestIsValid();
 		void							_checkBodyLimit();
 		bool							_isMultipartFormRequest();
+		bool							_isCgi(const std::string& path);
+
 
 	/***************************     BONUS     *************************/
 	#ifdef COOKIE

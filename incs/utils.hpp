@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/16 18:08:13 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/17 15:36:14 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 
 # include <cstdlib>
 # include <sstream>
+# include <ctime>
 # include <signal.h>
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/stat.h>
-# include <sys/time.h>
 
 # include "StatusCode.hpp"
 # include "MimeType.hpp"
@@ -61,6 +61,7 @@ void			displayMsg(const std::string& msg, const char* colorCode);
 
 		/*------------   Time   ---------*/
 
-size_t			getTime();
+std::string		getFormattedDate();
+std::string		getFormattedDate(std::time_t time);
 
 #endif

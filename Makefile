@@ -20,26 +20,21 @@ SRCS			= main.cpp \
 				MimeType.cpp \
 				HttpMethod.cpp \
 				Autoindex.cpp \
-				generateErrorPage.cpp
-
-SRCS_BONUS		= Cookie.cpp \
+				generateErrorPage.cpp \
+				Cookie.cpp \
 				Session.cpp
 
 OBJS_DIR		= ./objs
 
 OBJS			= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.o))
 
-OBJS_BONUS		= $(addprefix $(OBJS_DIR)/, $(SRCS_BONUS:.cpp=.o))
-
 vpath			%.cpp $(shell find $(SRCS_DIR) -type d)
 
 DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
-DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS_BONUS:.cpp=.d))
-
 CXX				= c++
 
-CXXFLAGS		= -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
+CXXFLAGS		 = -Wall -Wextra -Werror -std=c++98 -MMD -MP -I$(INCLUDE)
 
 DEBUG_MODE		= -DDISPLAY
 
@@ -52,14 +47,15 @@ INCLUDE			= ./incs
 
 $(NAME):	$(OBJS)
 		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
-		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
+		echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 -include $(DEP)
 $(OBJS_DIR)/%.o: %.cpp
 		@mkdir -p $(OBJS_DIR)
 		@$(CXX) $(CXXFLAGS) -c $< -o $@
-		@echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"
+		echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"
 		@printf "$(UP)"
+
 
 all:	$(NAME)
 
@@ -67,12 +63,9 @@ debug:
 		$(eval CXXFLAGS += $(DEBUG_MODE))
 
 cookie:
-		$(eval SRCS += $(SRCS_BONUS))
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
-bonus:		cookie $(OBJS_BONUS) $(OBJS)
-		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
-		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
+bonus:		cookie re
 
 clean:
 		@$(RM) $(OBJS_DIR)

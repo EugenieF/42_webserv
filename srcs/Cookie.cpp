@@ -2,12 +2,12 @@
 
 Cookie::Cookie()
 {
-	_time = getTime();
+	_time = std::time(NULL);
 }
 
 Cookie::Cookie(const std::string& sessionId)
 {
-	_time = getTime();
+	_time = std::time(NULL);
 	setCookie("SID", sessionId);
 }
 
@@ -142,10 +142,10 @@ std::string	Cookie::setCookieHeader()
 
 bool	Cookie::sessionIsAlive()
 {
-	return (getTime() - _time < SESSION_TIMEOUT);
+	return (std::time(NULL) - _time < SESSION_TIMEOUT);
 }
 
 void	Cookie::updateTime()
 {
-	_time = getTime();
+	_time = std::time(NULL);
 }

@@ -111,15 +111,37 @@ void	displayMsg(const std::string& msg, const char* colorCode)
 }
 
 /******************************************************************************/
-/*                               FILE RELATED                                 */
+/*                               TIME RELATED                                 */
 /******************************************************************************/
 
-size_t	getTime()
+std::string	getFormattedDate()
 {
-	struct timeval	timeval;
-	size_t			time_in_ms;
+	std::time_t	time;
+    char		date[100];
+	int			ret;
 
-	gettimeofday(&timeval, NULL);
-	time_in_ms = timeval.tv_sec * 1000 + timeval.tv_usec / 1000;
-	return (time_in_ms);
+	time = std::time(NULL);
+    ret = std::strftime(date, sizeof(date), "%a, %d %b %Y %X GMT", std::localtime(&time));
+	if (!ret)
+	{
+		/* An error occured */
+		std::cerr << "Webserv error: strftime() function failed" << std::endl;
+		throw (INTERNAL_SERVER_ERROR);
+	}
+	return(std::string(date));	
+}
+
+std::string	getFormattedDate(std::time_t time)
+{
+    char		date[100];
+	int			ret;
+
+    ret = std::strftime(date, sizeof(date), "%a, %d %b %Y %X GMT", std::localtime(&time));
+	if (!ret)
+	{
+		/* An error occured */
+		std::cerr << "Webserv error: strftime() function failed" << std::endl;
+		throw (INTERNAL_SERVER_ERROR);
+	}
+	return(std::string(date));	
 }

@@ -128,7 +128,7 @@ void	Response::_fillHeaders()
 	_headers["Server"] = WEBSERV_VERSION;
 	_headers["Content-Type"] = _getContentTypeHeader();
 	_headers["Content-Length"] = convertSizeToString(_body.length());
-	_headers["Date"] = _getDateHeader();
+	_headers["Date"] = getFormattedDate();
 	_headers["Connection"] = _getConnectionHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
@@ -153,30 +153,42 @@ void	Response::_readFileContent(const std::string& path)
 	std::ifstream		file;
 	std::stringstream	fileContent;
 	
-	 /* We try to access the file */
+	/* Check if file is accessible */
 	if (!pathIsAccessible(path))
-	{
 		throw(NOT_FOUND);
-	}
-	/* We try to open the file */
 	file.open(path.c_str(), std::ifstream::in); 
+	/* Check if file was successfully opened */
 	if (!file.is_open())
 	{
-		/* error */
+		/* An error occured */
 		_throwErrorMsg("Can't open file '" + path + "'");
 	}
+	/* We read the file */
 	fileContent << file.rdbuf();
 	_body = fileContent.str();
 	file.close();
 }
 
+/* Check if we need to run cgi */
+bool	Response::_isCgi(const std::string& path)
+{
+	std::string	ext;
+	size_t		pos;
+
+	if (_matchingBlock->getCgi().empty())
+		return (false);
+	pos = path.rfind(".");
+	if (pos == std::string::npos)
+		return (false);
+	ext = path.substr(pos + 1);
+	return (_matchingBlock->findCgi(ext));
+}
+
 /*  GET method : "Transfer a current representation of the target resource." */
 void	Response::_runGetMethod(std::string& path)
 {
-	std::string		filePath;
-
 	DEBUG("Get method");
-	if (_matchingBlock->cgiDirective()) // && check if cgi in request url
+	if (_isCgi(path))
 	{
 		/* process cgi */
 		return (_handleCgi());
@@ -295,22 +307,31 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 void	Response::_writeFileContent(const std::string& path, const std::string& content)
 {
 	std::ofstream	file;
+	std::string		pathDir;
 
+	/* Check if directory is accessible */
+	pathDir = path.substr(0, path.rfind("/") + 1);
+	if (!pathIsAccessible(pathDir))
+		throw (BAD_REQUEST);
+	/* Check if file already exist */
 	if (!pathIsAccessible(path))
 	{
 		/* New file will be created */
 		setStatusCode(CREATED);
 	}
 	file.open(path.c_str(), std::ofstream::app);
+	/* Check if file was successfully opened */
 	if (!file.is_open())
 	{
-		/* error */
+		/* An error occured */
 		_throwErrorMsg("Can't open file '" + path + "'");
 	}
+	/* We write in file */
 	file << content;
+	/* Check if writing was successfully performed */
 	if (file.bad())
 	{
-		/* error */
+		/* An error occured */
 		_throwErrorMsg("An error occurred while writing '" + path + "'");
 	}
 	file.close();
@@ -324,6 +345,7 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 void	Response::_handleCgi()
 {
 	DEBUG("handleCgi()");
+	std::cout << RED << "*** HANDLE CGI ***" << RESET << std::endl;
 }
 
 /* Perform resource-specific processing on the request payload. */
@@ -336,7 +358,7 @@ void	Response::_runPostMethod(std::string& path)
 	{
 		_handleMultipartContent(path, _request->getBody());
 	}
-	if (_matchingBlock->cgiDirective()) // && check if cgi in request url
+	if (_isCgi(path))
 	{
 		/* process cgi */
 		return (_handleCgi());
@@ -411,19 +433,19 @@ std::string		Response::_getContentTypeHeader()
 	return (g_mimeType[typeExtension]);
 }
 
-std::string		Response::_getDateHeader()
-{
-	std::time_t	time;
-    char		date[100];
+// std::string		Response::_getDateHeader()
+// {
+// 	std::time_t	time;
+//     char		date[100];
 
-	time = std::time(NULL);
-    if (!std::strftime(date, sizeof(date), "%a, %d %b %Y %X GMT", std::localtime(&time)))
-	{
-		/* Error */
-		_throwErrorMsg("strftime() function failed");
-	}
-	return(std::string(date));
-}
+// 	time = std::time(NULL);
+//     if (!std::strftime(date, sizeof(date), "%a, %d %b %Y %X GMT", std::localtime(&time)))
+// 	{
+// 		/* Error */
+// 		_throwErrorMsg("strftime() function failed");
+// 	}
+// 	return(std::string(date));
+// }
 
 /* The keep-alive directive indicates that the client wants the HTTP Connection to persist and remain
 open after the current transaction is complete. This is the default setting for HTTP/1.1 requests. */

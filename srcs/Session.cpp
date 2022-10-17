@@ -6,7 +6,7 @@
 
 Session::Session()
 {
-	srand(getTime());
+	srand(std::time(NULL));
 }
 
 Session::Session(const Session& other)
@@ -119,21 +119,26 @@ std::string		Session::_generateSessionId()
 
 void	Session::deleteSessions()
 {
-	mapOfSessions::iterator	session;
+	mapOfSessions::iterator	currentSession;
 
-	for (session = _sessions.begin(); session != _sessions.end(); session++)
-		_deleteSession(session);
+	// for (session = _sessions.begin(); session != _sessions.end(); session++)
+	// 	_deleteSession(session);
+	currentSession = _sessions.begin();
+	while (currentSession != _sessions.end())
+	{
+		_deleteSession(currentSession);
+		currentSession = _sessions.begin();
+	}
 }
 
 void	Session::_deleteSession(Session::mapOfSessions::iterator session)
 {
-	if (session == _sessions.end())
-		return ;
 	if (session->second)
 	{
 		delete session->second;
 		session->second = NULL;
 	}
+	_sessions.erase(session);
 }
 
 void	Session::_deleteSession(const std::string& sessionId)
@@ -148,6 +153,7 @@ void	Session::_deleteSession(const std::string& sessionId)
 		delete session->second;
 		session->second = NULL;
 	}
+	_sessions.erase(sessionId);
 }
 
 /******************************************************************************/

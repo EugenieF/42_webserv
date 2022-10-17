@@ -89,7 +89,9 @@ t_requestStatus	Request::parseRequest()
 		if (_chunkedTransfer && _requestStatus != COMPLETE_REQUEST)
 			_decodeChunks();
 		else
+		{
 			_runParsingFunctions();
+		}
 	}
 	catch(const t_statusCode& errorCode)
 	{
@@ -135,7 +137,7 @@ void	Request::_parsePath()
 	_getNextWord(path, " ");
 	if (path == "" || path[0] != '/')
 		throw (BAD_REQUEST);
-	if (path.length() > 2048)
+	if (path.length() > 2048) /* Maximum URL Length */
 		throw (URI_TOO_LONG);
 	/* Search for query */
 	pos = path.find("?");
@@ -143,6 +145,8 @@ void	Request::_parsePath()
 	{
 		_query = path.substr(pos + 1);
 		path.erase(pos);
+		if (_query.length() > 255) /* limited by the DNS */
+			throw (URI_TOO_LONG);
 	}
 	/* We need to handle cgi extension */
 	_path = path;
@@ -194,8 +198,9 @@ bool	Request::_parseHostHeader()
 		return (false);
 	_host = ite->second;
 	pos = _host.find(":");
-	if (pos != std::string::npos)
-		_host = _host.substr(0, pos);
+	if (pos == std::string::npos)
+		return (true);
+	_host = _host.substr(0, pos);
 	if (pos + 1 != std::string::npos)
 		return (convertPort(ite->second.substr(pos + 1), &_port));
 	return (true);
@@ -241,6 +246,27 @@ void	Request::_parseExtraHeader()
 	#endif
 }
 
+void	Request::_checkSizeBody()
+{
+	listOfHeaders::const_iterator	ite;
+	size_t							pos;
+	size_t							sizeToCheck;
+	
+	sizeToCheck = _body.size();
+	if (_body.substr(_body.length() - 2) == "\r\n")
+		sizeToCheck -= 2;
+	else if (_body.substr(_body.length() - 1) == "\n")
+		sizeToCheck -= 1;
+	else
+		throw (BAD_REQUEST);
+	ite = _headers.find("content-length");
+	if (_method != POST && ite == _headers.end())
+		return ;
+	/* Check if given size is correct */
+	if (sizeToCheck != _bodySize)
+		throw (BAD_REQUEST);
+}
+
 void	Request::_parseBody()
 {
 	std::string		body;
@@ -251,9 +277,8 @@ void	Request::_parseBody()
 		_decodeChunks();
 	else
 	{
-		// _getNextWord(_body, "\r\n\r\n");
-		// if (_body.length() != _bodySize) // ???
 		_body = _request;
+		_checkSizeBody();
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	}
 }
@@ -277,13 +302,14 @@ void	Request::_decodeChunks()
 		if (chunkSize.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
 			throw (BAD_REQUEST);
 		if (chunkSize == "0")
-			return (_setRequestStatus(COMPLETE_REQUEST));
+			break ;
 		size = std::strtol(chunkSize.c_str(), NULL, 16);
 		if (!size || size == LONG_MAX || size == LONG_MIN)
 			throw (BAD_REQUEST);
 		_body += _getNextWord(size);
 		_bodySize += size;
 	}
+	return (_setRequestStatus(COMPLETE_REQUEST));
 }
 
 /******************************************************************************/

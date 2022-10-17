@@ -134,18 +134,27 @@ std::string		Autoindex::_getFileSize(struct stat	fileInfos)
 	return (size);
 }
 
+// std::string		Autoindex::_getFileModificationTime(struct stat	fileInfos)
+// {
+//     char				date[100];
+// 	std::string			time;
+
+// 	if (!std::strftime(date, sizeof(date), "%d-%b-%Y %H:%M", std::localtime(&fileInfos.st_mtime)))
+// 	{
+// 		/* Error */
+// 		std::cerr << RED << "Webserv error: strftime() failed" << RESET << std::endl;
+// 		return ("");
+// 	}
+// 	time = convertCharPtrToString(date);
+// 	_formatCell(&time);
+// 	return(time);
+// }
+
 std::string		Autoindex::_getFileModificationTime(struct stat	fileInfos)
 {
-    char				date[100];
-	std::string			time;
+	std::string		time;
 
-	if (!std::strftime(date, sizeof(date), "%d-%b-%Y %H:%M", std::localtime(&fileInfos.st_mtime)))
-	{
-		/* Error */
-		std::cerr << RED << "Webserv error: strftime() failed" << RESET << std::endl;
-		return ("");
-	}
-	time = convertCharPtrToString(date);
+	time = getFormattedDate(fileInfos.st_mtime);
 	_formatCell(&time);
 	return(time);
 }

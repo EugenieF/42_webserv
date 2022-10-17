@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/14 19:12:03 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/17 15:52:10 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,7 +275,12 @@ void EpollInstance::_eraseClient(Client* client) {
 
 void EpollInstance::_clearClients()
 {
-	for (listOfClients::const_iterator client = _clientlist.begin(); client != _clientlist.end(); client++) {
-		_eraseClient(client->second);
+	listOfClients::const_iterator currentClient;
+
+	currentClient = _clientlist.begin();
+	while (currentClient != _clientlist.end())
+	{
+		_eraseClient(currentClient->second);
+		currentClient = _clientlist.begin();
 	}
 }

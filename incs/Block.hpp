@@ -40,6 +40,7 @@ class	Block
 		typedef std::map<std::string, blockPtr>		listOfLocations;
 		typedef std::map<int, std::string>			listOfErrorPages;
 		typedef std::vector<Block*>					listOfServers;
+		typedef std::map<std::string, std::string>	listOfCgi;
 		typedef	std::map<t_method, bool>			listOfMethods;
 
 	private :
@@ -58,8 +59,7 @@ class	Block
 		listOfStrings						_indexes;
 		bool								_autoindex;
 		size_t								_clientBodyLimit;
-		std::string							_cgiExt;
-		std::string							_cgiPath;
+		listOfCgi							_cgi;
 		listOfErrorPages					_errorPages;
 		int									_redirectCode;
 		std::string							_redirectUri;
@@ -115,11 +115,9 @@ class	Block
 		unsigned long						getClientBodyLimit() const;
 
 						/*-------      CGI     -------*/
-		void								setCgiExt(const std::string& extension);
-		void								setCgiPath(const std::string& path);
-		const std::string&					getCgiExt() const;
-		const std::string&					getCgiPath() const;
-		bool								cgiDirective();
+		void								setCgi(const std::string& extension, const std::string& path);
+		const listOfCgi&					getCgi() const;
+		bool								findCgi(const std::string& extension);
 
 						/*-------  Error_page  -------*/
 		void								setErrorPage(int code, const std::string& page);

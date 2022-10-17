@@ -282,13 +282,20 @@ void	Parser::_parseMaxBodySizeRule()
 /* Context: Server, Location */
 void	Parser::_parseCgiRule()
 {
+	std::string	extension;
+	std::string	path;
+
 	_expectNbOfArguments(2, EQUAL, SEMICOLON);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
-	if (_currentToken->getValue() != "php" || _currentToken->getValue() != "py")
+	if (_currentToken->getValue() != "php"	&& _currentToken->getValue() != ".php"
+		&& _currentToken->getValue() != ".py"	&& _currentToken->getValue() != "py")
 		_throwErrorParsing(_invalidValueMsg(_currentToken));
-	_currentBlock->setCgiExt(_currentToken->getValue());
+	extension = _currentToken->getValue();
+	if (extension[0] && extension[0] == '.')
+		extension.erase(0, 1);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
-	_currentBlock->setCgiPath(_currentToken->getValue());
+	path = _currentToken->getValue();
+	_currentBlock->setCgi(extension, path);
 }
 
 /* Context: Location */

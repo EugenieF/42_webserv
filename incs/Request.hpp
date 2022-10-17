@@ -112,6 +112,7 @@ class   Request
 		std::string					_toLowerStr(std::string* str);
 		bool						_reachedEndOfChunkedBody();
 		bool						_headerIsSet(const std::string& headerName);
+		void						_checkSizeBody();
 
 	/**************************     BONUS    **************************/
 	#ifdef COOKIE

@@ -60,4 +60,3 @@ std::string		Token::getLineStr(size_t nb) const
 {
 	return (convertSizeToString(_line + nb));
 }
-
