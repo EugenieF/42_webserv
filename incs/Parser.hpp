@@ -56,7 +56,7 @@ class Parser
 		std::string							getConfigFile() const;
 		Lexer								getLexer() const;
 		Lexer::listOfTokens::const_iterator	getCurrentToken() const;
-		listOfServers						getServers() const;
+		const listOfServers&				getServers() const;
 		listOfServers::const_iterator		getCurrentServer() const;
 		blockPtr							getCurrentBlock() const;
 		listOfParsingFunctions				getParsingFunct() const;
@@ -65,7 +65,7 @@ class Parser
 
 						/*-------    Display   ------*/
 		void								printTokens();
-		void								displayServersParams();
+		void								displayServersParams() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

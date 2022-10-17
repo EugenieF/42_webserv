@@ -39,7 +39,6 @@ class Webserv
 
 	/**********************     MEMBER VARIABLES     ********************/
 		Parser							_parser;
-		char* const*					_env;
 		serverMap						_servers;
 		EpollInstance					_epoll;
 
@@ -49,9 +48,9 @@ class Webserv
 						/*-------    Main    ------*/
 		Webserv();
 		Webserv(std::string configFile, char* const* env);
-		Webserv(const Webserv& other);
+		// Webserv(const Webserv& other);
 		~Webserv();
-		Webserv&						operator=(const Webserv& other);
+		// Webserv&						operator=(const Webserv& other);
 
 						/*-------    Run     ------*/
 		void							parse(std::string configFile);
@@ -59,20 +58,20 @@ class Webserv
 
 						/*-------   Getter   ------*/
 		Parser							getParser() const;
-		serverMap						getServers() const;
-		EpollInstance					getEpoll() const;
-		char* const*					getEnv() const;
-		listOfServers					getConfigServers();
-		int								getNbOfServers();
+		const serverMap&				getServers() const;
+		const EpollInstance&			getEpoll() const;
+		const listOfServers&			getConfigServers() const;
+		int								getNbOfServers() const;
 
 						/*-------   Display   ------*/
-		void							displayServers();
+		void							displayServers() const;
 	
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 						/*-------    Setup   ------*/
-		void							_setupServerMap(listOfServers configServers);
+		void							_setupServerMap(const listOfServers&
+											configServers, char* const* env);
 };
 
 #endif

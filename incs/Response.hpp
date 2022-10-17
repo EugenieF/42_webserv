@@ -16,6 +16,8 @@
 # include "Request.hpp"
 # include "MimeType.hpp"
 # include "Autoindex.hpp"
+# include "Env.hpp"
+# include "CgiHandler.hpp"
 
 extern StatusCode	g_statusCode;
 extern MimeType		g_mimeType;
@@ -41,15 +43,21 @@ class   Response
 		std::string						_body;
 		listOfHttpMethodsFunct			_httpMethods;
 		std::string						_locationPath;
+		int								_fd;
+
+		Env*							_env; // Shares same env than client
+		std::string						_cgiscript;
+		std::string						_cgiextra;
+		std::string						_cgiquery;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
-        Response(Block* server, Request* request);
-        Response(const Response& other);
+		Response(Block* server, Request* request, Env& env);
+        // Response(const Response& other);
         ~Response();
-        Response&    					operator=(const Response& other);
+        // Response&    					operator=(const Response& other);
 
 						/*-------  Generate  ------*/
 		void							generateResponse();
@@ -70,6 +78,13 @@ class   Response
 		std::string						getBody() const;
 		listOfHttpMethodsFunct			getHttpMethods() const;
 		std::string						getLocationPath() const;
+		int								getFd() const;
+
+		std::string						getCgiProgram() const;
+		std::string						getCgiName() const;
+		std::string						getCgiExtra() const;
+		std::string						getCgiQuery() const;
+		const Env&						getEnv() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
@@ -127,6 +142,11 @@ class   Response
 		bool							_isMultipartFormRequest();
 		bool							_isCgi(const std::string& path);
 
+						/*-------    Cgi     ------*/
+		size_t							_parsePosCgiExtension(const std::string& path) const;
+		void							_parseCgiUrl();
+		void							_fillCgiMetavariables();
+		std::string						_translateCgiName() const;
 
 	/***************************     BONUS     *************************/
 	#ifdef COOKIE

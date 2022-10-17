@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/10/14 21:21:57 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/17 22:50:30 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,51 +26,51 @@
 # include "Server.hpp"
 # include "Client.hpp"
 
-# define BUFSIZE 2048
 # define MAX_EVENT 100
 
 class EpollInstance {
 	public:
 		/* -- Typedef ------------------------------------------------------ */
-		typedef		std::map<Server*, Block*>			serverMap;
 		typedef		std::map<int, Client*>				listOfClients;
-		//typedef		std::map<int, Client>::iterator		listOfClientsIte;
-		//typedef		std::map<Server, Block*>::iterator	serverMapIte;
-
+		typedef		std::map<Server*, Block*>			serverMap;
 
 		EpollInstance();
 		virtual ~EpollInstance();
 
 		/* -- Epoll manipulation ------------------------------------------- */
-		void						startMonitoring(serverMap& servers, char* const* env);
+		void						startMonitoring(serverMap& servers);
 
 		/* -- Getter ------------------------------------------------------- */
 		int							getFd() const;
 
 	private:
 		/* -- Epoll manipulation ------------------------------------------- */
-		void						_closeFd();
-
-		/* -- Socket management -------------------------------------------- */
+		void						_closeEfd();
 		void						_addSocket(int socket, int flag);
 		void						_editSocket(int socket, int flag);
 		void						_removeSocket(int socket);
 
 		/* -- Client list management --------------------------------------- */
-		serverMap::const_iterator	_findServerConnection(int fd, const serverMap& serv) const;
+		void						_addClient(serverMap::const_iterator it,
+										int sock);
 		void						_eraseClient(Client* client);
-		void						_clearClients();
+		void						_clearClientList();
 
-		/* -- Server connection management --------------------------------- */
+		/* -- Server management -------------------------------------------- */
+		serverMap::const_iterator	 _findServerConnection(int fd,
+										const serverMap& serv) const;
 		void						_monitorServers(const serverMap& serverlist);
 		void						_processConnections(serverMap::const_iterator it);
-		void						_handleRequest(Client& client);
-		void						_handleResponse(Client& client, char* const* env);
+		void						_handleRequest(Client* client);
+		void						_handleResponse(Client* client);
+		
+		/* -- Utils -------------------------------------------------------- */
+		std::string					_readRequest(Client* client);
 
+		/* -- Data members ------------------------------------------------- */
 		int							_efd;
 		struct epoll_event			_events[MAX_EVENT];
 		listOfClients				_clientlist;
-
 };
 
 #endif

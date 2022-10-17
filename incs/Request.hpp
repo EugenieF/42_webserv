@@ -46,19 +46,19 @@ class   Request
 		bool						_chunkedTransfer;
 		std::string					_host;
 		int							_port;
-		std::string					_query;
+		std::string					_query; // Necessary ?
 		size_t						_payloadSize;
+		int							_fd;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
         Request();
-        Request(const std::string& buffer);
+		Request(const std::string& buffer, int clientfd);
         Request(const Request& other);
         ~Request();
         Request&    				operator=(const Request& other);
-
 
 						/*------   Parsing  ------*/
 		t_requestStatus				parseRequest();
@@ -82,6 +82,8 @@ class   Request
 		int							getPort() const;
 		std::string					getQuery() const;
 		size_t						getPayloadSize() const;
+		int							getFd() const;
+		std::string					getMethodStr() const; // Can be replaced by global
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
@@ -106,7 +108,6 @@ class   Request
 						/*------   Utils  ------*/
 		void						_initParsingFunct();
 		void						_setRequestStatus(t_requestStatus status);
-		// void						_requestIsInvalid(t_statusCode code);
 		size_t						_getNextWord(std::string& word, std::string const& delimiter);
 		std::string					_getNextWord(size_t sizeWord);
 		std::string					_toLowerStr(std::string* str);

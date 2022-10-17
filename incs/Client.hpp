@@ -23,28 +23,31 @@ class Client
 		serverMapNode			_runningServer;
         Request*            	_request;
         Response*           	_response;
+		Env						_env;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------    Main    ------*/
-        Client();
-        Client(serverMapNode server, int sockfd);
-        Client(Client const& other);
+        // Client();
+		Client(serverMapNode server, int sockfd, const Env& env);
+        // Client(Client const& other);
         ~Client();
-        Client&             	operator=(const Client& other);
+        // Client&             	operator=(const Client& other);
 
 						/*-------  Request  ------*/
         t_requestStatus     	parseRequest(const std::string& buffer);
 
 						/*-------  Response ------*/
-        std::string         	generateResponse();
+		void					generateResponse();
 
 						/*-------   Getter   ------*/
         serverMapNode  			getRunningServer() const;
         Request*            	getRequest() const;
         Response*           	getResponse() const;
 		int						getFd() const;
+		const Env&				getEnv() const;
+		Env&					getEnv();
 
 						/*-------    Utils   ------*/
 		void			    	clear();

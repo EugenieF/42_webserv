@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 15:36:14 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/17 23:27:09 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <string.h>
+# include <stdlib.h>
 
 # include "StatusCode.hpp"
 # include "MimeType.hpp"
@@ -29,10 +31,9 @@
 
 # define INIT_SIGNAL 0
 # define RESET_SIGNAL 1
+# define BUFSIZE 2048
 
 extern bool	_triggered;
-
-void	DEBUG(const std::string& str);
 
 		/*----------   Signal   ---------*/
 
@@ -48,6 +49,8 @@ bool			convertPort(const std::string& str, int* port);
 bool			convertHttpCode(const std::string& str, int* code);
 std::string		trimSpacesStr(std::string *str, const char *toTrim = " \t");
 std::string		trimSpacesEndStr(std::string *str, const char *toTrim = " \t");
+std::string		readFd(int fd);
+char*			clone_str(const std::string& str);
 
 		/*--------  File related  -------*/
 
@@ -57,6 +60,7 @@ bool			pathIsAccessible(const std::string& path);
 
 		/*----------   Display  ---------*/
 
+void			DEBUG(const std::string& str);
 void			displayMsg(const std::string& msg, const char* colorCode);
 
 		/*------------   Time   ---------*/
