@@ -114,7 +114,7 @@ Block*  Client::_selectVirtualServer()
 		return (_runningServer.second);
 	for (currentServer = virtualHosts.begin(); currentServer != virtualHosts.end(); currentServer++)
 	{
-		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()), *currentServer)
+		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort(), *currentServer))
 			return (*currentServer);
 	}
 	return (_runningServer.second);

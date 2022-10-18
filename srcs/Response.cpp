@@ -726,7 +726,8 @@ void   Response::_parseCgiUrl() {
 	size_t		pos_cgi = path.find_last_of('/', pos_extension);
 	std::string	cgi = path.substr(pos_cgi + 1, pos_end_extension);
 	if (cgi.empty())
-	        /* Error?: cgi script name empty */;
+	{}
+	        // /* Error?: cgi script name empty */;
 	        // throw (BAD_REQUEST);
 	_cgiscript = cgi;
 
