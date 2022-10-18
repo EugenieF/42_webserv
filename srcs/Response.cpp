@@ -81,6 +81,7 @@ void	Response::generateResponse()
 	/* Generate CGI here */
 	std::string	errorPage;
 
+	DEBUG("Response");
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
@@ -112,10 +113,15 @@ void	Response::_fillErrorBody()
 {
 	std::string		errorFile;
 
-	errorFile = _matchingBlock->getErrorPage(_statusCode);
-	if (!errorFile.empty())
-		return (_readFileContent(errorFile));
-	_body = _generateErrorPage();
+	try
+	{
+		errorFile = _matchingBlock->getErrorPage(_statusCode);
+		_readFileContent(errorFile);
+	}
+	catch(const t_statusCode& errorCode)
+	{
+		_body = _generateErrorPage();
+	}
 }
 
 void	Response::_fillResponseLine()
@@ -153,15 +159,25 @@ void	Response::_handleRedirection()
 	_headers["Location"] = _matchingBlock->getRedirectUri();
 }
 
+// namespace TEST {
+// 	void tmp(std::string path) {
+// 		size_t doublet = path.find('/');
+// 		while (doublet) {
+// 			substract
+// 		}
+// 	}
+// }
+
 void	Response::_readFileContent(const std::string& path)
 {
 	std::ifstream		file;
 	std::stringstream	fileContent;
 	
+	std::cout << GREEN << "path: " << path << RESET << std::endl;
 	/* Check if file is accessible */
 	if (!pathIsAccessible(path))
 		throw(NOT_FOUND);
-	file.open(path.c_str(), std::ifstream::in); 
+	file.open(path.c_str(), std::ifstream::in);
 	/* Check if file was successfully opened */
 	if (!file.is_open())
 	{
@@ -187,6 +203,7 @@ bool	Response::_isCgi(const std::string& path)
 		return (false);
 	extension = path.substr(pos + 1);
 	_cgipath = _matchingBlock->findCgi(extension);
+	std::cout <<YELLOW <<  "in cgi path = " << path << " | extension : " << extension << " | path = " << _cgipath << RESET << NL;
 	return (_cgipath != "");
 }
 
@@ -435,9 +452,12 @@ std::string		Response::_getContentTypeHeader()
 	/* Check if header is already set */
 	if (_headers.find("Content-Type") != _headers.end())
 		return (_headers["Content-Type"]);
-	pos = _request->getPath().find(".");
+	std::cout << RED << _buildpath << RESET << NL;
+	pos = _buildpath.rfind(".");
 	if (pos != std::string::npos)
-		typeExtension = _request->getPath().substr(pos);
+	{
+		typeExtension = _buildpath.substr(pos);
+	}
 	return (g_mimeType[typeExtension]);
 }
 
@@ -505,7 +525,8 @@ bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* pat
 	{
 		if (_foundIndexPage(dir, *currentIndex))
 		{
-			*path += "/" + *currentIndex;
+			// *path += "/" + *currentIndex;
+			*path += *currentIndex;
 			foundIndexPage = true;
 			break ;
 		}
@@ -552,6 +573,7 @@ std::string		Response::_buildPath()
 	// std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
+	_buildpath = path;
 	return (path);
 }
 
@@ -758,7 +780,7 @@ void	Response::_initHttpMethods()
 /******************************************************************************/
 
 #ifdef COOKIE
-Response::Response(Block *server, Request* request, Cookie& cookies):
+Response::Response(Block *server, Request* request, Env& env, Cookie& cookies):
 	_server(server),
 	_request(request),
 	_response(""),
@@ -766,6 +788,9 @@ Response::Response(Block *server, Request* request, Cookie& cookies):
 	_method(_request->getMethod()),
 	_body(""),
 	_locationPath(""),
+	_fd(request->getFd()),
+	_env(&env),
+	_cgipath(""),
 	_cookies(cookies)
 {
 	_initHttpMethods();

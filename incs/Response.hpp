@@ -44,6 +44,7 @@ class   Response
 		listOfHttpMethodsFunct			_httpMethods;
 		std::string						_locationPath;
 		int								_fd;
+		std::string						_buildpath;
 
 		Env*							_env; // Shares same env than client
 		std::string						_cgiscript;

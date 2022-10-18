@@ -26,7 +26,7 @@ void	MimeType::_initMimeTypesMap()
 	_mimeTypes[".avif"] = "image/avif";
 	_mimeTypes[".avi"] = "video/x-msvideo";
 	_mimeTypes[".azw"] = "application/vnd.amazon.ebook";
-	_mimeTypes[".bin"] = "application/octet-stream";
+	_mimeTypes[".bin"] = "application/octet-stream"; /* default type */
 	_mimeTypes[".bmp"] = "image/bmp";
 	_mimeTypes[".bz"] = "application/x-bzip";
 	_mimeTypes[".bz2"] = "application/x-bzip2";

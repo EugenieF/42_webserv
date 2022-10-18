@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiHandler.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 16:35:16 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 14:56:01 by etran            ###   ########.fr       */
+/*   Updated: 2022/10/18 19:51:09 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ std::string CgiHandler::getCgiOutput() {
 	std::string	output;
 	int			pid;
 
+	DEBUG("In CGI!!");
 	if (pipe(_fds) < 0)
 		throw std::runtime_error("cgihandler getCgiOutput (pipe) error");
 	pid = fork();
@@ -66,6 +67,7 @@ std::string CgiHandler::getCgiOutput() {
 	_waitForChild(pid);
 	output = readFd(_fds[0]);
 	close(_fds[0]);
+	DEBUG("Leaving CGI!!");
 	return (output);
 }
 

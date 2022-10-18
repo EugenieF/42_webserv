@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/18 15:11:18 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/18 19:19:23 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,8 +182,6 @@ void EpollInstance::_processConnections(serverMap::const_iterator it) {
 				throw std::runtime_error("accept error");
 		}
 		displayMsg(" 🤝 New connection accepted", LIGHT_GREEN);
-		std::cout << "server accessed : " << it->first->getSocket() << NL;
-		std::cout << "client : " << sock << NL;
 		_addClient(it, sock);
 	}
 }
@@ -198,9 +196,12 @@ void EpollInstance::_handleRequest(Client* client) {
 		std::cerr << e.what() << NL;
 	}
 	t_requestStatus requestStatus = client->parseRequest(str);
+	std::cout << " ============================== REQUEST STATUS : " << requestStatus << NL;
 	if (requestStatus == COMPLETE_REQUEST) {
 		_editSocket(client->getFd(), EPOLLOUT);
 	}
+	else if (requestStatus == INVALID_REQUEST)
+		_eraseClient(client);
 }
 
 void EpollInstance::_handleResponse(Client* client) {

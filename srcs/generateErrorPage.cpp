@@ -8,6 +8,7 @@ std::string		Response::_generateErrorPage()
 		"<!DOCTYPE html>\n\
 		<html>\n\
 				<head>\n\
+					<meta charset=\"utf-8\"/>\n\
 					<title>No available page 😰</title>\n\
 				</head>\n\
 			<body bgcolor=\"#FFF8BC\">\n\

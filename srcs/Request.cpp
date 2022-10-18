@@ -25,6 +25,7 @@ Request::Request():
 Request::Request(const std::string& buffer, int clientfd):
 	_request(buffer), _fd (clientfd)
 {
+	std::cout << BLUE << "Request: " << _request << RESET << std::endl;
 	_initVariables();
 	_initParsingFunct();
 }
@@ -95,7 +96,7 @@ t_requestStatus	Request::parseRequest()
 	catch(const t_statusCode& errorCode)
 	{
 		_statusCode = errorCode;
-		// _requestStatus = INVALID_REQUEST;
+		_requestStatus = COMPLETE_REQUEST;
 	}
 	// printRequestInfo();
 	return (_requestStatus);
@@ -125,7 +126,6 @@ void	Request::_parseMethod()
 	_getNextWord(method, " ");
 	if (g_httpMethod.isHttpMethod(method) == false)
 	{
-		DEBUG("PARSE BODY");
 		throw (NOT_IMPLEMENTED);
 	}
 	_method = g_httpMethod.getMethod(method);
@@ -254,7 +254,7 @@ void	Request::_checkSizeBody()
 	size_t							sizeToCheck;
 	
 	sizeToCheck = _body.size();
-	if (sizeToCheck)
+	if (sizeToCheck && _headers["content-type"] != "application/x-www-form-urlencoded")
 	{
 		if (_body.substr(_body.length() - 2) == "\r\n")
 			sizeToCheck -= 2;
@@ -281,8 +281,10 @@ void	Request::_parseBody()
 		_decodeChunks();
 	else
 	{
+		DEBUG("before check size");
 		_body = _request;
 		_checkSizeBody();
+		DEBUG("in parse body");
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	}
 }
