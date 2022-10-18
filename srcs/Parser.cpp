@@ -25,6 +25,7 @@ Parser::Parser(std::string configFile):
 	DEBUG("Parsing...");
 	// printTokens();
 	parseTokens();
+	_lexer.closeFile();
 	DEBUG("Parsing done");
 }
 

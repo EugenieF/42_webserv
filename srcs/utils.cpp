@@ -95,8 +95,8 @@ std::string readFd(int fd) {
 	char            buf[BUFSIZE + 1];
 	ssize_t         count;
 
-	count = read(fd, buf, BUFSIZE + 1);
 	memset(buf, 0, BUFSIZE + 1);
+	count = read(fd, buf, BUFSIZE + 1);
 	while (count) {
 		if (count < 0)
 			throw std::runtime_error("readFd (read) error");

@@ -34,6 +34,7 @@ class	Lexer
 						/*-------      File      -------*/
 		void							openFile(std::string configFile);
 		void							checkFile(std::string configFile);
+		void							closeFile();
 
 						/*-------     Getter      ------*/
 		const std::ifstream&			getFile() const;
@@ -68,9 +69,6 @@ class	Lexer
 		void							_ignoreComments(char character);
 		bool							_isDelimiter(char character);
 		void							_buildTokenTypeArray();
-
-						/*-------      File      ------*/
-		void							_closeFile();
 
 						/*-------      Error     ------*/
 		void							_throwErrorLexer(std::string errorMsg);

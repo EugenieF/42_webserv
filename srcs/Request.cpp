@@ -25,7 +25,6 @@ Request::Request():
 Request::Request(const std::string& buffer, int clientfd):
 	_request(buffer), _fd (clientfd)
 {
-	std::cout << RED << "request: '" << _request << "'" << RESET << NL;
 	_initVariables();
 	_initParsingFunct();
 }

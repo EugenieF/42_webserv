@@ -353,6 +353,7 @@ void	Response::_handleCgi()
 	DEBUG("handleCgi()");
 	CgiHandler	cgi(*this);
 	_response = cgi.getCgiOutput();
+	// _body = cgi.getCgiOutput(); // if headers not in cgi response
 }
 
 /* Perform resource-specific processing on the request payload. */
@@ -361,14 +362,14 @@ void	Response::_runPostMethod(std::string& path)
 	std::ofstream							ofs;
 
 	DEBUG("Post method");
-	if (_isMultipartFormRequest())
-	{
-		_handleMultipartContent(path, _request->getBody());
-	}
 	if (_isCgi(path))
 	{
 		/* process cgi */
 		return (_handleCgi());
+	}
+	if (_isMultipartFormRequest())
+	{
+		return (_handleMultipartContent(path, _request->getBody()));
 	}
 	_writeFileContent(path, _request->getBody());
 }
@@ -548,7 +549,7 @@ std::string		Response::_buildPath()
 	path += uri;
 	if (path[0] == '/')
 		path.insert(path.begin(), '.'); // Is it necessary ?
-	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
+	// std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
 	return (path);

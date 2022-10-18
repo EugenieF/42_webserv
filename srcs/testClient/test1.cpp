@@ -46,7 +46,7 @@ int main()
         return -1;
     }
     send(sock , hello , strlen(hello) , 0 );
-    sleep(3);
+    sleep(1);
     send(sock , hello2 , strlen(hello2) , 0 );
     printf("Hello message sent\n");
     valread = read( sock , buffer, 8024);

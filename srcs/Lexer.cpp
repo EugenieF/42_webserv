@@ -24,7 +24,7 @@ Lexer::Lexer(const Lexer& other)
 
 Lexer::~Lexer()
 {
-	this->_closeFile();
+	this->closeFile();
 }
 
 Lexer&	Lexer::operator=(const Lexer& other)
@@ -202,7 +202,7 @@ void	Lexer::openFile(std::string configFile)
 	_readFile();
 }
 
-void	Lexer::_closeFile()
+void	Lexer::closeFile()
 {
 	if (_file.is_open())
 		_file.close();

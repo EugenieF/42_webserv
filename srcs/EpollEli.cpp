@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/18 15:11:18 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/17 18:01:22 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 
 EpollInstance::EpollInstance() :
 	_efd(-1) {
-	memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
-}
+		memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
+	}
 
 EpollInstance::~EpollInstance() {
 	_clearClientList();
@@ -32,7 +32,6 @@ void EpollInstance::startMonitoring(serverMap& servers) {
 	/* Creating fd associated with epoll */
 	_efd = epoll_create1(0);
 	_monitorServers(servers);
-	std::cout << GREEN << "efd = " << _efd << RESET << std::endl;
 
 	while (getTriggeredValue() == false) {
 		/* Waiting for events on every server sockets */
@@ -61,7 +60,7 @@ void EpollInstance::startMonitoring(serverMap& servers) {
 					_handleRequest(_clientlist[_events[i].data.fd]);
 			} else if (_events[i].events & EPOLLOUT) {
 				/* Client waiting a response */
-				_handleResponse(_clientlist[_events[i].data.fd]);
+				_handleResponse(_clientlist[_events[i].data.fd]); 
 			}
 		}
 	}
@@ -114,27 +113,27 @@ void EpollInstance::_removeSocket(int sock) {
 void EpollInstance::_addClient(serverMap::const_iterator it, int sock) {
 	TcpSocket newsocket(sock, false);
 
-       newsocket.setToReusable();
-       newsocket.unlockSocket();
-       _addSocket(sock, EPOLLIN);
-       _clientlist[sock] = new Client(*it, sock, it->first->getEnv());
+	newsocket.setToReusable();
+	newsocket.unlockSocket();
+	_addSocket(sock, EPOLLIN);
+	_clientlist[sock] = new Client(it->second, sock, it->first->getEnv());
 }
 
 /* Removing the client from the server and from the client map */
 void EpollInstance::_eraseClient(Client* client) {
-       int clientfd;
+	int clientfd;
 
-       clientfd = client->getFd();
-       _removeSocket(clientfd);
-       if (close(clientfd) < 0)
-               throw std::runtime_error("_eraseClient (close) error");
-       _clientlist.erase(clientfd);
-       delete client;
+	clientfd = client->getFd();
+	_removeSocket(clientfd);
+	if (close(clientfd) < 0)
+		throw std::runtime_error("_eraseClient (close) error");
+	_clientlist.erase(clientfd);
+	delete client;
 }
 
 /* Clearing client map */
 void EpollInstance::_clearClientList() {
-	listOfClients::iterator ite = _clientlist.begin();
+	listOfClients::iterator	ite = _clientlist.begin();
 
 	while (ite != _clientlist.end()) {
 		_eraseClient(ite->second);
@@ -152,19 +151,18 @@ EpollInstance::serverMap::const_iterator
 				return (it);
 		}
 		return (serv.end());
-}
+	}
 
 /* Adding server sockets to the epoll instance */
-void   EpollInstance::_monitorServers(const serverMap& serverlist) {
+void	EpollInstance::_monitorServers(const serverMap& serverlist) {
 	for (serverMap::const_iterator it = serverlist.begin();
 			it != serverlist.end(); it++)
-				_addSocket(it->first->getSocket(), EPOLLIN);
+		_addSocket(it->first->getSocket(), EPOLLIN);
 }
 
 /* Checks whether the notification occurred unexpectedly,
    the event is then ignored and epoll keeps on checking
    the other events. */
-
 void EpollInstance::_processConnections(serverMap::const_iterator it) {
 	while (1) {
 		struct sockaddr_in	cl_addr;
@@ -173,15 +171,15 @@ void EpollInstance::_processConnections(serverMap::const_iterator it) {
 		
 		memset(&cl_addr, 0, cl_addr_len);
 		sock = accept(it->first->getSocket(),
-					reinterpret_cast<struct sockaddr*>(&cl_addr), &cl_addr_len);
+				reinterpret_cast<struct sockaddr*>(&cl_addr), &cl_addr_len);
 		if (sock < 0) {
-		/* Every connection has been processed */
+			/* Every connection has been processed */
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
 				break ;
 			else
 				throw std::runtime_error("accept error");
 		}
-		displayMsg(" 🤝 New connection accepted", LIGHT_GREEN);
+		DEBUG(" ** NEW CONNECTION ** ");
 		std::cout << "server accessed : " << it->first->getSocket() << NL;
 		std::cout << "client : " << sock << NL;
 		_addClient(it, sock);
@@ -191,13 +189,12 @@ void EpollInstance::_processConnections(serverMap::const_iterator it) {
 void EpollInstance::_handleRequest(Client* client) {
 	DEBUG("Request");
 	std::string		str;
-
 	try {
 		str = readFd(client->getFd());
 	} catch ( const std::exception& e) {
 		std::cerr << e.what() << NL;
 	}
-	t_requestStatus requestStatus = client->parseRequest(str);
+	t_requestStatus	requestStatus = client->parseRequest(str);
 	if (requestStatus == COMPLETE_REQUEST) {
 		_editSocket(client->getFd(), EPOLLOUT);
 	}
@@ -205,10 +202,12 @@ void EpollInstance::_handleRequest(Client* client) {
 
 void EpollInstance::_handleResponse(Client* client) {
 	DEBUG("Response");
+
 	//Response* response = client->generateResponse();
 	client->generateResponse();
 	std::string response = client->getResponse()->getResponse();
 	if (write(client->getFd(), response.c_str(), response.size()) < 0)
 		throw std::runtime_error("handleResponse (write) error");
+
 	_eraseClient(client);
 }
