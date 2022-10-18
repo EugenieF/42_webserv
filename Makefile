@@ -38,7 +38,7 @@ CXX				= c++
 
 CXXFLAGS		 = -Wall -Wextra -Werror -g3 -std=c++98 -MMD -MP -I$(INCLUDE) $(MACRO)
 
-MACRO			= -D WEBSERV_PATH=$(shell pwd) -D ROOT_PATH="www/html/"
+MACRO			= -D  WEBSERV_PATH=\"$(shell pwd)\" -D IMG_PATH=\"/www/html/img/\"
 
 DEBUG_MODE		= -D DISPLAY=1
 

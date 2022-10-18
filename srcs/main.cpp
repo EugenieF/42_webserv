@@ -15,8 +15,6 @@
 
 int main(int argc, char **argv, char* const* env)
 {
-	std::cout << "WEBSERV_PATH = " << WEBSERV_PATH << NL;
-	std::cout << "ROOT_PATH = " << ROOT_PATH << NL;
 	std::string configFile("tester/testFiles/valid/default.conf");
 
 	if (argc != 2)

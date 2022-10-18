@@ -3,7 +3,10 @@
 std::string		Response::_generateErrorPage()
 {
 	std::string	errorPage;
+	std::string	imagePath;
 
+	// imagePath = std::string(WEBSERV_PATH) + std::string(IMG_PATH) + "hamster_banana.png";
+	imagePath = "/img/hamster_banana.png";
 	errorPage = \
 		"<!DOCTYPE html>\n\
 		<html>\n\
@@ -14,7 +17,7 @@ std::string		Response::_generateErrorPage()
 			<body bgcolor=\"#FFF8BC\">\n\
 				<div class=\"hamster\">\n\
 					<center>\n\
-						<img src=\"www/html/img/hamster_banana.png\" alt=\"slide\" style=\"width:50%\">\n\
+						<img src=\"" + imagePath + "\" alt=\"slide\" style=\"width:50%\">\n\
 					</center>\n\
 				</div>\n\
 				<div>\n\
