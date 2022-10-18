@@ -117,7 +117,7 @@ class	Block
 						/*-------      CGI     -------*/
 		void								setCgi(const std::string& extension, const std::string& path);
 		const listOfCgi&					getCgi() const;
-		bool								findCgi(const std::string& extension);
+		std::string							findCgi(const std::string& extension);
 
 						/*-------  Error_page  -------*/
 		void								setErrorPage(int code, const std::string& page);

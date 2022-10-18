@@ -21,6 +21,8 @@ SRCS			= main.cpp \
 				HttpMethod.cpp \
 				Autoindex.cpp \
 				generateErrorPage.cpp \
+				CgiHandler.cpp \
+				Env.cpp \
 				Cookie.cpp \
 				Session.cpp
 
@@ -45,7 +47,7 @@ RM				= rm -rf
 INCLUDE			= ./incs
 
 
-$(NAME):	$(OBJS)
+$(NAME):	debug $(OBJS)
 		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 

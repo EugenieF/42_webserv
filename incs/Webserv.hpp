@@ -48,9 +48,9 @@ class Webserv
 						/*-------    Main    ------*/
 		Webserv();
 		Webserv(std::string configFile, char* const* env);
-		// Webserv(const Webserv& other);
+		Webserv(const Webserv& other);
 		~Webserv();
-		// Webserv&						operator=(const Webserv& other);
+		Webserv&						operator=(const Webserv& other);
 
 						/*-------    Run     ------*/
 		// void							parse(std::string configFile);

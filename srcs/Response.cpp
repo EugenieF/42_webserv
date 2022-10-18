@@ -14,38 +14,40 @@ Response::Response(Block *server, Request* request, Env& env):
 	_body(""),
 	_locationPath(""),
 	_fd(request->getFd()),
-	_env(&env) {
+	_env(&env),
+	_cgipath("") {
 	_initHttpMethods();
 }
 
-// Response::Response(const Response &other)
-// {
-// 	*this = other;
-// }
+Response::Response(const Response &other)
+{
+	*this = other;
+}
 
 Response::~Response() {}
 
-// Response&	Response::operator=(const Response &other)
-// {
-// 	if (this != &other)
-// 	{
-// 		_server = other.getServer();
-// 		_matchingBlock = other.getMatchingBlock();
-// 		_request = other.getRequest();
-// 		_response = other.getResponse();
-// 		_statusCode = other.getStatusCode();
-// 		_method = other.getMethod();
-// 		_headers = other.getHeaders();
-// 		_body = other.getBody();
-// 		_httpMethods = other.getHttpMethods();
-// 		_locationPath = other.getLocationPath();
-// 		_fd = other.getFd();
-// 		#ifdef COOKIE
-// 			_cookies = other.getCookies();
-// 		#endif
-// 	}
-// 	return (*this);
-// }
+Response&	Response::operator=(const Response &other)
+{
+	if (this != &other)
+	{
+		_server = other.getServer();
+		_matchingBlock = other.getMatchingBlock();
+		_request = other.getRequest();
+		_response = other.getResponse();
+		_statusCode = other.getStatusCode();
+		_method = other.getMethod();
+		_headers = other.getHeaders();
+		_body = other.getBody();
+		_httpMethods = other.getHttpMethods();
+		_locationPath = other.getLocationPath();
+		_fd = other.getFd();
+		_cgipath = other.getCgiProgram();
+		#ifdef COOKIE
+			_cookies = other.getCookies();
+		#endif
+	}
+	return (*this);
+}
 
 /******************************************************************************/
 /*                                 GENERATE                                   */
@@ -62,7 +64,7 @@ void	Response::_processMethod()
 	path = _buildPath();
 	if (path.empty())
 		throw(NOT_FOUND);
-	/* Finds corresponding http method */
+	/* Find corresponding http method */
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 		throw(METHOD_NOT_ALLOWED);
@@ -175,16 +177,17 @@ void	Response::_readFileContent(const std::string& path)
 /* Check if we need to run cgi */
 bool	Response::_isCgi(const std::string& path)
 {
-	std::string	ext;
-	size_t		pos;
+	std::string		extension;
+	size_t			pos;
 
 	if (_matchingBlock->getCgi().empty())
 		return (false);
 	pos = path.rfind(".");
 	if (pos == std::string::npos)
 		return (false);
-	ext = path.substr(pos + 1);
-	return (_matchingBlock->findCgi(ext));
+	extension = path.substr(pos + 1);
+	_cgipath = _matchingBlock->findCgi(extension);
+	return (_cgipath != "");
 }
 
 /*  GET method : "Transfer a current representation of the target resource." */
@@ -348,7 +351,8 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 void	Response::_handleCgi()
 {
 	DEBUG("handleCgi()");
-	std::cout << RED << "*** HANDLE CGI ***" << RESET << std::endl;
+	CgiHandler	cgi(*this);
+	_response = cgi.getCgiOutput();
 }
 
 /* Perform resource-specific processing on the request payload. */
@@ -357,7 +361,7 @@ void	Response::_runPostMethod(std::string& path)
 	std::ofstream							ofs;
 
 	DEBUG("Post method");
-	if (_isMultipartFormRequest()) // && pathIsDirectory(path)) ?
+	if (_isMultipartFormRequest())
 	{
 		_handleMultipartContent(path, _request->getBody());
 	}
@@ -436,22 +440,9 @@ std::string		Response::_getContentTypeHeader()
 	return (g_mimeType[typeExtension]);
 }
 
-// std::string		Response::_getDateHeader()
-// {
-// 	std::time_t	time;
-//     char		date[100];
-
-// 	time = std::time(NULL);
-//     if (!std::strftime(date, sizeof(date), "%a, %d %b %Y %X GMT", std::localtime(&time)))
-// 	{
-// 		/* Error */
-// 		_throwErrorMsg("strftime() function failed");
-// 	}
-// 	return(std::string(date));
-// }
-
-/* The keep-alive directive indicates that the client wants the HTTP Connection to persist and remain
-open after the current transaction is complete. This is the default setting for HTTP/1.1 requests. */
+/* The keep-alive directive indicates that the client wants the HTTP Connection
+to persist and remain open after the current transaction is complete.
+This is the default setting for HTTP/1.1 requests. */
 std::string		Response::_getConnectionHeader()
 {
 	std::string						connection;
@@ -536,7 +527,8 @@ void	Response::_handleDirectoryPath(std::string* path)
 	}
 }
 
-/* If a request ends with a slash, NGINX treats it as a request for a directory and tries to find an index file in the directory. */
+/* If a request ends with a slash, NGINX treats it as a request
+for a directory and tries to find an index file in the directory. */
 std::string		Response::_buildPath()
 {
 	std::string		path;
@@ -668,7 +660,7 @@ int		Response::getFd() const {
 }
 
 std::string		Response::getCgiProgram() const {
-	return (_matchingBlock->getCgiPath());
+	return (_cgipath);
 }
 
 std::string		Response::getCgiName() const {
@@ -692,7 +684,7 @@ const Env&		Response::getEnv() const {
 /******************************************************************************/
 
 /* Template url:
-	http://domain/cgi_dir_path/cgi_script.cgi_ext/cgi_extra?cgi_query
+		http://domain/cgi_dir_path/cgi_script.cgi_ext/cgi_extra?cgi_query
 */
 size_t	Response::_parsePosCgiExtension(const std::string& path) const {
 	(void)path;
@@ -712,7 +704,7 @@ void   Response::_parseCgiUrl() {
 	std::string	cgi = path.substr(pos_cgi + 1, pos_end_extension);
 	if (cgi.empty())
 	        /* Error?: cgi script name empty */;
-	        //return (_requestIsInvalid(BAD_REQUEST));
+	        // throw (BAD_REQUEST);
 	_cgiscript = cgi;
 
 	std::string	cgi_extra = path.substr(pos_end_extension);
@@ -744,7 +736,7 @@ void	Response::_fillCgiMetavariables() {
 
 std::string		Response::_translateCgiName() const {
 	std::string     translation(_env->getEnv("PWD"));
-	translation += _server->getCgiPath();
+	translation += _cgipath;
 	translation += getCgiName();
 	return (translation);
 }

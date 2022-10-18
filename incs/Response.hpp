@@ -49,15 +49,16 @@ class   Response
 		std::string						_cgiscript;
 		std::string						_cgiextra;
 		std::string						_cgiquery;
+		std::string						_cgipath;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
 		Response(Block* server, Request* request, Env& env);
-        // Response(const Response& other);
+        Response(const Response& other);
         ~Response();
-        // Response&    					operator=(const Response& other);
+        Response&    					operator=(const Response& other);
 
 						/*-------  Generate  ------*/
 		void							generateResponse();

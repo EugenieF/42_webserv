@@ -25,6 +25,7 @@ Request::Request():
 Request::Request(const std::string& buffer, int clientfd):
 	_request(buffer), _fd (clientfd)
 {
+	std::cout << RED << "request: '" << _request << "'" << RESET << NL;
 	_initVariables();
 	_initParsingFunct();
 }
@@ -41,7 +42,6 @@ void	Request::_initVariables()
 	_chunkedTransfer = false;
 	_host = "";
 	_port = UNDEFINED_PORT;
-	_query = "";
 	_payloadSize = 0;
 }
 
@@ -69,7 +69,6 @@ Request&	Request::operator=(const Request &other)
 		_chunkedTransfer = other.getChunkedTransfer();
 		_host = other.getHost();
 		_port = other.getPort();
-		_query = other.getQuery();
 		_payloadSize = other.getPayloadSize();
 		_fd = other.getFd();
 		#ifdef COOKIE
@@ -126,7 +125,10 @@ void	Request::_parseMethod()
 
 	_getNextWord(method, " ");
 	if (g_httpMethod.isHttpMethod(method) == false)
+	{
+		DEBUG("PARSE BODY");
 		throw (NOT_IMPLEMENTED);
+	}
 	_method = g_httpMethod.getMethod(method);
 }
 
@@ -134,6 +136,7 @@ void	Request::_parsePath()
 {
 	std::string		path;
 	size_t			pos;
+	std::string		query;
 
 	_getNextWord(path, " ");
 	if (path == "" || path[0] != '/')
@@ -144,12 +147,11 @@ void	Request::_parsePath()
 	pos = path.find("?");
 	if (pos != std::string::npos)
 	{
-		_query = path.substr(pos + 1);
+		query = path.substr(pos + 1);
 		path.erase(pos);
-		if (_query.length() > 255) /* limited by the DNS */
+		if (query.length() > 255) /* limited by the DNS */
 			throw (URI_TOO_LONG);
 	}
-	/* We need to handle cgi extension */
 	_path = path;
 }
 
@@ -394,11 +396,6 @@ std::string		Request::getHost() const
 int		Request::getPort() const
 {
 	return (_port);
-}
-
-std::string		Request::getQuery() const
-{
-	return (_query);
 }
 
 size_t	Request::getPayloadSize() const

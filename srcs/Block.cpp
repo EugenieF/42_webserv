@@ -211,9 +211,11 @@ const Block::listOfCgi&		Block::getCgi() const
 	return (_cgi);
 }
 
-bool	Block::findCgi(const std::string& extension)
+std::string		Block::findCgi(const std::string& extension)
 {
-	return (_cgi.find(extension) != _cgi.end());
+	if (_cgi.find(extension) != _cgi.end())
+		return (_cgi[extension]);
+	return ("");
 }
 
 /******************************************************************************/

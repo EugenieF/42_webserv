@@ -15,10 +15,10 @@ Webserv::Webserv(std::string configFile, char* const* env):
 	run();	
 }
 
-// Webserv::Webserv(const Webserv& other)
-// {
-// 	*this = other;
-// }
+Webserv::Webserv(const Webserv& other)
+{
+	*this = other;
+}
 
 Webserv::~Webserv() {
 	serverMap::iterator     it = _servers.begin();
@@ -33,16 +33,16 @@ Webserv::~Webserv() {
 	DEBUG("Deleted webserv");
 }
 
-// Webserv&	Webserv::operator=(const Webserv& other)
-// {
-// 	if (this != &other)
-// 	{
-// 		_parser = other.getParser();
-// 		_servers = other.getServers();
-// 		_epoll = other.getEpoll();
-// 	}
-// 	return (*this);
-// }
+Webserv&	Webserv::operator=(const Webserv& other)
+{
+	if (this != &other)
+	{
+		_parser = other.getParser();
+		_servers = other.getServers();
+		_epoll = other.getEpoll();
+	}
+	return (*this);
+}
 
 /******************************************************************************/
 /*                                  SETUP                                     */

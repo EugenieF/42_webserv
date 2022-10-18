@@ -580,7 +580,7 @@ Lexer::listOfTokens::const_iterator		Parser::getCurrentToken() const
 	return (_currentToken);
 }
 
-Parser::listOfServers	Parser::getServers() const
+const Parser::listOfServers&	Parser::getServers() const
 {
 	return (_servers);
 }
@@ -758,7 +758,7 @@ void	Parser::printTokens()
 	}
 }
 
-void	Parser::displayServersParams()
+void	Parser::displayServersParams() const
 {
 	listOfServers::const_iterator	currentServer;
 	int								count;

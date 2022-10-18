@@ -29,11 +29,10 @@ class Client
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------    Main    ------*/
-        // Client();
 		Client(serverMapNode server, int sockfd, const Env& env);
-        // Client(Client const& other);
+        Client(Client const& other);
         ~Client();
-        // Client&             	operator=(const Client& other);
+        Client&             	operator=(const Client& other);
 
 						/*-------  Request  ------*/
         t_requestStatus     	parseRequest(const std::string& buffer);

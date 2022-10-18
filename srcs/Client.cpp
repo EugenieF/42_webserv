@@ -10,8 +10,6 @@ are done in a non-blocking manner. */
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-// Client::Client() {}
-
 Client::Client(serverMapNode server, int sockfd, const Env& env):
 	_sockfd(sockfd),
     _runningServer(server),
@@ -20,10 +18,10 @@ Client::Client(serverMapNode server, int sockfd, const Env& env):
 	_env(env)
 {}
 
-// Client::Client(Client const& other)
-// {
-//     *this = other;
-// }
+Client::Client(Client const& other)
+{
+    *this = other;
+}
 
 Client::~Client()
 {
@@ -31,17 +29,17 @@ Client::~Client()
 	std::cout << "client destroyed: " << getFd() << NL;
 }
 
-// Client&     Client::operator=(const Client& other)
-// {
-//     if (this != &other)
-//     {
-// 		_sockfd = other.getFd();
-//         _runningServer = other.getRunningServer();
-//         _request = other.getRequest();
-//         _response = other.getResponse();
-//     }
-//     return (*this);
-// }
+Client&     Client::operator=(const Client& other)
+{
+    if (this != &other)
+    {
+		_sockfd = other.getFd();
+        _runningServer = other.getRunningServer();
+        _request = other.getRequest();
+        _response = other.getResponse();
+    }
+    return (*this);
+}
 
 /******************************************************************************/
 /*                                 REQUEST                                    */
@@ -70,7 +68,7 @@ void	Client::generateResponse()
 		delete _response;
 	_response = new Response(_selectVirtualServer(), _request, _env);
 	_response->generateResponse();
-	// return (_response->getResponse());
+	// return (_response);
 }
 #else
 void	Client::generateResponse()
@@ -82,7 +80,7 @@ void	Client::generateResponse()
 	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
 	_response = new Response(_selectVirtualServer(), _request, _env, *cookies);
 	_response->generateResponse();
-	// return (_response->getResponse());
+	// return (_response);
 }
 #endif
 

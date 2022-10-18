@@ -46,7 +46,6 @@ class   Request
 		bool						_chunkedTransfer;
 		std::string					_host;
 		int							_port;
-		std::string					_query; // Necessary ?
 		size_t						_payloadSize;
 		int							_fd;
 
@@ -80,7 +79,6 @@ class   Request
 		bool						getChunkedTransfer() const;
 		std::string					getHost() const;
 		int							getPort() const;
-		std::string					getQuery() const;
 		size_t						getPayloadSize() const;
 		int							getFd() const;
 		std::string					getMethodStr() const; // Can be replaced by global
