@@ -14,7 +14,7 @@ std::string		Response::_generateErrorPage()
 			<body bgcolor=\"#FFF8BC\">\n\
 				<div class=\"hamster\">\n\
 					<center>\n\
-						<img src=\"" + ROOT_PATH + "img/hamster_banana.png\" alt=\"slide\" style=\"width:50%\">\n\
+						<img src=\"www/html/img/hamster_banana.png\" alt=\"slide\" style=\"width:50%\">\n\
 					</center>\n\
 				</div>\n\
 				<div>\n\

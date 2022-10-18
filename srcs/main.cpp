@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 15:30:51 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 23:32:50 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/18 23:09:43 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 int main(int argc, char **argv, char* const* env)
 {
+	std::cout << "WEBSERV_PATH = " << WEBSERV_PATH << NL;
+	std::cout << "ROOT_PATH = " << ROOT_PATH << NL;
 	std::string configFile("tester/testFiles/valid/default.conf");
 
 	if (argc != 2)
