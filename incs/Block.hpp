@@ -53,6 +53,7 @@ class	Block
 		int									_port;
 		std::string							_host;
 		listOfServers						_virtualHosts;
+		std::string							_virtualServerName;
 
 					/*---- Server / Location block ----*/
 		std::string							_root;
@@ -90,6 +91,7 @@ class	Block
 						/*-------  Server_name  ------*/
 		void								setName(const std::string& name);
 		listOfStrings						getServerNames() const;	
+		void								setVirtualServerName(const std::string& name);
 		std::string							getServerName() const;	
 
 						/*-------    Listen    -------*/

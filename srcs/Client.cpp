@@ -84,7 +84,8 @@ void	Client::generateResponse()
 }
 #endif
 
-bool	Client::_matchingServerName(const listOfStrings& serverNames, int listeningPort)
+bool	Client::_matchingServerName(
+	const listOfStrings& serverNames, int listeningPort, Block* currentServer)
 {
 	listOfStrings::const_iterator	currentName;
 	int								requestedPort;
@@ -94,7 +95,11 @@ bool	Client::_matchingServerName(const listOfStrings& serverNames, int listening
 	{
 		if (_request->getHost() == *currentName
 			&& (requestedPort == UNDEFINED_PORT || requestedPort == listeningPort))
+		{
+			/* Configure virtual server name */
+			currentServer->setVirtualServerName(*currentName);
 			return (true);
+		}
 	}
     return (false);
 }
@@ -109,7 +114,7 @@ Block*  Client::_selectVirtualServer()
 		return (_runningServer.second);
 	for (currentServer = virtualHosts.begin(); currentServer != virtualHosts.end(); currentServer++)
 	{
-		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()))
+		if (_matchingServerName((*currentServer)->getServerNames(), (*currentServer)->getPort()), *currentServer)
 			return (*currentServer);
 	}
 	return (_runningServer.second);

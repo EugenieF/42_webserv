@@ -36,11 +36,13 @@ DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
 CXX				= c++
 
-CXXFLAGS		 = -Wall -Wextra -Werror -g -std=c++98 -MMD -MP -I$(INCLUDE)
+CXXFLAGS		 = -Wall -Wextra -Werror -g3 -std=c++98 -MMD -MP -I$(INCLUDE) $(MACRO)
 
-DEBUG_MODE		= -DDISPLAY
+MACRO			= -D WEBSERV_PATH=$(shell pwd) -D ROOT_PATH="www/html/"
 
-BONUS_MODE		= -DCOOKIE
+DEBUG_MODE		= -D DISPLAY=1
+
+BONUS_MODE		= -D COOKIE=1
 
 RM				= rm -rf
 

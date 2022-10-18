@@ -112,9 +112,16 @@ Block::listOfStrings	Block::getServerNames() const
 
 std::string		Block::getServerName() const
 {
+	if (!_virtualServerName.empty())
+		return (_virtualServerName);
 	if (!_serverNames.empty())
 		return (_serverNames[0]);
 	return (_host);
+}
+
+void	Block::setVirtualServerName(const std::string& name)
+{
+	_virtualServerName = name;
 }
 
 /******************************************************************************/

@@ -56,7 +56,9 @@ class Client
 
 						/*-------  Response ------*/
         Block*              	_selectVirtualServer();
-		bool					_matchingServerName(const listOfStrings& serverNames, int listeningPort);
+		bool					_matchingServerName(
+									const listOfStrings& serverNames,
+										int listeningPort, Block* currentServer);
 };
 
 #endif
