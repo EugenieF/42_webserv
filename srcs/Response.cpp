@@ -384,7 +384,7 @@ void	Response::_runDeleteMethod(std::string& path)
 	int	ret;
 
 	DEBUG("Delete method");
-	ret = remove(path.c_str());
+	ret = std::remove(path.c_str());
 	if (ret)
 	{
 		/* Error case */
