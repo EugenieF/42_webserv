@@ -145,8 +145,8 @@ class   Response
 		bool							_isCgi(const std::string& path);
 
 						/*-------    Cgi     ------*/
-		size_t							_parsePosCgiExtension(const std::string& path) const;
-		void							_parseCgiUrl();
+		size_t							_parsePosCgiExtension(std::string path);
+		void							_parseCgiUrl(size_t pos);
 		void							_fillCgiMetavariables();
 		std::string						_translateCgiName() const;
 

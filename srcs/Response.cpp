@@ -190,23 +190,6 @@ void	Response::_readFileContent(const std::string& path)
 	file.close();
 }
 
-/* Check if we need to run cgi */
-bool	Response::_isCgi(const std::string& path)
-{
-	std::string		extension;
-	size_t			pos;
-
-	if (_matchingBlock->getCgi().empty())
-		return (false);
-	pos = path.rfind(".");
-	if (pos == std::string::npos)
-		return (false);
-	extension = path.substr(pos + 1);
-	_cgipath = _matchingBlock->findCgi(extension);
-	std::cout <<YELLOW <<  "in cgi path = " << path << " | extension : " << extension << " | path = " << _cgipath << RESET << NL;
-	return (_cgipath != "");
-}
-
 /*  GET method : "Transfer a current representation of the target resource." */
 void	Response::_runGetMethod(std::string& path)
 {
@@ -216,7 +199,8 @@ void	Response::_runGetMethod(std::string& path)
 		/* process cgi */
 		return (_handleCgi());
 	}
-	_readFileContent(path);
+	if (_body.empty()) /* Problem autoindex */
+		_readFileContent(path);
 }
 
 // void	Response::_runGetMethod(std::string& path)
@@ -496,7 +480,8 @@ void	Response::_generateAutoindex(const std::string& path)
 	Autoindex	autoindex(path);
 
 	_body = autoindex.getIndexPage();
-	_headers["Content-type"] = "text/html";
+	_headers["Content-Type"] = "text/html";
+	// std::cout << RED << "_body = " << _body << RESET << NL;
 }
 
 bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
@@ -706,37 +691,70 @@ const Env&		Response::getEnv() const {
 /*                                    CGI                                     */
 /******************************************************************************/
 
+/* Check if we need to run cgi */
+bool	Response::_isCgi(const std::string& path)
+{
+	std::string		extension;
+	size_t			pos;
+
+	if (_matchingBlock->getCgi().empty())
+		return (false);
+	pos = _parsePosCgiExtension(path);
+	if (pos != std::string::npos)
+	{
+		_parseCgiUrl(pos);
+		return (true);
+	}
+	return (false);
+}
+
 /* Template url:
 		http://domain/cgi_dir_path/cgi_script.cgi_ext/cgi_extra?cgi_query
 */
-size_t	Response::_parsePosCgiExtension(const std::string& path) const {
-	(void)path;
-	return (1); /*dummy*/
+size_t	Response::_parsePosCgiExtension(std::string path) {
+
+	std::string		extension;
+	size_t			pos;
+
+	for (pos = path.find("."); pos != std::string::npos; pos = path.find(".")) {
+		extension = path.substr(pos + 1, path.find("/"));
+		if (_matchingBlock->findCgi(extension) != "")
+		{
+			_cgipath = _matchingBlock->findCgi(extension);
+			std::cout << YELLOW << "in cgi path = " << path << " | extension : " << extension << " | path = " << _cgipath << RESET << NL;
+			break ;
+		}
+		path.erase(0, extension.length() + 1);
+	}
+	return (pos); /*dummy*/
 }
 
-void   Response::_parseCgiUrl() {
+void   Response::_parseCgiUrl(size_t pos_extension) {
 	/* TODO: Retrieve cgi pos_extension and check if matching to block */
 	std::string		path = _request->getPath();
-	size_t			pos_extension = _parsePosCgiExtension(path);
-
-	if (pos_extension == std::string::npos)
-	        return ; /* No cgi in request */
 
 	size_t		pos_end_extension = path.find('/', pos_extension);
 	size_t		pos_cgi = path.find_last_of('/', pos_extension);
+	if (pos_cgi == std::string::npos)
+		return ;
 	std::string	cgi = path.substr(pos_cgi + 1, pos_end_extension);
-	if (cgi.empty())
-	{}
-	        // /* Error?: cgi script name empty */;
-	        // throw (BAD_REQUEST);
+	// if (cgi.empty()) {
+	//     /* Error?: cgi script name empty */;
+	//     throw (NOT_FOUND);
+	// }
 	_cgiscript = cgi;
 
-	std::string	cgi_extra = path.substr(pos_end_extension);
 	if (pos_end_extension == std::string::npos)
-	        return ;
+	{
+		std::cout << RED << "RETURN" << RESET << NL;
+	    return ;
+	}
+
+	std::cout << RED << "DEBUB" << RESET << NL;
 
 	size_t	pos_query = path.find('?');
-	_cgiquery = path.substr(pos_query + 1);
+	if (pos_query != std::string::npos)
+		_cgiquery = path.substr(pos_query + 1);
 
 	std::string extra = path.substr(0, pos_query);
 	_cgiextra = extra;

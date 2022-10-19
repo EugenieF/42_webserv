@@ -5,7 +5,6 @@ std::string		Response::_generateErrorPage()
 	std::string	errorPage;
 	std::string	imagePath;
 
-	// imagePath = std::string(WEBSERV_PATH) + std::string(IMG_PATH) + "hamster_banana.png";
 	imagePath = "/img/hamster_banana.png";
 	errorPage = \
 		"<!DOCTYPE html>\n\
@@ -17,7 +16,7 @@ std::string		Response::_generateErrorPage()
 			<body bgcolor=\"#FFF8BC\">\n\
 				<div class=\"hamster\">\n\
 					<center>\n\
-						<img src=\"" + imagePath + "\" alt=\"slide\" style=\"width:50%\">\n\
+						<img src=\"https://petskb.com/wp-content/uploads/2020/10/Hamster-eating-a-banana.jpg\" alt=\"slide\" style=\"width:50%\">\n\
 					</center>\n\
 				</div>\n\
 				<div>\n\
@@ -47,3 +46,5 @@ std::string		Response::_generateErrorPage()
 		</html>\n";
 	return (errorPage);
 }
+
+// <img src=\"" + imagePath + "\" alt=\"slide\" style=\"width:50%\">\n\
