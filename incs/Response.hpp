@@ -81,6 +81,7 @@ class   Response
 		listOfHttpMethodsFunct			getHttpMethods() const;
 		std::string						getLocationPath() const;
 		int								getFd() const;
+		std::string						getBuildPath() const;
 
 		std::string						getCgiProgram() const;
 		std::string						getCgiName() const;

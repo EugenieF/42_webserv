@@ -352,6 +352,7 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 void	Response::_handleCgi()
 {
 	DEBUG("handleCgi()");
+	_fillCgiMetavariables();
 	CgiHandler	cgi(*this);
 	_response = cgi.getCgiOutput();
 	// _body = cgi.getCgiOutput(); // if headers not in cgi response
@@ -687,6 +688,11 @@ const Env&		Response::getEnv() const {
 	return (*_env);
 }
 
+std::string		Response::getBuildPath() const
+{
+	return (_buildpath);
+}
+
 /******************************************************************************/
 /*                                    CGI                                     */
 /******************************************************************************/
@@ -777,9 +783,13 @@ void	Response::_fillCgiMetavariables() {
 }
 
 std::string		Response::_translateCgiName() const {
-	std::string     translation(_env->getEnv("PWD"));
-	translation += _cgipath;
+	// std::string     translation(_env->getEnv("PWD"));
+	std::string     translation(std::string(WEBSERV_PATH));
+	std::cout << RED << "PATH TRANSL. : " << translation << NL;
+	translation += _cgipath + "/";
 	translation += getCgiName();
+	std::cout << "PATH TRANSL. : " << translation << NL;
+	std::cout << "buildpath : " << _buildpath << RESET << NL;
 	return (translation);
 }
 

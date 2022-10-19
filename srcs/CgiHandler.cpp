@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 16:35:16 by etran             #+#    #+#             */
-/*   Updated: 2022/10/18 19:51:09 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/19 14:56:33 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ CgiHandler::CgiHandler(Response& response) :
 	_socket(response.getFd()),
 	_out(-1),
 	_env(response.getEnv()),
-	_script(response.getCgiName()) {}
+	_script(response.getBuildPath()) {}
 
 CgiHandler::~CgiHandler() {
 	_restore();
