@@ -159,21 +159,11 @@ void	Response::_handleRedirection()
 	_headers["Location"] = _matchingBlock->getRedirectUri();
 }
 
-// namespace TEST {
-// 	void tmp(std::string path) {
-// 		size_t doublet = path.find('/');
-// 		while (doublet) {
-// 			substract
-// 		}
-// 	}
-// }
-
 void	Response::_readFileContent(const std::string& path)
 {
 	std::ifstream		file;
 	std::stringstream	fileContent;
 	
-	std::cout << GREEN << "path: " << path << RESET << std::endl;
 	/* Check if file is accessible */
 	if (!pathIsAccessible(path))
 		throw(NOT_FOUND);
@@ -482,7 +472,7 @@ void	Response::_generateAutoindex(const std::string& path)
 
 	_body = autoindex.getIndexPage();
 	_headers["Content-Type"] = "text/html";
-	// std::cout << RED << "_body = " << _body << RESET << NL;
+	std::cout << RED << "_body = " << _body << RESET << NL;
 }
 
 bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
@@ -555,10 +545,10 @@ std::string		Response::_buildPath()
 		path += "/";
 	path += uri;
 	if (path[0] == '/')
-		path.insert(path.begin(), '.'); // Is it necessary ?
-	// std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
+		path.insert(path.begin(), '.'); // Should path be ./www or www ?
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
+	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
 	_buildpath = path;
 	return (path);
 }
@@ -697,7 +687,7 @@ std::string		Response::getBuildPath() const
 /*                                    CGI                                     */
 /******************************************************************************/
 
-/* Check if we need to run cgi */
+/* Check if we need to call cgi */
 bool	Response::_isCgi(const std::string& path)
 {
 	std::string		extension;
@@ -714,9 +704,6 @@ bool	Response::_isCgi(const std::string& path)
 	return (false);
 }
 
-/* Template url:
-		http://domain/cgi_dir_path/cgi_script.cgi_ext/cgi_extra?cgi_query
-*/
 size_t	Response::_parsePosCgiExtension(std::string path) {
 
 	std::string		extension;

@@ -36,9 +36,9 @@ DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
 CXX				= c++
 
-CXXFLAGS		 = -Wall -Wextra -Werror -g3 -std=c++98 -MMD -MP -I$(INCLUDE) $(MACRO)
+CXXFLAGS		 = -Wall -Wextra -Werror -g3 -std=c++98 -MMD -MP -I$(INCLUDE)
 
-MACRO			= -D WEBSERV_PATH=\"$(shell pwd)\" -D IMG_PATH=\"/www/html/img/\"
+MACRO			= -D WEBSERV_PATH=\"$(shell pwd)\"
 
 DEBUG_MODE		= -D DISPLAY=1
 
@@ -50,13 +50,13 @@ INCLUDE			= ./incs
 
 
 $(NAME):	debug $(OBJS)
-		@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME) 
+		@$(CXX) $(CXXFLAGS) $(MACRO) $(OBJS) -o $(NAME) 
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 -include $(DEP)
 $(OBJS_DIR)/%.o: %.cpp
 		@mkdir -p $(OBJS_DIR)
-		@$(CXX) $(CXXFLAGS) -c $< -o $@
+		@$(CXX) $(CXXFLAGS) $(MACRO) -c $< -o $@
 		@echo "$(CUT)$(BLUE)$(CXX) $(CXXFLAGS) $(RESET)$(notdir $@)"
 		@printf "$(UP)"
 

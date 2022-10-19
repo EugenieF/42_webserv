@@ -90,25 +90,25 @@ void	Parser::_createNewLocation()
 {
 	blockPtr		newLocation;
 	std::string		locationPath;
-	blockPtr		serverBlockTmp;
 	std::string		lineNbrLocation;
 
 	_directive = "location";
 	_expectContext(SERVER, "nested location");
 	lineNbrLocation	= _currentToken->getLineStr();
-	serverBlockTmp = _currentBlock;
+	_serverBlockTmp = _currentBlock;
 
 	_expectNbOfArguments(1, EQUAL, BLOCK_START);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
-
 	locationPath = _currentToken->getValue();
 	newLocation = new Block;
 	_updateContext(LOCATION, newLocation);
 	_parseBlock();
+
 	_directive = "";
-	if (!(serverBlockTmp->insertLocation(locationPath, newLocation)))
+	if (!(_serverBlockTmp->insertLocation(locationPath, newLocation)))	
 		_throwErrorParsing("duplicate location '" + locationPath + "'", lineNbrLocation);
-	_updateContext(SERVER, serverBlockTmp);
+	_updateContext(SERVER, _serverBlockTmp);
+	_serverBlockTmp = NULL;
 }
 
 Parser::blockPtr	Parser::_createNewServer()
@@ -146,26 +146,9 @@ void	Parser::parseTokens()
 		_currentServer = _servers.insert(_servers.end(), newServer);
 		_updateContext(NONE, NULL);
 	}
+	// _checkDomainNames();
 	_configureVirtualHosts();
 	_checkDuplicatePorts();
-}
-
-void	Parser::_checkDuplicatePorts()
-{
-	listOfServers::iterator		currentServer;
-	listOfServers::iterator		nextServer;
-
-	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
-	{
-		for (nextServer = currentServer + 1; nextServer != _servers.end(); nextServer++)
-		{
-			if ((*currentServer)->getPort() == (*nextServer)->getPort())
-			{
-				// std::cout << RED << "[**** DUPLICATE PORT ****]" << RESET << std::endl;
-				_throwErrorParsing(_duplicatePortMsg((*currentServer)->getPort()));
-			}
-		}
-	}	
 }
 
 /******************************************************************************/
@@ -416,6 +399,55 @@ void	Parser::_setHost(const std::string &token)
 	_currentBlock->setHost(_currentToken->getValue());
 }
 
+void	Parser::_checkDuplicatePorts()
+{
+	listOfServers::iterator		currentServer;
+	listOfServers::iterator		nextServer;
+
+	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
+	{
+		for (nextServer = currentServer + 1; nextServer != _servers.end(); nextServer++)
+		{
+			if ((*currentServer)->getPort() == (*nextServer)->getPort())
+			{
+				// std::cout << RED << "[**** DUPLICATE PORT ****]" << RESET << std::endl;
+				_throwErrorParsing(_duplicatePortMsg((*currentServer)->getPort()));
+			}
+		}
+	}	
+}
+
+void	Parser::_checkDomainNames()
+{
+	std::ifstream		file;
+	std::stringstream	fileContent;
+	std::string			content;
+	size_t				domainNamePos;
+	std::string			domainName;
+
+	file.open("/etc/hosts", std::ifstream::in);
+	/* Check if file was successfully opened */
+	if (!file.is_open())
+	{
+		/* An error occured */
+		_throwErrorParsing("Can't open file '\\etc\\hosts'");
+	}
+	/* We read the content of the file */
+	fileContent << file.rdbuf();
+	content = fileContent.str();
+	file.close();
+	for (size_t pos = content.find("\n"); pos != std::string::npos; pos = content.find("\n"))
+	{
+		domainNamePos = content.find(" localhost");
+		if (domainNamePos != std::string::npos)
+		{
+			domainName = content.substr(0, domainNamePos);
+			std::cout << YELLOW << "domainName = '" << domainName << "'" << RESET << NL;
+		}
+		content.erase(0, pos + 1);
+	}
+}
+
 /******************************************************************************/
 /*                                  EXPECT                                    */
 /******************************************************************************/
@@ -559,6 +591,15 @@ void	Parser::_deleteServers()
 	{
 		if (*_currentServer)
 			delete (*_currentServer);
+	}
+}
+
+void	Parser::_deleteBlock(Block* block)
+{
+	if (block)
+	{
+		delete block;
+		block = NULL;
 	}
 }
 
@@ -711,8 +752,9 @@ void	Parser::_throwErrorParsing(std::string errorMsg)
 		lineNbr = _currentToken->getLineStr();
 	message = "Webserv error: " + errorMsg;
 	message += " in " + getConfigFile() + ":" + lineNbr;
-	if (_currentBlock)
-		delete _currentBlock;
+	_deleteBlock(_currentBlock);
+	_deleteBlock(_serverBlockTmp);
+	_deleteServers();
 	throw (std::runtime_error(message));
 }
 
@@ -722,8 +764,9 @@ void	Parser::_throwErrorParsing(std::string errorMsg, std::string lineNbr)
 
 	message = "Webserv error: " + errorMsg;
 	message += " in " + getConfigFile() + ":" + lineNbr;
-	if (_currentBlock)
-		delete _currentBlock;
+	_deleteBlock(_currentBlock);
+	_deleteBlock(_serverBlockTmp);
+	_deleteServers();
 	throw (std::runtime_error(message));
 }
 

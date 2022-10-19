@@ -37,6 +37,7 @@ class Parser
 		listOfParsingFunctions				_parsingFunct;
 		t_context							_context;
 		std::string							_directive;
+		blockPtr							_serverBlockTmp;
 		
 	public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -97,6 +98,7 @@ class Parser
 		void								_checkDelimiter(Lexer::listOfTokens::const_iterator token);
 		void								_checkEndOfFile(Lexer::listOfTokens::const_iterator token);
 		void								_checkDuplicatePorts();
+		void								_checkDomainNames();
 
 		void								_setHost(const std::string &token);
 
@@ -118,6 +120,7 @@ class Parser
 		void								_setDirective(Token::tokenType type);
 		bool								_isDirective(Token::tokenType type);
 		void								_deleteServers();
+		void								_deleteBlock(Block* block);
 
 						/*-------     Error    ------*/
 		std::string							_unexpectedValueMsg(Lexer::listOfTokens::const_iterator token);

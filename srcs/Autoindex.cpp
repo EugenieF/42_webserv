@@ -8,8 +8,6 @@ Autoindex::Autoindex(const std::string& path):
     _directoryPath(""),
     _indexPage("")
 {
-    // if (path[0] != '/')
-    //     _directoryPath += "/"; 
     _directoryPath += path;
     _generateIndexPage();
 }
@@ -47,8 +45,9 @@ std::string	    Autoindex::_generateHtmlHeader()
             <title>Autoindex page</title>\n\
         </head>\n\
         <body>\n\
-        <h1>INDEX</h1>\n\
-            <p>\n";
+        	<h1>Index of " + _directoryPath + "</h1>\n\
+            <table>\n\
+				<colgroup span=\"20\"></colgroup>\n";
 	return (header);
 }
 
@@ -56,9 +55,9 @@ std::string    Autoindex::_generateHtmlFooter()
 {
 	std::string	footer;
 
-	footer = "</p>\n\
-    </body>\n\
-    </html>\n";
+	footer = "\t\t\t</table>\n\
+		</body>\n\
+	</html>\n";
 	return (footer);
 }
 
@@ -81,13 +80,13 @@ std::string		Autoindex::_generateHtmlLink(const unsigned char fileType, const st
 	std::string		link;
 	std::string		filePath(_directoryPath + fileName);
 
-	if (fileName == "." || stat(filePath.c_str(), &fileInfos) != 0)
+	if (fileName == "." || fileName == ".." || stat(filePath.c_str(), &fileInfos) != 0)
 		return ("");
-	link = "<tr>\n";
+	link = "\t\t\t<tr>\n";
 	link += _getFileLink(fileType, fileName);
 	link += _getFileModificationTime(fileInfos);
 	link += _getFileSize(fileInfos);
-	link += "</tr>\n";
+	link += "\t\t\t</tr>\n";
 	return (link);
 }
 
@@ -99,9 +98,8 @@ void    Autoindex::_generateIndexPage()
 	directory = opendir(_directoryPath.c_str());
 	if (!directory)
 	{
-		/* error case */
-		std::cerr << RED << "Webserv error: unable to read directory " << _directoryPath << RESET << std::endl;
-		return ;
+		/* error case: unable to read directory */
+		throw (INTERNAL_SERVER_ERROR);
 	}
     _indexPage += _generateHtmlHeader();
 	for (file = readdir(directory); file != NULL; file = readdir(directory))
@@ -119,7 +117,7 @@ void    Autoindex::_generateIndexPage()
 
 void	Autoindex::_formatCell(std::string* data)
 {
-	*data = "<td>" + *data + "</td>\n";
+	*data = "\t\t\t\t<td>" + *data + "</td>\n";
 }
 
 std::string		Autoindex::_getFileSize(struct stat	fileInfos)
@@ -133,22 +131,6 @@ std::string		Autoindex::_getFileSize(struct stat	fileInfos)
 	_formatCell(&size);
 	return (size);
 }
-
-// std::string		Autoindex::_getFileModificationTime(struct stat	fileInfos)
-// {
-//     char				date[100];
-// 	std::string			time;
-
-// 	if (!std::strftime(date, sizeof(date), "%d-%b-%Y %H:%M", std::localtime(&fileInfos.st_mtime)))
-// 	{
-// 		/* Error */
-// 		std::cerr << RED << "Webserv error: strftime() failed" << RESET << std::endl;
-// 		return ("");
-// 	}
-// 	time = convertCharPtrToString(date);
-// 	_formatCell(&time);
-// 	return(time);
-// }
 
 std::string		Autoindex::_getFileModificationTime(struct stat	fileInfos)
 {
