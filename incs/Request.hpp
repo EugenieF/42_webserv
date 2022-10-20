@@ -48,6 +48,7 @@ class   Request
 		int							_port;
 		size_t						_payloadSize;
 		int							_fd;
+		std::string					_query;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -82,6 +83,7 @@ class   Request
 		size_t						getPayloadSize() const;
 		int							getFd() const;
 		std::string					getMethodStr() const; // Can be replaced by global
+		std::string					getQuery() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();

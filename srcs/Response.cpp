@@ -81,7 +81,8 @@ void	Response::generateResponse()
 	/* Generate CGI here */
 	std::string	errorPage;
 
-	DEBUG("Response");
+	//DEBUG("Response");
+	//std::cerr << RED << "STATUS CODE: " << getStatusCode() << RESET << NL;
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
@@ -101,7 +102,8 @@ void	Response::generateResponse()
 		_fillErrorBody();
 	}
 	_fillResponseLine();
-	_fillHeaders();
+	if (!_isCgi(_buildpath))
+		_fillHeaders();
 	_response += _body + "\r\n";
 }
 
@@ -183,7 +185,7 @@ void	Response::_readFileContent(const std::string& path)
 /*  GET method : "Transfer a current representation of the target resource." */
 void	Response::_runGetMethod(std::string& path)
 {
-	DEBUG("Get method");
+	//DEBUG("Get method");
 	if (_isCgi(path))
 	{
 		/* process cgi */
@@ -291,7 +293,7 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 		if (filename != "")
 		{
 			fileContent = body.substr(0, body.find("\r\n"));
-			std::cout << GREEN << "filepath = " << path + filename << RESET << std::endl;
+			//std::cout << GREEN << "filepath = " << path + filename << RESET << std::endl;
 			_writeFileContent(path + filename, fileContent);
 		}
 	}
@@ -341,10 +343,15 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 
 void	Response::_handleCgi()
 {
-	DEBUG("handleCgi()");
+	//DEBUG("handleCgi()");
 	_fillCgiMetavariables();
 	CgiHandler	cgi(*this);
-	_response = cgi.getCgiOutput();
+	try {
+		_body = cgi.getCgiOutput();
+	} catch (const std::runtime_error& e) {
+		std::cerr << RED << "Exception in handlecgi : " << e.what() << RESET << NL;
+		throw (INTERNAL_SERVER_ERROR);
+	}
 	// _body = cgi.getCgiOutput(); // if headers not in cgi response
 }
 
@@ -353,7 +360,7 @@ void	Response::_runPostMethod(std::string& path)
 {
 	std::ofstream							ofs;
 
-	DEBUG("Post method");
+	//DEBUG("Post method");
 	if (_isCgi(path))
 	{
 		/* process cgi */
@@ -375,7 +382,7 @@ void	Response::_runDeleteMethod(std::string& path)
 {
 	int	ret;
 
-	DEBUG("Delete method");
+	//DEBUG("Delete method");
 	ret = std::remove(path.c_str());
 	if (ret)
 	{
@@ -427,7 +434,7 @@ std::string		Response::_getContentTypeHeader()
 	/* Check if header is already set */
 	if (_headers.find("Content-Type") != _headers.end())
 		return (_headers["Content-Type"]);
-	std::cout << RED << _buildpath << RESET << NL;
+	//std::cout << RED << _buildpath << RESET << NL;
 	pos = _buildpath.rfind(".");
 	if (pos != std::string::npos)
 	{
@@ -698,6 +705,7 @@ bool	Response::_isCgi(const std::string& path)
 	pos = _parsePosCgiExtension(path);
 	if (pos != std::string::npos)
 	{
+		//_env->add
 		_parseCgiUrl(pos);
 		return (true);
 	}
@@ -736,21 +744,21 @@ void   Response::_parseCgiUrl(size_t pos_extension) {
 	//     throw (NOT_FOUND);
 	// }
 	_cgiscript = cgi;
+	_cgiquery = _request->getQuery();
+	_cgiextra = "";
+//	if (pos_end_extension == std::string::npos)
+//	{
+//		//std::cout << RED << "RETURN" << RESET << NL;
+//	    return ;
+//	}
 
-	if (pos_end_extension == std::string::npos)
-	{
-		std::cout << RED << "RETURN" << RESET << NL;
-	    return ;
-	}
+	//std::cout << RED << "DEBUB" << RESET << NL;
 
-	std::cout << RED << "DEBUB" << RESET << NL;
+	//size_t	pos_query = path.find('?');
+	//if (pos_query != std::string::npos)
+		//_cgiquery = path.substr(pos_query + 1);
 
-	size_t	pos_query = path.find('?');
-	if (pos_query != std::string::npos)
-		_cgiquery = path.substr(pos_query + 1);
-
-	std::string extra = path.substr(0, pos_query);
-	_cgiextra = extra;
+	//std::string extra = path.substr(0, pos_query);
 }
 
 void	Response::_fillCgiMetavariables() {
@@ -760,23 +768,42 @@ void	Response::_fillCgiMetavariables() {
 	_env->addParam("CONTENT_TYPE", _request->getHeader("content-type"));
 	_env->addParam("REQUEST_METHOD", _request->getMethodStr());
 	_env->addParam("QUERY_STRING", getCgiQuery());
-	_env->addParam("SCRIPT_NAME", getCgiName());
-	_env->addParam("PATH_INFO", getCgiExtra());
-	_env->addParam("PATH_TRANSLATED", _translateCgiName());
-	_env->addParam("REMOTE_ADDR", "localhost"); // TODO: client ip
+	_env->addParam("SCRIPT_NAME", _request->getPath());
+	_env->addParam("SCRIPT_FILENAME", _translateCgiName());
+	_env->addParam("PATH_INFO", getCgiExtra()); // TODO: parse esc char
+	_env->addParam("PATH_TRANSLATED", ""); //TODO PATH_INFO translated :
+	// PATH_TRANSLATED=ROOT/PATH_INFO
+	_env->addParam("REMOTE_ADDR", "localhost"); /* TODO: inet_hton ? Recode epoll ? */
 	_env->addParam("SERVER_PORT", convertNbToString(_request->getPort()));
 	_env->addParam("REMOTE_IDENT", ""); // optional
-	_env->addParam("SERVER_PORT", ""); // optional
+
+	std::cerr << RED << "Query: " << getCgiQuery() << RESET << NL;
+	/* FROM CLIENT : */
+	_env->addParam("HTTP_ACCEPT", _request->getHeader("accept"));
+	_env->addParam("HTTP_ACCEPT_LANGUAGE", _request->getHeader("accept-language"));
+	_env->addParam("HTTP_USER_AGENT", _request->getHeader("user-agent"));
+	_env->addParam("HTTP_COOKIE", _request->getHeader("cookie")); 
+	_env->addParam("HTTP_REFERER", _request->getHeader("referer"));
+	_env->addParam("REDIRECT_STATUS", getStatusCodeStr());
+	
 }
 
 std::string		Response::_translateCgiName() const {
 	// std::string     translation(_env->getEnv("PWD"));
 	std::string     translation(std::string(WEBSERV_PATH));
-	std::cout << RED << "PATH TRANSL. : " << translation << NL;
-	translation += _cgipath + "/";
-	translation += getCgiName();
-	std::cout << "PATH TRANSL. : " << translation << NL;
-	std::cout << "buildpath : " << _buildpath << RESET << NL;
+	std::string		relativePath(getBuildPath());
+
+	if (relativePath[0] == '.')
+		relativePath.erase(0, 1);
+	else if (relativePath[0] != '/')
+		relativePath.insert(0, "/");
+	translation += relativePath;
+	//std::cout << RED << "PATH TRANSL. : " << translation << NL;
+	//translation += _cgipath + "/";
+	//translation += getCgiName();
+	//std::cout << "PATH TRANSL. : " << translation << NL;
+	//std::cout << "buildpath : " << _buildpath << RESET << NL;
+	std::cout << GREEN<<"Translation is: "<< translation<<RESET<<NL;
 	return (translation);
 }
 

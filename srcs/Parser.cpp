@@ -8,7 +8,8 @@
 Parser::Parser():
 	_lexer(),
 	_currentBlock(NULL),
-	_context(NONE)
+	_context(NONE),
+	_serverBlockTmp(NULL)
 {
 	_initArrayParsingFunctions();
 }
@@ -18,15 +19,16 @@ Parser::Parser(std::string configFile):
 	_lexer(configFile),
 	_currentToken(_lexer.getTokens().begin()),
 	_currentBlock(NULL),
-	_context(NONE)
+	_context(NONE),
+	_serverBlockTmp(NULL)
 {
-	DEBUG("Creating array...");
+	//DEBUG("Creating array...");
 	_initArrayParsingFunctions();
-	DEBUG("Parsing...");
+	//DEBUG("Parsing...");
 	// printTokens();
 	parseTokens();
 	_lexer.closeFile();
-	DEBUG("Parsing done");
+	//DEBUG("Parsing done");
 }
 
 Parser::Parser(const Parser& other)

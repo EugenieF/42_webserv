@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 15:30:51 by etran             #+#    #+#             */
-/*   Updated: 2022/10/18 23:09:43 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/19 15:19:48 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,14 @@ int main(int argc, char **argv, char* const* env)
 
 	if (argc != 2)
 	{
-		DEBUG("no File");
+		//DEBUG("no File");
 		std::cerr << "usage : ./webserv [a configuration file]" << std::endl;
 		if (argc > 2)
 			return (EXIT_FAILURE);
 		std::cout << "Using default configuration file" << std::endl;
 	}
 	else {
-		DEBUG("File");
+		//DEBUG("File");
 		configFile = argv[1];
 	}
 		//std::string configFile(argv[1]);

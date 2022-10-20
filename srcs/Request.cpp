@@ -135,7 +135,6 @@ void	Request::_parsePath()
 {
 	std::string		path;
 	size_t			pos;
-	std::string		query;
 
 	_getNextWord(path, " ");
 	if (path == "" || path[0] != '/')
@@ -146,10 +145,11 @@ void	Request::_parsePath()
 	pos = path.find("?");
 	if (pos != std::string::npos)
 	{
-		query = path.substr(pos + 1);
+		_query = path.substr(pos + 1);
 		path.erase(pos);
-		if (query.length() > 255) /* limited by the DNS */
+		if (_query.length() > 255) /* limited by the DNS */
 			throw (URI_TOO_LONG);
+		std::cerr << RED << "Query in request: " << _query << RESET << NL;
 	}
 	_path = path;
 }
@@ -274,6 +274,7 @@ void	Request::_checkSizeBody()
 void	Request::_parseBody()
 {
 	std::string		body;
+	Request::listOfHeaders::const_iterator	ite;
 
 	if (_requestStatus == COMPLETE_REQUEST)
 		return ;
@@ -281,10 +282,17 @@ void	Request::_parseBody()
 		_decodeChunks();
 	else
 	{
-		DEBUG("before check size");
+	//	DEBUG("before check size");
 		_body = _request;
-		_checkSizeBody();
-		DEBUG("in parse body");
+		// _checkSizeBody();
+		ite = _headers.find("content-type");
+		if (ite != _headers.end() && ite->second == "application/x-www-form-urlencoded")
+		{
+			// _query = _body;
+			_bodySize = 0;
+			std::cout << GREEN << "query request = " << _query << RESET << NL;
+		}
+		//DEBUG("in parse body");
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	}
 }
@@ -296,12 +304,12 @@ void	Request::_decodeChunks()
 
 	if (!_reachedEndOfChunkedBody())
 	{
-		DEBUG("Incomplete chunked body");
+		//DEBUG("Incomplete chunked body");
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
 	}
 	while (1)
 	{
-		DEBUG("Complete chunked body");
+		//DEBUG("Complete chunked body");
 		size = 0;
 		if (_getNextWord(chunkSize, "\r\n") == std::string::npos)
 			throw (BAD_REQUEST);
@@ -372,6 +380,10 @@ std::string		Request::getHeader(const std::string& headerName)
 size_t	Request::getBodySize() const
 {
 	return (_bodySize);
+}
+
+std::string	Request::getQuery() const {
+	return (_query);
 }
 
 std::string		Request::getBody() const
