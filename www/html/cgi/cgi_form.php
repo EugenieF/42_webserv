@@ -1,6 +1,8 @@
 <?php
 	session_start();
 ?>
+
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Cutie webserv 😚 💖</title>
@@ -67,7 +69,7 @@
 					$_SESSION['color'] = $_GET['color'];
 					echo 'Votre nom : '.$_GET["name"].'<br>';
 					echo 'Le nom de votre futur hamster : '.$_GET["hamster"].'<br>';
-					echo 'Vous avez choisi sa couleur magnifique qui est le '.$GET["color"].'<br>';
+					echo 'Vous avez choisi sa couleur magnifique qui est le '.$_GET["color"].'<br>';
 					break;
 				case 'POST':
 					$_SESSION['name'] = $_POST['name'];
@@ -75,20 +77,20 @@
 					$_SESSION['color'] = $_POST['color'];
 					echo 'Votre nom : '.$_POST["name"].'<br>';
 					echo 'Le nom de votre futur hamster : '.$_POST["hamster"].'<br>';
-					echo 'Vous avez choisi sa couleur magnifique qui est le '.$POST["color"].'<br>';
+					echo 'Vous avez choisi sa couleur magnifique qui est le '.$_POST["color"].'<br>';
 					break;
 				default:
 					echo "Il faut un minimum d'infos pour obtenir votre petit bebou!\n";
 			}
 		?>
 		</div>
-			<form action="../html/form.html">
+			<form action="../form.html">
 				<center><input type="submit" value="Go acheter un nouvel ami !" class="bouton" /></center>
 			</form>
-			<form action="../html/cgi_achat.php">
+			<form action="cgi_achat.php">
 				<center><input type="submit" value="Go voir le panier achete !" class="bouton" /></center>
 			</form>
-            <form action="./cgi_destroy.php">
+			<form action="./cgi_destroy.php">
 				<center><input type="submit" value="Jeter son hamster et reformuler une adoption" class="bouton" /></center>
 			</form>
 			<form action="../html/index.html">
