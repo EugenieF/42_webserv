@@ -73,3 +73,12 @@
 		</div>
 	</body>
 </html>
+
+<input id="btn" type="button" value="JE VEUX MON HAMSTER !" onclick="upload();"></input>
+<script>
+	function upload() {
+		var request = new XMLHttpRequest();
+		request.open("GET", form_upload.html, true); // false for synchronous request, true for asynchronous 
+		request.send();
+	}
+</script>
