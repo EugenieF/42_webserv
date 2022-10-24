@@ -110,6 +110,7 @@ std::string		Session::_generateSessionId()
 	sessionId = _generateRandomString(SESSION_ID_LENGTH);
 	while (_sessions.find(sessionId) != _sessions.end())
 		sessionId = _generateRandomString(SESSION_ID_LENGTH);
+	std::cout << RED << "SESSION ID ==> " << sessionId << RESET << NL;
 	return (sessionId);
 }
 

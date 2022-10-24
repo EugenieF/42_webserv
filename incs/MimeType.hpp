@@ -12,7 +12,7 @@ class MimeType
 	public:
 		MimeType();
 		~MimeType();
-		std::string&	operator[](const std::string &ext);
+		std::string		operator[](const std::string &ext);
 
 	private:
 		void			_initMimeTypesMap();

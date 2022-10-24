@@ -62,6 +62,7 @@ void	Response::_processMethod()
 	if (!_matchingBlock->isAllowedMethod(_method))
 		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
+	std::cout << YELLOW << "BUILD PATH = " << _builtPath << RESET << NL;
 	if (path.empty())
 		throw(NOT_FOUND);
 	/* Find corresponding http method */
@@ -73,7 +74,7 @@ void	Response::_processMethod()
 		/* Do redirection */
 		return (_handleRedirection());
 	}
-	(this->*ite->second)(path);
+	(this->*ite->second)();
 }
 
 void	Response::generateResponse()
@@ -102,7 +103,7 @@ void	Response::generateResponse()
 		_fillErrorBody();
 	}
 	_fillResponseLine();
-	if (!_isCgi(_buildpath))
+	if (!_isCgi(_builtPath))
 		_fillHeaders();
 	_response += _body + "\r\n";
 }
@@ -183,41 +184,17 @@ void	Response::_readFileContent(const std::string& path)
 }
 
 /*  GET method : "Transfer a current representation of the target resource." */
-void	Response::_runGetMethod(std::string& path)
+void	Response::_runGetMethod()
 {
 	//DEBUG("Get method");
-	if (_isCgi(path))
+	if (_isCgi(_builtPath))
 	{
 		/* process cgi */
 		return (_handleCgi());
 	}
 	if (_body.empty()) /* Problem autoindex */
-		_readFileContent(path);
+		_readFileContent(_builtPath);
 }
-
-// void	Response::_runGetMethod(std::string& path)
-// {
-// 	std::string		filePath;
-
-// 	DEBUG("Get method");
-// 	if (pathIsFile(path))
-// 		return (_readFileContent(path));
-// 	if (pathIsDirectory(path))
-// 	{
-// 		/* Directory case */
-// 		if (*(path.rbegin()) == '/' && _searchOfIndexPage(_matchingBlock->getIndexes(), &path))
-// 			return (_readFileContent(path));
-// 		if (*(path.rbegin()) != '/')
-// 			path += "/";
-// 		if (_matchingBlock->getAutoindex())
-// 		{
-// 			/* generate autoindex page */
-// 			return (_generateAutoindex(path));
-// 		}
-// 	}
-// 	DEBUG("Not Found");
-// 	throw(NOT_FOUND);
-// }
 
 /******************************************************************************/
 /*                            MULTIPART/FORM-DATA                             */
@@ -231,7 +208,9 @@ std::string		Response::_getBoundary(std::string contentType)
 
 	pos = contentType.find("boundary=");
 	if (pos == std::string::npos)
+	{
 		throw(BAD_REQUEST);
+	}
 	contentType.erase(0, pos + 9);
 	boundary = contentType.substr(0, contentType.find("\r\n"));
 	trimSpacesEndStr(&boundary);
@@ -242,7 +221,9 @@ std::string		Response::_getBoundary(std::string contentType)
 		boundary.erase(lastChar - 1);
 	}
 	if (boundary.length() > 70)
+	{
 		throw(BAD_REQUEST);
+	}
 	boundary = "--" + boundary + "\r\n"; 
 	return (boundary);
 }
@@ -255,7 +236,9 @@ std::string		Response::_getFilename(const std::string& content)
 
 	pos = content.find("Content-Disposition:");
 	if (pos == std::string::npos)
+	{
 		throw(BAD_REQUEST);
+	}
 	contentDisposition = content.substr(pos, content.find("\r\n"));
 	pos = contentDisposition.find("filename=\"");
 	if (pos == std::string::npos)
@@ -293,7 +276,9 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 		if (filename != "")
 		{
 			fileContent = body.substr(0, body.find("\r\n"));
-			//std::cout << GREEN << "filepath = " << path + filename << RESET << std::endl;
+			if (path[path.length() - 1] != '/' && filename[0] != '/')
+				filename.insert(0, "/");
+			std::cout << GREEN << "filename : " << path + filename << RESET << std::endl;
 			_writeFileContent(path + filename, fileContent);
 		}
 	}
@@ -356,21 +341,33 @@ void	Response::_handleCgi()
 }
 
 /* Perform resource-specific processing on the request payload. */
-void	Response::_runPostMethod(std::string& path)
+void	Response::_runPostMethod()
 {
-	std::ofstream							ofs;
+	std::ofstream		ofs;
 
-	//DEBUG("Post method");
-	if (_isCgi(path))
+	// what if path is empty ??
+	if (_isCgi(_builtPath))
 	{
 		/* process cgi */
 		return (_handleCgi());
 	}
-	if (_isMultipartFormRequest())
+	// if (_matchingBlock->getUploadPath().empty())
+	if (_uploadPath.empty())
 	{
-		return (_handleMultipartContent(path, _request->getBody()));
+		// setStatusCode ??
+		return ;
 	}
-	_writeFileContent(path, _request->getBody());
+	if (_contentTypeIsUrlencoded())
+	{
+		// setStatusCode ?
+		return ;
+	}
+	if (_contentTypeIsMultipart())
+	{
+		// return (_handleMultipartContent(_uploadPath, _request->getBody()));
+		return (_handleMultipartContent(_builtPath, _request->getBody()));
+	}
+	_writeFileContent(_builtPath, _request->getBody());
 }
 
 /******************************************************************************/
@@ -378,12 +375,12 @@ void	Response::_runPostMethod(std::string& path)
 /******************************************************************************/
 
 /* Remove all current representations of the target resource. */
-void	Response::_runDeleteMethod(std::string& path)
+void	Response::_runDeleteMethod()
 {
 	int	ret;
 
 	//DEBUG("Delete method");
-	ret = std::remove(path.c_str());
+	ret = std::remove(_builtPath.c_str());
 	if (ret)
 	{
 		/* Error case */
@@ -391,7 +388,7 @@ void	Response::_runDeleteMethod(std::string& path)
 	}
 	 /* Successfull case */
 	setStatusCode(NO_CONTENT);
-	displayMsg(" 🚫 Resource " + path + " was successfully deleted", LIGHT_GREEN);
+	displayMsg(" 🚫 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
 }
 
 /******************************************************************************/
@@ -434,11 +431,11 @@ std::string		Response::_getContentTypeHeader()
 	/* Check if header is already set */
 	if (_headers.find("Content-Type") != _headers.end())
 		return (_headers["Content-Type"]);
-	//std::cout << RED << _buildpath << RESET << NL;
-	pos = _buildpath.rfind(".");
+	//std::cout << RED << _builtPath << RESET << NL;
+	pos = _builtPath.rfind(".");
 	if (pos != std::string::npos)
 	{
-		typeExtension = _buildpath.substr(pos);
+		typeExtension = _builtPath.substr(pos);
 	}
 	return (g_mimeType[typeExtension]);
 }
@@ -478,8 +475,8 @@ void	Response::_generateAutoindex(const std::string& path)
 	Autoindex	autoindex(path);
 
 	_body = autoindex.getIndexPage();
-	_headers["Content-Type"] = "text/html";
-	std::cout << RED << "_body = " << _body << RESET << NL;
+	_headers["Content-Type"] = g_mimeType[".html"];
+	// std::cout << RED << "_body = " << _body << RESET << NL;
 }
 
 bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
@@ -542,6 +539,7 @@ std::string		Response::_buildPath()
 	uri = _request->getPath();
 	if (_locationPath != "")
 		uri.erase(0, _locationPath.length());
+	_uploadPath = _matchingBlock->getUploadPath();
 	if (_hasUploadPathDirective())
 		path = _matchingBlock->getUploadPath();
 	else
@@ -556,7 +554,7 @@ std::string		Response::_buildPath()
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
 	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
-	_buildpath = path;
+	_builtPath = path;
 	return (path);
 }
 
@@ -566,7 +564,8 @@ std::string		Response::_buildPath()
 
 bool	Response::_hasUploadPathDirective()
 {
-	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
+	return ((_method == POST || _method == DELETE)
+		&& !_matchingBlock->getUploadPath().empty());
 }
 
 bool	Response::_requestIsValid()
@@ -580,11 +579,19 @@ void	Response::_checkBodyLimit()
 		throw(PAYLOAD_TOO_LARGE);
 }
 
-bool	Response::_isMultipartFormRequest()
+bool	Response::_contentTypeIsMultipart()
 {
 	size_t pos;
 
 	pos = _request->getHeader("content-type").find("multipart/form-data");
+	return (pos != std::string::npos);
+}
+
+bool	Response::_contentTypeIsUrlencoded()
+{
+	size_t pos;
+
+	pos = _request->getHeader("content-type").find("application/x-www-form-urlencoded");
 	return (pos != std::string::npos);
 }
 
@@ -685,9 +692,9 @@ const Env&		Response::getEnv() const {
 	return (*_env);
 }
 
-std::string		Response::getBuildPath() const
+std::string		Response::getBuiltPath() const
 {
-	return (_buildpath);
+	return (_builtPath);
 }
 
 /******************************************************************************/
@@ -791,7 +798,7 @@ void	Response::_fillCgiMetavariables() {
 std::string		Response::_translateCgiName() const {
 	// std::string     translation(_env->getEnv("PWD"));
 	std::string     translation(std::string(WEBSERV_PATH));
-	std::string		relativePath(getBuildPath());
+	std::string		relativePath(getBuiltPath());
 
 	if (relativePath[0] == '.')
 		relativePath.erase(0, 1);
@@ -802,7 +809,7 @@ std::string		Response::_translateCgiName() const {
 	//translation += _cgipath + "/";
 	//translation += getCgiName();
 	//std::cout << "PATH TRANSL. : " << translation << NL;
-	//std::cout << "buildpath : " << _buildpath << RESET << NL;
+	//std::cout << "buildpath : " << _builtPath << RESET << NL;
 	std::cout << GREEN<<"Translation is: "<< translation<<RESET<<NL;
 	return (translation);
 }

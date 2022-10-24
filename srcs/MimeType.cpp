@@ -7,13 +7,17 @@ MimeType::MimeType()
 
 MimeType::~MimeType() {}
 
-std::string&	MimeType::operator[](const std::string &ext)
+std::string		MimeType::operator[](const std::string &ext)
 {
 	std::map<std::string, std::string>::iterator	ite;
 
 	ite = _mimeTypes.find(ext);
 	if (ite != _mimeTypes.end())
-		return ite->second;
+	{
+		if (ite->second == "text/html")
+			return (ite->second + "; charset=utf-8");
+		return (ite->second);
+	}
 	return (_mimeTypes[".bin"]);
 }
 

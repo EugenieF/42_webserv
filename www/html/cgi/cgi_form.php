@@ -16,22 +16,22 @@
 
     @font-face {
     font-family: berry;
-    src: url(../html/fonts/Berry\ Merry.otf);
+    src: url(../fonts/Berry_Merry.otf);
     }
 
     @font-face {
     font-family: peralta;
-    src: url(../html/fonts/Peralta-Regular.ttf);
+    src: url(../fonts/Peralta-Regular.ttf);
     }
 
     @font-face {
 	font-family: NotoSerifKR_R;
-	src: url(../html/fonts/NotoSerifKR-Bold.otf)
+	src: url(../fonts/NotoSerifKR-Bold.otf)
     }
 
     @font-face {
 	font-family: NotoSerifKR_L;
-	src: url(../html/fonts/NotoSerifKR-Light.otf)
+	src: url(../fonts/NotoSerifKR-Light.otf)
     }
 
     h1 {
@@ -58,8 +58,9 @@
 			<center>Remerciements Test apres Form</center>
 		</h1>
 		<div class="hamster">
-			<img src="../html/img/hamster_party.png" width="600px">
+			<img src="../img/hamster_party.png" width="600px">
 		</div>
+		<div><center>
 		<?php
 			switch($_SERVER['REQUEST_METHOD'])
 			{
@@ -83,17 +84,17 @@
 					echo "Il faut un minimum d'infos pour obtenir votre petit bebou!\n";
 			}
 		?>
-		</div>
+		</center></div>
 			<form action="../form.html">
 				<center><input type="submit" value="Go acheter un nouvel ami !" class="bouton" /></center>
 			</form>
 			<form action="cgi_achat.php">
 				<center><input type="submit" value="Go voir le panier achete !" class="bouton" /></center>
 			</form>
-			<form action="./cgi_destroy.php">
-				<center><input type="submit" value="Jeter son hamster et reformuler une adoption" class="bouton" /></center>
+            <form action="cgi_destroy.php">
+				<center><input type="submit" value="Jeter votre hamster et reformuler une adoption" class="bouton" /></center>
 			</form>
-			<form action="../html/index.html">
+			<form action="../index.html">
 				<center><input type="submit" value="Retour vers la page d'accueil" class="bouton" /></center>
 			</form>
 		</div>

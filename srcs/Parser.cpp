@@ -318,7 +318,7 @@ void	Parser::_parseAllowedMethodRule()
 /* Context: Location */
 void	Parser::_parseUploadPathRule()
 {
-	_expectContext(LOCATION);
+	// _expectContext(LOCATION);
 	_expectNbOfArguments(1, EQUAL, SEMICOLON);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
 	_currentBlock->setUploadPath(_currentToken->getValue());

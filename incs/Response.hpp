@@ -26,7 +26,7 @@ class   Response
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef void (Response::*httpMethod)(std::string&);
+		typedef void (Response::*httpMethod)();
 		typedef std::map<t_method, httpMethod>		listOfHttpMethodsFunct;
 		typedef Request::listOfHeaders				listOfHeaders;
 		typedef Block::listOfStrings				listOfStrings;
@@ -44,7 +44,8 @@ class   Response
 		listOfHttpMethodsFunct			_httpMethods;
 		std::string						_locationPath;
 		int								_fd;
-		std::string						_buildpath;
+		std::string						_builtPath;
+		std::string						_uploadPath;
 
 		Env*							_env; // Shares same env than client
 		std::string						_cgiscript;
@@ -81,7 +82,7 @@ class   Response
 		listOfHttpMethodsFunct			getHttpMethods() const;
 		std::string						getLocationPath() const;
 		int								getFd() const;
-		std::string						getBuildPath() const;
+		std::string						getBuiltPath() const;
 
 		std::string						getCgiProgram() const;
 		std::string						getCgiName() const;
@@ -102,11 +103,11 @@ class   Response
 		void							_fillErrorBody();
 
 						/*------  Get Method  -----*/
-		void							_runGetMethod(std::string& path);
+		void							_runGetMethod();
 		void							_readFileContent(const std::string& path);
 
 						/*------  Post Method -----*/
-		void							_runPostMethod(std::string& path);
+		void							_runPostMethod();
 		void							_writeFileContent(const std::string& path, const std::string& content);
 		void							_handleUploadFile();
 		void							_handleCgi();
@@ -115,7 +116,7 @@ class   Response
 		std::string						_getFilename(const std::string& content);
 
 						/*-----  Delete Method ----*/
-		void							_runDeleteMethod(std::string& path);
+		void							_runDeleteMethod();
 
 						/*-------   Path    ------*/
 		std::string						_buildPath();
@@ -142,7 +143,8 @@ class   Response
 						/*-------   Utils    ------*/
 		bool							_requestIsValid();
 		void							_checkBodyLimit();
-		bool							_isMultipartFormRequest();
+		bool							_contentTypeIsMultipart();
+		bool							_contentTypeIsUrlencoded();
 		bool							_isCgi(const std::string& path);
 
 						/*-------    Cgi     ------*/

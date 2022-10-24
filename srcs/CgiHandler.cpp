@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 16:35:16 by etran             #+#    #+#             */
-/*   Updated: 2022/10/20 11:36:11 by etran            ###   ########.fr       */
+/*   Updated: 2022/10/21 15:48:59 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,11 @@
 
 CgiHandler::CgiHandler(Response& response) :
 	_program(response.getCgiProgram()),
+	_in(-1),
 	_out(-1),
 	_env(response.getEnv()),
-	_script(response.getBuildPath()) {}
+	_script(response.getBuiltPath()),
+	_requestbody(response.getRequest()->getBody()) {}
 
 CgiHandler::~CgiHandler() {
 	_restore();
@@ -50,9 +52,12 @@ std::string CgiHandler::getCgiOutput() {
 	int			pid;
 
 	DEBUG("In CGI!!");
-	if (pipe(_fds) < 0)
+	if (pipe(_fd_in) < 0)
+		throw std::runtime_error("cgihandler getCgiOutput (pipe) error");
+	if (pipe(_fd_out) < 0)
 		throw std::runtime_error("cgihandler getCgiOutput (pipe) error");
 	_setPipeNoBlock();
+	//_writeToStdin();
 	pid = fork();
 	if (pid < 0) {
 		throw std::runtime_error("cgihandler getCgiOutput (fork) error");
@@ -67,8 +72,8 @@ std::string CgiHandler::getCgiOutput() {
 	}
 	/* Parent */
 	_waitForChild(pid);
-	output = readFd(_fds[0]);
-	close(_fds[0]);
+	output = readFd(_fd_out[0]);
+	close(_fd_out[0]);
 	std::cerr << RED << "OUTPUT :\n" << output << RESET << NL;
 	return (output);
 }
@@ -84,12 +89,21 @@ void CgiHandler::_execute() {
 		0 };
 	_redirectToPipe();
 	execve(av[0], av, getEnv());
-	if (close(_fds[1]))
+	if (close(_fd_in[0]))
+		throw std::runtime_error("close in fork failed in cgi");
+	if (close(_fd_out[1]))
 		throw std::runtime_error("close in fork failed in cgi");
 	throw std::runtime_error("execve failed in cgi");
 }
 
 void CgiHandler::_restore() {
+	if (_in == -1)
+		return ;
+	if (dup2(_in, STDIN_FILENO) < 0)
+		throw std::runtime_error("cgihandler _restore (dup2) error");
+	if (close(_in))
+		throw std::runtime_error("cgihandler _restore (close) error");
+
 	if (_out == -1)
 		return ;
 	if (dup2(_out, STDOUT_FILENO) < 0)
@@ -100,11 +114,18 @@ void CgiHandler::_restore() {
 
 /* Redirect output to the pipe -> building response */
 void CgiHandler::_redirectToPipe() {
-	if (close(_fds[0]) < 0) /* Don't need input side */
+	if (close(_fd_in[1]) < 0)
+		throw std::runtime_error("cgihandler _redirectToPipe (close) error");
+	if ((_in = dup(STDIN_FILENO)) < 0) /* Save old stdout */
+		throw std::runtime_error("cgihandler _redirectToSock (dup) error");
+	if (dup2(_fd_in[0], STDIN_FILENO) < 0) /* Output will also be on fd_out[0] */
+		throw std::runtime_error("cgihandler _redirectToPipe (dup2) error");
+
+	if (close(_fd_out[0]) < 0) /* Don't need input side */
 		throw std::runtime_error("cgihandler _redirectToPipe (close) error");
 	if ((_out = dup(STDOUT_FILENO)) < 0) /* Save old stdout */
 		throw std::runtime_error("cgihandler _redirectToSock (dup) error");
-	if (dup2(_fds[1], STDOUT_FILENO) < 0) /* Output will also be on fds[0] */
+	if (dup2(_fd_out[1], STDOUT_FILENO) < 0) /* Output will also be on fd_out[0] */
 		throw std::runtime_error("cgihandler _redirectToPipe (dup2) error");
 }
 
@@ -112,9 +133,13 @@ void CgiHandler::_waitForChild(int pid) {
 	/* Parent */
 	int	wstatus;
 	int	times_waited = -1;
-	if (close(_fds[1]) < 0) /* Don't need output side */
+
+	if (close(_fd_in[0]) < 0)
+		throw INTERNAL_SERVER_ERROR;
+	if (close(_fd_out[1]) < 0) /* Don't need output side */
 		throw INTERNAL_SERVER_ERROR;
 		//throw std::runtime_error("cgihandler _waitForChild (close) error");
+	_writeToStdin();
 
 	while (1) {
 		if (waitpid(pid, &wstatus, WNOHANG) == pid)
@@ -132,13 +157,24 @@ void CgiHandler::_waitForChild(int pid) {
 			return ; /* exited */
 		}
 	}
-	close(_fds[0]);
+	close(_fd_out[0]); // ERROR
 	throw INTERNAL_SERVER_ERROR;
 }
 
 void CgiHandler::_setPipeNoBlock() {
-	if (fcntl(_fds[0], F_SETFL, O_NONBLOCK))
+	//if (fcntl(_fd_in[0], F_SETFL, O_NONBLOCK))
+	//	throw std::runtime_error("cgihandler _setPipeNoBlock (fcntl) error");
+	//if (fcntl(_fd_in[1], F_SETFL, O_NONBLOCK))
+	//	throw std::runtime_error("cgihandler _setPipeNoBlock (fcntl) error");
+	if (fcntl(_fd_out[0], F_SETFL, O_NONBLOCK))
 		throw std::runtime_error("cgihandler _setPipeNoBlock (fcntl) error");
-	if (fcntl(_fds[1], F_SETFL, O_NONBLOCK))
+	if (fcntl(_fd_out[1], F_SETFL, O_NONBLOCK))
 		throw std::runtime_error("cgihandler _setPipeNoBlock (fcntl) error");
+}
+
+void CgiHandler::_writeToStdin() {
+	if (write(_fd_in[1], _requestbody.c_str(), _requestbody.size()) < 0)
+		throw std::runtime_error("cgihandler _writeToStdin (write) error");
+	if (close(_fd_in[1]) < 0)
+		throw std::runtime_error("cgihandler _writeToStdin (close) error");
 }

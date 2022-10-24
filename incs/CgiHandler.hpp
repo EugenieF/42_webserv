@@ -6,7 +6,7 @@
 /*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 14:06:06 by etran             #+#    #+#             */
-/*   Updated: 2022/10/20 17:24:23 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/20 17:43:00 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class CgiHandler {
 		void				_redirectToPipe();
 		void				_waitForChild(int pid);
 		void				_setPipeNoBlock();
+		void 				_writeToStdin();
 
 		/* -- Data members -------------------------------------------------- */
 		std::string			_program;
@@ -50,7 +51,9 @@ class CgiHandler {
 		int					_out;
 		const Env&			_env;
 		std::string			_script;
-		int					_fds[2];
+		int					_fd_in[2];
+		int					_fd_out[2];
+		std::string			_requestbody;
 };
 
 #endif

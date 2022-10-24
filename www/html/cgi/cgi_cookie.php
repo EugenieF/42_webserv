@@ -11,22 +11,22 @@
 
     @font-face {
     font-family: berry;
-    src: url(../html/fonts/Berry\ Merry.otf);
+    src: url(../fonts/Berry_Merry.otf);
     }
 
     @font-face {
     font-family: peralta;
-    src: url(../html/fonts/Peralta-Regular.ttf);
+    src: url(../fonts/Peralta-Regular.ttf);
     }
 
     @font-face {
 	font-family: NotoSerifKR_R;
-	src: url(../html/fonts/NotoSerifKR-Bold.otf)
+	src: url(../fonts/NotoSerifKR-Bold.otf)
     }
 
     @font-face {
 	font-family: NotoSerifKR_L;
-	src: url(../html/fonts/NotoSerifKR-Light.otf)
+	src: url(../fonts/NotoSerifKR-Light.otf)
     }
 
     h1 {
@@ -68,16 +68,16 @@
 			...
 		?>
 		</div>
-			<form action="../html/form.html">
+			<form action="../form.html">
 				<center><input type="submit" value="Go acheter un nouvel ami !" class="bouton" /></center>
 			</form>
-			<form action="../html/cgi_achat.php">
+			<form action="cgi_achat.php">
 				<center><input type="submit" value="Go voir le panier achete !" class="bouton" /></center>
 			</form>
-            <form action="./cgi_destroy.php">
-				<center><input type="submit" value="Jeter son hamster et reformuler une adoption" class="bouton" /></center>
+            <form action="cgi_destroy.php">
+				<center><input type="submit" value="Jeter votre hamster et reformuler une adoption" class="bouton" /></center>
 			</form>
-			<form action="../html/index.html">
+			<form action="../index.html">
 				<center><input type="submit" value="Retour vers la page d'accueil" class="bouton" /></center>
 			</form>
 		</div>
