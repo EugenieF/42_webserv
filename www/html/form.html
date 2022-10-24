@@ -4,6 +4,7 @@
     <title>Cutie webserv 😚 💖</title>
     <meta charset="UTF-8" />
     <link href="form.css" rel="stylesheet" />
+    <script type="text/javascript" src="./form.js"></script>
   </head>
   <body bgcolor="#D6EFED">
     <h1>
@@ -30,9 +31,7 @@
             placeholder="Vodka"
             name="hamster"
           /><br />
-          <label for="color"
-            >Veuillez selectionner la couleur de votre futur hamster :</label
-          >
+          <label for="color">Veuillez selectionner la couleur de votre futur hamster :</label>
           <input type="color" id="color" name="color" value="#98C024" /><br />
         </div>
         <input type="submit" value="JE VEUX MON HAMSTER !" class="bouton" />
@@ -60,33 +59,19 @@
             placeholder="Haribo"
             name="hamster"
           /><br />
-          <label for="color"
-            >Veuillez selectionner la couleur de votre futur hamster :</label
-          >
+          <label for="color">Veuillez selectionner la couleur de votre futur hamster :</label>
           <input type="color" id="color" name="color" value="#FFC0CB" /><br />
         </div>
         <input type="submit" value="JE VEUX MON HAMSTER !" class="bouton" />
       </form>
 
       <legend>C'est un form POST avec INPUT File</legend>
-      <!-- <form action="form_upload.html" method="post" class="formulaire" enctype="multipart/form-data"> -->
-      <form
-        action=""
-        method="post"
-        class="formulaire"
-        enctype="multipart/form-data"
-      >
+      <form id="with_input_file" class="formulaire">
         <div class="formulaire">
           <label for="nude">Envoyez votre nude :</label>
           <input type="file" name="nude" /><br />
         </div>
         <input type="submit" value="JE VEUX MON CASH !" class="bouton" />
-        <input
-          id="btn"
-          type="button"
-          value="JE VEUX MON CASH !"
-          onclick="sendGetRequest();"
-        />
       </form>
 
       <legend>C'est un form POST avec INPUT File et CGI</legend>
@@ -115,22 +100,14 @@
             placeholder="Rocky Siffredo"
             name="hamster"
           /><br />
-          <label for="color"
-            >Veuillez selectionner la couleur de votre futur hamster :</label
-          >
+          <label for="color">Veuillez selectionner la couleur de votre futur hamster :</label>
           <input type="color" id="color" name="color" value="#997a8d" /><br />
         </div>
         <input type="submit" value="JE VEUX MON HAMSTER !" class="bouton" />
       </form>
 
       <legend>C'est un form POST sans CGI</legend>
-      <!-- <form action="form_accept.html" method="post" class="formulaire" enctype="multipart/form-data"> -->
-      <form
-        action=""
-        method="post"
-        class="formulaire"
-        enctype="multipart/form-data"
-      >
+      <form id="without_cgi" class="formulaire">
         <div class="formulaire">
           <label for="name">Entrez votre nom :</label>
           <input
@@ -146,23 +123,12 @@
             placeholder="George Guy"
             name="hamster"
           /><br />
-          <label for="color"
-            >Veuillez selectionner la couleur de votre futur hamster :</label
-          >
+          <label for="color">
+            Veuillez selectionner la couleur de votre futur hamster :
+          </label>
           <input type="color" id="color" name="color" value="#FAEE2F" /><br />
         </div>
-        <!-- <input type="submit" value="JE VEUX MON HAMSTER !" class="bouton"> -->
-        <button type="button" onclick="sendGetRequest">
-          JE VEUX MON HAMSTER !
-        </button>
-        <script>
-          function sendGetRequest() {
-            const request = new XMLHttpRequest();
-            request.open("GET", "form_upload.html"); // false for synchronous request, true for asynchronous
-            request.responseType = "document";
-            request.send();
-          }
-        </script>
+        <input type="submit" value="JE VEUX MON HAMSTER !" class="bouton">
       </form>
 
       <legend>C'est un bad form GET qui marche pas</legend>
@@ -177,9 +143,7 @@
             placeholder="Espelette"
             name="hamster"
           /><br />
-          <label for="color"
-            >Veuillez selectionner la couleur de votre futur hamster :</label
-          >
+          <label for="color">Veuillez selectionner la couleur de votre futur hamster :</label>
           <input type="color" id="color" name="color" value="#a25240" /><br />
         </div>
         <input type="submit" value="JE VEUX MON HAMSTER !" class="bouton" />
@@ -197,9 +161,7 @@
             placeholder="Boulette"
             name="hamster"
           /><br />
-          <label for="color"
-            >Veuillez selectionner la couleur de votre futur hamster :</label
-          >
+          <label for="color">Veuillez selectionner la couleur de votre futur hamster :</label>
           <input type="color" id="color" name="color" value="#0082a1" /><br />
         </div>
         <input type="submit" value="JE VEUX MON HAMSTER !" class="bouton" />
