@@ -194,6 +194,11 @@ void	Response::_runGetMethod()
 		/* process cgi */
 		return (_handleCgi());
 	}
+	if (_request->getPath() == "/form_list")
+	{
+		_body = _generateOrderFormPage();
+		_headers["Content-Type"] = g_mimeType[".html"];
+	}
 	if (_body.empty()) /* If there is no autoindex */
 	{
 		_readFileContent(_builtPath);
@@ -247,6 +252,12 @@ std::string		Response::_getFilename(const std::string& content)
 	pos = contentDisposition.find("filename=\"");
 	if (pos == std::string::npos)
 		return ("");
+	size_t pos2 = contentDisposition.find("name=\"");
+	if (pos2 != std::string::npos)
+	{
+		std::string name = contentDisposition.substr(pos2 + 6, contentDisposition.find("\""));
+		std::cout << YELLOW << "name = " << name << RESET << NL;
+	}
 	contentDisposition.erase(0, pos + 10);
 	filename = contentDisposition.substr(0, contentDisposition.find("\""));
 	return (filename);
@@ -288,9 +299,7 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 	}
 	if (_request->getPath() == "/form_accept")
 	{
-		std::cout << RED << "FORM ACCEPT" << RESET << NL;
-		// _readFileContent("www/html/form_accept.html");
-		_body = _generateAcceptFormPage();
+		_body = _generateFormAcceptPage();
 		_headers["Content-Type"] = g_mimeType[".html"];
 	}
 }

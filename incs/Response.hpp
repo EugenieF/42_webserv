@@ -155,7 +155,8 @@ class   Response
 		std::string						_translateCgiName() const;
 
 						/*-------  Test page ------*/
-		std::string						_generateAcceptFormPage();
+		std::string						_generateFormAcceptPage();
+		std::string						_generateFormOrderPage();
 
 	/***************************     BONUS     *************************/
 	#ifdef COOKIE

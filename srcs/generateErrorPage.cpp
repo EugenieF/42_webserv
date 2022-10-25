@@ -47,7 +47,7 @@ std::string		Response::_generateErrorPage()
 	return (errorPage);
 }
 
-std::string		Response::_generateAcceptFormPage()
+std::string		Response::_generateFormAcceptPage()
 {
 	std::string	htmlPage;
 
@@ -74,9 +74,45 @@ std::string		Response::_generateAcceptFormPage()
 				</div>\n\
 					<form action=\"./form.html\">\n\
 						<center><input type=\"submit\" value=\"Creer une nouvelle demande pour creer une horde d'hamsters\" class=\"bouton\" /></center>\n\
+					<form action=\"form_list\">
+						<center><input type=\"submit\" value=\"Voir le contenu du panier\" class=\"bouton\" /></center>
+					</form>
 					<form action=\"./index.html\">\n\
 						<center><input type=\"submit\" value=\"Retour vers la page d'accueil\" class=\"bouton\" /></center>\n\
 					</form>\n\
+				</div>\n\
+			</body>\n\
+		</html>\n";
+	return (htmlPage);
+}
+
+std::string		Response::_generateFormOrderPage()
+{
+	std::string	htmlPage;
+
+	std::string name = "Bobby";
+	std::string hamster = "Crotte";
+	std::string color = "#00000";
+	htmlPage = \
+		"<!DOCTYPE html>\n\
+		<html>\n\
+			<head>\n\
+				<title>Cutie webserv 😚 💖</title>\n\
+				<meta charset=\"UTF-8\">\n\
+				<link href=\"form_accept.css\" rel=\"stylesheet\">\n\
+			</head>\n\
+			<body class=\"background\">\n\
+				<h1>\n\
+					<center>Etat de votre panier 🧺</center>\n\
+				</h1>\n\
+				<div class=\"name\">\n\
+					<center>Hamster : " + name + "<br></center>\n\
+				</div>\n\
+				<div class=\"hamster\">\n\
+					<center>Hamster : " + hamster + "<br></center>\n\
+				</div>\n\
+				<div class=\"color\">\n\
+					<center>Hamster : " + color + "<br></center>\n\
 				</div>\n\
 			</body>\n\
 		</html>\n";
