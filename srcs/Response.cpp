@@ -106,6 +106,8 @@ void	Response::generateResponse()
 	if (!_isCgi(_builtPath))
 		_fillHeaders();
 	_response += _body + "\r\n";
+	
+	// std::cout << RED << _response << RESET << NL;
 }
 
 /******************************************************************************/
@@ -191,11 +193,6 @@ void	Response::_runGetMethod()
 	{
 		/* process cgi */
 		return (_handleCgi());
-	}
-	if (_request->getPath() == "form_accept")
-	{
-		std::cout << RED << "FORM ACCEPT" << RESET << NL;
-		_readFileContent(_generateAcceptFormPage());
 	}
 	if (_body.empty()) /* If there is no autoindex */
 	{
@@ -289,6 +286,13 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 			_writeFileContent(path + filename, fileContent);
 		}
 	}
+	if (_request->getPath() == "/form_accept")
+	{
+		std::cout << RED << "FORM ACCEPT" << RESET << NL;
+		// _readFileContent("www/html/form_accept.html");
+		_body = _generateAcceptFormPage();
+		_headers["Content-Type"] = g_mimeType[".html"];
+	}
 }
 
 /******************************************************************************/
@@ -362,7 +366,7 @@ void	Response::_runPostMethod()
 	if (_uploadPath.empty())
 	{
 		// setStatusCode ??
-		return ;
+		// return ;
 	}
 	if (_contentTypeIsUrlencoded())
 	{
