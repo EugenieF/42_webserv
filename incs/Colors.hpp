@@ -14,7 +14,7 @@
 # define LIGHT_YELLOW	"\033[0;33m"
 # define BLUE			"\033[1;34m"
 # define LIGHT_BLUE		"\033[0;34m"
-# define WHITE			"\033[1;37m"
+# define WHITE			"\033[0;37m"
 # define ORANGE			"\033[1;38;5;208m"
 # define GREY			"\033[0;38;5;243m"
 

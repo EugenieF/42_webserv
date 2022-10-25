@@ -26,7 +26,7 @@ Client::Client(Client const& other)
 Client::~Client()
 {
     clear();
-	std::cout << "client destroyed: " << getFd() << NL;
+	DEBUG("client destroyed: " + convertNbToString(getFd()));
 }
 
 Client&     Client::operator=(const Client& other)
@@ -78,6 +78,7 @@ void	Client::generateResponse()
 	if (_response)
 		delete _response;
 	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
+	cookies->display();
 	_response = new Response(_selectVirtualServer(), _request, _env, *cookies);
 	_response->generateResponse();
 	// return (_response);

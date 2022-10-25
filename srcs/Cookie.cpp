@@ -91,8 +91,10 @@ void	Cookie::display() const
 {
 	mapOfCookies::const_iterator	ite;
 
+	std::cout << std::endl << LIGHT_YELLOW << "🍪 List of cookies:" << RESET << std::endl;
 	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
-		std::cout << ite->first << "=" << ite->second << std::endl;
+		std::cout << "   > " << ite->first << "=" << ite->second << std::endl;
+	std::cout << std::endl;
 }
 
 std::string		Cookie::getSessionId() const

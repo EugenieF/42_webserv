@@ -63,7 +63,7 @@ void	Webserv::_setupServerMap(const listOfServers& configServers,
 // }
 
 void	Webserv::run() {
-	displayMsg(" 🏁 Server is launching...", LIGHT_YELLOW);
+	displayMsg(" 🏁 Server is launching...", WHITE);
 	_epoll.startMonitoring(_servers);
 }
 

@@ -148,9 +148,8 @@ void	Parser::parseTokens()
 		_currentServer = _servers.insert(_servers.end(), newServer);
 		_updateContext(NONE, NULL);
 	}
-	// _checkDomainNames();
 	_configureVirtualHosts();
-	_checkDuplicatePorts();
+	// _checkDuplicatePorts();
 }
 
 /******************************************************************************/
@@ -192,7 +191,7 @@ void	Parser::_parseListenRule()
 			// port = atoi(_currentToken->getValue().c_str());
 			if (!convertPort(_currentToken->getValue(), &port))
 				_throwErrorParsing(_invalidPortMsg());
-			_currentBlock->setPort(port); // Need to check port number --> 0 < port <= 65535
+			_currentBlock->setPort(port);
 			break;
 		case SEMICOLON:
 			_throwErrorParsing(_invalidNbOfArgumentsMsg());
@@ -201,6 +200,7 @@ void	Parser::_parseListenRule()
 			_throwErrorParsing(_invalidValueMsg(_currentToken + 1));
 			break;	
 	}
+	_checkDuplicatePorts(_currentBlock->getHost(), _currentBlock->getPort());
 	_expectNextToken(SEMICOLON, _invalidParameterMsg());
 }
 
@@ -401,54 +401,49 @@ void	Parser::_setHost(const std::string &token)
 	_currentBlock->setHost(_currentToken->getValue());
 }
 
-void	Parser::_checkDuplicatePorts()
+void	Parser::_checkDuplicatePorts(const std::string& host, int port)
 {
 	listOfServers::iterator		currentServer;
-	listOfServers::iterator		nextServer;
 
 	for (currentServer = _servers.begin(); currentServer != _servers.end(); currentServer++)
 	{
-		for (nextServer = currentServer + 1; nextServer != _servers.end(); nextServer++)
+		if ((*currentServer)->getHost() != host && (*currentServer)->getPort() == port)
 		{
-			if ((*currentServer)->getPort() == (*nextServer)->getPort())
-			{
-				// std::cout << RED << "[**** DUPLICATE PORT ****]" << RESET << std::endl;
-				_throwErrorParsing(_duplicatePortMsg((*currentServer)->getPort()));
-			}
+			_throwErrorParsing(_duplicatePortMsg((*currentServer)->getPort()));
 		}
-	}	
-}
-
-void	Parser::_checkDomainNames()
-{
-	std::ifstream		file;
-	std::stringstream	fileContent;
-	std::string			content;
-	size_t				domainNamePos;
-	std::string			domainName;
-
-	file.open("/etc/hosts", std::ifstream::in);
-	/* Check if file was successfully opened */
-	if (!file.is_open())
-	{
-		/* An error occured */
-		_throwErrorParsing("Can't open file '\\etc\\hosts'");
-	}
-	/* We read the content of the file */
-	fileContent << file.rdbuf();
-	content = fileContent.str();
-	file.close();
-	for (size_t pos = content.find("\n"); pos != std::string::npos; pos = content.find("\n"))
-	{
-		domainNamePos = content.find(" localhost");
-		if (domainNamePos != std::string::npos)
-		{
-			domainName = content.substr(0, domainNamePos);
-			std::cout << YELLOW << "domainName = '" << domainName << "'" << RESET << NL;
-		}
-		content.erase(0, pos + 1);
 	}
 }
+
+// void	Parser::_checkDomainNames()
+// {
+// 	std::ifstream		file;
+// 	std::stringstream	fileContent;
+// 	std::string			content;
+// 	size_t				domainNamePos;
+// 	std::string			domainName;
+
+// 	file.open("/etc/hosts", std::ifstream::in);
+// 	/* Check if file was successfully opened */
+// 	if (!file.is_open())
+// 	{
+// 		/* An error occured */
+// 		_throwErrorParsing("Can't open file '\\etc\\hosts'");
+// 	}
+// 	/* We read the content of the file */
+// 	fileContent << file.rdbuf();
+// 	content = fileContent.str();
+// 	file.close();
+// 	for (size_t pos = content.find("\n"); pos != std::string::npos; pos = content.find("\n"))
+// 	{
+// 		domainNamePos = content.find(" localhost");
+// 		if (domainNamePos != std::string::npos)
+// 		{
+// 			domainName = content.substr(0, domainNamePos);
+// 			std::cout << YELLOW << "domainName = '" << domainName << "'" << RESET << NL;
+// 		}
+// 		content.erase(0, pos + 1);
+// 	}
+// }
 
 /******************************************************************************/
 /*                                  EXPECT                                    */

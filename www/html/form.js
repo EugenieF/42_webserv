@@ -10,13 +10,22 @@ window.addEventListener("load", () => {
         });
 
         // Do something with the form data, e.g. send it to a server
+		const request = new XMLHttpRequest();
+		request.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+       			// Typical action to be performed when the document is ready:
+       			document.getElementById("post").innerHTML = request.responseText;
+    			}
+			};
+			request.open("POST", formData); // false for synchronous request, true for asynchronous 
+            request.send();
 
         // Redirect to the next page on success (after successful call to server)
         // onSuccess();
     }
 
     // Get the form elements
-    const form1 = document.getElementById("with_input_file");
+    const form1 = document.getElementById("post");
     const form2 = document.getElementById("without_cgi");
 
     // Add 'submit' event handlers

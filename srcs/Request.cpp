@@ -25,7 +25,8 @@ Request::Request():
 Request::Request(const std::string& buffer, int clientfd):
 	_request(buffer), _fd (clientfd)
 {
-	std::cout << BLUE << "Request: " << _request << RESET << std::endl;
+	// DEBUG("Request: " + _request);
+	displayMsg("Request: " + _request, LIGHT_BLUE);
 	_initVariables();
 	_initParsingFunct();
 }
@@ -137,6 +138,7 @@ void	Request::_parsePath()
 	size_t			pos;
 
 	_getNextWord(path, " ");
+	// std::cout << YELLOW << "Requested uri : " << path << RESET << std::endl;
 	if (path == "" || path[0] != '/')
 		throw (BAD_REQUEST);
 	if (path.length() > 2048) /* Maximum URL Length */
@@ -149,7 +151,6 @@ void	Request::_parsePath()
 		path.erase(pos);
 		if (_query.length() > 255) /* limited by the DNS */
 			throw (URI_TOO_LONG);
-		std::cerr << RED << "Query in request: " << _query << RESET << NL;
 	}
 	_path = path;
 }

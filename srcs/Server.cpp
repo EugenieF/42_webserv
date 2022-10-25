@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 23:50:36 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/25 18:51:13 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void Server::_setMetaVar(const Block* block) {
 // Debug -----------------------------------------
 
 void Server::_displayServer() const {
-	displayMsg(" 👂 Server is listening on " + getHost() + ":" + convertNbToString(getPort()), LIGHT_BLUE);
+	displayMsg(" 👂 Server is listening on " + getHost() + ":" + convertNbToString(getPort()), GREY);
 	#ifndef DISPLAY
 		return;
 	#endif

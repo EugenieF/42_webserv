@@ -120,6 +120,7 @@ class   Response
 
 						/*-------   Path    ------*/
 		std::string						_buildPath();
+		void							_handleSlash(std::string* path, const std::string& uri);
 		void							_handleDirectoryPath(std::string* path);
 		bool							_hasUploadPathDirective();
 		bool							_searchOfIndexPage(const listOfStrings& indexes, std::string* path);

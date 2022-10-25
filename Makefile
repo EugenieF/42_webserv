@@ -49,7 +49,7 @@ RM				= rm -rf
 INCLUDE			= ./incs
 
 
-$(NAME):	debug $(OBJS)
+$(NAME):	$(OBJS)
 		@$(CXX) $(CXXFLAGS) $(MACRO) $(OBJS) -o $(NAME) 
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 

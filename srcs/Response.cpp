@@ -62,7 +62,7 @@ void	Response::_processMethod()
 	if (!_matchingBlock->isAllowedMethod(_method))
 		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
-	std::cout << YELLOW << "BUILD PATH = " << _builtPath << RESET << NL;
+	DEBUG("BUILD PATH = " + _builtPath);
 	if (path.empty())
 		throw(NOT_FOUND);
 	/* Find corresponding http method */
@@ -192,8 +192,10 @@ void	Response::_runGetMethod()
 		/* process cgi */
 		return (_handleCgi());
 	}
-	if (_body.empty()) /* Problem autoindex */
+	if (_body.empty()) /* If there is no autoindex */
+	{
 		_readFileContent(_builtPath);
+	}
 }
 
 /******************************************************************************/
@@ -529,6 +531,16 @@ void	Response::_handleDirectoryPath(std::string* path)
 	}
 }
 
+void	Response::_handleSlash(std::string* path, const std::string& uri)
+{
+	if (*(path->rbegin()) == '/' && *(uri.begin()) == '/')
+		path->erase(path->length() - 1);
+	else if (*(path->rbegin()) != '/' && *(uri.begin()) != '/')
+		*path += "/";
+	if (*(path->begin()) == '/')
+		path->insert(path->begin(), '.');
+}
+
 /* If a request ends with a slash, NGINX treats it as a request
 for a directory and tries to find an index file in the directory. */
 std::string		Response::_buildPath()
@@ -539,21 +551,16 @@ std::string		Response::_buildPath()
 	uri = _request->getPath();
 	if (_locationPath != "")
 		uri.erase(0, _locationPath.length());
-	_uploadPath = _matchingBlock->getUploadPath();
 	if (_hasUploadPathDirective())
-		path = _matchingBlock->getUploadPath();
-	else
-		path = _matchingBlock->getRoot(); 
-	if (*(path.rbegin()) == '/' && *(uri.begin()) == '/')
-		path.erase(path.length() - 1);
-	else if (*(path.rbegin()) != '/' && *(uri.begin()) != '/')
-		path += "/";
+		_uploadPath = _matchingBlock->getUploadPath();
+	path = _matchingBlock->getRoot(); 
+	_handleSlash(&path, uri);
 	path += uri;
 	if (path[0] == '/')
-		path.insert(path.begin(), '.'); // Should path be ./www or www ?
+		path.insert(path.begin(), '.');
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
-	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
+	// DEBUG("uri: " + _request->getPath();
 	_builtPath = path;
 	return (path);
 }
