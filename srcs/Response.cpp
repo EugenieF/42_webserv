@@ -248,7 +248,6 @@ std::string		Response::_getField(std::string contentDisposition, const std::stri
 		return ("");
 	contentDisposition.erase(0, pos + field.size());
 	name = contentDisposition.substr(0, contentDisposition.find("\""));
-	std::cout << YELLOW << field << " = " << name << RESET << NL;
 	return (name);
 }
 
@@ -267,7 +266,7 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	name = _getField(contentDisposition, "name=\"");
 	filename = _getField(contentDisposition, "filename=\"");
 	body.erase(0, body.find("\r\n") + 2);
-	body.erase(0, body.find("\r\n\r\n") + 4);
+	body.erase(0, body.find("\r\n") + 2);
 	content = body.substr(0, body.find("\r\n"));
 	if (filename != "")
 	{
