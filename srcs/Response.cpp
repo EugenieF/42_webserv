@@ -196,7 +196,7 @@ void	Response::_runGetMethod()
 	}
 	if (_request->getPath() == "/form_list")
 	{
-		_body = _generateOrderFormPage();
+		_body = _generateFormOrderPage();
 		_headers["Content-Type"] = g_mimeType[".html"];
 	}
 	if (_body.empty()) /* If there is no autoindex */

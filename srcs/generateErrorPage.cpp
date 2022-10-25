@@ -74,9 +74,9 @@ std::string		Response::_generateFormAcceptPage()
 				</div>\n\
 					<form action=\"./form.html\">\n\
 						<center><input type=\"submit\" value=\"Creer une nouvelle demande pour creer une horde d'hamsters\" class=\"bouton\" /></center>\n\
-					<form action=\"form_list\">
-						<center><input type=\"submit\" value=\"Voir le contenu du panier\" class=\"bouton\" /></center>
-					</form>
+					<form action=\"form_list\">\n\
+						<center><input type=\"submit\" value=\"Voir le contenu du panier\" class=\"bouton\" /></center>\n\
+					</form>\n\
 					<form action=\"./index.html\">\n\
 						<center><input type=\"submit\" value=\"Retour vers la page d'accueil\" class=\"bouton\" /></center>\n\
 					</form>\n\
