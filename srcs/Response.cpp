@@ -192,6 +192,11 @@ void	Response::_runGetMethod()
 		/* process cgi */
 		return (_handleCgi());
 	}
+	if (_request->getPath() == "form_accept")
+	{
+		std::cout << RED << "FORM ACCEPT" << RESET << NL;
+		_readFileContent(_generateAcceptFormPage());
+	}
 	if (_body.empty()) /* If there is no autoindex */
 	{
 		_readFileContent(_builtPath);

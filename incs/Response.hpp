@@ -154,6 +154,9 @@ class   Response
 		void							_fillCgiMetavariables();
 		std::string						_translateCgiName() const;
 
+						/*-------  Test page ------*/
+		std::string						_generateAcceptFormPage();
+
 	/***************************     BONUS     *************************/
 	#ifdef COOKIE
 	public:

@@ -14,8 +14,7 @@
 		</div>
 		<div class="form_container">
 			<legend>C'est un form POST sans CGI</legend>
-			<!-- <form action="http://localhost:8080/form_accept.html" method="post" class="formulaire" enctype="multipart/form-data"> -->
-			<form method="post" class="formulaire" enctype="multipart/form-data">
+			<form action="form_accept" method="post" class="formulaire" enctype="multipart/form-data">
 				<div class="formulaire">
 					<label for="name">Entrez votre nom :</label>
 					<input type="text" id="name" placeholder="Vincent" name="name"><br>
@@ -24,17 +23,16 @@
 					<label for="color">Veuillez selectionner la couleur de votre futur hamster :</label>
 					<input type="color" id="color" name="color" value="#FAEE2F"><br>
 				</div>
-				<!-- <input id="submitBtn" type="submit" value="JE VEUX MON HAMSTER !" class="bouton"></input> -->
-				<!-- <input type="submit" value="JE VEUX MON HAMSTER !"></input> -->
-				<input id="submitBtn" type="submit" value="JE VEUX MON HAMSTER !"></input>
-				<script>
+				<input id="submitBtn" type="submit" value="JE VEUX MON HAMSTER !" class="bouton"></input>
+				<!-- <input id="submitBtn" type="submit" value="JE VEUX MON HAMSTER !"></input> -->
+				<!-- <script>
 					// setTimeout(la_fonction, nb_millisecondes);
 					document.getElementById("submitBtn").addEventListener("click", setTimeout(myFunction, 5000));
 					function myFunction() {
 
 					  window.location.href="http://form_accept.html";  
 					}
-				</script>
+				</script> -->
 		</form>
 		</div>
 		</div>
