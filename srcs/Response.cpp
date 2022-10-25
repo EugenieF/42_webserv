@@ -249,15 +249,16 @@ std::string		Response::_getField(std::string contentDisposition, const std::stri
 	contentDisposition.erase(0, pos + field.size());
 	name = contentDisposition.substr(0, contentDisposition.find("\""));
 	std::cout << YELLOW << field << " = " << name << RESET << NL;
-	return (filename);
+	return (name);
 }
 
-void	Response::_parseContent(std::string content)
+void	Response::_parseContent(const std::string& path, std::string content)
 {
 	size_t		pos;
 	std::string	contentDisposition;
 	std::string	filename;
 	std::string	name;
+	std::string	fileContent;
 
 	pos = content.find("Content-Disposition:");
 	if (pos == std::string::npos)
@@ -293,13 +294,12 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 {
 	std::string	boundary;
 	std::string	filename;
-	std::string	fileContent;
 
 	boundary = _getBoundary(_request->getHeader("content-type"));
 	while (body.find(boundary) != std::string::npos)
 	{
 		body.erase(0, body.find(boundary) + boundary.length());
-		_parseContent(body);
+		_parseContent(path, body);
 	}
 	if (_request->getPath() == "/form_accept")
 	{
