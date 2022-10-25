@@ -264,8 +264,9 @@ void	Response::_parseContent(const std::string& path, std::string content)
 	if (pos == std::string::npos)
 		throw(BAD_REQUEST);
 	contentDisposition = content.substr(pos, content.find("\r\n"));
-	name = _getField("name=\"");
-	filename = _getField("filename=\"");
+	std::cout << GREEN << "Content-disposition : " << contentDisposition << RESET << NL;
+	name = _getField(contentDisposition, "name=\"");
+	filename = _getField(contentDisposition, "filename=\"");
 	content.erase(0, content.find("\r\n") + 2);
 	content.erase(0, content.find("\r\n\r\n") + 4);
 	if (filename != "")
