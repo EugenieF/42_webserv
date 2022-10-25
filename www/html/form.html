@@ -28,8 +28,10 @@
 				<!-- <input type="submit" value="JE VEUX MON HAMSTER !"></input> -->
 				<input id="submitBtn" type="submit" value="JE VEUX MON HAMSTER !"></input>
 				<script>
-					document.getElementById("submitBtn").addEventListener("click", myFunction);
+					// setTimeout(la_fonction, nb_millisecondes);
+					document.getElementById("submitBtn").addEventListener("click", setTimeout(myFunction, 5000));
 					function myFunction() {
+
 					  window.location.href="http://form_accept.html";  
 					}
 				</script>
