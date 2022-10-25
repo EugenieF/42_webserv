@@ -252,31 +252,31 @@ std::string		Response::_getField(std::string contentDisposition, const std::stri
 	return (name);
 }
 
-void	Response::_parseContent(const std::string& path, std::string content)
+void	Response::_parseContent(const std::string& path, std::string body)
 {
 	size_t		pos;
 	std::string	contentDisposition;
 	std::string	filename;
 	std::string	name;
-	std::string	fileContent;
+	std::string	content;
 
-	pos = content.find("Content-Disposition:");
+	pos = body.find("Content-Disposition:");
 	if (pos == std::string::npos)
 		throw(BAD_REQUEST);
-	contentDisposition = content.substr(pos, content.find("\r\n"));
-	std::cout << GREEN << "Content-disposition : " << contentDisposition << RESET << NL;
+	contentDisposition = body.substr(pos, body.find("\r\n"));
 	name = _getField(contentDisposition, "name=\"");
 	filename = _getField(contentDisposition, "filename=\"");
-	content.erase(0, content.find("\r\n") + 2);
-	content.erase(0, content.find("\r\n\r\n") + 4);
+	body.erase(0, body.find("\r\n") + 2);
+	body.erase(0, body.find("\r\n\r\n") + 4);
+	content = body.substr(0, body.find("\r\n"));
 	if (filename != "")
 	{
-		fileContent = content.substr(0, content.find("\r\n"));
 		if (path[path.length() - 1] != '/' && filename[0] != '/')
 			filename.insert(0, "/");
 		std::cout << GREEN << "filename : " << path + filename << RESET << std::endl;
-		_writeFileContent(path + filename, fileContent);
+		_writeFileContent(path + filename, content);
 	}
+	std::cout << GREEN << name << " = " << content << RESET << NL;
 }
 
 /*
