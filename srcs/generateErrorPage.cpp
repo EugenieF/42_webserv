@@ -74,7 +74,8 @@ std::string		Response::_generateFormAcceptPage()
 				</div>\n\
 					<form action=\"./form.html\">\n\
 						<center><input type=\"submit\" value=\"Creer une nouvelle demande pour creer une horde d'hamsters\" class=\"bouton\" /></center>\n\
-					<form action=\"form_list\">\n\
+					</form>\n\
+					<form action=\"form_order\">\n\
 						<center><input type=\"submit\" value=\"Voir le contenu du panier\" class=\"bouton\" /></center>\n\
 					</form>\n\
 					<form action=\"./index.html\">\n\
@@ -103,16 +104,16 @@ std::string		Response::_generateFormOrderPage()
 			</head>\n\
 			<body class=\"background\">\n\
 				<h1>\n\
-					<center>Etat de votre panier 🧺</center>\n\
+					<center>Etat de votre panier 🛒</center>\n\
 				</h1>\n\
 				<div class=\"name\">\n\
-					<center>Hamster : " + name + "<br></center>\n\
+					<center>Name : " + name + "<br></center>\n\
 				</div>\n\
 				<div class=\"hamster\">\n\
 					<center>Hamster : " + hamster + "<br></center>\n\
 				</div>\n\
 				<div class=\"color\">\n\
-					<center>Hamster : " + color + "<br></center>\n\
+					<center>Color : " + color + "<br></center>\n\
 				</div>\n\
 			</body>\n\
 		</html>\n";

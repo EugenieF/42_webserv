@@ -194,12 +194,13 @@ void	Response::_runGetMethod()
 		/* process cgi */
 		return (_handleCgi());
 	}
-	if (_request->getPath() == "/form_list")
+	if (_request->getPath() == "/form_order")
 	{
+		std::cout << RED << "ORDER" << RESET << std::endl;
 		_body = _generateFormOrderPage();
 		_headers["Content-Type"] = g_mimeType[".html"];
 	}
-	if (_body.empty()) /* If there is no autoindex */
+	else if (_body.empty()) /* If there is no autoindex */
 	{
 		_readFileContent(_builtPath);
 	}
@@ -249,17 +250,20 @@ std::string		Response::_getFilename(const std::string& content)
 		throw(BAD_REQUEST);
 	}
 	contentDisposition = content.substr(pos, content.find("\r\n"));
-	pos = contentDisposition.find("filename=\"");
-	if (pos == std::string::npos)
-		return ("");
+
 	size_t pos2 = contentDisposition.find("name=\"");
 	if (pos2 != std::string::npos)
 	{
 		std::string name = contentDisposition.substr(pos2 + 6, contentDisposition.find("\""));
 		std::cout << YELLOW << "name = " << name << RESET << NL;
 	}
+
+	pos = contentDisposition.find("filename=\"");
+	if (pos == std::string::npos)
+		return ("");
 	contentDisposition.erase(0, pos + 10);
 	filename = contentDisposition.substr(0, contentDisposition.find("\""));
+	std::cout << RED << "Content disposition:" << contentDisposition << RESET << NL;
 	return (filename);
 }
 
