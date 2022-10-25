@@ -113,7 +113,8 @@ class   Response
 		void							_handleCgi();
 		void							_handleMultipartContent(const std::string& path, std::string content);
 		std::string						_getBoundary(std::string contentType);
-		std::string						_getFilename(const std::string& content);
+		std::string						_getField(std::string contentDisposition, const std::string& field);
+		void							_parseContent(std::string content);
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod();

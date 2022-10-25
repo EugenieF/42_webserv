@@ -115,6 +115,16 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + color + "<br></center>\n\
 				</div>\n\
+				<form action=\"/form.html\">\n\
+					<center><input type=\"submit\" value=\"Go acheter un nouvel ami !\" class=\"bouton\" /></center>\n\
+				</form>\n\
+				<form action=\"/form_delete\">\n\
+					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" /></center>\n\
+				</form>\n\
+				<form action=\"/index.html\">\n\
+					<center><input type=\"submit\" value=\"Retour vers la page d'accueil\" class=\"bouton\" /></center>\n\
+				</form>\n\
+				</div>\n\
 			</body>\n\
 		</html>\n";
 	return (htmlPage);

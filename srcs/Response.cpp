@@ -238,33 +238,43 @@ std::string		Response::_getBoundary(std::string contentType)
 	return (boundary);
 }
 
-std::string		Response::_getFilename(const std::string& content)
+std::string		Response::_getField(std::string contentDisposition, const std::string& field)
+{
+	size_t		pos;
+	std::string	name;
+
+	pos = contentDisposition.find(field);
+	if (pos == std::string::npos)
+		return ("");
+	contentDisposition.erase(0, pos + field.size());
+	name = contentDisposition.substr(0, contentDisposition.find("\""));
+	std::cout << YELLOW << field << " = " << name << RESET << NL;
+	return (filename);
+}
+
+void	Response::_parseContent(std::string content)
 {
 	size_t		pos;
 	std::string	contentDisposition;
 	std::string	filename;
+	std::string	name;
 
 	pos = content.find("Content-Disposition:");
 	if (pos == std::string::npos)
-	{
 		throw(BAD_REQUEST);
-	}
 	contentDisposition = content.substr(pos, content.find("\r\n"));
-
-	size_t pos2 = contentDisposition.find("name=\"");
-	if (pos2 != std::string::npos)
+	name = _getField("name=\"");
+	filename = _getField("filename=\"");
+	content.erase(0, content.find("\r\n") + 2);
+	content.erase(0, content.find("\r\n\r\n") + 4);
+	if (filename != "")
 	{
-		std::string name = contentDisposition.substr(pos2 + 6, contentDisposition.find("\""));
-		std::cout << YELLOW << "name = " << name << RESET << NL;
+		fileContent = content.substr(0, content.find("\r\n"));
+		if (path[path.length() - 1] != '/' && filename[0] != '/')
+			filename.insert(0, "/");
+		std::cout << GREEN << "filename : " << path + filename << RESET << std::endl;
+		_writeFileContent(path + filename, fileContent);
 	}
-
-	pos = contentDisposition.find("filename=\"");
-	if (pos == std::string::npos)
-		return ("");
-	contentDisposition.erase(0, pos + 10);
-	filename = contentDisposition.substr(0, contentDisposition.find("\""));
-	std::cout << RED << "Content disposition:" << contentDisposition << RESET << NL;
-	return (filename);
 }
 
 /*
@@ -289,17 +299,7 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 	while (body.find(boundary) != std::string::npos)
 	{
 		body.erase(0, body.find(boundary) + boundary.length());
-		filename = _getFilename(body);
-		body.erase(0, body.find("\r\n") + 2);
-		body.erase(0, body.find("\r\n\r\n") + 4);
-		if (filename != "")
-		{
-			fileContent = body.substr(0, body.find("\r\n"));
-			if (path[path.length() - 1] != '/' && filename[0] != '/')
-				filename.insert(0, "/");
-			std::cout << GREEN << "filename : " << path + filename << RESET << std::endl;
-			_writeFileContent(path + filename, fileContent);
-		}
+		_parseContent(body);
 	}
 	if (_request->getPath() == "/form_accept")
 	{
