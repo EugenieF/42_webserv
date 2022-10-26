@@ -1,7 +1,8 @@
-#ifndef COOKIE_HPP
-# define COOKIE_HPP
+#ifndef PURCHASE_ORDER_HPP
+# define PURCHASE_ORDER_HPP
 
 # include "utils.hpp"
+# include <vector>
 
 # define SESSION_TIMEOUT 1000
 
@@ -9,38 +10,51 @@
 /*                                CLASS COOKIE                                */
 /******************************************************************************/
 
-class Cookie
+class Purchase
+{
+	private:
+		std::string		_name;
+		std::string		_hamster;
+		std::string		_color;
+
+	public:
+		Purchase();
+		Purchase(const std::string& name, const std::string& hamster, const std::string& color);
+		~Purchase();
+
+		void	setPurchase(const std::string& name, const std::string& content);
+		void	setPurchase(const std::string& name, const std::string& hamster, const std::string& color);
+		void	display() const;
+		bool	isEmpty() const;
+};
+
+class Order
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef std::map<std::string, std::string> mapOfCookies;
+		typedef std::vector<class Purchase>	listOfPurchase;
 
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
 		std::string			_sessionId;
-		mapOfCookies		_cookies;
+		listOfPurchase		_purchase;
 		size_t				_time;
 
 	public:
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------     Main    -------*/
-		Cookie();
-		Cookie(const std::string& sessionId);
-		Cookie(const Cookie& other);
-		Cookie&				operator=(const Cookie& other);
-		~Cookie();
-		void				fillCookies(const Cookie& other);
+		Order();
+		Order(const std::string& sessionId);
+		Order(const Order& other);
+		Order&				operator=(const Order& other);
+		~Order();
+		void				fillOrder(const Order& other);
 
 						/*-------    Setter   -------*/
-		void				setCookie(const std::string& name, const std::string& value);
-		void				setCookies(std::string header);
-		std::string			setCookieHeader();
+		void				addPurchase(const std::string& name, const std::string& hamster, const std::string& color);
 
 						/*-------    Getter   -------*/
-		mapOfCookies&		getCookies();
-		const mapOfCookies&	getCookies() const;
-		std::string			getCookie(const std::string& name);
 		std::string			getSessionId() const;
 
 						/*-------     Size   -------*/
@@ -53,11 +67,7 @@ class Cookie
 		void				updateTime();
 
 						/*-------     Utils   -------*/
-		bool				isSet(const std::string& name);
 		void				display() const;
-
-
-		std::string&		operator[](const std::string& name);
 };
 
 #endif

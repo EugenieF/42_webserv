@@ -91,7 +91,7 @@ std::string		Response::_generateFormOrderPage()
 {
 	std::string	htmlPage;
 
-	std::string name = _purchaseOrder["name"];
+	std::string name = "Robinou";
 	std::string hamster = "Crotte";
 	std::string color = "#00000";
 	htmlPage = \

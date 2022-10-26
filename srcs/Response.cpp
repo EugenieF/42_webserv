@@ -259,6 +259,7 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	std::string	name;
 	std::string	content;
 
+	(void)path;
 	pos = body.find("Content-Disposition:");
 	if (pos == std::string::npos)
 		throw(BAD_REQUEST);
@@ -270,13 +271,13 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	content = body.substr(0, body.find("\r\n"));
 	if (filename != "")
 	{
-		if (path[path.length() - 1] != '/' && filename[0] != '/')
+		// std::cout << RED << "********" << RESET << NL;
+		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
 			filename.insert(0, "/");
-		std::cout << GREEN << "filename : " << path + filename << RESET << std::endl;
-		_writeFileContent(path + filename, content);
+		std::cout << GREEN << "filename : " << _uploadPath + filename << RESET << std::endl;
+		_writeFileContent(_uploadPath + filename, content);
 	}
-	_purchaseOrder.setCookie(name, content);
-	_purchaseOrder.display();
+	_purchase.setPurchase(name, content);
 	std::cout << GREEN << name << " = " << content << RESET << NL;
 }
 
@@ -380,13 +381,14 @@ void	Response::_runPostMethod()
 	if (_isCgi(_builtPath))
 	{
 		/* process cgi */
+		_builtPath = _uploadPath;
 		return (_handleCgi());
 	}
 	// if (_matchingBlock->getUploadPath().empty())
 	if (_uploadPath.empty())
 	{
 		// setStatusCode ??
-		// return ;
+		return ;
 	}
 	if (_contentTypeIsUrlencoded())
 	{
@@ -731,6 +733,11 @@ const Env&		Response::getEnv() const {
 std::string		Response::getBuiltPath() const
 {
 	return (_builtPath);
+}
+
+const Purchase&		Response::getPurchase() const
+{
+	return (_purchase);
 }
 
 /******************************************************************************/

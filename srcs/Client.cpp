@@ -68,6 +68,11 @@ void	Client::generateResponse()
 		delete _response;
 	_response = new Response(_selectVirtualServer(), _request, _env);
 	_response->generateResponse();
+	if (!_response->getPurchase().isEmpty())
+	{
+		std::cout << RED << "*******" << RESET << NL;
+		_response->getPurchase().display();
+	}
 }
 #else
 void	Client::generateResponse()

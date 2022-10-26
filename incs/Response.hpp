@@ -18,6 +18,7 @@
 # include "Autoindex.hpp"
 # include "Env.hpp"
 # include "CgiHandler.hpp"
+# include "PurchaseOrder.hpp"
 
 extern StatusCode	g_statusCode;
 extern MimeType		g_mimeType;
@@ -53,7 +54,7 @@ class   Response
 		std::string						_cgiquery;
 		std::string						_cgipath;
 
-		Cookie							_purchaseOrder;
+		Purchase						_purchase;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -91,6 +92,7 @@ class   Response
 		std::string						getCgiExtra() const;
 		std::string						getCgiQuery() const;
 		const Env&						getEnv() const;
+		const Purchase&					getPurchase() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

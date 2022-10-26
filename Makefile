@@ -24,7 +24,8 @@ SRCS			= main.cpp \
 				CgiHandler.cpp \
 				Env.cpp \
 				Cookie.cpp \
-				Session.cpp
+				Session.cpp \
+				PurchaseOrder.cpp
 
 OBJS_DIR		= ./objs
 
