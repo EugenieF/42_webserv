@@ -61,32 +61,35 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
 /*                                 RESPONSE                                   */
 /******************************************************************************/
 
-#ifndef COOKIE
+// #ifndef COOKIE
+// void	Client::generateResponse()
+// {
+
+// 	if (_response)
+// 		delete _response;
+// 	_response = new Response(_selectVirtualServer(), _request, _env);
+// 	_response->generateResponse();
+// 	if (!_response->getPurchase().isEmpty())
+// 	{
+// 		std::cout << RED << "*******" << RESET << NL;
+// 		_response->getPurchase().display();
+// 	}
+// }
+// #else
 void	Client::generateResponse()
 {
-	if (_response)
-		delete _response;
-	_response = new Response(_selectVirtualServer(), _request, _env);
-	_response->generateResponse();
-	if (!_response->getPurchase().isEmpty())
-	{
-		std::cout << RED << "*******" << RESET << NL;
-		_response->getPurchase().display();
-	}
-}
-#else
-void	Client::generateResponse()
-{
+	// Session		currentSession;
     Cookie*		cookies;
 
 	if (_response)
 		delete _response;
+	// currentSession = _runningServer.first->findSession()
 	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
 	cookies->display();
 	_response = new Response(_selectVirtualServer(), _request, _env, *cookies);
 	_response->generateResponse();
 }
-#endif
+// #endif
 
 bool	Client::_matchingServerName(
 	const listOfStrings& serverNames, int listeningPort, Block* currentServer)

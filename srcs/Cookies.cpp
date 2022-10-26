@@ -1,22 +1,22 @@
-#include "Cookie.hpp"
+#include "Cookies.hpp"
 
-Cookie::Cookie()
+Cookies::Cookies()
 {
 	_time = std::time(NULL);
 }
 
-Cookie::Cookie(const std::string& sessionId)
+Cookies::Cookies(const std::string& sessionId)
 {
 	_time = std::time(NULL);
 	setCookie("SID", sessionId);
 }
 
-Cookie::Cookie(const Cookie& other)
+Cookies::Cookies(const Cookies& other)
 {
 	*this = other;
 }
 
-Cookie&		Cookie::operator=(const Cookie& other)
+Cookies&		Cookies::operator=(const Cookies& other)
 {
 	if (this != &other)
 	{
@@ -26,14 +26,14 @@ Cookie&		Cookie::operator=(const Cookie& other)
 	return (*this);
 }
 
-Cookie::~Cookie() {}
+Cookies::~Cookies() {}
 
-size_t	Cookie::size() const
+size_t	Cookies::size() const
 {
 	return (_cookies.size());
 }
 
-void	Cookie::setCookie(const std::string& name, const std::string& value)
+void	Cookies::setCookie(const std::string& name, const std::string& value)
 {
 	checkSizeCookie(name, value);
 	_cookies[name] = value;
@@ -41,14 +41,14 @@ void	Cookie::setCookie(const std::string& name, const std::string& value)
 		_sessionId = value;
 }
 
-void	Cookie::setCookies(std::string header)
+void	Cookies::setCookies(std::string header)
 {
 	std::string		name;
 	std::string		value;
 	size_t			pos;
 
 	/* Limit Firefox = 150 cookies */
-	for (size_t nbOfCookies = 0; nbOfCookies < 150; nbOfCookies++)
+	for (size_t nbOfCookiess = 0; nbOfCookiess < 150; nbOfCookiess++)
 	{
 		pos = header.find("=");
 		if (pos == std::string::npos)
@@ -65,7 +65,7 @@ void	Cookie::setCookies(std::string header)
 	throw (PAYLOAD_TOO_LARGE);
 }
 
-void	Cookie::fillCookies(const Cookie& other)
+void	Cookies::fillCookies(const Cookies& other)
 {
 	mapOfCookies					cookies;
 	mapOfCookies::const_iterator	ite;
@@ -78,7 +78,7 @@ void	Cookie::fillCookies(const Cookie& other)
 	}
 }
 
-void	Cookie::checkSizeCookie(const std::string& name, const std::string& value)
+void	Cookies::checkSizeCookie(const std::string& name, const std::string& value)
 {
 	size_t	totalSize;
 
@@ -87,7 +87,7 @@ void	Cookie::checkSizeCookie(const std::string& name, const std::string& value)
 		throw(BAD_REQUEST);
 }
 
-void	Cookie::display() const
+void	Cookies::display() const
 {
 	mapOfCookies::const_iterator	ite;
 
@@ -97,22 +97,22 @@ void	Cookie::display() const
 	std::cout << std::endl;
 }
 
-std::string		Cookie::getSessionId() const
+std::string		Cookies::getSessionId() const
 {
 	return (_sessionId);
 }
 
-Cookie::mapOfCookies&	Cookie::getCookies()
+Cookies::mapOfCookies&	Cookies::getCookies()
 {
 	return (_cookies);
 }
 
-const Cookie::mapOfCookies&	Cookie::getCookies() const
+const Cookies::mapOfCookies&	Cookies::getCookies() const
 {
 	return (_cookies);
 }
 
-bool	Cookie::isSet(const std::string& name)
+bool	Cookies::isSet(const std::string& name)
 {
 	mapOfCookies::const_iterator	ite;
 
@@ -120,39 +120,39 @@ bool	Cookie::isSet(const std::string& name)
 	return (ite != _cookies.end());
 }
 
-std::string	 Cookie::getCookie(const std::string& name)
+std::string	 Cookies::getCookie(const std::string& name)
 {
 	if (isSet(name))
 		return (_cookies[name]);
 	return ("");
 }
 
-bool	Cookie::isEmpty()
+bool	Cookies::isEmpty()
 {
 	return (_cookies.empty());
 }
 
-std::string	Cookie::setCookieHeader()
+std::string	Cookies::setCookieHeader()
 {
 	std::string						header;
 	mapOfCookies::const_iterator	ite;
 
 	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
-		header += "Set-Cookie: " + ite->first + "=" + ite->second + "\r\n";
+		header += "Set-Cookies: " + ite->first + "=" + ite->second + "\r\n";
 	return (header);
 }
 
-bool	Cookie::sessionIsAlive()
+bool	Cookies::sessionIsAlive()
 {
 	return (std::time(NULL) - _time < SESSION_TIMEOUT);
 }
 
-void	Cookie::updateTime()
+void	Cookies::updateTime()
 {
 	_time = std::time(NULL);
 }
 
-std::string&	Cookie::operator[](const std::string& name)
+std::string&	Cookies::operator[](const std::string& name)
 {
 	return (_cookies[name]);
 }

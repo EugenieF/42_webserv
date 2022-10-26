@@ -23,7 +23,7 @@ SRCS			= main.cpp \
 				generateErrorPage.cpp \
 				CgiHandler.cpp \
 				Env.cpp \
-				Cookie.cpp \
+				Cookies.cpp \
 				Session.cpp \
 				PurchaseOrder.cpp
 

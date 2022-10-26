@@ -1,5 +1,5 @@
-#ifndef COOKIE_HPP
-# define COOKIE_HPP
+#ifndef COOKIES_HPP
+# define COOKIES_HPP
 
 # include "utils.hpp"
 
@@ -9,7 +9,7 @@
 /*                                CLASS COOKIE                                */
 /******************************************************************************/
 
-class Cookie
+class Cookies
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
@@ -25,12 +25,12 @@ class Cookie
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------     Main    -------*/
-		Cookie();
-		Cookie(const std::string& sessionId);
-		Cookie(const Cookie& other);
-		Cookie&				operator=(const Cookie& other);
-		~Cookie();
-		void				fillCookies(const Cookie& other);
+		Cookies();
+		Cookies(const std::string& sessionId);
+		Cookies(const Cookies& other);
+		Cookies&			operator=(const Cookies& other);
+		~Cookies();
+		void				fillCookies(const Cookies& other);
 
 						/*-------    Setter   -------*/
 		void				setCookie(const std::string& name, const std::string& value);

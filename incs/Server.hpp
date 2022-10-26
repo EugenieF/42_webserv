@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/26 13:44:37 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/26 17:27:20 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@
 class Server {
 	public:
 		/* -- Typedef ------------------------------------------------------ */
-		typedef Parser::listOfServers	listOfServers;
+		typedef Parser::listOfServers		listOfServers;
+		typedef Session::listOfPurchases	listOfPurchases;
 
 		Server(Block* x, char* const* env);
 		virtual ~Server();
@@ -67,14 +68,12 @@ class Server {
 		Env								_env;
 
 	/* ------ BONUS -------------------------------------------------------- */
-	// #ifdef COOKIE
 	private:
-		Session							_sessionsHandler;
+		SessionHandler							_sessionHandler;
 
 	public:
 		Cookie*							getSessionCookies(const Cookie& requestCookies);
-		Cookie*							getSessionPurchaseOrder(const Cookie& requestCookies);
-	// #endif
+		listOfPurchases					getSessionOrder(const Cookie& requestCookies);
 };
 
 #endif

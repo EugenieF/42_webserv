@@ -1,12 +1,12 @@
 #include "Session.hpp"
 
 /******************************************************************************/
-/*                                   MAIN                                     */
+/*                              CLASS SESSION                                 */
 /******************************************************************************/
 
-Session::Session()
+Session::Session(const std::string& id)
 {
-	srand(std::time(NULL));
+	_id = id;
 }
 
 Session::Session(const Session& other)
@@ -18,21 +18,127 @@ Session&	Session::operator=(const Session& other)
 {
 	if (this != &other)
 	{
-		_sessions = other.getSessions();
+		_id = other.getId();
+		_cookies = other.getCookies();
+		_order = other.getOrder();
 	}
 	return (*this);
 }
 
-Session::~Session()
+Session::~Session() {}
+
+std::string			Session::getId() const
 {
-	deleteSessions();
+	return (_id);
+}
+
+Cookies*	Session::getCookies()
+{
+	return (_cookies);
+}
+
+Session::listOfPurchases&		Session::getOrder()
+{
+	return (_order);
+}
+
+const Session::listOfPurchases&		Session::getOrder() const
+{
+	return (_order);
 }
 
 /******************************************************************************/
-/*                                   LOOKUP                                   */
+/*                           CLASS SESSION HANDLER                            */
 /******************************************************************************/
 
-Cookie*		Session::_findSession(std::string sessionId)
+SessionHandler::SessionHandler()
+{
+	srand(std::time(NULL));
+}
+
+Cookie*	SessionHandler::_newSession()
+{
+	std::string	newId;
+	Cookie*		newCookie;
+
+	/* init creation time */
+	newId = _generateSessionId();
+	newCookie = new Cookie(newId);
+	_sessions[newId] = newCookie;
+	return (newCookie);
+}	
+
+std::string 	SessionHandler::_generateRandomString(size_t length)
+{
+	std::string		charset;
+	int				pos;
+	size_t			maxIndex;
+	std::string		randomStr;
+
+	charset = "0123456789abcdefghijklmnopqrstuvwxyz";
+	maxIndex = charset.size() - 1;
+	while(randomStr.size() != length)
+	{
+		pos = ((rand() % maxIndex));
+		randomStr += charset.substr(pos, 1);
+	}
+	return (randomStr);
+}
+
+/* Generate unique Identifier for the new Session */
+std::string		SessionHandler::_generateSessionId()
+{
+	std::string		sessionId;
+
+	sessionId = _generateRandomString(SESSION_ID_LENGTH);
+	while (findSession(sessionId) != _sessions.end())
+		sessionId = _generateRandomString(SESSION_ID_LENGTH);
+	DEBUG("SESSION ID = " + sessionId);
+	return (sessionId);
+}
+
+std::vector<Session>&	SessionHandler::getSessions()
+{
+	return (_sessions);
+}
+
+const std::vector<Session>&	SessionHandler::getSessions() const
+{
+	return (_sessions);
+}
+
+std::vector<Session>::const_iterator	SessionHandler::findSession(std::string sessionId)
+{
+	std::vector<Session>::const_iterator	ite;
+
+	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
+	{
+		if (ite->getId() == sessionId)
+			return (ite);
+	}
+}
+
+Cookies*	SessionHandler::getSessionCookies(std::string sessionId)
+{
+	std::vector<Session>::const_iterator	ite;
+
+	ite = findSession(sessionId);	
+	if (ite != _sessions.end())
+		return (ite->getCookies());
+}
+
+SessionHandler::listOfPurchases		SessionHandler::getSessionOrder(std::string sessionId)
+{
+	std::vector<Session>::const_iterator	ite;
+
+	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
+	{
+		if (ite->getId() == sessionId)
+			return (ite->getOrder());
+	}
+}
+
+Cookie*		SessionHandler::_findSession(std::string sessionId)
 {
 	mapOfSessions::iterator		ite;
 	Cookie*						cookies;
@@ -51,13 +157,12 @@ Cookie*		Session::_findSession(std::string sessionId)
 	return (_newSession());
 }
 
-Cookie*	Session::lookupSession(const Cookie& requestCookies)
+Cookies*	SessionHandler::lookupSession(const Cookie& requestCookies)
 {
 	std::string						sessionId;
 	Cookie*							cookies;
 
 	sessionId = requestCookies.getSessionId();
-	// std::cout << RED << "sessionId = '" << sessionId << "'" << RESET << std::endl;
 	if (sessionId == "")
 		cookies = _newSession();
 	else
@@ -67,106 +172,4 @@ Cookie*	Session::lookupSession(const Cookie& requestCookies)
 		throw(PAYLOAD_TOO_LARGE);
 	// cookies->display();
 	return (cookies);
-}
-
-/******************************************************************************/
-/*                                   SETUP                                    */
-/******************************************************************************/
-
-Cookie*	Session::_newSession()
-{
-	std::string	newId;
-	Cookie*		newCookie;
-
-	/* init creation time */
-	newId = _generateSessionId();
-	newCookie = new Cookie(newId);
-	_sessions[newId] = newCookie;
-	return (newCookie);
-}
-
-std::string 	Session::_generateRandomString(size_t length)
-{
-	std::string		charset;
-	int				pos;
-	size_t			maxIndex;
-	std::string		randomStr;
-
-	charset = "0123456789abcdefghijklmnopqrstuvwxyz";
-	maxIndex = charset.size() - 1;
-	while(randomStr.size() != length)
-	{
-		pos = ((rand() % maxIndex));
-		randomStr += charset.substr(pos, 1);
-	}
-	return (randomStr);
-}
-
-/* Generate unique Identifier for the new Session */
-std::string		Session::_generateSessionId()
-{
-	std::string		sessionId;
-
-	sessionId = _generateRandomString(SESSION_ID_LENGTH);
-	while (_sessions.find(sessionId) != _sessions.end())
-		sessionId = _generateRandomString(SESSION_ID_LENGTH);
-	DEBUG("SESSION ID = " + sessionId);
-	return (sessionId);
-}
-
-/******************************************************************************/
-/*                                  CLEANUP                                   */
-/******************************************************************************/
-
-void	Session::deleteSessions()
-{
-	mapOfSessions::iterator	currentSession;
-
-	// for (session = _sessions.begin(); session != _sessions.end(); session++)
-	// 	_deleteSession(session);
-	currentSession = _sessions.begin();
-	while (currentSession != _sessions.end())
-	{
-		_deleteSession(currentSession);
-		currentSession = _sessions.begin();
-	}
-}
-
-void	Session::_deleteSession(Session::mapOfSessions::iterator session)
-{
-	if (session->second)
-	{
-		delete session->second;
-		session->second = NULL;
-	}
-	_sessions.erase(session);
-}
-
-void	Session::_deleteSession(const std::string& sessionId)
-{
-	mapOfSessions::iterator session;
-
-	session = _sessions.find(sessionId);
-	if (session == _sessions.end())
-		return ;
-	if (session->second)
-	{
-		delete session->second;
-		session->second = NULL;
-	}
-	_sessions.erase(sessionId);
-}
-
-/******************************************************************************/
-/*                                   GETTER                                   */
-/******************************************************************************/
-
-Session::mapOfSessions&		Session::getSessions()
-{
-	return (_sessions);
-}
-
-const Session::mapOfSessions&	Session::getSessions() const
-{
-	return (_sessions);
 }
