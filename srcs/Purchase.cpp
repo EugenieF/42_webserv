@@ -4,10 +4,25 @@ Purchase::Purchase() {}
 
 Purchase::Purchase(const std::string& name, const std::string& hamster, const std::string& color)
 {
-    _name = name;
-    _hamster = hamster;
-    _color = color;
+	setPurchase(name, hamster, color);
 }
+
+Purchase::Purchase(const Purchase& other)
+{
+	*this = other;
+}
+
+Purchase::Purchase&		operator=(const Purchase& other)
+{
+	if (this != &other)
+	{
+		_name = other.getName();
+		_hamster = other.getHamster();
+		_color = other.getColor();
+	}
+	return (*this);
+}
+
 
 Purchase::~Purchase() {}
 
@@ -40,7 +55,3 @@ bool	Purchase::isEmpty() const
     return (_name.empty() || _hamster.empty() || _color.empty());
 }
 
-void    Order::addPurchase(const std::string& name, const std::string& hamster, const std::string& color)
-{
-    _purchase.insert(_purchase.end(), Purchase(name, hamster, color));
-}

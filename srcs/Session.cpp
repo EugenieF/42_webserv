@@ -6,6 +6,7 @@
 
 Session::Session(const std::string& id)
 {
+	_time = std::time(NULL);
 	_id = id;
 }
 
@@ -18,6 +19,7 @@ Session&	Session::operator=(const Session& other)
 {
 	if (this != &other)
 	{
+		_time = other.getTime();
 		_id = other.getId();
 		_cookies = other.getCookies();
 		_order = other.getOrder();
@@ -27,12 +29,22 @@ Session&	Session::operator=(const Session& other)
 
 Session::~Session() {}
 
+size_t	Session::getTime() const
+{
+	return (_time);
+}
+
 std::string			Session::getId() const
 {
 	return (_id);
 }
 
-Cookies*	Session::getCookies()
+listOfCookies&	Session::getCookies()
+{
+	return (_cookies);
+}
+
+const listOfCookies&	Session::getCookies() const
 {
 	return (_cookies);
 }
@@ -47,6 +59,63 @@ const Session::listOfPurchases&		Session::getOrder() const
 	return (_order);
 }
 
+bool	Session::sessionIsAlive()
+{
+	return (std::time(NULL) - _time < SESSION_TIMEOUT);
+}
+
+void	Session::updateTime()
+{
+	_time = std::time(NULL);
+}
+
+void	Session::setCookies(std::string header)
+{
+	std::string		name;
+	std::string		value;
+	size_t			pos;
+
+	/* Limit Firefox = 150 cookies */
+	for (size_t nbOfCookies = 0; nbOfCookies < 150; nbOfCookies++)
+	{
+		pos = header.find("=");
+		if (pos == std::string::npos)
+			throw(BAD_REQUEST);
+		name = header.substr(0, pos);
+		header.erase(0, pos + 1);
+		pos = header.find("; ");
+		value = header.substr(0, pos);
+		header.erase(0, pos + 2);
+		addCookie(name, value);
+		if (pos == std::string::npos)
+			return ;
+	}
+	throw (PAYLOAD_TOO_LARGE);
+}
+
+void	Session::fillCookies(const listOfCookies& cookies)
+{
+	listOfCookies::iterator	ite;
+
+	for (ite = cookies.begin(); ite != cookies.end(); ite++)
+		_addCookie(ite->getName(), ite->getValue());
+}
+
+void	Session::addCookie(const std::string& name, const std::string& value)
+{
+	_cookies.insert(_cookies.end(), Cookie(name, value));
+}
+
+void    Session::addPurchase(const std::string& name, const std::string& hamster, const std::string& color)
+{
+    _order.insert(_order.end(), Purchase(name, hamster, color));
+}
+
+void	Session::deletePurchase(listOfPurchases::iterator ite)
+{
+	_order.erase(ite);
+}
+
 /******************************************************************************/
 /*                           CLASS SESSION HANDLER                            */
 /******************************************************************************/
@@ -56,16 +125,14 @@ SessionHandler::SessionHandler()
 	srand(std::time(NULL));
 }
 
-Cookie*	SessionHandler::_newSession()
+Session&	SessionHandler::_newSession()
 {
-	std::string	newId;
-	Cookie*		newCookie;
+	std::string		newId;
 
-	/* init creation time */
 	newId = _generateSessionId();
-	newCookie = new Cookie(newId);
-	_sessions[newId] = newCookie;
-	return (newCookie);
+	Session	newSession(newId);
+	_sessions.insert(_sessions.end(), newSession);
+	return (newSession);
 }	
 
 std::string 	SessionHandler::_generateRandomString(size_t length)
@@ -97,28 +164,32 @@ std::string		SessionHandler::_generateSessionId()
 	return (sessionId);
 }
 
-std::vector<Session>&	SessionHandler::getSessions()
+Session::listOfSessions&	SessionHandler::getSessions()
 {
 	return (_sessions);
 }
 
-const std::vector<Session>&	SessionHandler::getSessions() const
+const Session::listOfSessions&	SessionHandler::getSessions() const
 {
 	return (_sessions);
 }
 
-std::vector<Session>::const_iterator	SessionHandler::findSession(std::string sessionId)
+//////////
+
+
+
+Session&	SessionHandler::findSession(const std::string& sessionId)
 {
-	std::vector<Session>::const_iterator	ite;
+	listOfSession::const_iterator	ite;
 
 	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
 	{
 		if (ite->getId() == sessionId)
-			return (ite);
+			return (*ite);
 	}
 }
 
-Cookies*	SessionHandler::getSessionCookies(std::string sessionId)
+listOfCookies	SessionHandler::getSessionCookies(std::string sessionId)
 {
 	std::vector<Session>::const_iterator	ite;
 

@@ -2,6 +2,7 @@
 # define SESSION_HPP
 
 # define SESSION_ID_LENGTH 16
+# define SESSION_TIMEOUT 1000
 
 # include "utils.hpp"
 # include "Cookie.hpp"
@@ -17,13 +18,15 @@ class Session
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef std::vector<class Purchase>			listOfPurchases;
+		typedef std::vector<class Cookie>		listOfCookies;
+		typedef std::vector<class Purchase>		listOfPurchases;
 
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
 		std::string				_id;
-		Cookie*					_cookies;
+		listOfCookies			_cookies;
 		listOfPurchases			_order;
+		size_t					_time;
 
 	public: 
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -36,23 +39,36 @@ class Session
 
 						/*--------    Getter   -------*/
 		std::string				getId() const;
-		Cookies*				getCookies();
+		listOfCookies&			getCookies();
+		const listOfCookies&	getCookies() const;
 		listOfPurchases&		getOrder();
 		const listOfPurchases&	getOrder() const;
+						
+						/*-------     Time   -------*/
+		bool					sessionIsAlive();
+		void					updateTime();
 
-	private:
-	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
+						/*-------   Cookies  -------*/
+		void					setCookies(std::string header);
+		void					fillCookies(const listOfCookies& other);
+		void					addCookie(const std::string& name, const std::string& value);
+
+						/*--------  Purchase  -------*/
+		void					addPurchase(const std::string& name, const std::string& hamster, const std::string& color);
+		void					deletePurchase(listOfPurchases::iterator ite);
 };
 
 class SessionHandler
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
+		typedef Session::listOfCookies		listOfCookies;
 		typedef Session::listOfPurchases	listOfPurchases;
+		typedef std::vector<Session>		listOfSessions;
 
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
-		std::vector<Session>				_sessions;
+		listOfSessions						_sessions;
 
 	public:
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -60,16 +76,16 @@ class SessionHandler
 		SessionHandler();
 		~SessionHandler();
 
-		Cookies*							getSessionCookies(std::string sessionId);
+		listOfCookies						getSessionCookies(std::string sessionId);
 		listOfPurchases						getSessionOrder(std::string sessionId);
 
 								/*-------     Lookup   -------*/
 		std::vector<Session>::const_iterator	findSession(std::string sessionId);
-		Cookies*							lookupSession(const Cookie& requestCookies);
+		listOfCookies							lookupSession(const Cookie& requestCookies);
 
 								/*-------     Getter   -------*/
-		std::vector<Session>&				getSessions();
-		const std::vector<Session>&			getSessions() const;
+		listOfSessions&						getSessions();
+		const listOfSessions&					getSessions() const;
 
 		// Cookie*							fillSessionCookies(const Cookie& requestCookies);
 		// Order*							fillSessionOrder(const Order& responseOrder);
@@ -78,7 +94,7 @@ class SessionHandler
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 								/*--------     Setup   ------*/
-		Cookies*							_newSession();
+		Session&							_newSession();
 		std::string							_generateSessionId();
 		std::string							_generateRandomString(size_t length);
 };
