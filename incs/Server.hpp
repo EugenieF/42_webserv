@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 22:53:58 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/26 13:44:37 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,7 @@
 # include "Parser.hpp"
 # include "Env.hpp"
 
-#ifdef COOKIE
-	# include "Session.hpp"
-#endif
+# include "Session.hpp"
 
 class Server {
 	public:
@@ -69,13 +67,14 @@ class Server {
 		Env								_env;
 
 	/* ------ BONUS -------------------------------------------------------- */
-	#ifdef COOKIE
+	// #ifdef COOKIE
 	private:
 		Session							_sessionsHandler;
 
 	public:
 		Cookie*							getSessionCookies(const Cookie& requestCookies);
-	#endif
+		Cookie*							getSessionPurchaseOrder(const Cookie& requestCookies);
+	// #endif
 };
 
 #endif

@@ -68,7 +68,6 @@ void	Client::generateResponse()
 		delete _response;
 	_response = new Response(_selectVirtualServer(), _request, _env);
 	_response->generateResponse();
-	// return (_response);
 }
 #else
 void	Client::generateResponse()
@@ -81,7 +80,6 @@ void	Client::generateResponse()
 	cookies->display();
 	_response = new Response(_selectVirtualServer(), _request, _env, *cookies);
 	_response->generateResponse();
-	// return (_response);
 }
 #endif
 

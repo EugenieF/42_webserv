@@ -8,9 +8,7 @@
 #include "Block.hpp"
 #include "utils.hpp"
 
-#ifdef COOKIE
-	# include "Cookie.hpp"
-#endif
+# include "Cookie.hpp"
 
 # define UNDEFINED_PORT -1
 

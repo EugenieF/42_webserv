@@ -53,6 +53,8 @@ class   Response
 		std::string						_cgiquery;
 		std::string						_cgipath;
 
+		Cookie							_purchaseOrder;
+
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 

@@ -151,3 +151,8 @@ void	Cookie::updateTime()
 {
 	_time = std::time(NULL);
 }
+
+std::string&	Cookie::operator[](const std::string& name)
+{
+	return (_cookies[name]);
+}

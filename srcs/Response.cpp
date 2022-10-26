@@ -275,6 +275,8 @@ void	Response::_parseContent(const std::string& path, std::string body)
 		std::cout << GREEN << "filename : " << path + filename << RESET << std::endl;
 		_writeFileContent(path + filename, content);
 	}
+	_purchaseOrder.setCookie(name, content);
+	_purchaseOrder.display();
 	std::cout << GREEN << name << " = " << content << RESET << NL;
 }
 
@@ -304,6 +306,11 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 	if (_request->getPath() == "/form_accept")
 	{
 		_body = _generateFormAcceptPage();
+		_headers["Content-Type"] = g_mimeType[".html"];
+	}
+	else if (_request->getPath() == "/form_upload")
+	{
+		_readFileContent("www/html/upload.html");
 		_headers["Content-Type"] = g_mimeType[".html"];
 	}
 }
