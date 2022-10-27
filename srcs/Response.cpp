@@ -867,7 +867,7 @@ void	Response::_fillCookieHeader()
 	// #endif
 }
 
-const Session*	Response::getSession() const
+Session*	Response::getSession() const
 {
-	return (*_session);
+	return (_session);
 }

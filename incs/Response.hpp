@@ -92,7 +92,7 @@ class   Response
 		std::string						getCgiExtra() const;
 		std::string						getCgiQuery() const;
 		const Env&						getEnv() const;
-		const Session&					getSession() const;
+		Session*						getSession() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
