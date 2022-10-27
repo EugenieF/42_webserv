@@ -119,18 +119,14 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
-				<div class=\"color\">\n\
-					<center>Id : " + ite->getId() + "<br></center>\n\
-				</div>\n\
 				<div>\n\
 					<center><button class=\"bouton\" id=\"" + ite->getId() + "\" onclick=\"deleteData(this.id)\">Jeter votre hamster et reformuler une adoption</button></center>\n\
 				<div>\n\n\n";
 	}
 
-// <center><button class=\"bouton\" id=\"selectedItemId\" value=\"" + ite->getId() + "\" onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n
-
 	htmlPage += \
-				"<form action=\"/form.html\">\n\
+				"\n\n\
+				<form action=\"/form.html\">\n\
 					<center><input type=\"submit\" value=\"Go acheter un nouvel ami !\" class=\"bouton\" /></center>\n\
 				</form>\n\
 				<form action=\"/index.html\">\n\
@@ -139,7 +135,7 @@ std::string		Response::_generateFormOrderPage()
 				</div>\n\
 				<script>\n\
 					function deleteData(id) {\n\
-						alert('Button clicked ' + id);\n\
+						alert('The selected item will be deleted');\n\
 						fetch(`/form_delete/${id}`, {\n\
 							method: 'DELETE',\n\
 							credentials: 'include'\n\
@@ -153,5 +149,3 @@ std::string		Response::_generateFormOrderPage()
 		</html>\n";
 	return (htmlPage);
 }
-
-						// var id = document.getElementById(\"selectedItemId\").value;\n

@@ -35,10 +35,7 @@ Session&	Session::operator=(const Session& other)
 	return (*this);
 }
 
-Session::~Session() 
-{
-	std::cout << GREEN << "*****Destructor" << RESET << NL;
-}
+Session::~Session() {}
 
 bool	Session::_idIsUnique(const std::string& id)
 {

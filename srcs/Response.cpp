@@ -277,7 +277,6 @@ void	Response::_parseContent(const std::string& path, std::string body)
 		_writeFileContent(_uploadPath + filename, content);
 	}
 	_session->completePurchase(name, content);
-	// std::cout << GREEN << name << " = " << content << RESET << NL;
 }
 
 /*
@@ -415,7 +414,7 @@ bool	Response::_deletePurchase(const std::string& uri)
 		id = uri.substr(13);
 		if (_session->deletePurchase(id))
 		{
-			_body = _generateFormAcceptPage();
+			_body = _generateFormOrderPage();
 			return (true);
 		}
 	}
@@ -425,7 +424,7 @@ bool	Response::_deletePurchase(const std::string& uri)
 /* Remove all current representations of the target resource. */
 void	Response::_runDeleteMethod()
 {
-	int		ret;
+	int	ret;
 
 	if (_deletePurchase(_request->getPath()))
 		return ;	
