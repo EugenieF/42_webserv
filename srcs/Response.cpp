@@ -413,8 +413,7 @@ bool	Response::_deletePurchase(const std::string& uri)
 		id = uri.substr(13);
 		if (_session->deletePurchase(id))
 		{
-			_readFileContent("www/html//form.html");
-			_headers["Content-Type"] = g_mimeType[".html"];
+			// _headers["Content-Type"] = g_mimeType[".html"];
 			// _body = _generateFormOrderPage();
 			// std::cout << RED << _body << RESET << NL;
 			return (true);

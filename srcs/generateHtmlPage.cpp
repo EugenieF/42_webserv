@@ -141,6 +141,7 @@ std::string		Response::_generateFormOrderPage()
 							credentials: 'include'\n\
 						})\n\
 						.then(response => {\n\
+							window.location.reload();\n\
 							console.log('OK');\n\
 						})\n\
 					}\n\
