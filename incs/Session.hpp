@@ -26,6 +26,7 @@ class Session
 		std::string				_id;
 		listOfCookies			_cookies;
 		listOfPurchases			_order;
+		Purchase				_purchase;
 		size_t					_time;
 
 	public: 
@@ -53,13 +54,18 @@ class Session
 						/*-------   Cookies  -------*/
 		std::string				getCookieHeader();
 		void					fillCookies(const listOfCookies& other);
-		void					addCookie(const std::string& name, const std::string& value);
 
 						/*--------  Purchase  -------*/
-		void					addPurchase(const std::string& name, const std::string& content);
+		void					completePurchase(const std::string& name, const std::string& content);
 		void					deletePurchase(listOfPurchases::iterator ite);
 		void					displayCookies() const;
 
+	private:
+						/*-------   Cookies  -------*/
+		void					_addCookie(const std::string& name, const std::string& value);
+
+						/*--------  Purchase  -------*/
+		void					_addPurchaseInOrder();
 };
 
 /******************************************************************************/
