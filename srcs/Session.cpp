@@ -139,7 +139,7 @@ void	SessionHandler::_deleteSessions()
 	_sessions.clear();
 }
 
-void	SessionHandler::_deleteSession(listOfSessions::iterator session)
+void	SessionHandler::_deleteSession(listOfSessions::iterator ite)
 {
 	Session*	tmp;
 
@@ -153,7 +153,7 @@ void	SessionHandler::_deleteSession(listOfSessions::iterator session)
 Session*	SessionHandler::_newSession()
 {
 	std::string		newId;
-	Session			newSession;
+	Session*		newSession;
 
 	newId = _generateSessionId();
 	newSession = new Session(newId);
@@ -196,12 +196,12 @@ Session*	SessionHandler::_findSession(const std::string& sessionId)
 
 	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
 	{
-		if (ite->getId() == sessionId)
+		if ((*ite)->getId() == sessionId)
 		{
-			if (ite->sessionIsAlive())
+			if ((*ite)->sessionIsAlive())
 			{
-				ite->updateTime();
-				return (&(*ite));
+				(*ite)->updateTime();
+				return (*ite);
 			}
 			_deleteSession(ite);
 			break ;
