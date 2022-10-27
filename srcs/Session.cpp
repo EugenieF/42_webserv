@@ -158,9 +158,9 @@ bool	Session::deletePurchase(const std::string& id)
 		std::cout << RED << "[" << ite->getId() << "] | [" << id << "]" << RESET << NL;
 		if (ite->getId() == id)
 		{
-			_order.erase(ite);
 			displayMsg(" ❎🐹 Purchase [" + ite->getName() + "; " + ite->getHamster() + "; "
 				+ ite->getColor() + "] was successfully deleted", LIGHT_GREEN);
+			_order.erase(ite);
 			return (true);
 		}
 	}	

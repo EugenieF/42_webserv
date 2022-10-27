@@ -414,6 +414,7 @@ bool	Response::_deletePurchase(const std::string& uri)
 		id = uri.substr(13);
 		if (_session->deletePurchase(id))
 		{
+			std::cout << GREEN << ">> _order.size() = " << _session->getOrder().size() << RESET << NL;
 			_body = _generateFormOrderPage();
 			return (true);
 		}
