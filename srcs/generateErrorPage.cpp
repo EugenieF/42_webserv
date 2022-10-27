@@ -119,10 +119,15 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
-				<form id=\"form_delete\" action=\"/form_delete/" + ite->getId() + "\" method=\"POST\">\n\
-					<input type=\"hidden\" name=\"_method\" value=\"DELETE\" />\n\
-					<input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token() }}\">\n\
-					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" /></center>\n\
+				<form id=\"form_delete\" action=\"/form_delete/" + ite->getId() + "\">\n\
+					<center><input type=\"button\" value=\"Jeter votre hamster et reformuler une adoption\" onclick=\"deleteData\" class=\"bouton\" /></center>\n\
+					<script>\n\
+						function deleteData() {\n\
+							fetch(form.action,  {\n\
+							method: 'DELETE'\n\
+							})\n\
+						}\n\
+					</script>\n\
 				</form>\n\n";
 	}
 /* <script>\n\
@@ -132,6 +137,8 @@ std::string		Response::_generateFormOrderPage()
 				// 		fetch(form.action, {method: \"DELETE\"})\n\
 				// 	}\n\
 				// </script>\n\
+					<input type=\"hidden\" name=\"_method\" value=\"DELETE\" />\n\
+					<input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token() }}\">\n\
 */
 
 	htmlPage += \
