@@ -69,7 +69,7 @@ class SessionHandler
 	public:
 	/***********************      MEMBER TYPES      *********************/
 		typedef Session::listOfCookies		listOfCookies;
-		typedef std::vector<Session>		listOfSessions;
+		typedef std::vector<Session*>		listOfSessions;
 
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -83,12 +83,11 @@ class SessionHandler
 
 								/*-------     Lookup   -------*/
 		Session*							lookupSession(const listOfCookies& requestCookies);
-		Session*							findSession(const std::string& sessionId);
-		std::string							getCookieSID(const listOfCookies& cookies);
 
 								/*-------     Getter   -------*/
 		listOfSessions&						getSessions();
 		const listOfSessions&				getSessions() const;
+
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
@@ -97,6 +96,14 @@ class SessionHandler
 		Session*							_newSession();
 		std::string							_generateSessionId();
 		std::string							_generateRandomString(size_t length);
+
+								/*--------     find   ------*/
+		Session*							_findSession(const std::string& sessionId);
+		std::string							_getCookieSID(const listOfCookies& cookies);
+
+								/*--------   Cleanup  ------*/
+		void								_deleteSessions();
+		void								_deleteSession(listOfSessions::iterator session);
 };
 
 #endif

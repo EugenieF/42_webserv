@@ -122,14 +122,43 @@ SessionHandler::SessionHandler()
 	srand(std::time(NULL));
 }
 
+SessionHandler::~SessionHandler()
+{
+	_deleteSessions();
+}
+
+void	SessionHandler::_deleteSessions()
+{
+	listOfSessions::iterator	ite;
+
+	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
+	{
+		delete (*ite);
+		*ite = NULL;
+	}
+	_sessions.clear();
+}
+
+void	SessionHandler::_deleteSession(listOfSessions::iterator session)
+{
+	Session*	tmp;
+
+	tmp = *ite
+	_sessions.erase(ite);
+	delete tmp;
+	tmp = NULL;
+
+}
+
 Session*	SessionHandler::_newSession()
 {
 	std::string		newId;
+	Session			newSession;
 
 	newId = _generateSessionId();
-	Session newSession(newId);
+	newSession = new Session(newId);
 	_sessions.insert(_sessions.end(), newSession);
-	return (&newSession);
+	return (newSession);
 }	
 
 std::string 	SessionHandler::_generateRandomString(size_t length)
@@ -161,17 +190,7 @@ std::string		SessionHandler::_generateSessionId()
 	return (sessionId);
 }
 
-SessionHandler::listOfSessions&	SessionHandler::getSessions()
-{
-	return (_sessions);
-}
-
-const SessionHandler::listOfSessions&	SessionHandler::getSessions() const
-{
-	return (_sessions);
-}
-
-Session*	SessionHandler::findSession(const std::string& sessionId)
+Session*	SessionHandler::_findSession(const std::string& sessionId)
 {
 	listOfSessions::iterator	ite;
 
@@ -184,14 +203,14 @@ Session*	SessionHandler::findSession(const std::string& sessionId)
 				ite->updateTime();
 				return (&(*ite));
 			}
-			_sessions.erase(ite);
+			_deleteSession(ite);
 			break ;
 		}
 	}
 	return (_newSession());
 }
 
-std::string	SessionHandler::getCookieSID(const listOfCookies& cookies)
+std::string	SessionHandler::_getCookieSID(const listOfCookies& cookies)
 {
 	listOfCookies::const_iterator	ite;
 
@@ -208,12 +227,22 @@ Session*	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 	std::string			sessionId;
 	Session				*session;
 
-	sessionId = getCookieSID(requestCookies);
+	sessionId = _getCookieSID(requestCookies);
 	if (sessionId == "")
 		session = _newSession();
 	else
-		session = findSession(sessionId);
+		session = _findSession(sessionId);
 	session->fillCookies(requestCookies);
 	// session->getCookies().display();
 	return (session);
+}
+
+SessionHandler::listOfSessions&	SessionHandler::getSessions()
+{
+	return (_sessions);
+}
+
+const SessionHandler::listOfSessions&	SessionHandler::getSessions() const
+{
+	return (_sessions);
 }
