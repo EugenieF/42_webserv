@@ -120,7 +120,7 @@ std::string		Response::_generateFormOrderPage()
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
 				<div>\n\
-					<center><button onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n\
+					<center><button id=\"selectedItemId\" value=\"" + ite->getId() + "\" onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n\
 				<div>\n\n\n";
 	}
 
@@ -134,7 +134,8 @@ std::string		Response::_generateFormOrderPage()
 				</div>\n\
 				<script>\n\
 					function deleteData() {\n\
-						alert('Button clicked');\n\
+						var id = document.getElementById(\"selectedItemId\").value;\n\
+						alert('Button clicked ${id}');\n\
 					}\n\
 				</script>\n\
 			</body>\n\
