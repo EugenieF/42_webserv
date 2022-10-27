@@ -123,10 +123,11 @@ std::string		Response::_generateFormOrderPage()
 					<center>Id : " + ite->getId() + "<br></center>\n\
 				</div>\n\
 				<div>\n\
-					<center><button id=\"selectedItemId\" value=\"" + ite->getId() + "\" onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n\
-					<center><button class=\"bouton\" id=\"selectedItemId\" value=\"" + ite->getId() + "\" onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n\
+					<center><button class=\"bouton\" id=\"" + ite->getId() + "\" onclick=\"deleteData(this.id)\">Jeter votre hamster et reformuler une adoption</button></center>\n\
 				<div>\n\n\n";
 	}
+
+// <center><button class=\"bouton\" id=\"selectedItemId\" value=\"" + ite->getId() + "\" onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n
 
 	htmlPage += \
 				"<form action=\"/form.html\">\n\
@@ -137,14 +138,13 @@ std::string		Response::_generateFormOrderPage()
 				</form>\n\
 				</div>\n\
 				<script>\n\
-					function deleteData() {\n\
-						var id = document.getElementById(\"selectedItemId\").value;\n\
+					function deleteData(id) {\n\
 						alert('Button clicked ' + id);\n\
 						fetch(`/form_delete/${id}`, {\n\
-							method: 'DELETE'\n\
+							method: \"DELETE\"\n\
 						})\n\
 						.then(response => {\n\
-							console.log('OK')'\n\
+							console.log('OK');\n\
 						})\n\
 					}\n\
 				</script>\n\
@@ -152,3 +152,5 @@ std::string		Response::_generateFormOrderPage()
 		</html>\n";
 	return (htmlPage);
 }
+
+						// var id = document.getElementById(\"selectedItemId\").value;\n
