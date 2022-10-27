@@ -4,9 +4,14 @@
 /*                              CLASS SESSION                                 */
 /******************************************************************************/
 
+Session::Session()
+{
+	updateTime();
+}
+
 Session::Session(const std::string& id)
 {
-	_time = std::time(NULL);
+	updateTime();
 	_id = id;
 }
 
@@ -39,12 +44,12 @@ std::string			Session::getId() const
 	return (_id);
 }
 
-listOfCookies&	Session::getCookies()
+Session::listOfCookies&	Session::getCookies()
 {
 	return (_cookies);
 }
 
-const listOfCookies&	Session::getCookies() const
+const Session::listOfCookies&	Session::getCookies() const
 {
 	return (_cookies);
 }
@@ -71,8 +76,8 @@ void	Session::updateTime()
 
 void	Session::fillCookies(const listOfCookies& cookies)
 {
-	listOfCookies::iterator	ite;
-	size_t					count;
+	listOfCookies::const_iterator	ite;
+	size_t							count;
 
 	for (ite = cookies.begin(), count = 0; ite != cookies.end(); ite++, count++)
 	{
@@ -150,26 +155,25 @@ std::string		SessionHandler::_generateSessionId()
 	std::string		sessionId;
 
 	sessionId = _generateRandomString(SESSION_ID_LENGTH);
-	while (findSession(sessionId) != _sessions.end())
-		sessionId = _generateRandomString(SESSION_ID_LENGTH);
+	// while (findSession(sessionId) != _sessions.end())
+	// 	sessionId = _generateRandomString(SESSION_ID_LENGTH);
 	DEBUG("SESSION ID = " + sessionId);
 	return (sessionId);
 }
 
-Session::listOfSessions&	SessionHandler::getSessions()
+SessionHandler::listOfSessions&	SessionHandler::getSessions()
 {
 	return (_sessions);
 }
 
-const Session::listOfSessions&	SessionHandler::getSessions() const
+const SessionHandler::listOfSessions&	SessionHandler::getSessions() const
 {
 	return (_sessions);
 }
-
 
 Session&	SessionHandler::findSession(const std::string& sessionId)
 {
-	listOfSession::iterator	ite;
+	listOfSessions::iterator	ite;
 
 	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
 	{
@@ -187,7 +191,7 @@ Session&	SessionHandler::findSession(const std::string& sessionId)
 	return (_newSession());
 }
 
-std::string	SessionHandler::getCookieSID(const listOfCookies& requestCookies)
+std::string	SessionHandler::getCookieSID(const listOfCookies& cookies)
 {
 	listOfCookies::const_iterator	ite;
 
@@ -208,7 +212,7 @@ Session&	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 	if (sessionId == "")
 		session = _newSession();
 	else
-		session = _findSession(sessionId);
+		session = findSession(sessionId);
 	session.fillCookies(requestCookies);
 	// session.getCookies().display();
 	return (session);

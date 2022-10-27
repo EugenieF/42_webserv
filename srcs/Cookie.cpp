@@ -12,7 +12,7 @@ Cookie::Cookie(const Cookie& other)
 	*this = other;
 }
 
-Cookie&		Cookie::operator=(const Cookies& other)
+Cookie&		Cookie::operator=(const Cookie& other)
 {
 	if (this != &other)
 	{

@@ -524,7 +524,7 @@ void	Request::printRequestInfo()
 // 	return (_cookies);
 // }
 
-const listOfCookies&	Request::getCookies() const
+const Request::listOfCookies&	Request::getCookies() const
 {
 	return (_cookies);
 }

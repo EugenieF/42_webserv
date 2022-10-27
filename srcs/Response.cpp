@@ -277,7 +277,7 @@ void	Response::_parseContent(const std::string& path, std::string body)
 		std::cout << GREEN << "filename : " << _uploadPath + filename << RESET << std::endl;
 		_writeFileContent(_uploadPath + filename, content);
 	}
-	_purchase.setPurchase(name, content);
+	// _session.addPurchase(name, content);
 	std::cout << GREEN << name << " = " << content << RESET << NL;
 }
 
@@ -726,11 +726,6 @@ const Env&		Response::getEnv() const {
 std::string		Response::getBuiltPath() const
 {
 	return (_builtPath);
-}
-
-const Purchase&		Response::getPurchase() const
-{
-	return (_purchase);
 }
 
 /******************************************************************************/

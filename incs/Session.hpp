@@ -6,7 +6,7 @@
 
 # include "utils.hpp"
 # include "Cookie.hpp"
-# include "PurchaseOrder.hpp
+# include "Purchase.hpp"
 
 # include <vector>
 
@@ -32,6 +32,7 @@ class Session
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------     Main    -------*/
+		Session();
 		Session(const std::string& id);
 		Session(const Session& other);
 		Session&				operator=(const Session& other);
@@ -43,6 +44,7 @@ class Session
 		const listOfCookies&	getCookies() const;
 		listOfPurchases&		getOrder();
 		const listOfPurchases&	getOrder() const;
+		size_t					getTime() const;
 						
 						/*-------     Time   -------*/
 		bool					sessionIsAlive();
@@ -82,7 +84,7 @@ class SessionHandler
 								/*-------     Lookup   -------*/
 		Session&							lookupSession(const listOfCookies& requestCookies);
 		Session&							findSession(const std::string& sessionId);
-		std::string							getCookieSID(const listOfCookies& requestCookies);
+		std::string							getCookieSID(const listOfCookies& cookies);
 
 								/*-------     Getter   -------*/
 		listOfSessions&						getSessions();
