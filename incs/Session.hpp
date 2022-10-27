@@ -82,8 +82,8 @@ class SessionHandler
 		~SessionHandler();
 
 								/*-------     Lookup   -------*/
-		Session&							lookupSession(const listOfCookies& requestCookies);
-		Session&							findSession(const std::string& sessionId);
+		Session*							lookupSession(const listOfCookies& requestCookies);
+		Session*							findSession(const std::string& sessionId);
 		std::string							getCookieSID(const listOfCookies& cookies);
 
 								/*-------     Getter   -------*/
@@ -94,7 +94,7 @@ class SessionHandler
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 
 								/*--------     Setup   ------*/
-		Session&							_newSession();
+		Session*							_newSession();
 		std::string							_generateSessionId();
 		std::string							_generateRandomString(size_t length);
 };

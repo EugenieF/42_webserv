@@ -16,7 +16,7 @@ Response::Response(Block *server, Request* request, Env& env, Session& session):
 	_fd(request->getFd()),
 	_env(&env),
 	_cgipath(""),
-	_session(session)
+	_session(&session)
 {
 	_initHttpMethods();
 }
@@ -863,16 +863,11 @@ void	Response::_initHttpMethods()
 void	Response::_fillCookieHeader()
 {
 	// #ifdef COOKIE
-	_response += _session.getCookieHeader();
+	_response += _session->getCookieHeader();
 	// #endif
 }
 
-Session&		Response::getSession()
+const Session*	Response::getSession() const
 {
-	return (_session);
-}
-
-const Session&	Response::getSession() const
-{
-	return (_session);
+	return (*_session);
 }

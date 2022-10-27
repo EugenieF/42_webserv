@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/27 12:07:19 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/27 12:57:11 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void Server::_displayServer() const {
 
 // Bonus -----------------------------------------
 
-Session&	Server::lookupSession(const listOfCookies& requestCookies)
+Session*	Server::lookupSession(const listOfCookies& requestCookies)
 {
 	return (_sessionHandler.lookupSession(requestCookies));
 }

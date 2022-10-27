@@ -122,14 +122,14 @@ SessionHandler::SessionHandler()
 	srand(std::time(NULL));
 }
 
-Session&	SessionHandler::_newSession()
+Session*	SessionHandler::_newSession()
 {
 	std::string		newId;
 
 	newId = _generateSessionId();
-	Session	newSession(newId);
+	Session newSession(newId);
 	_sessions.insert(_sessions.end(), newSession);
-	return (newSession);
+	return (&newSession);
 }	
 
 std::string 	SessionHandler::_generateRandomString(size_t length)
@@ -171,7 +171,7 @@ const SessionHandler::listOfSessions&	SessionHandler::getSessions() const
 	return (_sessions);
 }
 
-Session&	SessionHandler::findSession(const std::string& sessionId)
+Session*	SessionHandler::findSession(const std::string& sessionId)
 {
 	listOfSessions::iterator	ite;
 
@@ -182,7 +182,7 @@ Session&	SessionHandler::findSession(const std::string& sessionId)
 			if (ite->sessionIsAlive())
 			{
 				ite->updateTime();
-				return (*ite);
+				return (&(*ite));
 			}
 			_sessions.erase(ite);
 			break ;
@@ -203,17 +203,17 @@ std::string	SessionHandler::getCookieSID(const listOfCookies& cookies)
 	return ("");
 }
 
-Session&	SessionHandler::lookupSession(const listOfCookies& requestCookies)
+Session*	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 {
-	std::string						sessionId;
-	Session							session;
+	std::string			sessionId;
+	Session				*session;
 
 	sessionId = getCookieSID(requestCookies);
 	if (sessionId == "")
 		session = _newSession();
 	else
 		session = findSession(sessionId);
-	session.fillCookies(requestCookies);
-	// session.getCookies().display();
+	session->fillCookies(requestCookies);
+	// session->getCookies().display();
 	return (session);
 }

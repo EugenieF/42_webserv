@@ -54,7 +54,7 @@ class   Response
 		std::string						_cgiextra;
 		std::string						_cgiquery;
 		std::string						_cgipath;
-		Session							_session;
+		Session*						_session;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -92,7 +92,6 @@ class   Response
 		std::string						getCgiExtra() const;
 		std::string						getCgiQuery() const;
 		const Env&						getEnv() const;
-		Session&						getSession();
 		const Session&					getSession() const;
 
 	private:

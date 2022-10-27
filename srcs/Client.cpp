@@ -63,12 +63,12 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
 
 void	Client::generateResponse()
 {
-	Session		session;
+	Session* session;
 
+	session = _runningServer.first->lookupSession(_request->getCookies());
 	if (_response)
 		delete _response;
-	session = _runningServer.first->lookupSession(_request->getCookies());
-	_response = new Response(_selectVirtualServer(), _request, _env, session);
+	_response = new Response(_selectVirtualServer(), _request, _env, &session);
 	_response->generateResponse();
 }
 
