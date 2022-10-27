@@ -148,15 +148,19 @@ void	Session::completePurchase(const std::string& name, const std::string& conte
 	}
 }
 
-void	Session::deletePurchase(const std::string& id)
+bool	Session::deletePurchase(const std::string& id)
 {
 	listOfPurchases::iterator	ite;
 
 	for (ite = _order.begin(); ite != _order.end(); ite++)
 	{
 		if (ite->getId() == id)
+		{
 			_order.erase(ite);
+			return (true);
+		}
 	}	
+	return (false);
 }
 
 std::string		Session::getCookieHeader()

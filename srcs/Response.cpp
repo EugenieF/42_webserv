@@ -411,15 +411,19 @@ void	Response::_runDeleteMethod()
 {
 	int				ret;
 	std::string		uri;
+	bool			deleted;
 
 	uri = _request->getPath();
 	if (uri.find("/form_delete/") == 0)
 	{
-		std::cout << GREEN << "uri.substr(14)" << uri.substr(14) << RESET << NL;
-		_session->deletePurchase(uri.substr(14));
-		_body = _generateFormAcceptPage();
-		displayMsg(" 🚫 Purchase was successfully deleted", LIGHT_GREEN);
-		return ;
+		std::cout << GREEN << "uri.substr(14) = '" << uri.substr(14) << "'" <<RESET << NL;
+		deleted = _session->deletePurchase(uri.substr(14));
+		if (deleted)
+		{
+			_body = _generateFormAcceptPage();
+			displayMsg(" 🚫 Purchase " + uri.substr(14) + " was successfully deleted", LIGHT_GREEN);
+			return ;
+		}
 	}
 	ret = std::remove(_builtPath.c_str());
 	if (ret)

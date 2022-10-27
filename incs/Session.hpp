@@ -58,8 +58,7 @@ class Session
 
 						/*--------  Purchase  -------*/
 		void					completePurchase(const std::string& name, const std::string& content);
-		void					deletePurchase(listOfPurchases::iterator ite);
-		void					deletePurchase(const std::string& id);
+		bool					deletePurchase(const std::string& id);
 		void					displayCookies() const;
 
 	private:
