@@ -60,7 +60,7 @@ class   Response
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
-        Response(Block* server, Request* request, Env& env, Session& session);
+        Response(Block* server, Request* request, Env& env, Session* session);
         Response(const Response& other);
         ~Response();
         Response&    					operator=(const Response& other);

@@ -5,7 +5,7 @@
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response(Block *server, Request* request, Env& env, Session& session):
+Response::Response(Block *server, Request* request, Env& env, Session* session):
 	_server(server),
 	_request(request),
 	_response(""),
@@ -16,7 +16,7 @@ Response::Response(Block *server, Request* request, Env& env, Session& session):
 	_fd(request->getFd()),
 	_env(&env),
 	_cgipath(""),
-	_session(&session)
+	_session(session)
 {
 	_initHttpMethods();
 }
