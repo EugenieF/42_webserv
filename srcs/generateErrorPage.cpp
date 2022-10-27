@@ -119,17 +119,18 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
-				<form id=\"form_delete\" action=\"/form_delete/" + ite->getId() + "\">\n\
+				<form id=\"form_delete\" action=\"/form_delete/" + ite->getId() + "\" method=\"POST\">\n\
+					<center><input type=\"hidden\" name=\"_method\" value=\"DELETE\" /></center>\n\
 					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" /></center>\n\
-				<script>\n\
-					const form = document.getElementById(\"form_delete\");\n\
-					form.addEventListener(\"submit\", formSubmit);\n\
-					function formSubmit {\n\
-						fetch(form.action, {method: \"DELETE\"})\n\
-					}\n\
-				</script>\n\
 				</form>\n\n";
 	}
+	// <script>\n\
+				// 	const form = document.getElementById(\"form_delete\");\n\
+				// 	form.addEventListener(\"submit\", formSubmit);\n\
+				// 	function formSubmit {\n\
+				// 		fetch(form.action, {method: \"DELETE\"})\n\
+				// 	}\n\
+				// </script>\n\
 
 	htmlPage += \
 				"<form action=\"/form.html\">\n\
