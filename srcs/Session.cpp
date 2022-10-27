@@ -143,11 +143,10 @@ void	SessionHandler::_deleteSession(listOfSessions::iterator ite)
 {
 	Session*	tmp;
 
-	tmp = *ite
+	tmp = *ite;
 	_sessions.erase(ite);
 	delete tmp;
 	tmp = NULL;
-
 }
 
 Session*	SessionHandler::_newSession()

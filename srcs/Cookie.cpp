@@ -47,5 +47,5 @@ std::string		Cookie::getValue() const
 
 void	Cookie::display() const
 {
-	std::cout << _name << " = " << _value << std::endl;
+	std::cout << RED << _name << " = " << _value << RESET << std::endl;
 }

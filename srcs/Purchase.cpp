@@ -12,7 +12,7 @@ Purchase::Purchase(const Purchase& other)
 	*this = other;
 }
 
-Purchase::Purchase&		operator=(const Purchase& other)
+Purchase&	Purchase::operator=(const Purchase& other)
 {
 	if (this != &other)
 	{
@@ -55,3 +55,17 @@ bool	Purchase::isEmpty() const
     return (_name.empty() || _hamster.empty() || _color.empty());
 }
 
+std::string		Purchase::getName() const
+{
+    return (_name);
+}
+
+std::string		Purchase::getHamster() const
+{
+    return (_hamster);
+}
+
+std::string		Purchase::getColor() const
+{
+    return (_color);
+}
