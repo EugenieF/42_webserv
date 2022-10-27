@@ -120,7 +120,8 @@ std::string		Response::_generateFormOrderPage()
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
 				<form id=\"form_delete\" action=\"/form_delete/" + ite->getId() + "\" method=\"POST\">\n\
-					<center><input type=\"hidden\" name=\"_method\" value=\"DELETE\" /></center>\n\
+					<input type=\"hidden\" name=\"_method\" value=\"DELETE\" />\n\
+					<input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token() }}\">\n\
 					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" /></center>\n\
 				</form>\n\n";
 	}
