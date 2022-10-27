@@ -113,6 +113,15 @@ std::string		Session::getCookieHeader()
 	return (header);
 }
 
+void	Session::displayCookies() const
+{
+	listOfCookies::const_iterator	ite;
+
+	std::cout << "List of Cookies :" << std::endl;
+	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
+		ite->display();
+}
+
 /******************************************************************************/
 /*                           CLASS SESSION HANDLER                            */
 /******************************************************************************/
@@ -232,7 +241,7 @@ Session*	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 	else
 		session = _findSession(sessionId);
 	session->fillCookies(requestCookies);
-	// session->getCookies().display();
+	session->displayCookies();
 	return (session);
 }
 

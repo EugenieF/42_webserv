@@ -88,6 +88,7 @@ class SessionHandler
 		listOfSessions&						getSessions();
 		const listOfSessions&				getSessions() const;
 
+		void								displayCookies() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
