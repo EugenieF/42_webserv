@@ -350,9 +350,9 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 	}
 	file.close();
 	if (_statusCode == CREATED)
-		displayMsg(" 📝 File " + path + " was successfully created", LIGHT_GREEN);
+		displayMsg(" ✅📄 File " + path + " was successfully created", LIGHT_GREEN);
 	else
-		displayMsg(" 📝 File " + path + " was completed", LIGHT_GREEN);
+		displayMsg(" ✅📝 File " + path + " was completed", LIGHT_GREEN);
 	setStatusCode(NO_CONTENT);
 }
 
@@ -436,7 +436,7 @@ void	Response::_runDeleteMethod()
 	}
  	/* Successfull case */
 	setStatusCode(NO_CONTENT);
-	displayMsg(" 🚫 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
+	displayMsg(" ❎📄 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
 }
 
 /******************************************************************************/

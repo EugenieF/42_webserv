@@ -128,8 +128,8 @@ void	Session::_addCookie(const std::string& name, const std::string& value)
 
 void    Session::_addPurchaseInOrder()
 {
-	std::cout << YELLOW << "***** order.size() = " << _order.size() << RESET << NL;
 	_order.insert(_order.end(), Purchase(_purchase));
+	displayMsg(" ✅🛒 Hamster " + _purchase.getHamster() + " has been successfully added to your shopping basket ", LIGHT_GREEN);
 	_initPurchase();
 }
 
@@ -153,15 +153,14 @@ bool	Session::deletePurchase(const std::string& id)
 {
 	listOfPurchases::iterator	ite;
 
-	std::cout << GREEN << "***** order.size() = " << _order.size() << RESET << NL;
 	for (ite = _order.begin(); ite != _order.end(); ite++)
 	{
 		std::cout << RED << "[" << ite->getId() << "] | [" << id << "]" << RESET << NL;
 		if (ite->getId() == id)
 		{
 			_order.erase(ite);
-			displayMsg(" 🚫 Purchase " + ite->getName() + "/" + ite->getHamster() + "/" + ite->getColor() + "/"
-				+ ite->getId() + " was successfully deleted", LIGHT_GREEN);
+			displayMsg(" ❎🐹 Purchase [" + ite->getName() + "; " + ite->getHamster() + "; "
+				+ ite->getColor() + "] was successfully deleted", LIGHT_GREEN);
 			return (true);
 		}
 	}	
