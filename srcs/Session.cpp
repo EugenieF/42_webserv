@@ -13,7 +13,7 @@ Session::Session(const std::string& id)
 {
 	updateTime();
 	_id = id;
-	addCookie("SID", id);
+	_addCookie(SESSION_ID, id);
 }
 
 Session::Session(const Session& other)
@@ -82,7 +82,7 @@ void	Session::fillCookies(const listOfCookies& cookies)
 
 	for (ite = cookies.begin(), count = 0; ite != cookies.end(); ite++, count++)
 	{
-		if (ite->getName() != "SID")
+		if (ite->getName() != SESSION_ID)
 			_addCookie(ite->getName(), ite->getValue());
 		if (count > 150)
 			throw(PAYLOAD_TOO_LARGE);
@@ -104,14 +104,18 @@ void    Session::_addPurchaseInOrder()
 
 void	Session::completePurchase(const std::string& name, const std::string& content)
 {
-    if (name == "name")
+    if (name == "name") {
         _purchase.setName(content);
-    else if (name == "hamster")
+	}
+    else if (name == "hamster") {
         _purchase.setHamster(content);
-    else if (name == "color")
+	}
+    else if (name == "color") {
         _purchase.setColor(content);
-	if (_purchase.isComplete())
+	}
+	if (_purchase.isComplete()) {
 		_addPurchaseInOrder();
+	}
 }
 
 void	Session::deletePurchase(listOfPurchases::iterator ite)
@@ -125,7 +129,7 @@ std::string		Session::getCookieHeader()
 	listOfCookies::const_iterator	ite;
 
 	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
-		header += "Set-Cookies: " + ite->getName() + "=" + ite->getValue() + "\r\n";
+		header += "Set-Cookie: " + ite->getName() + "=" + ite->getValue() + "\r\n";
 	return (header);
 }
 
@@ -214,7 +218,7 @@ std::string		SessionHandler::_generateSessionId()
 	return (sessionId);
 }
 
-listOfSessions::iterator	SessionHandler::_findSessionIte(const std::string& sessionId)
+SessionHandler::listOfSessions::iterator	SessionHandler::_findSessionIte(const std::string& sessionId)
 {
 	listOfSessions::iterator	ite;
 
@@ -252,7 +256,7 @@ std::string	SessionHandler::_getCookieSID(const listOfCookies& cookies)
 
 	for (ite = cookies.begin(); ite != cookies.end(); ite++)
 	{
-		if (ite->getName() == "SID")
+		if (ite->getName() == SESSION_ID)
 			return (ite->getValue());
 	}
 	return ("");

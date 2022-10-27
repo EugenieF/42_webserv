@@ -3,6 +3,7 @@
 
 # define SESSION_ID_LENGTH 16
 # define SESSION_TIMEOUT 1000
+# define SESSION_ID	"sessionId"
 
 # include "utils.hpp"
 # include "Cookie.hpp"
