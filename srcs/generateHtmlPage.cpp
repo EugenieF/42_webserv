@@ -139,7 +139,13 @@ std::string		Response::_generateFormOrderPage()
 				<script>\n\
 					function deleteData() {\n\
 						var id = document.getElementById(\"selectedItemId\").value;\n\
-						alert('Button clicked ' + ${id});\n\
+						alert('Button clicked ' + id);\n\
+						fetch(`/form_delete/${id}`, {\n\
+							method: 'DELETE'\n\
+						})\n\
+						.then(response => {\n\
+							console.log('OK')'\n\
+						})\n\
 					}\n\
 				</script>\n\
 			</body>\n\
