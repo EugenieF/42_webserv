@@ -409,25 +409,27 @@ void	Response::_runPostMethod()
 /* Remove all current representations of the target resource. */
 void	Response::_runDeleteMethod()
 {
-	int	ret;
+	int				ret;
+	std::string		uri;
 
-	//DEBUG("Delete method");
-	if (_request->getPath() == "/form_delete")
+	uri = _request->getPath();
+	if (uri.find("/form_delete/") == 0)
 	{
-		// _session->getOrder().deletePurchase();
+		std::cout << GREEN << "uri.substr(14)" << uri.substr(14) << RESET << NL;
+		_session->deletePurchase(uri.substr(14));
+		_body = _generateFormAcceptPage();
 		displayMsg(" 🚫 Purchase was successfully deleted", LIGHT_GREEN);
+		return ;
 	}
-	else
+	ret = std::remove(_builtPath.c_str());
+	if (ret)
 	{
-		ret = std::remove(_builtPath.c_str());
-		if (ret)
-		{
-			/* Error case */
-			throw (_findErrorCode());
-		}
-		displayMsg(" 🚫 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
-	} /* Successfull case */
+		/* Error case */
+		throw (_findErrorCode());
+	}
+ 	/* Successfull case */
 	setStatusCode(NO_CONTENT);
+	displayMsg(" 🚫 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
 }
 
 /******************************************************************************/

@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 23:27:09 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/27 16:01:43 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ std::string		trimSpacesStr(std::string *str, const char *toTrim = " \t");
 std::string		trimSpacesEndStr(std::string *str, const char *toTrim = " \t");
 std::string		readFd(int fd);
 char*			clone_str(const std::string& str);
+std::string		generateRandomString(size_t length);
 
 		/*--------  File related  -------*/
 

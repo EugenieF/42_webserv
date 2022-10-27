@@ -2,13 +2,6 @@
 
 Purchase::Purchase() {}
 
-Purchase::Purchase(const std::string& name, const std::string& hamster, const std::string& color)
-{
-	_name = name;
-	_hamster = hamster;
-	_color = color;
-}
-
 Purchase::Purchase(const Purchase& other)
 {
 	*this = other;
@@ -21,10 +14,10 @@ Purchase&	Purchase::operator=(const Purchase& other)
 		_name = other.getName();
 		_hamster = other.getHamster();
 		_color = other.getColor();
+		_id = other.getId();
 	}
 	return (*this);
 }
-
 
 Purchase::~Purchase() {}
 
@@ -37,7 +30,7 @@ void	Purchase::display() const
 
 bool	Purchase::isComplete() const
 {
-    return (!_name.empty() && !_hamster.empty() && !_color.empty());
+    return (!_name.empty() && !_hamster.empty() && !_color.empty() && !_id.empty());
 }
 
 std::string		Purchase::getName() const
@@ -55,6 +48,11 @@ std::string		Purchase::getColor() const
     return (_color);
 }
 
+std::string		Purchase::getId() const
+{
+	return (_id);
+}
+
 void	Purchase::setName(const std::string& name)
 {
 	_name = name;
@@ -68,4 +66,9 @@ void	Purchase::setHamster(const std::string& hamster)
 void	Purchase::setColor(const std::string& color)
 {
 	_color = color;
+}
+
+void	Purchase::setId(const std::string& id)
+{
+	_id = id;
 }

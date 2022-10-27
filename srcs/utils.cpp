@@ -111,6 +111,23 @@ std::string readFd(int fd) {
 	return (str);
 }
 
+std::string		generateRandomString(size_t length)
+{
+	std::string		charset;
+	int				pos;
+	size_t			maxIndex;
+	std::string		randomStr;
+
+	charset = "0123456789abcdefghijklmnopqrstuvwxyz";
+	maxIndex = charset.size() - 1;
+	while(randomStr.size() != length)
+	{
+		pos = ((rand() % maxIndex));
+		randomStr += charset.substr(pos, 1);
+	}
+	return (randomStr);
+}
+
 /******************************************************************************/
 /*                               FILE RELATED                                 */
 /******************************************************************************/

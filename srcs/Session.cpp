@@ -7,6 +7,7 @@
 Session::Session()
 {
 	updateTime();
+	_initPurchase();
 }
 
 Session::Session(const std::string& id)
@@ -14,6 +15,7 @@ Session::Session(const std::string& id)
 	updateTime();
 	_id = id;
 	_addCookie(SESSION_ID, id);
+	_initPurchase();
 }
 
 Session::Session(const Session& other)
@@ -34,6 +36,36 @@ Session&	Session::operator=(const Session& other)
 }
 
 Session::~Session() {}
+
+bool	Session::_idIsUnique(const std::string& id)
+{
+	listOfPurchases::const_iterator	ite;
+
+	for (ite = _order.begin(); ite != _order.end(); ite++)
+	{
+		if (ite->getId() == id)
+			return (false);
+	}
+	return (true);
+}
+
+std::string		Session::_generatePurchaseId()
+{
+	std::string						id;
+
+	id = generateRandomString(PURCHASE_ID_LENGTH);
+	while (!_idIsUnique(id))
+		id = generateRandomString(PURCHASE_ID_LENGTH);
+	return (id);
+}
+
+void	Session::_initPurchase()
+{
+	_purchase.setName("");
+	_purchase.setHamster("");
+	_purchase.setColor("");
+	_purchase.setId(_generatePurchaseId());
+}
 
 size_t	Session::getTime() const
 {
@@ -97,9 +129,7 @@ void	Session::_addCookie(const std::string& name, const std::string& value)
 void    Session::_addPurchaseInOrder()
 {
 	_order.insert(_order.end(), Purchase(_purchase));
-	_purchase.setName("");
-	_purchase.setHamster("");
-	_purchase.setColor("");
+	_initPurchase();
 }
 
 void	Session::completePurchase(const std::string& name, const std::string& content)
@@ -118,9 +148,15 @@ void	Session::completePurchase(const std::string& name, const std::string& conte
 	}
 }
 
-void	Session::deletePurchase(listOfPurchases::iterator ite)
+void	Session::deletePurchase(const std::string& id)
 {
-	_order.erase(ite);
+	listOfPurchases::const_iterator	ite;
+
+	for (ite = _order.begin(); ite != _order.end(); ite++)
+	{
+		if (ite->getId() == id)
+			_order.erase(ite);
+	}	
 }
 
 std::string		Session::getCookieHeader()
@@ -187,23 +223,6 @@ Session*	SessionHandler::_newSession()
 	newSession = new Session(newId);
 	_sessions.insert(_sessions.end(), newSession);
 	return (newSession);
-}	
-
-std::string 	SessionHandler::_generateRandomString(size_t length)
-{
-	std::string		charset;
-	int				pos;
-	size_t			maxIndex;
-	std::string		randomStr;
-
-	charset = "0123456789abcdefghijklmnopqrstuvwxyz";
-	maxIndex = charset.size() - 1;
-	while(randomStr.size() != length)
-	{
-		pos = ((rand() % maxIndex));
-		randomStr += charset.substr(pos, 1);
-	}
-	return (randomStr);
 }
 
 /* Generate unique Identifier for the new Session */
@@ -211,9 +230,9 @@ std::string		SessionHandler::_generateSessionId()
 {
 	std::string		sessionId;
 
-	sessionId = _generateRandomString(SESSION_ID_LENGTH);
+	sessionId = generateRandomString(SESSION_ID_LENGTH);
 	while (_findSessionIte(sessionId) != _sessions.end())
-		sessionId = _generateRandomString(SESSION_ID_LENGTH);
+		sessionId = generateRandomString(SESSION_ID_LENGTH);
 	DEBUG("SESSION ID = " + sessionId);
 	return (sessionId);
 }

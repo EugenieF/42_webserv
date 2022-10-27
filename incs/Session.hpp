@@ -59,6 +59,7 @@ class Session
 						/*--------  Purchase  -------*/
 		void					completePurchase(const std::string& name, const std::string& content);
 		void					deletePurchase(listOfPurchases::iterator ite);
+		void					deletePurchase(const std::string& id);
 		void					displayCookies() const;
 
 	private:
@@ -66,7 +67,10 @@ class Session
 		void					_addCookie(const std::string& name, const std::string& value);
 
 						/*--------  Purchase  -------*/
+		void					_initPurchase();
+		std::string				_generatePurchaseId();
 		void					_addPurchaseInOrder();
+		bool					_idIsUnique(const std::string& id);
 };
 
 /******************************************************************************/
@@ -103,7 +107,6 @@ class SessionHandler
 								/*--------     Setup   ------*/
 		Session*							_newSession();
 		std::string							_generateSessionId();
-		std::string							_generateRandomString(size_t length);
 
 								/*--------     find   ------*/
 		Session*							_findSession(const std::string& sessionId);
