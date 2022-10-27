@@ -35,7 +35,10 @@ Session&	Session::operator=(const Session& other)
 	return (*this);
 }
 
-Session::~Session() {}
+Session::~Session() 
+{
+	std::cout << GREEN << "*****Destructor" << RESET << NL;
+}
 
 bool	Session::_idIsUnique(const std::string& id)
 {
@@ -128,6 +131,7 @@ void	Session::_addCookie(const std::string& name, const std::string& value)
 
 void    Session::_addPurchaseInOrder()
 {
+	std::cout << YELLOW << "***** order.size() = " << _order.size() << RESET << NL;
 	_order.insert(_order.end(), Purchase(_purchase));
 	_initPurchase();
 }
@@ -152,6 +156,7 @@ bool	Session::deletePurchase(const std::string& id)
 {
 	listOfPurchases::iterator	ite;
 
+	std::cout << GREEN << "***** order.size() = " << _order.size() << RESET << NL;
 	for (ite = _order.begin(); ite != _order.end(); ite++)
 	{
 		std::cout << RED << "[" << ite->getId() << "] | [" << id << "]" << RESET << NL;
@@ -226,6 +231,7 @@ Session*	SessionHandler::_newSession()
 	std::string		newId;
 	Session*		newSession;
 
+	std::cout << YELLOW << "******* new session *******" << RESET << NL;
 	newId = _generateSessionId();
 	newSession = new Session(newId);
 	_sessions.insert(_sessions.end(), newSession);

@@ -141,7 +141,8 @@ std::string		Response::_generateFormOrderPage()
 					function deleteData(id) {\n\
 						alert('Button clicked ' + id);\n\
 						fetch(`/form_delete/${id}`, {\n\
-							method: \"DELETE\"\n\
+							method: 'DELETE',\n\
+							credentials: 'include'\n\
 						})\n\
 						.then(response => {\n\
 							console.log('OK');\n\
