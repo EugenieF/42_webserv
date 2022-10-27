@@ -258,7 +258,27 @@ SessionHandler::listOfSessions::iterator	SessionHandler::_findSessionIte(const s
 	return (ite);
 }
 
-Session*	SessionHandler::_findSession(const std::string& sessionId)
+// Session*	SessionHandler::_matchSession(const std::string& sessionId)
+// {
+// 	listOfSessions::iterator	ite;
+
+// 	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
+// 	{
+// 		if ((*ite)->getId() == sessionId)
+// 		{
+// 			if ((*ite)->sessionIsAlive())
+// 			{
+// 				(*ite)->updateTime();
+// 				return (*ite);
+// 			}
+// 			_deleteSession(ite);
+// 			break ;
+// 		}
+// 	}
+// 	return (_newSession());
+// }
+
+bool	SessionHandler::_matchSession(const std::string& sessionId, Session* session)
 {
 	listOfSessions::iterator	ite;
 
@@ -269,37 +289,37 @@ Session*	SessionHandler::_findSession(const std::string& sessionId)
 			if ((*ite)->sessionIsAlive())
 			{
 				(*ite)->updateTime();
-				return (*ite);
+				session = *ite;
+				return (true);
 			}
 			_deleteSession(ite);
 			break ;
 		}
 	}
-	return (_newSession());
+	return (false);
 }
 
-std::string	SessionHandler::_getCookieSID(const listOfCookies& cookies)
+Session*	SessionHandler::_findSession(const listOfCookies& cookies)
 {
 	listOfCookies::const_iterator	ite;
+	Session							*session;
 
 	for (ite = cookies.begin(); ite != cookies.end(); ite++)
 	{
 		if (ite->getName() == SESSION_ID)
-			return (ite->getValue());
+		{
+			if (_matchSession(ite->getValue(), session))
+				return (session);
+		}
 	}
-	return ("");
+	return (_newSession());
 }
 
 Session*	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 {
-	std::string			sessionId;
-	Session				*session;
+	Session		*session;
 
-	sessionId = _getCookieSID(requestCookies);
-	if (sessionId == "")
-		session = _newSession();
-	else
-		session = _findSession(sessionId);
+	session = _findSession(requestCookies);
 	session->fillCookies(requestCookies);
 	session->displayCookies();
 	return (session);
