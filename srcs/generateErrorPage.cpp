@@ -121,7 +121,7 @@ std::string		Response::_generateFormOrderPage()
 				</div>\n\
 				<form>\n\
 					<input type=\"hidden\" id=\"selectedItemId\" value=\"" + ite->getId() + "\">\n\
-					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"button\" onClick=\"deleteData();\" /></center>\n\
+					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" onClick=\"return deleteData();\" /></center>\n\
 				</form>\n\n";
 	}
 
