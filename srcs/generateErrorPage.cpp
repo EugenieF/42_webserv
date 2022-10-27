@@ -124,13 +124,14 @@ std::string		Response::_generateFormOrderPage()
 					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" /></center>\n\
 				</form>\n\n";
 	}
-	// <script>\n\
+/* <script>\n\
 				// 	const form = document.getElementById(\"form_delete\");\n\
 				// 	form.addEventListener(\"submit\", formSubmit);\n\
 				// 	function formSubmit {\n\
 				// 		fetch(form.action, {method: \"DELETE\"})\n\
 				// 	}\n\
 				// </script>\n\
+*/
 
 	htmlPage += \
 				"<form action=\"/form.html\">\n\
