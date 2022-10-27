@@ -406,25 +406,29 @@ void	Response::_runPostMethod()
 /*                               DELETE METHOD                                */
 /******************************************************************************/
 
+bool	Response::_deletePurchase(const std::string& uri)
+{
+	std::string	id;
+
+	if (uri.find("/form_delete/") == 0)
+	{
+		id = uri.substr(13);
+		if (_session->deletePurchase(id))
+		{
+			_body = _generateFormAcceptPage();
+			return (true);
+		}
+	}
+	return (false);
+}
+
 /* Remove all current representations of the target resource. */
 void	Response::_runDeleteMethod()
 {
-	int				ret;
-	std::string		uri;
-	bool			deleted;
+	int		ret;
 
-	uri = _request->getPath();
-	if (uri.find("/form_delete/") == 0)
-	{
-		std::cout << GREEN << "uri.substr(14) = '" << uri.substr(13) << "'" <<RESET << NL;
-		deleted = _session->deletePurchase(uri.substr(13));
-		if (deleted)
-		{
-			_body = _generateFormAcceptPage();
-			displayMsg(" 🚫 Purchase " + uri.substr(13) + " was successfully deleted", LIGHT_GREEN);
-			return ;
-		}
-	}
+	if (_deletePurchase(_request->getPath()))
+		return ;	
 	ret = std::remove(_builtPath.c_str());
 	if (ret)
 	{

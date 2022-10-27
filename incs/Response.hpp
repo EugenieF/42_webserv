@@ -122,6 +122,7 @@ class   Response
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod();
+		bool							_deletePurchase(const std::string& uri);
 
 						/*-------   Path    ------*/
 		std::string						_buildPath();
