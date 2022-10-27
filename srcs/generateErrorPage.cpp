@@ -119,13 +119,38 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
-				<form>\n\
-					<input type=\"hidden\" id=\"selectedItemId\" value=\"" + ite->getId() + "\">\n\
-					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" onClick=\"return deleteData();\" /></center>\n\
-				</form>\n\n";
+				<div>\n\
+					<center><button onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n\
+				<div>\n\n\n";
 	}
 
-/* <script>\n\
+	htmlPage += \
+				"<form action=\"/form.html\">\n\
+					<center><input type=\"submit\" value=\"Go acheter un nouvel ami !\" class=\"bouton\" /></center>\n\
+				</form>\n\
+				<form action=\"/index.html\">\n\
+					<center><input type=\"submit\" value=\"Retour vers la page d'accueil\" class=\"bouton\" /></center>\n\
+				</form>\n\
+				</div>\n\
+				<script>\n\
+					function deleteData() {\n\
+						alert('Button clicked');\n\
+					}\n\
+				</script>\n\
+			</body>\n\
+		</html>\n";
+	return (htmlPage);
+}
+
+/*
+					<input type=\"hidden\" id=\"selectedItemId\" value=\"" + ite->getId() + "\">\n\
+						/ var id = document.getElementById(\"selectedItemId\").value;\n\
+						// const deleted = await fetch(`/form_delete/${id}`, {\n\
+						// 	method: \"DELETE\"\n\
+						// });\n\
+
+
+<script>\n\
 				<form action=\"/form_delete/" + ite->getId() + "\">\n\
 				// 	const form = document.getElementById(\"form_delete\");\n\
 				// 	form.addEventListener(\"submit\", formSubmit);\n\
@@ -136,25 +161,3 @@ std::string		Response::_generateFormOrderPage()
 					<input type=\"hidden\" name=\"_method\" value=\"DELETE\" />\n\
 					<input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token() }}\">\n\
 */
-
-	htmlPage += \
-				"<form action=\"/form.html\">\n\
-					<center><input type=\"submit\" value=\"Go acheter un nouvel ami !\" class=\"bouton\" /></center>\n\
-				</form>\n\
-				<form action=\"/index.html\">\n\
-					<center><input type=\"submit\" value=\"Retour vers la page d'accueil\" class=\"bouton\" /></center>\n\
-				</form>\n\
-				</div>\n\
-					<script>\n\
-						function deleteData() {\n\
-							var id = document.getElementById(\"selectedItemId\").value;\n\
-							alert('Button clicked');\n\
-							const deleted = await fetch(`/form_delete/${id}`, {\n\
-								method: \"DELETE\"\n\
-							});\n\
-						}\n\
-					</script>\n\
-			</body>\n\
-		</html>\n";
-	return (htmlPage);
-}
