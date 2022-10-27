@@ -103,7 +103,7 @@ class SessionHandler
 
 								/*--------   Cleanup  ------*/
 		void								_deleteSessions();
-		void								_deleteSession(listOfSessions::iterator session);
+		void								_deleteSession(listOfSessions::iterator ite);
 };
 
 #endif
