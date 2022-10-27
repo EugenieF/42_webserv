@@ -119,13 +119,15 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
-				<form id=\"form_delete\" action=\"/form_delete/" + ite->getId() + "\">\n\
-					<center><input type=\"button\" value=\"Jeter votre hamster et reformuler une adoption\" onclick=\"deleteData\" class=\"bouton\" /></center>\n\
+				<form action=\"/form_delete/" + ite->getId() + "\">\n\
+					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" onclick=\"deleteData();\" /></center>\n\
 					<script>\n\
 						function deleteData() {\n\
-							fetch(form.action,  {\n\
-							method: 'DELETE'\n\
-							})\n\
+							alert('Button clicked');\n\
+							const deleted = await fetch(form.action, {\n\
+							method: \"DELETE\"\n\
+							});\n\
+							return true;\n\
 						}\n\
 					</script>\n\
 				</form>\n\n";
