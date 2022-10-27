@@ -110,7 +110,7 @@ std::string		Session::getCookieHeader()
 	listOfCookies::const_iterator	ite;
 
 	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
-		header += "Set-Cookies: " + ite->getName() + "=" + ite->getValue() + "\r\n";
+		header += "Set-Cookie: " + ite->getName() + "=" + ite->getValue() + "\r\n";
 	return (header);
 }
 
@@ -199,7 +199,7 @@ std::string		SessionHandler::_generateSessionId()
 	return (sessionId);
 }
 
-listOfSessions::iterator	SessionHandler::_findSessionIte(const std::string& sessionId)
+SessionHandler::listOfSessions::iterator	SessionHandler::_findSessionIte(const std::string& sessionId)
 {
 	listOfSessions::iterator	ite;
 
@@ -237,7 +237,7 @@ std::string	SessionHandler::_getCookieSID(const listOfCookies& cookies)
 
 	for (ite = cookies.begin(); ite != cookies.end(); ite++)
 	{
-		if (ite->getName() == "SID")
+		if (ite->getName() == "sessionId")
 			return (ite->getValue());
 	}
 	return ("");
