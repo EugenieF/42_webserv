@@ -7,8 +7,7 @@
 
 #include "Block.hpp"
 #include "utils.hpp"
-
-# include "Cookie.hpp"
+# include "Session.hpp"
 
 # define UNDEFINED_PORT -1
 
@@ -28,6 +27,7 @@ class   Request
 		typedef void (Request::*parsingFunction)();
 		typedef std::vector<parsingFunction>		listOfParsingFunctions;
 		typedef std::map<std::string, std::string>	listOfHeaders;
+		typedef Session::listOfCookies				listOfCookies;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -47,6 +47,7 @@ class   Request
 		size_t						_payloadSize;
 		int							_fd;
 		std::string					_query;
+		listOfCookies				_cookies;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -82,6 +83,8 @@ class   Request
 		int							getFd() const;
 		std::string					getMethodStr() const; // Can be replaced by global
 		std::string					getQuery() const;
+		// listOfCookies&				getCookies();
+		const listOfCookies&		getCookies() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
@@ -100,7 +103,6 @@ class   Request
 		void						_checkHeaders();
 		void						_parseBody();
 		bool						_parseHostHeader();
-		void						_parseExtraHeader();
 		void						_decodeChunks();
 
 						/*------   Utils  ------*/
@@ -113,16 +115,10 @@ class   Request
 		bool						_headerIsSet(const std::string& headerName);
 		void						_checkSizeBody();
 
-	/**************************     BONUS    **************************/
-	#ifdef COOKIE
-    public:
-		Cookie&						getCookies();
-		const Cookie&				getCookies() const;
-
-	private:
-		Cookie						_cookies;
+						/*------   Cookies  ------*/
 		void						_parseCookies();
-	#endif
+		void						_setCookies(std::string header);
+		void						_addCookie(const std::string& name, const std::string& value);
 };
 
 #endif

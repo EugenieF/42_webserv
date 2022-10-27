@@ -49,7 +49,7 @@ class Session
 		void					updateTime();
 
 						/*-------   Cookies  -------*/
-		void					setCookies(std::string header);
+		std::string				getCookieHeader();
 		void					fillCookies(const listOfCookies& other);
 		void					addCookie(const std::string& name, const std::string& value);
 
@@ -58,12 +58,15 @@ class Session
 		void					deletePurchase(listOfPurchases::iterator ite);
 };
 
+/******************************************************************************/
+/*                           CLASS SESSION HANDLER                            */
+/******************************************************************************/
+
 class SessionHandler
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
 		typedef Session::listOfCookies		listOfCookies;
-		typedef Session::listOfPurchases	listOfPurchases;
 		typedef std::vector<Session>		listOfSessions;
 
 	private:
@@ -76,19 +79,14 @@ class SessionHandler
 		SessionHandler();
 		~SessionHandler();
 
-		listOfCookies						getSessionCookies(std::string sessionId);
-		listOfPurchases						getSessionOrder(std::string sessionId);
-
 								/*-------     Lookup   -------*/
-		std::vector<Session>::const_iterator	findSession(std::string sessionId);
-		listOfCookies							lookupSession(const Cookie& requestCookies);
+		Session&							lookupSession(const listOfCookies& requestCookies);
+		Session&							findSession(const std::string& sessionId);
+		std::string							getCookieSID(const listOfCookies& requestCookies);
 
 								/*-------     Getter   -------*/
 		listOfSessions&						getSessions();
-		const listOfSessions&					getSessions() const;
-
-		// Cookie*							fillSessionCookies(const Cookie& requestCookies);
-		// Order*							fillSessionOrder(const Order& responseOrder);
+		const listOfSessions&				getSessions() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

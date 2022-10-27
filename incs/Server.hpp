@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:07 by etran             #+#    #+#             */
-/*   Updated: 2022/10/26 17:27:20 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/27 12:07:27 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class Server {
 	public:
 		/* -- Typedef ------------------------------------------------------ */
 		typedef Parser::listOfServers		listOfServers;
-		typedef Session::listOfPurchases	listOfPurchases;
+		typedef Session::listOfCookies		listOfCookies;
 
 		Server(Block* x, char* const* env);
 		virtual ~Server();
@@ -66,14 +66,10 @@ class Server {
 		struct sockaddr_in				_addr;
 		std::string						_ip;
 		Env								_env;
-
-	/* ------ BONUS -------------------------------------------------------- */
-	private:
-		SessionHandler							_sessionHandler;
+		SessionHandler					_sessionHandler;
 
 	public:
-		Cookie*							getSessionCookies(const Cookie& requestCookies);
-		listOfPurchases					getSessionOrder(const Cookie& requestCookies);
+		Session&						lookupSession(const listOfCookies& requestCookies);
 };
 
 #endif

@@ -69,36 +69,17 @@ void	Session::updateTime()
 	_time = std::time(NULL);
 }
 
-void	Session::setCookies(std::string header)
-{
-	std::string		name;
-	std::string		value;
-	size_t			pos;
-
-	/* Limit Firefox = 150 cookies */
-	for (size_t nbOfCookies = 0; nbOfCookies < 150; nbOfCookies++)
-	{
-		pos = header.find("=");
-		if (pos == std::string::npos)
-			throw(BAD_REQUEST);
-		name = header.substr(0, pos);
-		header.erase(0, pos + 1);
-		pos = header.find("; ");
-		value = header.substr(0, pos);
-		header.erase(0, pos + 2);
-		addCookie(name, value);
-		if (pos == std::string::npos)
-			return ;
-	}
-	throw (PAYLOAD_TOO_LARGE);
-}
-
 void	Session::fillCookies(const listOfCookies& cookies)
 {
 	listOfCookies::iterator	ite;
+	size_t					count;
 
-	for (ite = cookies.begin(); ite != cookies.end(); ite++)
-		_addCookie(ite->getName(), ite->getValue());
+	for (ite = cookies.begin(), count = 0; ite != cookies.end(); ite++, count++)
+	{
+		addCookie(ite->getName(), ite->getValue());
+		if (count > 150)
+			throw(PAYLOAD_TOO_LARGE);
+	}
 }
 
 void	Session::addCookie(const std::string& name, const std::string& value)
@@ -106,7 +87,8 @@ void	Session::addCookie(const std::string& name, const std::string& value)
 	_cookies.insert(_cookies.end(), Cookie(name, value));
 }
 
-void    Session::addPurchase(const std::string& name, const std::string& hamster, const std::string& color)
+void    Session::addPurchase(
+	const std::string& name, const std::string& hamster, const std::string& color)
 {
     _order.insert(_order.end(), Purchase(name, hamster, color));
 }
@@ -114,6 +96,16 @@ void    Session::addPurchase(const std::string& name, const std::string& hamster
 void	Session::deletePurchase(listOfPurchases::iterator ite)
 {
 	_order.erase(ite);
+}
+
+std::string		Session::getCookieHeader()
+{
+	std::string						header;
+	listOfCookies::const_iterator	ite;
+
+	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
+		header += "Set-Cookies: " + ite->getName() + "=" + ite->getValue() + "\r\n";
+	return (header);
 }
 
 /******************************************************************************/
@@ -174,73 +166,50 @@ const Session::listOfSessions&	SessionHandler::getSessions() const
 	return (_sessions);
 }
 
-//////////
-
-
 
 Session&	SessionHandler::findSession(const std::string& sessionId)
 {
-	listOfSession::const_iterator	ite;
+	listOfSession::iterator	ite;
 
 	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
 	{
 		if (ite->getId() == sessionId)
-			return (*ite);
-	}
-}
-
-listOfCookies	SessionHandler::getSessionCookies(std::string sessionId)
-{
-	std::vector<Session>::const_iterator	ite;
-
-	ite = findSession(sessionId);	
-	if (ite != _sessions.end())
-		return (ite->getCookies());
-}
-
-SessionHandler::listOfPurchases		SessionHandler::getSessionOrder(std::string sessionId)
-{
-	std::vector<Session>::const_iterator	ite;
-
-	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
-	{
-		if (ite->getId() == sessionId)
-			return (ite->getOrder());
-	}
-}
-
-Cookie*		SessionHandler::_findSession(std::string sessionId)
-{
-	mapOfSessions::iterator		ite;
-	Cookie*						cookies;
-	
-	ite = _sessions.find(sessionId);
-	if (ite != _sessions.end())
-	{
-		cookies = ite->second;
-		if (cookies->sessionIsAlive())
 		{
-			cookies->updateTime();
-			return (cookies);
+			if (ite->sessionIsAlive())
+			{
+				ite->updateTime();
+				return (*ite);
+			}
+			_sessions.erase(ite);
+			break ;
 		}
-		_deleteSession(ite);
 	}
 	return (_newSession());
 }
 
-Cookies*	SessionHandler::lookupSession(const Cookie& requestCookies)
+std::string	SessionHandler::getCookieSID(const listOfCookies& requestCookies)
+{
+	listOfCookies::const_iterator	ite;
+
+	for (ite = cookies.begin(); ite != cookies.end(); ite++)
+	{
+		if (ite->getName() == "SID")
+			return (ite->getValue());
+	}
+	return ("");
+}
+
+Session&	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 {
 	std::string						sessionId;
-	Cookie*							cookies;
+	Session							session;
 
-	sessionId = requestCookies.getSessionId();
+	sessionId = getCookieSID(requestCookies);
 	if (sessionId == "")
-		cookies = _newSession();
+		session = _newSession();
 	else
-		cookies = _findSession(sessionId);
-	cookies->fillCookies(requestCookies);
-	if (cookies->size() > 150)
-		throw(PAYLOAD_TOO_LARGE);
-	// cookies->display();
-	return (cookies);
+		session = _findSession(sessionId);
+	session.fillCookies(requestCookies);
+	// session.getCookies().display();
+	return (session);
 }

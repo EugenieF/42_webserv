@@ -72,9 +72,7 @@ Request&	Request::operator=(const Request &other)
 		_port = other.getPort();
 		_payloadSize = other.getPayloadSize();
 		_fd = other.getFd();
-		#ifdef COOKIE
-			_cookies = other.getCookies();
-		#endif
+		_cookies = other.getCookies();
 	}
 	return (*this);
 }
@@ -217,7 +215,7 @@ void	Request::_checkHeaders()
 
 	if (!_parseHostHeader())
 		throw (BAD_REQUEST);
-	_parseExtraHeader();
+	_parseCookies();
 	if (_method != POST)
 		return ;
 	ite = _headers.find("transfer-encoding");
@@ -240,13 +238,6 @@ void	Request::_checkHeaders()
 	}
 	else
 		throw (BAD_REQUEST);
-}
-
-void	Request::_parseExtraHeader()
-{
-	#ifdef COOKIE
-		_parseCookies();
-	#endif
 }
 
 void	Request::_checkSizeBody()
@@ -486,12 +477,6 @@ std::string		Request::_getNextWord(size_t sizeWord)
 	return (nextWord);
 }
 
-// void	Request::_requestIsInvalid(t_statusCode code)
-// {
-// 	_statusCode = code;
-// 	_requestStatus = INVALID_REQUEST;
-// }
-
 void	Request::_initParsingFunct()
 {
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseMethod);
@@ -534,13 +519,12 @@ void	Request::printRequestInfo()
 /*                                 COOKIES                                    */
 /******************************************************************************/
 
-#ifdef COOKIE
-Cookie&		Request::getCookies()
-{
-	return (_cookies);
-}
+// listOfCookies&		Request::getCookies()
+// {
+// 	return (_cookies);
+// }
 
-const Cookie&	Request::getCookies() const
+const listOfCookies&	Request::getCookies() const
 {
 	return (_cookies);
 }
@@ -551,6 +535,34 @@ void	Request::_parseCookies()
 
 	ite = _headers.find("cookie");
 	if (ite != _headers.end())
-		_cookies.setCookies(ite->second);
+		_setCookies(ite->second);
 }
-#endif
+
+void	Request::_setCookies(std::string header)
+{
+	std::string		name;
+	std::string		value;
+	size_t			pos;
+
+	/* Limit Firefox = 150 cookies */
+	for (size_t nbOfCookies = 0; nbOfCookies < 150; nbOfCookies++)
+	{
+		pos = header.find("=");
+		if (pos == std::string::npos)
+			throw(BAD_REQUEST);
+		name = header.substr(0, pos);
+		header.erase(0, pos + 1);
+		pos = header.find("; ");
+		value = header.substr(0, pos);
+		header.erase(0, pos + 2);
+		_addCookie(name, value);
+		if (pos == std::string::npos)
+			return ;
+	}
+	throw (PAYLOAD_TOO_LARGE);
+}
+
+void	Request::_addCookie(const std::string& name, const std::string& value)
+{
+	_cookies.insert(_cookies.end(), Cookie(name, value));
+}

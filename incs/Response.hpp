@@ -18,7 +18,6 @@
 # include "Autoindex.hpp"
 # include "Env.hpp"
 # include "CgiHandler.hpp"
-# include "PurchaseOrder.hpp"
 
 extern StatusCode	g_statusCode;
 extern MimeType		g_mimeType;
@@ -31,6 +30,8 @@ class   Response
 		typedef std::map<t_method, httpMethod>		listOfHttpMethodsFunct;
 		typedef Request::listOfHeaders				listOfHeaders;
 		typedef Block::listOfStrings				listOfStrings;
+		typedef Session::listOfCookies				listOfCookies;
+		typedef Session::listOfPurchases			listOfPurchases;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -53,14 +54,13 @@ class   Response
 		std::string						_cgiextra;
 		std::string						_cgiquery;
 		std::string						_cgipath;
-
-		Purchase						_purchase;
+		Session							_session;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
-		Response(Block* server, Request* request, Env& env);
+        Response(Block* server, Request* request, Env& env, Session& session);
         Response(const Response& other);
         ~Response();
         Response&    					operator=(const Response& other);
@@ -92,7 +92,8 @@ class   Response
 		std::string						getCgiExtra() const;
 		std::string						getCgiQuery() const;
 		const Env&						getEnv() const;
-		const Purchase&					getPurchase() const;
+		Session&						getSession();
+		const Session&					getSession() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
@@ -144,7 +145,6 @@ class   Response
 		std::string						_getDateHeader();
 		std::string						_getContentTypeHeader();
 		std::string						_getConnectionHeader();
-		void							_fillExtraHeader();
 
 						/*-------   Utils    ------*/
 		bool							_requestIsValid();
@@ -163,17 +163,8 @@ class   Response
 		std::string						_generateFormAcceptPage();
 		std::string						_generateFormOrderPage();
 
-	/***************************     BONUS     *************************/
-	#ifdef COOKIE
-	public:
-        Response(Block* server, Request* request, Env& env, Cookie& cookies);
-		Cookie&							getCookies();
-		const Cookie&					getCookies() const;
-
-	private:
-		Cookie							_cookies;
+						/*-----  Bonus Cookies ----*/
 		void							_fillCookieHeader();
-	#endif
 };
 
 #endif

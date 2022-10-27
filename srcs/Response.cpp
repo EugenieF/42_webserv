@@ -5,7 +5,7 @@
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response(Block *server, Request* request, Env& env):
+Response::Response(Block *server, Request* request, Env& env, Session& session):
 	_server(server),
 	_request(request),
 	_response(""),
@@ -15,7 +15,9 @@ Response::Response(Block *server, Request* request, Env& env):
 	_locationPath(""),
 	_fd(request->getFd()),
 	_env(&env),
-	_cgipath("") {
+	_cgipath(""),
+	_session(session)
+{
 	_initHttpMethods();
 }
 
@@ -42,9 +44,7 @@ Response&	Response::operator=(const Response &other)
 		_locationPath = other.getLocationPath();
 		_fd = other.getFd();
 		_cgipath = other.getCgiProgram();
-		#ifdef COOKIE
-			_cookies = other.getCookies();
-		#endif
+		_session = other.getSession();
 	}
 	return (*this);
 }
@@ -148,7 +148,7 @@ void	Response::_fillHeaders()
 	_headers["Connection"] = _getConnectionHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
-	_fillExtraHeader();
+	_fillCookieHeader();
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
 	_response += "\r\n";
@@ -490,13 +490,6 @@ std::string		Response::_getConnectionHeader()
 	if (connectionHeader != requestHeaders.end() && connectionHeader->second == "close")
 		connection = "close";
 	return (connection);
-}
-
-void	Response::_fillExtraHeader()
-{
-	#ifdef COOKIE
-		_fillCookieHeader();
-	#endif
 }
 
 /******************************************************************************/
@@ -872,36 +865,19 @@ void	Response::_initHttpMethods()
 /*                                  BONUS                                     */
 /******************************************************************************/
 
-#ifdef COOKIE
-Response::Response(Block *server, Request* request, Env& env, Cookie& cookies):
-	_server(server),
-	_request(request),
-	_response(""),
-	_statusCode(_request->getStatusCode()),
-	_method(_request->getMethod()),
-	_body(""),
-	_locationPath(""),
-	_fd(request->getFd()),
-	_env(&env),
-	_cgipath(""),
-	_cookies(cookies)
-{
-	_initHttpMethods();
-}
-
 void	Response::_fillCookieHeader()
 {
-	_response += _cookies.setCookieHeader();
+	// #ifdef COOKIE
+	_response += _session.getCookieHeader();
+	// #endif
 }
 
-Cookie&		Response::getCookies()
+Session&		Response::getSession()
 {
-	return (_cookies);
+	return (_session);
 }
 
-const Cookie&	Response::getCookies() const
+const Session&	Response::getSession() const
 {
-	return (_cookies);
+	return (_session);
 }
-
-#endif
