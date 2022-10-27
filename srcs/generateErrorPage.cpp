@@ -122,6 +122,10 @@ std::string		Response::_generateFormOrderPage()
 				<form action=\"/form_delete\">\n\
 					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" /></center>\n\
 				</form>\n\n";
+
+				<script>
+					fetch("", {method: "DELETE", })
+				</script>
 	}
 
 	htmlPage += \
