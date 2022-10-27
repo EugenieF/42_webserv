@@ -13,6 +13,7 @@ Session::Session(const std::string& id)
 {
 	updateTime();
 	_id = id;
+	addCookie("SID", id);
 }
 
 Session::Session(const Session& other)
@@ -81,7 +82,8 @@ void	Session::fillCookies(const listOfCookies& cookies)
 
 	for (ite = cookies.begin(), count = 0; ite != cookies.end(); ite++, count++)
 	{
-		addCookie(ite->getName(), ite->getValue());
+		if (ite->getName() != "SID")
+			addCookie(ite->getName(), ite->getValue());
 		if (count > 150)
 			throw(PAYLOAD_TOO_LARGE);
 	}

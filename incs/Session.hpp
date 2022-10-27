@@ -58,6 +58,9 @@ class Session
 						/*--------  Purchase  -------*/
 		void					addPurchase(const std::string& name, const std::string& hamster, const std::string& color);
 		void					deletePurchase(listOfPurchases::iterator ite);
+
+		void					displayCookies() const;
+
 };
 
 /******************************************************************************/
@@ -87,8 +90,6 @@ class SessionHandler
 								/*-------     Getter   -------*/
 		listOfSessions&						getSessions();
 		const listOfSessions&				getSessions() const;
-
-		void								displayCookies() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
