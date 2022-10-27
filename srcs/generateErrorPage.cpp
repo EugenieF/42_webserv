@@ -119,20 +119,12 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
-				<div>\n\
-					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"button\" onclick=\"deleteData();\" /></center>\n\
-					<script>\n\
-						function deleteData() {\n\
-							var url = \"/form_delete/" + ite->getId() + "\";\n\
-							alert('Button clicked');\n\
-							const deleted = await fetch(url, {\n\
-							method: \"DELETE\"\n\
-							});\n\
-							return true;\n\
-						}\n\
-					</script>\n\
-				</div>\n\n";
+				<form>\n\
+					<input type=\"hidden\" id=\"selectedItemId\" value=\"" + ite->getId() + "\">\n\
+					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"button\" onClick=\"deleteData();\" /></center>\n\
+				</form>\n\n";
 	}
+
 /* <script>\n\
 				<form action=\"/form_delete/" + ite->getId() + "\">\n\
 				// 	const form = document.getElementById(\"form_delete\");\n\
@@ -153,6 +145,15 @@ std::string		Response::_generateFormOrderPage()
 					<center><input type=\"submit\" value=\"Retour vers la page d'accueil\" class=\"bouton\" /></center>\n\
 				</form>\n\
 				</div>\n\
+					<script>\n\
+						function deleteData() {\n\
+							var id = document.getElementById(\"selectedItemId\").value;\n\
+							alert('Button clicked');\n\
+							const deleted = await fetch(`/form_delete/${id}`, {\n\
+								method: \"DELETE\"\n\
+							});\n\
+						}\n\
+					</script>\n\
 			</body>\n\
 		</html>\n";
 	return (htmlPage);
