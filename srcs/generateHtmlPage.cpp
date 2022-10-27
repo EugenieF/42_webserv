@@ -142,7 +142,6 @@ std::string		Response::_generateFormOrderPage()
 						})\n\
 						.then(response => {\n\
 							window.location.reload();\n\
-							console.log('OK');\n\
 						})\n\
 					}\n\
 				</script>\n\
