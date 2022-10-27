@@ -56,9 +56,8 @@ class Session
 		void					addCookie(const std::string& name, const std::string& value);
 
 						/*--------  Purchase  -------*/
-		void					addPurchase(const std::string& name, const std::string& hamster, const std::string& color);
+		void					addPurchase(const std::string& name, const std::string& content);
 		void					deletePurchase(listOfPurchases::iterator ite);
-
 		void					displayCookies() const;
 
 };
@@ -101,6 +100,7 @@ class SessionHandler
 
 								/*--------     find   ------*/
 		Session*							_findSession(const std::string& sessionId);
+		listOfSessions::iterator			_findSessionIte(const std::string& sessionId);
 		std::string							_getCookieSID(const listOfCookies& cookies);
 
 								/*--------   Cleanup  ------*/

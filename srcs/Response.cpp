@@ -271,14 +271,13 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	content = body.substr(0, body.find("\r\n"));
 	if (filename != "")
 	{
-		// std::cout << RED << "********" << RESET << NL;
 		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
 			filename.insert(0, "/");
 		std::cout << GREEN << "filename : " << _uploadPath + filename << RESET << std::endl;
 		_writeFileContent(_uploadPath + filename, content);
 	}
-	// _session.addPurchase(name, content);
-	std::cout << GREEN << name << " = " << content << RESET << NL;
+	_session->addPurchase(name, content);
+	// std::cout << GREEN << name << " = " << content << RESET << NL;
 }
 
 /*
@@ -413,15 +412,22 @@ void	Response::_runDeleteMethod()
 	int	ret;
 
 	//DEBUG("Delete method");
-	ret = std::remove(_builtPath.c_str());
-	if (ret)
+	if (_request->getPath() == "/form_delete")
 	{
-		/* Error case */
-		throw (_findErrorCode());
+		// _session->getOrder().deletePurchase();
+		displayMsg(" 🚫 Purchase was successfully deleted", LIGHT_GREEN);
 	}
-	 /* Successfull case */
+	else
+	{
+		ret = std::remove(_builtPath.c_str());
+		if (ret)
+		{
+			/* Error case */
+			throw (_findErrorCode());
+		}
+		displayMsg(" 🚫 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
+	} /* Successfull case */
 	setStatusCode(NO_CONTENT);
-	displayMsg(" 🚫 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
 }
 
 /******************************************************************************/

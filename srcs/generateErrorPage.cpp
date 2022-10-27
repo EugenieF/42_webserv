@@ -89,11 +89,11 @@ std::string		Response::_generateFormAcceptPage()
 
 std::string		Response::_generateFormOrderPage()
 {
-	std::string	htmlPage;
+	std::string						htmlPage;
+	listOfPurchases					order;
+	listOfPurchases::const_iterator	ite;
 
-	std::string name = "Robinou";
-	std::string hamster = "Crotte";
-	std::string color = "#00000";
+	order = _session->getOrder();
 	htmlPage = \
 		"<!DOCTYPE html>\n\
 		<html>\n\
@@ -105,21 +105,28 @@ std::string		Response::_generateFormOrderPage()
 			<body class=\"background\">\n\
 				<h1>\n\
 					<center>Etat de votre panier 🛒</center>\n\
-				</h1>\n\
-				<div class=\"name\">\n\
-					<center>Name : " + name + "<br></center>\n\
+				</h1>\n";
+	
+	for (ite = order.begin(); ite != order.end(); ite++)
+	{
+		htmlPage += \
+				"<div class=\"name\">\n\
+					<center>Name : " + ite->getName() + "<br></center>\n\
 				</div>\n\
 				<div class=\"hamster\">\n\
-					<center>Hamster : " + hamster + "<br></center>\n\
+					<center>Hamster : " + ite->getHamster() + "<br></center>\n\
 				</div>\n\
 				<div class=\"color\">\n\
-					<center>Color : " + color + "<br></center>\n\
+					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
-				<form action=\"/form.html\">\n\
-					<center><input type=\"submit\" value=\"Go acheter un nouvel ami !\" class=\"bouton\" /></center>\n\
-				</form>\n\
 				<form action=\"/form_delete\">\n\
 					<center><input type=\"submit\" value=\"Jeter votre hamster et reformuler une adoption\" class=\"bouton\" /></center>\n\
+				</form>\n\n";
+	}
+
+	htmlPage += \
+				"<form action=\"/form.html\">\n\
+					<center><input type=\"submit\" value=\"Go acheter un nouvel ami !\" class=\"bouton\" /></center>\n\
 				</form>\n\
 				<form action=\"/index.html\">\n\
 					<center><input type=\"submit\" value=\"Retour vers la page d'accueil\" class=\"bouton\" /></center>\n\

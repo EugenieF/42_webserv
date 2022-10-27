@@ -21,14 +21,13 @@ class Purchase
 
 						/*-------     Main    -------*/
 		Purchase();
-		Purchase(const std::string& name, const std::string& hamster, const std::string& color);
+		Purchase(const std::string& name, const std::string& content);
 		Purchase(const Purchase& other);
 		Purchase&		operator=(const Purchase& other);
 		~Purchase();
 
 						/*-------    Setter   -------*/
 		void			setPurchase(const std::string& name, const std::string& content);
-		void			setPurchase(const std::string& name, const std::string& hamster, const std::string& color);
 
 						/*-------    Getter   -------*/
 		std::string		getName() const;

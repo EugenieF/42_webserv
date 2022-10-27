@@ -94,10 +94,9 @@ void	Session::addCookie(const std::string& name, const std::string& value)
 	_cookies.insert(_cookies.end(), Cookie(name, value));
 }
 
-void    Session::addPurchase(
-	const std::string& name, const std::string& hamster, const std::string& color)
+void    Session::addPurchase(const std::string& name, const std::string& content)
 {
-    _order.insert(_order.end(), Purchase(name, hamster, color));
+    _order.insert(_order.end(), Purchase(name, content));
 }
 
 void	Session::deletePurchase(listOfPurchases::iterator ite)
@@ -194,10 +193,22 @@ std::string		SessionHandler::_generateSessionId()
 	std::string		sessionId;
 
 	sessionId = _generateRandomString(SESSION_ID_LENGTH);
-	// while (findSession(sessionId) != _sessions.end())
-	// 	sessionId = _generateRandomString(SESSION_ID_LENGTH);
+	while (_findSessionIte(sessionId) != _sessions.end())
+		sessionId = _generateRandomString(SESSION_ID_LENGTH);
 	DEBUG("SESSION ID = " + sessionId);
 	return (sessionId);
+}
+
+listOfSessions::iterator	SessionHandler::_findSessionIte(const std::string& sessionId)
+{
+	listOfSessions::iterator	ite;
+
+	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
+	{
+		if ((*ite)->getId() == sessionId)
+			break ;
+	}
+	return (ite);
 }
 
 Session*	SessionHandler::_findSession(const std::string& sessionId)

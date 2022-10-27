@@ -2,9 +2,9 @@
 
 Purchase::Purchase() {}
 
-Purchase::Purchase(const std::string& name, const std::string& hamster, const std::string& color)
+Purchase::Purchase(const std::string& name, const std::string& content)
 {
-	setPurchase(name, hamster, color);
+	setPurchase(name, content);
 }
 
 Purchase::Purchase(const Purchase& other)
@@ -34,13 +34,6 @@ void	Purchase::setPurchase(const std::string& name, const std::string& content)
         _hamster = content;
     else if (name == "color")
         _color = content;
-}
-
-void	Purchase::setPurchase(const std::string& name, const std::string& hamster, const std::string& color)
-{
-    _name = name;
-    _hamster = hamster;
-    _color = color;
 }
 
 void	Purchase::display() const
