@@ -150,7 +150,7 @@ void	Session::completePurchase(const std::string& name, const std::string& conte
 
 void	Session::deletePurchase(const std::string& id)
 {
-	listOfPurchases::const_iterator	ite;
+	listOfPurchases::iterator	ite;
 
 	for (ite = _order.begin(); ite != _order.end(); ite++)
 	{
