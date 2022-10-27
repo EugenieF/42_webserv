@@ -119,8 +119,12 @@ std::string		Response::_generateFormOrderPage()
 				<div class=\"color\">\n\
 					<center>Color : " + ite->getColor() + "<br></center>\n\
 				</div>\n\
+				<div class=\"color\">\n\
+					<center>Id : " + ite->getId() + "<br></center>\n\
+				</div>\n\
 				<div>\n\
 					<center><button id=\"selectedItemId\" value=\"" + ite->getId() + "\" onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n\
+					<center><button class=\"bouton\" id=\"selectedItemId\" value=\"" + ite->getId() + "\" onclick=\"deleteData()\">Jeter votre hamster et reformuler une adoption</button></center>\n\
 				<div>\n\n\n";
 	}
 
@@ -135,36 +139,10 @@ std::string		Response::_generateFormOrderPage()
 				<script>\n\
 					function deleteData() {\n\
 						var id = document.getElementById(\"selectedItemId\").value;\n\
-						alert('Button clicked ' + id);\n\
-						fetch(`/form_delete/${id}`, {\n\
-						 	method: \"DELETE\"\n\
-						})\n\
-						.then(response => {\n\
-							console.log('OK');\n\
-						})\n\
+						alert('Button clicked ' + ${id});\n\
 					}\n\
 				</script>\n\
 			</body>\n\
 		</html>\n";
 	return (htmlPage);
 }
-
-/*
-					<input type=\"hidden\" id=\"selectedItemId\" value=\"" + ite->getId() + "\">\n\
-						/ var id = document.getElementById(\"selectedItemId\").value;\n\
-						// const deleted = await fetch(`/form_delete/${id}`, {\n\
-						// 	method: \"DELETE\"\n\
-						// });\n\
-
-
-<script>\n\
-				<form action=\"/form_delete/" + ite->getId() + "\">\n\
-				// 	const form = document.getElementById(\"form_delete\");\n\
-				// 	form.addEventListener(\"submit\", formSubmit);\n\
-				// 	function formSubmit {\n\
-				// 		fetch(form.action, {method: \"DELETE\"})\n\
-				// 	}\n\
-				// </script>\n\
-					<input type=\"hidden\" name=\"_method\" value=\"DELETE\" />\n\
-					<input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token() }}\">\n\
-*/

@@ -20,9 +20,9 @@ SRCS			= main.cpp \
 				MimeType.cpp \
 				HttpMethod.cpp \
 				Autoindex.cpp \
-				generateErrorPage.cpp \
 				CgiHandler.cpp \
 				Env.cpp \
+				generateHtmlPage.cpp \
 				Cookie.cpp \
 				Session.cpp \
 				Purchase.cpp
