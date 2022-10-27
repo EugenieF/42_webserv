@@ -2,9 +2,11 @@
 
 Purchase::Purchase() {}
 
-Purchase::Purchase(const std::string& name, const std::string& content)
+Purchase::Purchase(const std::string& name, const std::string& hamster, const std::string& color)
 {
-	setPurchase(name, content);
+	_name = name;
+	_hamster = hamster;
+	_color = color;
 }
 
 Purchase::Purchase(const Purchase& other)
@@ -26,16 +28,6 @@ Purchase&	Purchase::operator=(const Purchase& other)
 
 Purchase::~Purchase() {}
 
-void	Purchase::setPurchase(const std::string& name, const std::string& content)
-{
-    if (name == "name")
-        _name = content;
-    else if (name == "hamster")
-        _hamster = content;
-    else if (name == "color")
-        _color = content;
-}
-
 void	Purchase::display() const
 {
     std::cout << "name = " << _name << std::endl;    
@@ -43,9 +35,9 @@ void	Purchase::display() const
     std::cout << "color = " << _color << std::endl;    
 }
 
-bool	Purchase::isEmpty() const
+bool	Purchase::isComplete() const
 {
-    return (_name.empty() || _hamster.empty() || _color.empty());
+    return (!_name.empty() && !_hamster.empty() && !_color.empty());
 }
 
 std::string		Purchase::getName() const
@@ -61,4 +53,19 @@ std::string		Purchase::getHamster() const
 std::string		Purchase::getColor() const
 {
     return (_color);
+}
+
+void	Purchase::setName(const std::string& name)
+{
+	_name = name;
+}
+
+void	Purchase::setHamster(const std::string& hamster)
+{
+	_hamster = hamster;
+}
+
+void	Purchase::setColor(const std::string& color)
+{
+	_color = color;
 }

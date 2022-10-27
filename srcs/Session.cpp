@@ -83,20 +83,35 @@ void	Session::fillCookies(const listOfCookies& cookies)
 	for (ite = cookies.begin(), count = 0; ite != cookies.end(); ite++, count++)
 	{
 		if (ite->getName() != "SID")
-			addCookie(ite->getName(), ite->getValue());
+			_addCookie(ite->getName(), ite->getValue());
 		if (count > 150)
 			throw(PAYLOAD_TOO_LARGE);
 	}
 }
 
-void	Session::addCookie(const std::string& name, const std::string& value)
+void	Session::_addCookie(const std::string& name, const std::string& value)
 {
 	_cookies.insert(_cookies.end(), Cookie(name, value));
 }
 
-void    Session::addPurchase(const std::string& name, const std::string& content)
+void    Session::_addPurchaseInOrder()
 {
-    _order.insert(_order.end(), Purchase(name, content));
+	_order.insert(_order.end(), Purchase(_purchase));
+	_purchase.setName("");
+	_purchase.setHamster("");
+	_purchase.setColor("");
+}
+
+void	Session::completePurchase(const std::string& name, const std::string& content)
+{
+    if (name == "name")
+        _purchase.setName(content);
+    else if (name == "hamster")
+        _purchase.setHamster(content);
+    else if (name == "color")
+        _purchase.setColor(content);
+	if (_purchase.isComplete())
+		_addPurchaseInOrder();
 }
 
 void	Session::deletePurchase(listOfPurchases::iterator ite)
