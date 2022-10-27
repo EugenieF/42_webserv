@@ -155,7 +155,6 @@ bool	Session::deletePurchase(const std::string& id)
 
 	for (ite = _order.begin(); ite != _order.end(); ite++)
 	{
-		std::cout << RED << "[" << ite->getId() << "] | [" << id << "]" << RESET << NL;
 		if (ite->getId() == id)
 		{
 			displayMsg(" ❎🐹 Purchase [" + ite->getName() + "; " + ite->getHamster() + "; "
@@ -278,21 +277,18 @@ SessionHandler::listOfSessions::iterator	SessionHandler::_findSessionIte(const s
 // 	return (_newSession());
 // }
 
-bool	SessionHandler::_matchSession(const std::string& sessionId, Session* session)
+bool	SessionHandler::_matchSession(const std::string& sessionId)
 {
-	listOfSessions::iterator	ite;
-
-	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
+	for (_ite = _sessions.begin(); _ite != _sessions.end(); _ite++)
 	{
-		if ((*ite)->getId() == sessionId)
+		if ((*_ite)->getId() == sessionId)
 		{
-			if ((*ite)->sessionIsAlive())
+			if ((*_ite)->sessionIsAlive())
 			{
-				(*ite)->updateTime();
-				session = *ite;
+				(*_ite)->updateTime();
 				return (true);
 			}
-			_deleteSession(ite);
+			_deleteSession(_ite);
 			break ;
 		}
 	}
@@ -302,14 +298,13 @@ bool	SessionHandler::_matchSession(const std::string& sessionId, Session* sessio
 Session*	SessionHandler::_findSession(const listOfCookies& cookies)
 {
 	listOfCookies::const_iterator	ite;
-	Session							*session;
 
 	for (ite = cookies.begin(); ite != cookies.end(); ite++)
 	{
 		if (ite->getName() == SESSION_ID)
 		{
-			if (_matchSession(ite->getValue(), session))
-				return (session);
+			if (_matchSession(ite->getValue()))
+				return (*_ite);
 		}
 	}
 	return (_newSession());

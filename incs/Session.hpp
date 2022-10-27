@@ -86,6 +86,7 @@ class SessionHandler
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
 		listOfSessions						_sessions;
+		listOfSessions::iterator			_ite;
 
 	public:
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -110,7 +111,7 @@ class SessionHandler
 								/*--------     find   ------*/
 		// Session*							_findSession(const std::string& sessionId);
 		Session*							_findSession(const listOfCookies& cookies);
-		bool								_matchSession(const std::string& sessionId, Session* session);
+		bool								_matchSession(const std::string& sessionId);
 		listOfSessions::iterator			_findSessionIte(const std::string& sessionId);
 		std::string							_getCookieSID(const listOfCookies& cookies);
 
