@@ -226,7 +226,7 @@ Session*	SessionHandler::_newSession()
 	std::string		newId;
 	Session*		newSession;
 
-	std::cout << YELLOW << "******* new session *******" << RESET << NL;
+	// std::cout << YELLOW << "******* new session *******" << RESET << NL;
 	newId = _generateSessionId();
 	newSession = new Session(newId);
 	_sessions.insert(_sessions.end(), newSession);
@@ -256,26 +256,6 @@ SessionHandler::listOfSessions::iterator	SessionHandler::_findSessionIte(const s
 	}
 	return (ite);
 }
-
-// Session*	SessionHandler::_matchSession(const std::string& sessionId)
-// {
-// 	listOfSessions::iterator	ite;
-
-// 	for (ite = _sessions.begin(); ite != _sessions.end(); ite++)
-// 	{
-// 		if ((*ite)->getId() == sessionId)
-// 		{
-// 			if ((*ite)->sessionIsAlive())
-// 			{
-// 				(*ite)->updateTime();
-// 				return (*ite);
-// 			}
-// 			_deleteSession(ite);
-// 			break ;
-// 		}
-// 	}
-// 	return (_newSession());
-// }
 
 bool	SessionHandler::_matchSession(const std::string& sessionId)
 {
@@ -316,7 +296,7 @@ Session*	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 
 	session = _findSession(requestCookies);
 	session->fillCookies(requestCookies);
-	session->displayCookies();
+	// session->displayCookies();
 	return (session);
 }
 
