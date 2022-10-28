@@ -354,8 +354,8 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		_throwErrorMsg("Can't open file '" + path + "'");
 	}
 	/* We write in file */
-	// file << content;
-	file.write (content.c_str(), content.length());
+	file << content;
+	// file.write (content.c_str(), content.length());
 	/* Check if writing was successfully performed */
 	if (file.bad())
 	{
