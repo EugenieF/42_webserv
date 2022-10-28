@@ -90,20 +90,25 @@ char* clone_str(const std::string& str) {
 	return (copy);
 }
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
 std::string readFd(int fd) {
 	std::string     str;
 	char            buf[BUFSIZE + 1];
 	ssize_t         count;
 
 	memset(buf, 0, BUFSIZE + 1);
-	count = read(fd, buf, BUFSIZE + 1);
+	count = read(fd, buf, BUFSIZE);
+	// std::cout << YELLOW << "***" << buf << "***" << RESET << NL; 
 	while (count) {
 		if (count < 0)
 			throw std::runtime_error("readFd (read) error");
 		str += buf;
+		// std::cout << ORANGE << "count = " << count << RESET << NL; 
 		if (count == BUFSIZE) {
 			memset(buf, 0, BUFSIZE + 1);
-			count = read(fd, buf, BUFSIZE + 1);
+			count = read(fd, buf, BUFSIZE);
 		} else {
 			break ;
 		}

@@ -98,6 +98,7 @@ t_requestStatus	Request::parseRequest()
 		_requestStatus = COMPLETE_REQUEST;
 	}
 	// printRequestInfo();
+	std::cout << RED << "size body : " << _body.size() << RESET << NL;
 	return (_requestStatus);
 }
 
@@ -282,7 +283,6 @@ void	Request::_parseBody()
 		{
 			// _query = _body;
 			_bodySize = 0;
-			std::cout << GREEN << "query request = " << _query << RESET << NL;
 		}
 		//DEBUG("in parse body");
 		return (_setRequestStatus(COMPLETE_REQUEST));

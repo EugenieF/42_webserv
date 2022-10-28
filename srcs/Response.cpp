@@ -106,8 +106,6 @@ void	Response::generateResponse()
 	if (!_isCgi(_builtPath))
 		_fillHeaders();
 	_response += _body + "\r\n";
-	
-	// std::cout << RED << _response << RESET << NL;
 }
 
 /******************************************************************************/
@@ -258,6 +256,11 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	std::string	name;
 	std::string	content;
 
+	// pos = 0;
+	// contentDisposition = "";
+	// filename = "";
+	// name = "";
+	// content = "";
 	(void)path;
 	pos = body.find("Content-Disposition:");
 	if (pos == std::string::npos)
@@ -266,16 +269,21 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	name = _getField(contentDisposition, "name=\"");
 	filename = _getField(contentDisposition, "filename=\"");
 	body.erase(0, body.find("\r\n") + 2);
-	body.erase(0, body.find("\r\n") + 2);
-	content = body.substr(0, body.find("\r\n"));
 	if (filename != "")
 	{
+		body.erase(0, body.find("\r\n\r\n") + 4);
+		content = body.substr(0, body.find("\r\n"));
 		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
 			filename.insert(0, "/");
-		std::cout << GREEN << "filename : " << _uploadPath + filename << RESET << std::endl;
+		DEBUG("filename : " + _uploadPath + filename);
 		_writeFileContent(_uploadPath + filename, content);
 	}
-	_session->completePurchase(name, content);
+	else
+	{
+		body.erase(0, body.find("\r\n") + 2);
+		content = body.substr(0, body.find("\r\n"));
+		_session->completePurchase(name, content);
+	}
 }
 
 /*
@@ -308,14 +316,19 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 	}
 	else if (_request->getPath() == "/form_upload")
 	{
-		_readFileContent("www/html/upload.html");
-		_headers["Content-Type"] = g_mimeType[".html"];
+		// _readFileContent("www/html/upload.html");
+		// _headers["Content-Type"] = g_mimeType[".html"];
 	}
 }
 
 /******************************************************************************/
 /*                               POST METHOD                                  */
 /******************************************************************************/
+
+// void	Response::_writeFileContent(const std::string& path, const std::string& content)
+// {
+// 	std::ofstream(path.c_str(), std::ios::binary) << std::ifstream(path.c_str(), std::ios::binary).rdbuf();
+// }
 
 void	Response::_writeFileContent(const std::string& path, const std::string& content)
 {
@@ -332,7 +345,8 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		/* New file will be created */
 		setStatusCode(CREATED);
 	}
-	file.open(path.c_str(), std::ofstream::app);
+	file.open(path.c_str(), std::ios::out | std::ios::binary);
+	// file.open(path.c_str(), std::ofstream::app | std::ios::binary);
 	/* Check if file was successfully opened */
 	if (!file.is_open())
 	{
@@ -340,7 +354,8 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		_throwErrorMsg("Can't open file '" + path + "'");
 	}
 	/* We write in file */
-	file << content;
+	// file << content;
+	file.write (content.c_str(), content.length());
 	/* Check if writing was successfully performed */
 	if (file.bad())
 	{
@@ -605,7 +620,7 @@ std::string		Response::_buildPath()
 	return (path);
 }
 
-/******************************************************************************/
+/****************************************************i**************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
 

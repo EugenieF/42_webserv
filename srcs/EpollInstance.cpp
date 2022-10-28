@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/20 17:24:51 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/28 17:18:25 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,6 +190,7 @@ void EpollInstance::_handleRequest(Client* client) {
 	DEBUG("Request");
 	std::string		str;
 
+	str = "";
 	try {
 		str = readFd(client->getFd());
 	} catch ( const std::exception& e) {
