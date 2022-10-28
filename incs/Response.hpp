@@ -118,7 +118,7 @@ class   Response
 		void							_handleMultipartContent(const std::string& path, std::string content);
 		std::string						_getBoundary(std::string contentType);
 		std::string						_getField(std::string contentDisposition, const std::string& field);
-		void							_parseContent(const std::string& path, std::string body);
+		void							_parseContent(const std::string& path, std::string body, const std::string& boundary);
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod();

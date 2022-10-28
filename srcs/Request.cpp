@@ -275,15 +275,19 @@ void	Request::_parseBody()
 		_decodeChunks();
 	else
 	{
-	//	DEBUG("before check size");
 		_body = _request;
 		// _checkSizeBody();
-		ite = _headers.find("content-type");
-		if (ite != _headers.end() && ite->second == "application/x-www-form-urlencoded")
+		if (_body.size() != _bodySize)
 		{
-			// _query = _body;
-			_bodySize = 0;
+			std::cout << GREEN << _body.size() << " | " << _bodySize << RESET << std::endl;
+			return ;
 		}
+		// ite = _headers.find("content-type");
+		// if (ite != _headers.end() && ite->second == "application/x-www-form-urlencoded")
+		// {
+		// 	// _query = _body;
+		// 	_bodySize = 0;
+		// }
 		//DEBUG("in parse body");
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	}

@@ -231,7 +231,7 @@ std::string		Response::_getBoundary(std::string contentType)
 	{
 		throw(BAD_REQUEST);
 	}
-	boundary = "--" + boundary + "\r\n"; 
+	boundary = "--" + boundary; 
 	return (boundary);
 }
 
@@ -248,7 +248,8 @@ std::string		Response::_getField(std::string contentDisposition, const std::stri
 	return (name);
 }
 
-void	Response::_parseContent(const std::string& path, std::string body)
+void	Response::_parseContent(const std::string& path, std::string body,
+	const std::string& boundary)
 {
 	size_t		pos;
 	std::string	contentDisposition;
@@ -256,11 +257,6 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	std::string	name;
 	std::string	content;
 
-	// pos = 0;
-	// contentDisposition = "";
-	// filename = "";
-	// name = "";
-	// content = "";
 	(void)path;
 	pos = body.find("Content-Disposition:");
 	if (pos == std::string::npos)
@@ -268,11 +264,11 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	contentDisposition = body.substr(pos, body.find("\r\n"));
 	name = _getField(contentDisposition, "name=\"");
 	filename = _getField(contentDisposition, "filename=\"");
-	body.erase(0, body.find("\r\n") + 2);
+	body.erase(0, body.find("\r\n\r\n") + 4);
+	content = body.substr(0, body.find("\r\n" + boundary));
+	std::cout << ORANGE << content << RESET << NL;
 	if (filename != "")
 	{
-		body.erase(0, body.find("\r\n\r\n") + 4);
-		content = body.substr(0, body.find("\r\n"));
 		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
 			filename.insert(0, "/");
 		DEBUG("filename : " + _uploadPath + filename);
@@ -280,8 +276,7 @@ void	Response::_parseContent(const std::string& path, std::string body)
 	}
 	else
 	{
-		body.erase(0, body.find("\r\n") + 2);
-		content = body.substr(0, body.find("\r\n"));
+		content = body.substr(0, body.find("\r\n" + boundary));
 		_session->completePurchase(name, content);
 	}
 }
@@ -304,10 +299,10 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 	std::string	filename;
 
 	boundary = _getBoundary(_request->getHeader("content-type"));
-	while (body.find(boundary) != std::string::npos)
+	while (body.find(boundary + "\r\n") != std::string::npos)
 	{
-		body.erase(0, body.find(boundary) + boundary.length());
-		_parseContent(path, body);
+		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
+		_parseContent(path, body, boundary);
 	}
 	if (_request->getPath() == "/form_accept")
 	{
@@ -354,8 +349,8 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		_throwErrorMsg("Can't open file '" + path + "'");
 	}
 	/* We write in file */
-	file << content;
-	// file.write (content.c_str(), content.length());
+	// file << content;
+	file.write (content.c_str(), content.length());
 	/* Check if writing was successfully performed */
 	if (file.bad())
 	{
