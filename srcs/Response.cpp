@@ -107,8 +107,8 @@ void	Response::generateResponse()
 	if (!_is_cgi)
 		_fillHeaders();
 	_response += _body + "\r\n";
-	if (_request->getMethod() == POST)
-		std::cout << RED << "Response is : " << _response << RESET << NL;
+	// if (_request->getMethod() == POST)
+		// std::cout << RED << "Response is : " << _response << RESET << NL;
 }
 
 /******************************************************************************/
@@ -235,7 +235,7 @@ std::string		Response::_getBoundary(std::string contentType)
 	{
 		throw(BAD_REQUEST);
 	}
-	boundary = "--" + boundary + "\r\n"; 
+	boundary = "--" + boundary; 
 	return (boundary);
 }
 
@@ -270,7 +270,7 @@ void	Response::_parseContent(const std::string& path, std::string body,
 	filename = _getField(contentDisposition, "filename=\"");
 	body.erase(0, body.find("\r\n\r\n") + 4);
 	content = body.substr(0, body.find("\r\n" + boundary));
-	std::cout << ORANGE << content << RESET << NL;
+	// std::cout << ORANGE << content << RESET << NL;
 	if (filename != "")
 	{
 		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
@@ -318,6 +318,7 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 	{
 		// _readFileContent("www/html/upload.html");
 		// _headers["Content-Type"] = g_mimeType[".html"];
+		_body = "OK";
 	}
 }
 
@@ -368,7 +369,7 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		displayMsg(" ✅📄 File " + path + " was successfully created", LIGHT_GREEN);
 	else
 		displayMsg(" ✅📝 File " + path + " was completed", LIGHT_GREEN);
-	setStatusCode(NO_CONTENT);
+	// setStatusCode(NO_CONTENT);
 }
 
 void	Response::_handleCgi()

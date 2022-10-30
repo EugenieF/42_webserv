@@ -94,32 +94,33 @@ char* clone_str(const std::string& str) {
 #include <sys/socket.h>
 # include <vector>
 
-//std::string readFd(int fd) {
-//	std::string     str;
-//	ssize_t         count;
-//
-//	std::vector<char>	vecBuf(BUFSIZE, '\0');
-//	std::vector<char>	vecStr;
-//
-//	count = read(fd, &vecBuf[0], vecBuf.size());
-//	while (count) {
-//		if (count < 0)
-//			throw std::runtime_error("readFd (read) error");
-//		vecStr.insert(vecStr.end(), vecBuf.begin(), vecBuf.end());
-//		if (count == BUFSIZE) {
-//			count = read(fd, &vecBuf[0], vecBuf.size());
-//		} else {
-//			break ;
-//		}
-//	}
-//	for (std::vector<char>::iterator ite = vecStr.begin(); ite != vecStr.end(); ite++)
-//	{
-//		std::cout << YELLOW << *ite;
-//		str += *ite;
-//	}
-//	std::cout << RESET << NL;
-//	return (str);
-//}
+// std::string readFd(int fd) {
+// 	std::string     str;
+// 	ssize_t         count;
+
+// 	std::vector<char>	vecBuf(BUFSIZE, '\0');
+// 	std::vector<char>	vecStr;
+
+// 	count = read(fd, &vecBuf[0], vecBuf.size());
+// 	while (count) {
+// 		if (count < 0)
+// 			throw std::runtime_error("readFd (read) error");
+// 		vecStr.insert(vecStr.end(), vecBuf.begin(), vecBuf.end());
+// 		if (count == BUFSIZE) {
+// 			count = read(fd, &vecBuf[0], vecBuf.size());
+// 		} else {
+// 			break ;
+// 		}
+// 	}
+// 	for (std::vector<char>::iterator ite = vecStr.begin(); ite != vecStr.end(); ite++)
+// 	{
+// 		std::cout << YELLOW << *ite;
+// 		str += *ite;
+// 	}
+// 	std::cout << RESET << NL;
+// 	return (str);
+// }
+
 
 std::string readFd(int fd) {
 	std::string     str;
@@ -128,6 +129,7 @@ std::string readFd(int fd) {
 
 	count = recv(fd, buf, BUFSIZE, 0);
 	while (count) {
+		std::cout << GREEN << "count = " << count << GREEN << NL;
 		if (count < 0)
 			throw std::runtime_error("readFd (recv) error");
 		buf[count] = 0;
@@ -138,6 +140,7 @@ std::string readFd(int fd) {
 			break ;
 		}
 	}
+	std::cout << ORANGE << str << RESET << std::endl;
 	return (str);
 }
 
