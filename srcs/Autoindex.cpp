@@ -42,12 +42,23 @@ std::string	    Autoindex::_generateHtmlHeader()
     header = "<!DOCTYPE html>\n\
     <html>\n\
         <head>\n\
-            <title>Autoindex page</title>\n\
+            <title>Autoindex 👆</title>\n\
+			<meta charset=\"UTF-8\">\n\
         </head>\n\
+		<style>\n\
+			h1 {font-family: \"Times New Roman\";}\n\
+			table {font-family: \"Courier New\";}\n\
+			.border {text-align: start; border-bottom-style: solid; border-width: 1px;}\n\
+			.image {display: block; margin-top: 30px; margin-left: auto; margin-right: auto}\n\
+		</style>\n\
         <body>\n\
-        	<h1>Index of " + _directoryPath + "</h1>\n\
-            <table>\n\
-				<colgroup span=\"20\"></colgroup>\n";
+        	<h1>Index of " + _directoryPath + " 🌐</h1>\n\
+            <table style=\"width:100%\">\n\
+				<colgroup span=\"20\"></colgroup>\n\
+				<tr>\n\
+					<th class=\"border\">Link</th>\n\
+					<th class=\"border\">Modification Time</th>\n\
+					<th class=\"border\">Size (in bytes)</th>";
 	return (header);
 }
 
@@ -56,6 +67,7 @@ std::string    Autoindex::_generateHtmlFooter()
 	std::string	footer;
 
 	footer = "\t\t\t</table>\n\
+		<img class=\"image\" src=\"https://acegif.com/wp-content/uploads/gifs/hamster-26.gif\">\n\
 		</body>\n\
 	</html>\n";
 	return (footer);
@@ -68,7 +80,11 @@ std::string		Autoindex::_getFileLink(const unsigned char fileType, std::string f
 	fileLink = "<a href=\"" + fileName;
 	if (fileType == DT_DIR) /* file is directory */
 		fileLink += "/";
-	fileLink += "\">" + fileName + "</a>";
+	if (fileType == DT_DIR)
+		fileLink += "\">📂 ";
+	else
+		fileLink += "\">💌 ";
+	fileLink += fileName + "</a>";
 	_formatCell(&fileLink);
 	return (fileLink);
 }
@@ -108,6 +124,7 @@ void    Autoindex::_generateIndexPage()
 		_indexPage += _generateHtmlLink(file->d_type, std::string(file->d_name));
 	}
 	_indexPage += _generateHtmlFooter();
+	std::cout << RED << getIndexPage() << std::endl;
     closedir(directory);
 }
 
@@ -117,7 +134,7 @@ void    Autoindex::_generateIndexPage()
 
 void	Autoindex::_formatCell(std::string* data)
 {
-	*data = "\t\t\t\t<td>" + *data + "</td>\n";
+	*data = "\t\t\t\t<td class=\"border\">" + *data + "</td>\n";
 }
 
 std::string		Autoindex::_getFileSize(struct stat	fileInfos)

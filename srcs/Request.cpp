@@ -26,7 +26,7 @@ Request::Request(const std::string& buffer, int clientfd):
 	_request(buffer), _fd (clientfd)
 {
 	// DEBUG("Request: " + _request);
-	displayMsg("Request: " + _request, LIGHT_BLUE);
+	//displayMsg("Request: " + _request, LIGHT_BLUE);
 	_initVariables();
 	_initParsingFunct();
 }
@@ -98,7 +98,7 @@ t_requestStatus	Request::parseRequest()
 		_requestStatus = COMPLETE_REQUEST;
 	}
 	// printRequestInfo();
-	std::cout << RED << "size body : " << _body.size() << RESET << NL;
+	//std::cout << RED << "size body : " << _body.size() << RESET << NL;
 	return (_requestStatus);
 }
 
@@ -275,19 +275,15 @@ void	Request::_parseBody()
 		_decodeChunks();
 	else
 	{
+	//	DEBUG("before check size");
 		_body = _request;
 		// _checkSizeBody();
-		if (_body.size() != _bodySize)
+		ite = _headers.find("content-type");
+		if (ite != _headers.end() && ite->second == "application/x-www-form-urlencoded")
 		{
-			std::cout << GREEN << _body.size() << " | " << _bodySize << RESET << std::endl;
-			return ;
+			// _query = _body;
+			_bodySize = 0;
 		}
-		// ite = _headers.find("content-type");
-		// if (ite != _headers.end() && ite->second == "application/x-www-form-urlencoded")
-		// {
-		// 	// _query = _body;
-		// 	_bodySize = 0;
-		// }
 		//DEBUG("in parse body");
 		return (_setRequestStatus(COMPLETE_REQUEST));
 	}

@@ -15,8 +15,7 @@ Client::Client(serverMapNode server, int sockfd, const Env& env):
     _runningServer(server),
     _request(0),
     _response(0),
-	_env(env)
-{}
+	_env(env) {}
 
 Client::Client(Client const& other)
 {

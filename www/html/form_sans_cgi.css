@@ -3,14 +3,6 @@ body {
     padding: 0;
 }
 
-.background {
-	background: url(img/polka.jpg) repeat center center fixed;
-	-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-o-background-size: cover;
-	background-size: cover;
-}
-
 @font-face {
     font-family: berry;
     src: url(fonts/Berry_Merry.otf);
@@ -23,7 +15,7 @@ body {
 
 @font-face {
 	font-family: NotoSerifKR_R;
-	src: url(fonts/NotoSerifKR-Bold.otf)
+	src: url(fonts/NotoSerifKR-Regular.otf)
 }
 
 @font-face {
@@ -31,13 +23,9 @@ body {
 	src: url(fonts/NotoSerifKR-Light.otf)
 }
 
-.icon {
-	position: fixed;
-    right: 0;
-}
 
 h1 {
-    color: black;
+    color: #d71b3b;
     font-family: peralta;
 }
 
@@ -45,17 +33,34 @@ h1 {
     text-align: center;
 }
 
-.requete {
-	margin-top: 50px;
+.form_container {
 	margin-bottom: 15px;
-	font-family: NotoSerifKR_L;
-	font-size: 150%;
+	padding: 10px;
+	display: flex;
+	flex-flow: column wrap;
+	align-content: center;
 }
 
-.happy {
-	margin-bottom: 15px;
+legend {
+	padding: 10px 3px;
 	font-family: NotoSerifKR_R;
-	font-size: 150%;
+	font-weight: bold;
+	font-variant: small-caps;
+	text-align: left;
+}
+
+label {
+	width: 500px;
+	display: inline-block;
+	vertical-align: top;
+	margin: 6px;
+	font-family: NotoSerifKR_L;
+}
+
+input::placeholder {
+	font-family: NotoSerifKR_L;
+	font-style: italic;
+	font-size: 90%;
 }
 
 .bouton {
@@ -66,4 +71,5 @@ h1 {
 	font-family: berry;
 	font-size: 150%;
 	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+	cursor: pointer;
 }

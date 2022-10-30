@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/27 16:01:43 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/28 22:26:06 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 # define BUFSIZE 2048
 
 extern bool	_triggered;
+extern int	__is_child;
 
 		/*----------   Signal   ---------*/
 

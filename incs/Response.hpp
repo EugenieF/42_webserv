@@ -50,6 +50,7 @@ class   Response
 		std::string						_uploadPath;
 
 		Env*							_env; // Shares same env than client
+		bool							_is_cgi;
 		std::string						_cgiscript;
 		std::string						_cgiextra;
 		std::string						_cgiquery;
@@ -91,8 +92,8 @@ class   Response
 		std::string						getCgiName() const;
 		std::string						getCgiExtra() const;
 		std::string						getCgiQuery() const;
-		const Env&						getEnv() const;
 		Session*						getSession() const;
+		Env*							getEnv() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

@@ -5,25 +5,39 @@
 		<meta charset="UTF-8">
 		<link href="form_upload.css" rel="stylesheet">
 	</head>
-	<body class="background">
+	<body bgcolor="#850E35">
+		<div class="icon">
+			<a href="form_gallery.html"><img src="img/icon_panier.png" width="100px"></a>
+		</div>
 		<h1>
-			<center>Envoi de votre nude ACCEPTED 💝</center>
+			<center>👙 Plateforme d'echange de nudes d'hamster 🩲</center>
 		</h1>
 		<div class="hamster">
-			<img src="img/hamster_nude.jpg" width="500px">
+			<img src="img/hamster_slip.png" width="400">
 		</div>
-		<div class="requete">
-			<center>Ton envoi de votre nude a ete accepte.<br></center>
-		</div>
-		<div class="happy">
-			<center>Vous nous rendez tres tres heureux 😏 !</center>
-		</div>
-			<form action="./form.html">
-				<center><input type="submit" value="Creer une nouvelle demande pour eveiller nos sens" class="bouton" /></center>
+		<div class="form_container">
+			<legend>C'est un form POST avec INPUT File</legend>
+			<form action="form_upload.html" method="post" class="formulaire" accept='image/*' enctype="multipart/form-data">
+				<div class="formulaire">
+					<label for="nude">Envoyez votre nude :</label>
+					<input type="file" name="nude"><br>
+				</div>
+				<!-- <input type="submit" value="JE VEUX MON CASH !" class="bouton"></input> -->
+				<input type="submit" value="JE VEUX MON CASH !" formmethod="GET" formaction="form_upload.html" class="bouton"></input>
+				<!-- <input id="btn" type="button" value="JE VEUX MON CASH !" onclick="sendGetRequest();"></input> -->
 			</form>
-			<form action="./index.html">
-				<center><input type="submit" value="Retour vers la page d'accueil" class="bouton" /></center>
+			<!-- ====================================================================================== -->
+			<legend>C'est un form POST avec INPUT File et CGI</legend>
+			<form action="../cgi/cgi_upload.py" method="post" class="formulaire" accept='image/*' enctype="multipart/form-data">
+				<div class="formulaire">
+					<label form="nude">Envoyez votre nude :</label>
+					<input type="file" name="nude"><br>
+				</div>
+				<input type="submit" value="JE VEUX MON CASH !" class="bouton"></input>
 			</form>
 		</div>
+		<form action="./index.html">
+			<center><input type="submit" value="Retour vers la page d'accueil" class="bouton" /></center>
+		</form>
 	</body>
 </html>

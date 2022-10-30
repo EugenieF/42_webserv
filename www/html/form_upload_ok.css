@@ -1,10 +1,11 @@
-body {
+/* body {
     margin: 0;
     padding: 0;
-}
+	background-color: #FF69B4;
+} */
 
 .background {
-	background: url(img/polka.jpg) repeat center center fixed;
+	background: url(img/sunflower.jpg) no-repeat center center fixed;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
@@ -17,9 +18,10 @@ body {
 }
 
 @font-face {
-    font-family: peralta;
-    src: url(fonts/Peralta-Regular.ttf);
+    font-family: katelina;
+    src: url(fonts/Katenila-OVJL6.otf);
 }
+
 
 @font-face {
 	font-family: NotoSerifKR_R;
@@ -37,8 +39,9 @@ body {
 }
 
 h1 {
-    color: black;
-    font-family: peralta;
+    color: #511845;
+    font-family: katelina;
+	font-size: 500%;
 }
 
 .hamster {
@@ -48,19 +51,21 @@ h1 {
 .requete {
 	margin-top: 50px;
 	margin-bottom: 15px;
-	font-family: NotoSerifKR_L;
-	font-size: 150%;
+	font-family: katelina;
+	font-size: 250%;
+	color: #900C3F;
 }
 
 .happy {
 	margin-bottom: 15px;
-	font-family: NotoSerifKR_R;
-	font-size: 150%;
+	font-family: katelina;
+	font-size: 250%;
+	color: #C70039;
 }
 
 .bouton {
-	margin: 20px;
-	background-color: #FF69B4;
+	margin: 10px;
+	background-color: #FF5733;
 	color: white;
 	text-align: center;
 	font-family: berry;

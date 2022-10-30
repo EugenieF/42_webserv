@@ -15,6 +15,7 @@ Response::Response(Block *server, Request* request, Env& env, Session* session):
 	_locationPath(""),
 	_fd(request->getFd()),
 	_env(&env),
+	_is_cgi(false),
 	_cgipath(""),
 	_session(session)
 {
@@ -43,6 +44,7 @@ Response&	Response::operator=(const Response &other)
 		_httpMethods = other.getHttpMethods();
 		_locationPath = other.getLocationPath();
 		_fd = other.getFd();
+		_env = other.getEnv();
 		_cgipath = other.getCgiProgram();
 		_session = other.getSession();
 	}
@@ -62,7 +64,7 @@ void	Response::_processMethod()
 	if (!_matchingBlock->isAllowedMethod(_method))
 		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
-	DEBUG("BUILD PATH = " + _builtPath);
+	//DEBUG("BUILD PATH = " + _builtPath);
 	if (path.empty())
 		throw(NOT_FOUND);
 	/* Find corresponding http method */
@@ -82,7 +84,6 @@ void	Response::generateResponse()
 	/* Generate CGI here */
 	std::string	errorPage;
 
-	//DEBUG("Response");
 	//std::cerr << RED << "STATUS CODE: " << getStatusCode() << RESET << NL;
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
@@ -103,9 +104,10 @@ void	Response::generateResponse()
 		_fillErrorBody();
 	}
 	_fillResponseLine();
-	if (!_isCgi(_builtPath))
+	if (!_is_cgi)
 		_fillHeaders();
 	_response += _body + "\r\n";
+	//std::cerr << RED << "Response is : " << _response << RESET << NL;
 }
 
 /******************************************************************************/
@@ -187,7 +189,8 @@ void	Response::_readFileContent(const std::string& path)
 void	Response::_runGetMethod()
 {
 	//DEBUG("Get method");
-	if (_isCgi(_builtPath))
+	_is_cgi = _isCgi(_builtPath);
+	if (_is_cgi)
 	{
 		/* process cgi */
 		return (_handleCgi());
@@ -231,7 +234,7 @@ std::string		Response::_getBoundary(std::string contentType)
 	{
 		throw(BAD_REQUEST);
 	}
-	boundary = "--" + boundary; 
+	boundary = "--" + boundary + "\r\n"; 
 	return (boundary);
 }
 
@@ -293,6 +296,7 @@ bytes of pdf file
 ...
 */
 
+
 void	Response::_handleMultipartContent(const std::string& path, std::string body)
 {
 	std::string	boundary;
@@ -315,6 +319,7 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 		// _headers["Content-Type"] = g_mimeType[".html"];
 	}
 }
+
 
 /******************************************************************************/
 /*                               POST METHOD                                  */
@@ -349,8 +354,8 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		_throwErrorMsg("Can't open file '" + path + "'");
 	}
 	/* We write in file */
-	// file << content;
-	file.write (content.c_str(), content.length());
+	file << content;
+	// file.write (content.c_str(), content.length());
 	/* Check if writing was successfully performed */
 	if (file.bad())
 	{
@@ -367,16 +372,18 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 
 void	Response::_handleCgi()
 {
-	//DEBUG("handleCgi()");
 	_fillCgiMetavariables();
+
 	CgiHandler	cgi(*this);
 	try {
-		_body = cgi.getCgiOutput();
+		if (!cgi.getCgiOutput(_body)) {
+			_is_cgi = false;
+			throw (INTERNAL_SERVER_ERROR);
+		}
 	} catch (const std::runtime_error& e) {
 		std::cerr << RED << "Exception in handlecgi : " << e.what() << RESET << NL;
 		throw (INTERNAL_SERVER_ERROR);
 	}
-	// _body = cgi.getCgiOutput(); // if headers not in cgi response
 }
 
 /* Perform resource-specific processing on the request payload. */
@@ -384,8 +391,8 @@ void	Response::_runPostMethod()
 {
 	std::ofstream		ofs;
 
-	// what if path is empty ??
-	if (_isCgi(_builtPath))
+	_is_cgi = _isCgi(_builtPath);
+	if (_is_cgi)
 	{
 		/* process cgi */
 		_builtPath = _uploadPath;
@@ -490,7 +497,6 @@ std::string		Response::_getContentTypeHeader()
 	/* Check if header is already set */
 	if (_headers.find("Content-Type") != _headers.end())
 		return (_headers["Content-Type"]);
-	//std::cout << RED << _builtPath << RESET << NL;
 	pos = _builtPath.rfind(".");
 	if (pos != std::string::npos)
 	{
@@ -528,7 +534,6 @@ void	Response::_generateAutoindex(const std::string& path)
 
 	_body = autoindex.getIndexPage();
 	_headers["Content-Type"] = g_mimeType[".html"];
-	// std::cout << RED << "_body = " << _body << RESET << NL;
 }
 
 bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
@@ -610,7 +615,6 @@ std::string		Response::_buildPath()
 		path.insert(path.begin(), '.');
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
-	// DEBUG("uri: " + _request->getPath();
 	_builtPath = path;
 	return (path);
 }
@@ -745,8 +749,8 @@ std::string		Response::getCgiQuery() const {
 	return (_cgiquery);
 }
 
-const Env&		Response::getEnv() const {
-	return (*_env);
+Env*		Response::getEnv() const {
+	return (_env);
 }
 
 std::string		Response::getBuiltPath() const
@@ -769,7 +773,6 @@ bool	Response::_isCgi(const std::string& path)
 	pos = _parsePosCgiExtension(path);
 	if (pos != std::string::npos)
 	{
-		//_env->add
 		_parseCgiUrl(pos);
 		return (true);
 	}
@@ -786,16 +789,17 @@ size_t	Response::_parsePosCgiExtension(std::string path) {
 		if (_matchingBlock->findCgi(extension) != "")
 		{
 			_cgipath = _matchingBlock->findCgi(extension);
-			std::cout << YELLOW << "in cgi path = " << path << " | extension : " << extension << " | path = " << _cgipath << RESET << NL;
+			std::cout	<< YELLOW << "in cgi path = " << path
+						<< " | extension : " << extension
+						<< " | path = " << _cgipath << RESET << NL;
 			break ;
 		}
 		path.erase(0, extension.length() + 1);
 	}
-	return (pos); /*dummy*/
+	return (pos);
 }
 
 void   Response::_parseCgiUrl(size_t pos_extension) {
-	/* TODO: Retrieve cgi pos_extension and check if matching to block */
 	std::string		path = _request->getPath();
 
 	size_t		pos_end_extension = path.find('/', pos_extension);
@@ -803,30 +807,13 @@ void   Response::_parseCgiUrl(size_t pos_extension) {
 	if (pos_cgi == std::string::npos)
 		return ;
 	std::string	cgi = path.substr(pos_cgi + 1, pos_end_extension);
-	// if (cgi.empty()) {
-	//     /* Error?: cgi script name empty */;
-	//     throw (NOT_FOUND);
-	// }
 	_cgiscript = cgi;
 	_cgiquery = _request->getQuery();
-	_cgiextra = "";
-//	if (pos_end_extension == std::string::npos)
-//	{
-//		//std::cout << RED << "RETURN" << RESET << NL;
-//	    return ;
-//	}
-
-	//std::cout << RED << "DEBUB" << RESET << NL;
-
-	//size_t	pos_query = path.find('?');
-	//if (pos_query != std::string::npos)
-		//_cgiquery = path.substr(pos_query + 1);
-
-	//std::string extra = path.substr(0, pos_query);
+	_cgiextra = ""; // TODO : get extra
 }
 
+/* Retrieve info from request and put them in env */
 void	Response::_fillCgiMetavariables() {
-	/* Retrieve info from request */
 	_env->addParam("SERVER_PROTOCOL", _request->getHttpProtocol());
 	_env->addParam("CONTENT_LENGTH", convertNbToString(_request->getBodySize()));
 	_env->addParam("CONTENT_TYPE", _request->getHeader("content-type"));
@@ -836,13 +823,11 @@ void	Response::_fillCgiMetavariables() {
 	_env->addParam("SCRIPT_FILENAME", _translateCgiName());
 	_env->addParam("PATH_INFO", getCgiExtra()); // TODO: parse esc char
 	_env->addParam("PATH_TRANSLATED", ""); //TODO PATH_INFO translated :
-	// PATH_TRANSLATED=ROOT/PATH_INFO
 	_env->addParam("REMOTE_ADDR", "localhost"); /* TODO: inet_hton ? Recode epoll ? */
 	_env->addParam("SERVER_PORT", convertNbToString(_request->getPort()));
 	_env->addParam("REMOTE_IDENT", ""); // optional
 
-	std::cerr << RED << "Query: " << getCgiQuery() << RESET << NL;
-	/* FROM CLIENT : */
+	//std::cerr << RED << "Query: " << getCgiQuery() << RESET << NL;
 	_env->addParam("HTTP_ACCEPT", _request->getHeader("accept"));
 	_env->addParam("HTTP_ACCEPT_LANGUAGE", _request->getHeader("accept-language"));
 	_env->addParam("HTTP_USER_AGENT", _request->getHeader("user-agent"));
@@ -853,7 +838,6 @@ void	Response::_fillCgiMetavariables() {
 }
 
 std::string		Response::_translateCgiName() const {
-	// std::string     translation(_env->getEnv("PWD"));
 	std::string     translation(std::string(WEBSERV_PATH));
 	std::string		relativePath(getBuiltPath());
 
@@ -862,12 +846,6 @@ std::string		Response::_translateCgiName() const {
 	else if (relativePath[0] != '/')
 		relativePath.insert(0, "/");
 	translation += relativePath;
-	//std::cout << RED << "PATH TRANSL. : " << translation << NL;
-	//translation += _cgipath + "/";
-	//translation += getCgiName();
-	//std::cout << "PATH TRANSL. : " << translation << NL;
-	//std::cout << "buildpath : " << _builtPath << RESET << NL;
-	std::cout << GREEN<<"Translation is: "<< translation<<RESET<<NL;
 	return (translation);
 }
 

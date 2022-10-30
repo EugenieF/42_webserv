@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/28 17:18:25 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/28 22:36:01 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void EpollInstance::startMonitoring(serverMap& servers) {
 	/* Creating fd associated with epoll */
 	_efd = epoll_create1(0);
 	_monitorServers(servers);
-	//std::cout << GREEN << "efd = " << _efd << RESET << std::endl;
 
 	while (getTriggeredValue() == false) {
 		/* Waiting for events on every server sockets */
@@ -104,6 +103,8 @@ void EpollInstance::_editSocket(int sock, int flag) {
 }
 
 void EpollInstance::_removeSocket(int sock) {
+	if (__is_child == 1)
+		return ;
 	if (epoll_ctl(_efd, EPOLL_CTL_DEL, sock, 0) < 0)
 		throw std::runtime_error("removing socket in epoll led to error");
 }
@@ -197,19 +198,23 @@ void EpollInstance::_handleRequest(Client* client) {
 		std::cerr << e.what() << NL;
 	}
 	t_requestStatus requestStatus = client->parseRequest(str);
-	//std::cout << " ============================== REQUEST STATUS : " << requestStatus << NL;
-	if (requestStatus == COMPLETE_REQUEST) {
+	if (requestStatus == COMPLETE_REQUEST)
 		_editSocket(client->getFd(), EPOLLOUT);
-	}
 	else if (requestStatus == INVALID_REQUEST)
 		_eraseClient(client);
 }
 
 void EpollInstance::_handleResponse(Client* client) {
 	DEBUG("Response");
-	//Response* response = client->generateResponse();
+
+	std::string response;
+
 	client->generateResponse();
-	std::string response = client->getResponse()->getResponse();
+	if (__is_child != 0) {
+		_triggered = true;
+		return ;
+	}
+	response = client->getResponse()->getResponse();
 	//std::cerr << RED << "Response:\n" << response << RESET << NL;
 	if (write(client->getFd(), response.c_str(), response.size()) < 0)
 		throw std::runtime_error("handleResponse (write) error");

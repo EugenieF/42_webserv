@@ -1,10 +1,11 @@
-body {
+/* body {
     margin: 0;
     padding: 0;
-}
+	background-color: #FF69B4;
+} */
 
 .background {
-	background: url(img/polka.jpg) repeat center center fixed;
+	background: url(img/sunflower.jpg) no-repeat center center fixed;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
@@ -37,7 +38,7 @@ body {
 }
 
 h1 {
-    color: black;
+    color: #d71b3b;
     font-family: peralta;
 }
 
@@ -50,12 +51,14 @@ h1 {
 	margin-bottom: 15px;
 	font-family: NotoSerifKR_L;
 	font-size: 150%;
+	color: white;
 }
 
 .happy {
 	margin-bottom: 15px;
 	font-family: NotoSerifKR_R;
 	font-size: 150%;
+	color: white;
 }
 
 .bouton {

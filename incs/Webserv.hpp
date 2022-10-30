@@ -11,6 +11,7 @@
 
 # include "Parser.hpp"
 # include "EpollInstance.hpp"
+# include "utils.hpp"
 
 # define NL '\n'
 # define PORT	8080

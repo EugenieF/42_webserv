@@ -241,7 +241,7 @@ std::string		SessionHandler::_generateSessionId()
 	sessionId = generateRandomString(SESSION_ID_LENGTH);
 	while (_findSessionIte(sessionId) != _sessions.end())
 		sessionId = generateRandomString(SESSION_ID_LENGTH);
-	DEBUG("SESSION ID = " + sessionId);
+	//DEBUG("SESSION ID = " + sessionId);
 	return (sessionId);
 }
 

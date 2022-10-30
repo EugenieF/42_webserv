@@ -4,6 +4,8 @@
 # include "Server.hpp"
 # include "Parser.hpp"
 # include "Response.hpp"
+# include "utils.hpp"
+
 
 /******************************************************************************/
 /*                                CLASS CLIENT                                */
