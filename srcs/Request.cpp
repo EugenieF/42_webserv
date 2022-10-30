@@ -26,7 +26,7 @@ Request::Request(const std::string& buffer, int clientfd):
 	_request(buffer), _fd (clientfd)
 {
 	// DEBUG("Request: " + _request);
-	//displayMsg("Request: " + _request, LIGHT_BLUE);
+	displayMsg("Request: " + _request, LIGHT_BLUE);
 	_initVariables();
 	_initParsingFunct();
 }

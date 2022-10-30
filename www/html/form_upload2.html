@@ -4,7 +4,7 @@
 		<title>Cutie webserv 😚 💖</title>
 		<meta charset="UTF-8">
 		<link href="form_upload.css" rel="stylesheet">
-		<!-- <script type="text/javascript" src="form.js"></script> -->
+		<script type="text/javascript" src="form.js"></script>
 	</head>
 	<body bgcolor="#850E35">
 		<div class="icon">
@@ -18,16 +18,27 @@
 		</div>
 		<div class="form_container">
 			<legend>C'est un form POST avec INPUT File</legend>
-			<!-- <form id="form" class="formulaire" accept='image/*' enctype="multipart/form-data"> -->
-			<form action="form_upload" accept='image/*'>
+			<form id="form" class="formulaire" accept='image/*' enctype="multipart/form-data">
 				<div class="formulaire">
 					<label for="nude">Envoyez votre nude :</label>
-					<input id="file" type="file"><br>
+					<input id="file" type="file" name="nude" ><br>
 				</div>
-				<!-- <button class="bouton">UPLOAD</button> -->
+				<button class="bouton">UPLOAD</button>
 				<!-- <button class="bouton" onclick="uploadData()">UPLOAD</button> -->
 				<!-- <input type="submit" value="JE VEUX MON CASH !" class="bouton"></input> -->
+			</form>
+			<!-- ====================================================================================== -->
+			<legend>C'est un form POST avec INPUT File et CGI</legend>
+			<form action="../cgi/cgi_upload.py" method="post" class="formulaire" accept='image/*' enctype="multipart/form-data">
+				<div class="formulaire">
+					<label form="nude">Envoyez votre nude :</label>
+					<input type="file" name="nude"><br>
+				</div>
 				<input type="submit" value="JE VEUX MON CASH !" class="bouton"></input>
+			</form>
+		</div>
+		<form action="./index.html">
+			<center><input type="submit" value="Retour vers la page d'accueil" class="bouton" /></center>
 		</form>
 	</body>
 </html>

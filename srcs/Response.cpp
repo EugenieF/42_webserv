@@ -107,7 +107,8 @@ void	Response::generateResponse()
 	if (!_is_cgi)
 		_fillHeaders();
 	_response += _body + "\r\n";
-	//std::cerr << RED << "Response is : " << _response << RESET << NL;
+	if (_request->getMethod() == POST)
+		std::cout << RED << "Response is : " << _response << RESET << NL;
 }
 
 /******************************************************************************/
