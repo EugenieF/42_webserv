@@ -84,7 +84,6 @@ void	Response::generateResponse()
 	/* Generate CGI here */
 	std::string	errorPage;
 
-	//std::cerr << RED << "STATUS CODE: " << getStatusCode() << RESET << NL;
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
@@ -107,8 +106,6 @@ void	Response::generateResponse()
 	if (!_is_cgi)
 		_fillHeaders();
 	_response += _body + "\r\n";
-	// if (_request->getMethod() == POST)
-		// std::cout << RED << "Response is : " << _response << RESET << NL;
 }
 
 /******************************************************************************/
@@ -159,6 +156,27 @@ void	Response::_fillHeaders()
 /*                               GET METHOD                                   */
 /******************************************************************************/
 
+void   Response::_parseQuery()
+{
+	std::string     query;
+	std::string     name;
+	std::string     content;
+	size_t          pos;
+
+	pos = 0;
+	query = _request->getQuery();
+	while (pos < query.size())
+	{
+		name = query.substr(pos, query.find("="));
+		query.erase(pos, name.length() + 1);
+		content = query.substr(pos, query.find("&"));
+		query.erase(pos, content.length() + 1);
+		if (name == "color" && content.size() > 7)
+			content = "#" + content.substr(content.size() - 6);
+		_session->completePurchase(name, content);
+	}
+}
+
 void	Response::_handleRedirection()
 {
 	setStatusCode(_matchingBlock->getRedirectCode());
@@ -203,6 +221,10 @@ void	Response::_runGetMethod()
 	}
 	else if (_body.empty()) /* If there is no autoindex */
 	{
+		if (_request->getPath() == "/form_accept.html" && !_request->getQuery().empty())
+		{
+			_parseQuery();
+		}
 		_readFileContent(_builtPath);
 	}
 }
@@ -239,21 +261,24 @@ std::string		Response::_getBoundary(std::string contentType)
 	return (boundary);
 }
 
-std::string		Response::_getField(std::string contentDisposition, const std::string& field)
+size_t	Response::_getField(
+	std::string contentDisposition, const std::string& field, std::string* name)
 {
-	size_t		pos;
-	std::string	name;
+	size_t	pos;
 
 	pos = contentDisposition.find(field);
 	if (pos == std::string::npos)
-		return ("");
-	contentDisposition.erase(0, pos + field.size());
-	name = contentDisposition.substr(0, contentDisposition.find("\""));
-	return (name);
+	{
+		*name = "";
+		return (pos);
+	}
+	pos += field.size();
+	contentDisposition.erase(0, pos);
+	*name = contentDisposition.substr(0, contentDisposition.find("\""));
+	return (pos);
 }
 
-void	Response::_parseContent(const std::string& path, std::string body,
-	const std::string& boundary)
+void	Response::_parseContent(std::string body, const std::string& boundary)
 {
 	size_t		pos;
 	std::string	contentDisposition;
@@ -261,21 +286,19 @@ void	Response::_parseContent(const std::string& path, std::string body,
 	std::string	name;
 	std::string	content;
 
-	(void)path;
 	pos = body.find("Content-Disposition:");
 	if (pos == std::string::npos)
 		throw(BAD_REQUEST);
 	contentDisposition = body.substr(pos, body.find("\r\n"));
-	name = _getField(contentDisposition, "name=\"");
-	filename = _getField(contentDisposition, "filename=\"");
+	_getField(contentDisposition, "name=\"", &name);
+	_getField(contentDisposition, "filename=\"", &filename);
 	body.erase(0, body.find("\r\n\r\n") + 4);
 	content = body.substr(0, body.find("\r\n" + boundary));
-	// std::cout << ORANGE << content << RESET << NL;
 	if (filename != "")
 	{
+		/* filenamePath = _uploadPath + filename */
 		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
-			filename.insert(0, "/");
-		DEBUG("filename : " + _uploadPath + filename);
+			_uploadPath += "/";
 		_writeFileContent(_uploadPath + filename, content);
 	}
 	else
@@ -297,17 +320,44 @@ bytes of pdf file
 ...
 */
 
-
-void	Response::_handleMultipartContent(const std::string& path, std::string body)
+void	Response::_handleMultipartContentCgi(std::string body)
 {
 	std::string	boundary;
 	std::string	filename;
+	std::string	contentDisposition;
+	size_t		pos;
+	size_t		posFilename;
+
+	posFilename = 0;
+	boundary = _getBoundary(_request->getHeader("content-type"));
+	while (body.find(boundary + "\r\n") != std::string::npos)
+	{
+		posFilename += body.find(boundary + "\r\n") + boundary.length() + 2;
+		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
+		pos = body.find("Content-Disposition:");
+		if (pos == std::string::npos)
+			throw(BAD_REQUEST);
+		contentDisposition = body.substr(pos, body.find("\r\n"));
+		posFilename += _getField(contentDisposition, "filename=\"", &filename);
+		if (filename != "")
+		{
+			if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
+				_uploadPath += "/";
+			_request->insertUploadPath(posFilename, _uploadPath);
+			// std::cout << RED << _request->getBody() << RESET << NL;
+		}
+	}
+}
+
+void	Response::_handleMultipartContent(std::string body)
+{
+	std::string	boundary;
 
 	boundary = _getBoundary(_request->getHeader("content-type"));
 	while (body.find(boundary + "\r\n") != std::string::npos)
 	{
 		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
-		_parseContent(path, body, boundary);
+		_parseContent(body, boundary);
 	}
 	if (_request->getPath() == "/form_accept")
 	{
@@ -316,21 +366,13 @@ void	Response::_handleMultipartContent(const std::string& path, std::string body
 	}
 	else if (_request->getPath() == "/form_upload")
 	{
-		// _readFileContent("www/html/upload.html");
-		// _headers["Content-Type"] = g_mimeType[".html"];
 		_body = "OK";
 	}
 }
 
-
 /******************************************************************************/
 /*                               POST METHOD                                  */
 /******************************************************************************/
-
-// void	Response::_writeFileContent(const std::string& path, const std::string& content)
-// {
-// 	std::ofstream(path.c_str(), std::ios::binary) << std::ifstream(path.c_str(), std::ios::binary).rdbuf();
-// }
 
 void	Response::_writeFileContent(const std::string& path, const std::string& content)
 {
@@ -348,7 +390,6 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		setStatusCode(CREATED);
 	}
 	file.open(path.c_str(), std::ios::out | std::ios::binary);
-	// file.open(path.c_str(), std::ofstream::app | std::ios::binary);
 	/* Check if file was successfully opened */
 	if (!file.is_open())
 	{
@@ -357,7 +398,6 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 	}
 	/* We write in file */
 	file << content;
-	// file.write (content.c_str(), content.length());
 	/* Check if writing was successfully performed */
 	if (file.bad())
 	{
@@ -397,7 +437,7 @@ void	Response::_runPostMethod()
 	if (_is_cgi)
 	{
 		/* process cgi */
-		_builtPath = _uploadPath;
+		_handleMultipartContentCgi(_request->getBody());
 		return (_handleCgi());
 	}
 	// if (_matchingBlock->getUploadPath().empty())
@@ -413,8 +453,7 @@ void	Response::_runPostMethod()
 	}
 	if (_contentTypeIsMultipart())
 	{
-		// return (_handleMultipartContent(_uploadPath, _request->getBody()));
-		return (_handleMultipartContent(_builtPath, _request->getBody()));
+		return (_handleMultipartContent(_request->getBody()));
 	}
 	_writeFileContent(_builtPath, _request->getBody());
 }
@@ -791,9 +830,9 @@ size_t	Response::_parsePosCgiExtension(std::string path) {
 		if (_matchingBlock->findCgi(extension) != "")
 		{
 			_cgipath = _matchingBlock->findCgi(extension);
-			std::cout	<< YELLOW << "in cgi path = " << path
-						<< " | extension : " << extension
-						<< " | path = " << _cgipath << RESET << NL;
+			// std::cout	<< YELLOW << "in cgi path = " << path
+			// 			<< " | extension : " << extension
+			// 			<< " | path = " << _cgipath << RESET << NL;
 			break ;
 		}
 		path.erase(0, extension.length() + 1);

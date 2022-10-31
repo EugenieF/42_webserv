@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 16:35:16 by etran             #+#    #+#             */
-/*   Updated: 2022/10/26 16:25:35 by eli              ###   ########.fr       */
+/*   Updated: 2022/10/31 13:48:08 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ bool CgiHandler::getCgiOutput(std::string& output) {
 	int	pid;
 
 	DEBUG("In CGI!!");
+	// _env.display();
 	_setupPipe();
 	pid = fork();
 	if (pid < 0) {

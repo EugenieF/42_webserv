@@ -48,6 +48,8 @@ class   Request
 		int							_fd;
 		std::string					_query;
 		listOfCookies				_cookies;
+		std::string					_raw;
+		bool						_headerIsParsed;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -83,11 +85,14 @@ class   Request
 		int							getFd() const;
 		std::string					getMethodStr() const; // Can be replaced by global
 		std::string					getQuery() const;
-		// listOfCookies&				getCookies();
+		std::string					getRawRequest() const;
 		const listOfCookies&		getCookies() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
+		bool						keepAlive() const;
+
+		void						insertUploadPath(size_t pos, const std::string& uploadPath);
 
 	private:
 	/**********************  PRIVATE MEMBER FUNCTIONS  ******************/

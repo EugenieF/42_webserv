@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:35:13 by etran             #+#    #+#             */
-/*   Updated: 2022/10/08 13:31:07 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/10/31 17:15:06 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@
 
 # include "utils.hpp"
 
-# define LISTEN_VAL 10
+// # define LISTEN_VAL 10
+# define LISTEN_VAL SOMAXCONN
 
 class TcpSocket {
 	public:

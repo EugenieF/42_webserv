@@ -126,7 +126,7 @@ std::string		Response::_generateFormOrderPage()
 
 	htmlPage += \
 				"\n\n\
-				<form action=\"/form.html\">\n\
+				<form action=\"/form_sans_cgi.html\">\n\
 					<center><input type=\"submit\" value=\"Go acheter un nouvel ami !\" class=\"bouton\" /></center>\n\
 				</form>\n\
 				<form action=\"/index.html\">\n\

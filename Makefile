@@ -65,7 +65,7 @@ $(OBJS_DIR)/%.o: %.cpp
 all:	$(NAME)
 
 debug:	
-		$(eval CXXFLAGS += $(DEBUG_MODE))
+		$(eval CXXFLAGS += $(DEBUG_MODE)) all
 
 cookie:
 		$(eval CXXFLAGS += $(BONUS_MODE))

@@ -114,11 +114,23 @@ void	Session::fillCookies(const listOfCookies& cookies)
 
 	for (ite = cookies.begin(), count = 0; ite != cookies.end(); ite++, count++)
 	{
-		if (ite->getName() != SESSION_ID)
+		if (ite->getName() != SESSION_ID && !_cookieAlreadySet(ite->getName(), ite->getValue()))
 			_addCookie(ite->getName(), ite->getValue());
 		if (count > 150)
 			throw(PAYLOAD_TOO_LARGE);
 	}
+}
+
+bool	Session::_cookieAlreadySet(const std::string& name, const std::string& value)
+{
+	listOfCookies::const_iterator	ite;
+
+	for (ite = _cookies.begin(); ite != _cookies.end(); ite++)
+	{
+		if (ite->getName() == name && ite->getValue() == value)
+			return (true);
+	}
+	return (false);
 }
 
 void	Session::_addCookie(const std::string& name, const std::string& value)

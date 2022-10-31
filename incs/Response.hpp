@@ -116,14 +116,20 @@ class   Response
 		void							_writeFileContent(const std::string& path, const std::string& content);
 		void							_handleUploadFile();
 		void							_handleCgi();
-		void							_handleMultipartContent(const std::string& path, std::string content);
+		void							_handleMultipartContent(std::string body);
+		void							_handleMultipartContentCgi(std::string body);
 		std::string						_getBoundary(std::string contentType);
-		std::string						_getField(std::string contentDisposition, const std::string& field);
-		void							_parseContent(const std::string& path, std::string body, const std::string& boundary);
+		// std::string						_getField(std::string contentDisposition, const std::string& field);
+		size_t							_getField(std::string contentDisposition, const std::string& field,
+											std::string* name);
+		void							_parseContent(std::string body, const std::string& boundary);
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod();
 		bool							_deletePurchase(const std::string& uri);
+
+						/*-----       Query    ----*/
+		void							_parseQuery();
 
 						/*-------   Path    ------*/
 		std::string						_buildPath();

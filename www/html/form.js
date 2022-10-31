@@ -1,3 +1,10 @@
+function handleErrors(response) {
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    return response;
+}
+
 function uploadData() {
     // alert('The selected file will be uploaded');
     const input = document.getElementById("file");
@@ -5,31 +12,45 @@ function uploadData() {
     formData.append(file.name, input.files[0]);
     const response = fetch(`/form_upload`, {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // send cookies, even in CORS
         body: formData,
     })
-    .then(response => {
-        // window.location.href = "form_upload_ok.html";
+    .then( response => {
+        if (response.ok) {
+            window.location.href = "form_upload_ok.html";
+        } else {
+            // console.log(response.text());
+            throw Error(response.text());
+        }
     })
-    .catch(response => {
-        console.log("Error");  
+    .catch( error => {
+        console.log(error);
+        // console.log(response.status, response.statusText);
     })
 }
 
-// function uploadData() {
-//     // alert('The selected file will be uploaded');
-//     const input = document.getElementById("file");
-//     const formData = new FormData();
-//     formData.append(file.name, input.files[0]);
-//     const response = fetch(file.name, {
-//         method: 'POST',
-//         credentials: 'include',
-//         body: input.files[0],
-//     })
+
+
+//     .then(handleErrors)
+//     .then(function(response) {
+//         console.log("ok");
+//     }).catch(function(error) {
+//         console.log(error);
+//     });
+// }
+
+
+
 //     .then(response => {
-//         // window.location.href = "form_upload_ok.html";
+//         if (response.ok) {
+//             console.log("Ok");  
+//             // window.location.href = "form_upload_ok.html";
+//         }
+//         else {
+//             console.log("Error");
+//         }
 //     })
 //     .catch(response => {
-//         console.log("Error");  
+//         console.log("Error catch");
 //     })
 // }

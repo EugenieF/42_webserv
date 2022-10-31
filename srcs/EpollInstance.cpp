@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/10/28 22:36:01 by eli              ###   ########.fr       */
+/*   Updated: 2022/10/31 18:57:42 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 EpollInstance::EpollInstance() :
 	_efd(-1) {
-	memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
+		memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
 }
 
 EpollInstance::~EpollInstance() {
@@ -148,7 +148,8 @@ void EpollInstance::_clearClientList() {
 /* Finding which server triggered the EPOLLIN call */
 EpollInstance::serverMap::const_iterator
 	EpollInstance::_findServerConnection(int fd, const serverMap& serv) const {
-		for (serverMap::const_iterator it = serv.begin(); it != serv.end(); it++) {
+		for (serverMap::const_iterator it = serv.begin();
+			it != serv.end(); it++) {
 			if (it->first->getSocket() == fd)
 				return (it);
 		}
@@ -159,53 +160,51 @@ EpollInstance::serverMap::const_iterator
 void   EpollInstance::_monitorServers(const serverMap& serverlist) {
 	for (serverMap::const_iterator it = serverlist.begin();
 			it != serverlist.end(); it++)
-				_addSocket(it->first->getSocket(), EPOLLIN);
+		_addSocket(it->first->getSocket(), EPOLLIN);
 }
 
-/* Checks whether the notification occurred unexpectedly,
-   the event is then ignored and epoll keeps on checking
-   the other events. */
+/* Accepting every incoming connection on monitored server */
 
 void EpollInstance::_processConnections(serverMap::const_iterator it) {
 	while (1) {
 		struct sockaddr_in	cl_addr;
 		socklen_t			cl_addr_len = sizeof(struct sockaddr_in);
 		int					sock;
-		
+
 		memset(&cl_addr, 0, cl_addr_len);
 		sock = accept(it->first->getSocket(),
-					reinterpret_cast<struct sockaddr*>(&cl_addr), &cl_addr_len);
+				reinterpret_cast<struct sockaddr*>(&cl_addr), &cl_addr_len);
 		if (sock < 0) {
-		/* Every connection has been processed */
+			/* Every connection has been processed */
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
 				break ;
 			else
 				throw std::runtime_error("accept error");
 		}
-		displayMsg(" 🤝 New connection accepted", LIGHT_GREEN);
+		displayMsg(" 🤝 New connection accepted: "
+			+ convertNbToString(sock), LIGHT_GREEN);
 		_addClient(it, sock);
 	}
 }
 
 void EpollInstance::_handleRequest(Client* client) {
-	DEBUG("Request");
+	DEBUG("Request (client n." + convertNbToString(client->getFd()) + ")");
 	std::string		str;
 
-	str = "";
-	try {
-		str = readFd(client->getFd());
-	} catch ( const std::exception& e) {
-		std::cerr << e.what() << NL;
-	}
+	str = readFd(client->getFd());
+	// std::cerr << YELLOW<< "Content [" << str.size() << "] :" << NL
+	// 	<< str<< RESET << NL;
 	t_requestStatus requestStatus = client->parseRequest(str);
 	if (requestStatus == COMPLETE_REQUEST)
+	{
+		// std::cerr << ORANGE << " -- complete request --" << RESET << NL;
 		_editSocket(client->getFd(), EPOLLOUT);
-	else if (requestStatus == INVALID_REQUEST)
+	} else if (requestStatus == INVALID_REQUEST)
 		_eraseClient(client);
 }
 
 void EpollInstance::_handleResponse(Client* client) {
-	DEBUG("Response");
+	DEBUG("Response (client n." + convertNbToString(client->getFd()) + ")");
 
 	std::string response;
 
@@ -218,5 +217,6 @@ void EpollInstance::_handleResponse(Client* client) {
 	//std::cerr << RED << "Response:\n" << response << RESET << NL;
 	if (write(client->getFd(), response.c_str(), response.size()) < 0)
 		throw std::runtime_error("handleResponse (write) error");
-	_eraseClient(client);
+	if (!client->getRequest()->keepAlive())
+		_eraseClient(client);
 }

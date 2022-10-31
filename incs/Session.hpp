@@ -21,6 +21,7 @@ class Session
 	/***********************      MEMBER TYPES      *********************/
 		typedef std::vector<class Cookie>		listOfCookies;
 		typedef std::vector<class Purchase>		listOfPurchases;
+		typedef std::vector<std::string>		listOfPath;
 
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -29,6 +30,7 @@ class Session
 		listOfPurchases			_order;
 		Purchase				_purchase;
 		size_t					_time;
+		listOfPath				_images;
 
 	public: 
 	/*********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -64,6 +66,7 @@ class Session
 	private:
 						/*-------   Cookies  -------*/
 		void					_addCookie(const std::string& name, const std::string& value);
+		bool					_cookieAlreadySet(const std::string& name, const std::string& value);
 
 						/*--------  Purchase  -------*/
 		void					_initPurchase();

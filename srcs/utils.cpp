@@ -90,57 +90,39 @@ char* clone_str(const std::string& str) {
 	return (copy);
 }
 
-#include <sys/types.h>
-#include <sys/socket.h>
-# include <vector>
+/* Doesn't work with large uploads, I don't know why... */
 
 // std::string readFd(int fd) {
 // 	std::string     str;
+// 	char            buf[BUFSIZE + 1];
 // 	ssize_t         count;
 
-// 	std::vector<char>	vecBuf(BUFSIZE, '\0');
-// 	std::vector<char>	vecStr;
-
-// 	count = read(fd, &vecBuf[0], vecBuf.size());
+// 	count = read(fd, buf, BUFSIZE);
 // 	while (count) {
+// 		std::cout << GREEN << "count = " << count << GREEN << NL;
 // 		if (count < 0)
-// 			throw std::runtime_error("readFd (read) error");
-// 		vecStr.insert(vecStr.end(), vecBuf.begin(), vecBuf.end());
+// 			throw std::runtime_error("readFd (recv) error");
+// 		buf[count] = 0;
+// 		str.insert(str.size(), buf, count);
 // 		if (count == BUFSIZE) {
-// 			count = read(fd, &vecBuf[0], vecBuf.size());
+// 			count = read(fd, buf, BUFSIZE);
 // 		} else {
 // 			break ;
 // 		}
 // 	}
-// 	for (std::vector<char>::iterator ite = vecStr.begin(); ite != vecStr.end(); ite++)
-// 	{
-// 		std::cout << YELLOW << *ite;
-// 		str += *ite;
-// 	}
-// 	std::cout << RESET << NL;
 // 	return (str);
 // }
-
 
 std::string readFd(int fd) {
 	std::string     str;
 	char            buf[BUFSIZE + 1];
 	ssize_t         count;
 
-	count = recv(fd, buf, BUFSIZE, 0);
-	while (count) {
-		std::cout << GREEN << "count = " << count << GREEN << NL;
-		if (count < 0)
-			throw std::runtime_error("readFd (recv) error");
-		buf[count] = 0;
-		str.insert(str.size(), buf, count);
-		if (count == BUFSIZE) {
-			count = recv(fd, buf, BUFSIZE, 0);
-		} else {
-			break ;
-		}
-	}
-	std::cout << ORANGE << str << RESET << std::endl;
+	count = read(fd, buf, BUFSIZE);
+	if (count < 0)
+		throw std::runtime_error("readFd (recv) error");
+	buf[count] = 0;
+	str.insert(str.size(), buf, count);
 	return (str);
 }
 

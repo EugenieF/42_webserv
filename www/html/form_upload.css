@@ -9,8 +9,8 @@ body {
 }
 
 @font-face {
-    font-family: peralta;
-    src: url(fonts/Peralta-Regular.ttf);
+    font-family: love;
+    src: url(fonts/LoveCrush-ZVn8Z.ttf) format('truetype');
 }
 
 @font-face {
@@ -28,9 +28,31 @@ body {
     right: 0;
 }
 
+.house {
+	position: fixed;
+	right: 0;
+	margin-top: 120px;
+}
+
+.danse {
+	position: fixed;
+	right: 0;
+	margin-top: 240px;
+	margin-right: 10px;
+}
+
 h1 {
     color:#FFC4C4;
-    font-family: peralta;
+    font-family: love;
+	text-align: center;
+}
+
+h3 {
+	color:#FFC4C4;
+	font-family: NotoSerifKR_L;
+	font-size: 75%;
+	margin-top: 100px;
+	text-align: center;
 }
 
 .hamster {
