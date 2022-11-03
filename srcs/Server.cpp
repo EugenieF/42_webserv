@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 11:28:12 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 23:50:36 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/02 11:17:36 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void Server::_setMetaVar(const Block* block) {
 // Debug -----------------------------------------
 
 void Server::_displayServer() const {
-	displayMsg(" 👂 Server is listening on " + getHost() + ":" + convertNbToString(getPort()), LIGHT_BLUE);
+	displayMsg("   Server is listening on " + getHost() + ":" + convertNbToString(getPort()), GREY);
 	#ifndef DISPLAY
 		return;
 	#endif
@@ -125,9 +125,7 @@ void Server::_displayServer() const {
 
 // Bonus -----------------------------------------
 
-#ifdef COOKIE
-Cookie*		Server::getSessionCookies(const Cookie& requestCookies)
+Session*	Server::lookupSession(const listOfCookies& requestCookies)
 {
-	return (_sessionsHandler.lookupSession(requestCookies));
+	return (_sessionHandler.lookupSession(requestCookies));
 }
-#endif

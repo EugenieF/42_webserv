@@ -5,7 +5,7 @@
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response(Block *server, Request* request, Env& env):
+Response::Response(Block *server, Request* request, Env& env, Session* session):
 	_server(server),
 	_request(request),
 	_response(""),
@@ -15,7 +15,10 @@ Response::Response(Block *server, Request* request, Env& env):
 	_locationPath(""),
 	_fd(request->getFd()),
 	_env(&env),
-	_cgipath("") {
+	_is_cgi(false),
+	_cgipath(""),
+	_session(session)
+{
 	_initHttpMethods();
 }
 
@@ -41,10 +44,9 @@ Response&	Response::operator=(const Response &other)
 		_httpMethods = other.getHttpMethods();
 		_locationPath = other.getLocationPath();
 		_fd = other.getFd();
+		_env = other.getEnv();
 		_cgipath = other.getCgiProgram();
-		#ifdef COOKIE
-			_cookies = other.getCookies();
-		#endif
+		_session = other.getSession();
 	}
 	return (*this);
 }
@@ -62,7 +64,7 @@ void	Response::_processMethod()
 	if (!_matchingBlock->isAllowedMethod(_method))
 		throw(METHOD_NOT_ALLOWED);
 	path = _buildPath();
-	std::cout << YELLOW << "BUILD PATH = " << _builtPath << RESET << NL;
+	//DEBUG("BUILD PATH = " + _builtPath);
 	if (path.empty())
 		throw(NOT_FOUND);
 	/* Find corresponding http method */
@@ -82,8 +84,6 @@ void	Response::generateResponse()
 	/* Generate CGI here */
 	std::string	errorPage;
 
-	//DEBUG("Response");
-	//std::cerr << RED << "STATUS CODE: " << getStatusCode() << RESET << NL;
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
 	{
@@ -103,7 +103,7 @@ void	Response::generateResponse()
 		_fillErrorBody();
 	}
 	_fillResponseLine();
-	if (!_isCgi(_builtPath))
+	if (!_is_cgi)
 		_fillHeaders();
 	_response += _body + "\r\n";
 }
@@ -146,7 +146,7 @@ void	Response::_fillHeaders()
 	_headers["Connection"] = _getConnectionHeader();
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 		_response += ite->first + ": " + ite->second + "\r\n";
-	_fillExtraHeader();
+	_fillCookieHeader();
 	/* An empty line is placed after the series of HTTP headers,
 	to divide the headers from the message body */
 	_response += "\r\n";
@@ -155,6 +155,27 @@ void	Response::_fillHeaders()
 /******************************************************************************/
 /*                               GET METHOD                                   */
 /******************************************************************************/
+
+void   Response::_parseQuery()
+{
+	std::string     query;
+	std::string     name;
+	std::string     content;
+	size_t          pos;
+
+	pos = 0;
+	query = _request->getQuery();
+	while (pos < query.size())
+	{
+		name = query.substr(pos, query.find("="));
+		query.erase(pos, name.length() + 1);
+		content = query.substr(pos, query.find("&"));
+		query.erase(pos, content.length() + 1);
+		if (name == "color" && content.size() > 7)
+			content = "#" + content.substr(content.size() - 6);
+		_session->completePurchase(name, content, &_msg);
+	}
+}
 
 void	Response::_handleRedirection()
 {
@@ -166,7 +187,7 @@ void	Response::_readFileContent(const std::string& path)
 {
 	std::ifstream		file;
 	std::stringstream	fileContent;
-	
+
 	/* Check if file is accessible */
 	if (!pathIsAccessible(path))
 		throw(NOT_FOUND);
@@ -187,13 +208,30 @@ void	Response::_readFileContent(const std::string& path)
 void	Response::_runGetMethod()
 {
 	//DEBUG("Get method");
-	if (_isCgi(_builtPath))
+	_is_cgi = _isCgi(_builtPath);
+	if (_is_cgi)
 	{
 		/* process cgi */
 		return (_handleCgi());
 	}
-	if (_body.empty()) /* Problem autoindex */
+	if (_request->getPath() == "/form_order")
+	{
+		_body = _generateFormOrderPage();
+		_headers["Content-Type"] = g_mimeType[".html"];
+	}
+	else if (_request->getPath() == "/form_gallery")
+	{
+		_body = _generateGalleryPage();
+		_headers["Content-Type"] = g_mimeType[".html"];
+	}
+	else if (_body.empty()) /* If there is no autoindex */
+	{
+		if (_request->getPath() == "/form_accept.html" && !_request->getQuery().empty())
+		{
+			_parseQuery();
+		}
 		_readFileContent(_builtPath);
+	}
 }
 
 /******************************************************************************/
@@ -224,28 +262,55 @@ std::string		Response::_getBoundary(std::string contentType)
 	{
 		throw(BAD_REQUEST);
 	}
-	boundary = "--" + boundary + "\r\n"; 
+	boundary = "--" + boundary;
 	return (boundary);
 }
 
-std::string		Response::_getFilename(const std::string& content)
+size_t	Response::_getField(
+	std::string contentDisposition, const std::string& field, std::string* name)
+{
+	size_t	pos;
+
+	pos = contentDisposition.find(field);
+	if (pos == std::string::npos)
+	{
+		*name = "";
+		return (pos);
+	}
+	pos += field.size();
+	contentDisposition.erase(0, pos);
+	*name = contentDisposition.substr(0, contentDisposition.find("\""));
+	return (pos);
+}
+
+void	Response::_parseContent(std::string body, const std::string& boundary)
 {
 	size_t		pos;
 	std::string	contentDisposition;
 	std::string	filename;
+	std::string	name;
+	std::string	content;
 
-	pos = content.find("Content-Disposition:");
+	pos = body.find("Content-Disposition:");
 	if (pos == std::string::npos)
-	{
 		throw(BAD_REQUEST);
+	contentDisposition = body.substr(pos, body.find("\r\n"));
+	_getField(contentDisposition, "name=\"", &name);
+	_getField(contentDisposition, "filename=\"", &filename);
+	body.erase(0, body.find("\r\n\r\n") + 4);
+	content = body.substr(0, body.find("\r\n" + boundary));
+	if (filename != "")
+	{
+		/* filenamePath = _uploadPath + filename */
+		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
+			_uploadPath += "/";
+		_writeFileContent(_uploadPath + filename, content);
 	}
-	contentDisposition = content.substr(pos, content.find("\r\n"));
-	pos = contentDisposition.find("filename=\"");
-	if (pos == std::string::npos)
-		return ("");
-	contentDisposition.erase(0, pos + 10);
-	filename = contentDisposition.substr(0, contentDisposition.find("\""));
-	return (filename);
+	else
+	{
+		content = body.substr(0, body.find("\r\n" + boundary));
+		_session->completePurchase(name, content, &_msg);
+	}
 }
 
 /*
@@ -260,27 +325,55 @@ bytes of pdf file
 ...
 */
 
-void	Response::_handleMultipartContent(const std::string& path, std::string body)
+void	Response::_handleMultipartContentCgi(std::string body)
 {
 	std::string	boundary;
 	std::string	filename;
-	std::string	fileContent;
+	std::string	contentDisposition;
+	size_t		pos;
+	size_t		posFilename;
 
+	posFilename = 0;
 	boundary = _getBoundary(_request->getHeader("content-type"));
-	while (body.find(boundary) != std::string::npos)
+	while (body.find(boundary + "\r\n") != std::string::npos)
 	{
-		body.erase(0, body.find(boundary) + boundary.length());
-		filename = _getFilename(body);
-		body.erase(0, body.find("\r\n") + 2);
-		body.erase(0, body.find("\r\n\r\n") + 4);
+		posFilename += body.find(boundary + "\r\n") + boundary.length() + 2;
+		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
+		pos = body.find("Content-Disposition:");
+		if (pos == std::string::npos)
+			throw(BAD_REQUEST);
+		contentDisposition = body.substr(pos, body.find("\r\n"));
+		posFilename += _getField(contentDisposition, "filename=\"", &filename);
 		if (filename != "")
 		{
-			fileContent = body.substr(0, body.find("\r\n"));
-			if (path[path.length() - 1] != '/' && filename[0] != '/')
-				filename.insert(0, "/");
-			std::cout << GREEN << "filename : " << path + filename << RESET << std::endl;
-			_writeFileContent(path + filename, fileContent);
+			if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
+				_uploadPath += "/";
+			_request->insertUploadPath(posFilename, _uploadPath);
+			_cgiFilenames.insert(_cgiFilenames.begin(), _uploadPath + filename);
+			_msg += "   ✅📄 File '" + _uploadPath + filename
+				+ "' was successfully uploaded with CGI";
 		}
+	}
+}
+
+void	Response::_handleMultipartContent(std::string body)
+{
+	std::string	boundary;
+
+	boundary = _getBoundary(_request->getHeader("content-type"));
+	while (body.find(boundary + "\r\n") != std::string::npos)
+	{
+		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
+		_parseContent(body, boundary);
+	}
+	if (_request->getPath() == "/form_accept")
+	{
+		_body = _generateFormAcceptPage();
+		_headers["Content-Type"] = g_mimeType[".html"];
+	}
+	else if (_request->getPath() == "/form_upload")
+	{
+		_body = "OK";
 	}
 }
 
@@ -292,23 +385,30 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 {
 	std::ofstream	file;
 	std::string		pathDir;
+	std::string		filename;
+	std::string		new_file;
+	size_t			separator;
 
-	/* Check if directory is accessible */
-	pathDir = path.substr(0, path.rfind("/") + 1);
+	separator = path.rfind("/");
+	pathDir = path.substr(0, separator + 1);
+	/* Check if directory exists */
 	if (!pathIsAccessible(pathDir))
 		throw (BAD_REQUEST);
-	/* Check if file already exist */
-	if (!pathIsAccessible(path))
-	{
-		/* New file will be created */
-		setStatusCode(CREATED);
+	filename = path.substr(separator + 1);
+	if (filename.empty()) { /* Case: no input file (TODO) */
+		throw (BAD_REQUEST);
+	} else if (pathIsAccessible(path)) { /* Case: file already exists */
+		new_file = generateCopyFilename(pathDir, filename);
+	} else { /* Case: file doesn't exist */
+		new_file = path;
 	}
-	file.open(path.c_str(), std::ofstream::app);
+	setStatusCode(CREATED);
+	file.open(new_file.c_str(), std::ios::out | std::ios::binary);
 	/* Check if file was successfully opened */
 	if (!file.is_open())
 	{
 		/* An error occured */
-		_throwErrorMsg("Can't open file '" + path + "'");
+		_throwErrorMsg("Can't open file '" + new_file + "'");
 	}
 	/* We write in file */
 	file << content;
@@ -316,28 +416,38 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 	if (file.bad())
 	{
 		/* An error occured */
-		_throwErrorMsg("An error occurred while writing '" + path + "'");
+		_throwErrorMsg("An error occurred while writing '" + new_file + "'");
 	}
 	file.close();
-	if (_statusCode == CREATED)
-		displayMsg(" 📝 File " + path + " was successfully created", LIGHT_GREEN);
-	else
-		displayMsg(" 📝 File " + path + " was completed", LIGHT_GREEN);
-	setStatusCode(NO_CONTENT);
+	_session->addImage(path, _matchingBlock->getRoot());
+	_msg = "   ✅📄 File " + new_file + " was successfully uploaded";
 }
 
 void	Response::_handleCgi()
 {
-	//DEBUG("handleCgi()");
+	std::vector<std::string>::const_iterator ite;
+
 	_fillCgiMetavariables();
+
 	CgiHandler	cgi(*this);
 	try {
-		_body = cgi.getCgiOutput();
+		if (!cgi.getCgiOutput(_body)) {
+			_is_cgi = false;
+			throw (INTERNAL_SERVER_ERROR);
+		}
 	} catch (const std::runtime_error& e) {
 		std::cerr << RED << "Exception in handlecgi : " << e.what() << RESET << NL;
 		throw (INTERNAL_SERVER_ERROR);
 	}
-	// _body = cgi.getCgiOutput(); // if headers not in cgi response
+	/* If the request was successfull, we add uploaded files in the gallery */
+	if (_statusCode >= 200 && _statusCode < 300)
+	{
+		for (ite = _cgiFilenames.begin(); ite != _cgiFilenames.end(); ite++)
+		{
+			std::cout << YELLOW << *ite << RESET << NL;
+			_session->addImage(*ite, _matchingBlock->getRoot());
+		}
+	}
 }
 
 /* Perform resource-specific processing on the request payload. */
@@ -345,10 +455,12 @@ void	Response::_runPostMethod()
 {
 	std::ofstream		ofs;
 
-	// what if path is empty ??
-	if (_isCgi(_builtPath))
+	// _statusCode = BAD_REQUEST;
+	_is_cgi = _isCgi(_builtPath);
+	if (_is_cgi)
 	{
 		/* process cgi */
+		_handleMultipartContentCgi(_request->getBody());
 		return (_handleCgi());
 	}
 	// if (_matchingBlock->getUploadPath().empty())
@@ -364,8 +476,7 @@ void	Response::_runPostMethod()
 	}
 	if (_contentTypeIsMultipart())
 	{
-		// return (_handleMultipartContent(_uploadPath, _request->getBody()));
-		return (_handleMultipartContent(_builtPath, _request->getBody()));
+		return (_handleMultipartContent(_request->getBody()));
 	}
 	_writeFileContent(_builtPath, _request->getBody());
 }
@@ -374,21 +485,37 @@ void	Response::_runPostMethod()
 /*                               DELETE METHOD                                */
 /******************************************************************************/
 
+bool	Response::_deletePurchase(const std::string& uri)
+{
+	std::string	id;
+
+	if (uri.find("/form_delete/") == 0)
+	{
+		id = uri.substr(13);
+		if (_session->deletePurchase(id, &_msg))
+		{
+			return (true);
+		}
+	}
+	return (false);
+}
+
 /* Remove all current representations of the target resource. */
 void	Response::_runDeleteMethod()
 {
 	int	ret;
 
-	//DEBUG("Delete method");
+	if (_deletePurchase(_request->getPath()))
+		return ;
 	ret = std::remove(_builtPath.c_str());
 	if (ret)
 	{
 		/* Error case */
 		throw (_findErrorCode());
 	}
-	 /* Successfull case */
+ 	/* Successfull case */
 	setStatusCode(NO_CONTENT);
-	displayMsg(" 🚫 Resource " + _builtPath + " was successfully deleted", LIGHT_GREEN);
+	_msg = "   ❎📄 Resource " + _builtPath + " was successfully uploaded";
 }
 
 /******************************************************************************/
@@ -431,7 +558,6 @@ std::string		Response::_getContentTypeHeader()
 	/* Check if header is already set */
 	if (_headers.find("Content-Type") != _headers.end())
 		return (_headers["Content-Type"]);
-	//std::cout << RED << _builtPath << RESET << NL;
 	pos = _builtPath.rfind(".");
 	if (pos != std::string::npos)
 	{
@@ -459,13 +585,6 @@ std::string		Response::_getConnectionHeader()
 	return (connection);
 }
 
-void	Response::_fillExtraHeader()
-{
-	#ifdef COOKIE
-		_fillCookieHeader();
-	#endif
-}
-
 /******************************************************************************/
 /*                                  PATH                                      */
 /******************************************************************************/
@@ -476,7 +595,6 @@ void	Response::_generateAutoindex(const std::string& path)
 
 	_body = autoindex.getIndexPage();
 	_headers["Content-Type"] = g_mimeType[".html"];
-	// std::cout << RED << "_body = " << _body << RESET << NL;
 }
 
 bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
@@ -529,6 +647,16 @@ void	Response::_handleDirectoryPath(std::string* path)
 	}
 }
 
+void	Response::_handleSlash(std::string* path, const std::string& uri)
+{
+	if (*(path->rbegin()) == '/' && *(uri.begin()) == '/')
+		path->erase(path->length() - 1);
+	else if (*(path->rbegin()) != '/' && *(uri.begin()) != '/')
+		*path += "/";
+	if (*(path->begin()) == '/')
+		path->insert(path->begin(), '.');
+}
+
 /* If a request ends with a slash, NGINX treats it as a request
 for a directory and tries to find an index file in the directory. */
 std::string		Response::_buildPath()
@@ -539,21 +667,15 @@ std::string		Response::_buildPath()
 	uri = _request->getPath();
 	if (_locationPath != "")
 		uri.erase(0, _locationPath.length());
-	_uploadPath = _matchingBlock->getUploadPath();
 	if (_hasUploadPathDirective())
-		path = _matchingBlock->getUploadPath();
-	else
-		path = _matchingBlock->getRoot(); 
-	if (*(path.rbegin()) == '/' && *(uri.begin()) == '/')
-		path.erase(path.length() - 1);
-	else if (*(path.rbegin()) != '/' && *(uri.begin()) != '/')
-		path += "/";
+		_uploadPath = _matchingBlock->getUploadPath();
+	path = _matchingBlock->getRoot();
+	_handleSlash(&path, uri);
 	path += uri;
 	if (path[0] == '/')
-		path.insert(path.begin(), '.'); // Should path be ./www or www ?
+		path.insert(path.begin(), '.');
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
-	std::cout << BLUE << "uri: " << _request->getPath() << " | filePath: " << path << RESET << std::endl;
 	_builtPath = path;
 	return (path);
 }
@@ -688,13 +810,18 @@ std::string		Response::getCgiQuery() const {
 	return (_cgiquery);
 }
 
-const Env&		Response::getEnv() const {
-	return (*_env);
+Env*		Response::getEnv() const {
+	return (_env);
 }
 
 std::string		Response::getBuiltPath() const
 {
 	return (_builtPath);
+}
+
+std::string		Response::getMsgToDisplay() const
+{
+	return (_msg);
 }
 
 /******************************************************************************/
@@ -712,7 +839,6 @@ bool	Response::_isCgi(const std::string& path)
 	pos = _parsePosCgiExtension(path);
 	if (pos != std::string::npos)
 	{
-		//_env->add
 		_parseCgiUrl(pos);
 		return (true);
 	}
@@ -729,16 +855,17 @@ size_t	Response::_parsePosCgiExtension(std::string path) {
 		if (_matchingBlock->findCgi(extension) != "")
 		{
 			_cgipath = _matchingBlock->findCgi(extension);
-			std::cout << YELLOW << "in cgi path = " << path << " | extension : " << extension << " | path = " << _cgipath << RESET << NL;
+			// std::cout	<< YELLOW << "in cgi path = " << path
+			// 			<< " | extension : " << extension
+			// 			<< " | path = " << _cgipath << RESET << NL;
 			break ;
 		}
 		path.erase(0, extension.length() + 1);
 	}
-	return (pos); /*dummy*/
+	return (pos);
 }
 
 void   Response::_parseCgiUrl(size_t pos_extension) {
-	/* TODO: Retrieve cgi pos_extension and check if matching to block */
 	std::string		path = _request->getPath();
 
 	size_t		pos_end_extension = path.find('/', pos_extension);
@@ -746,30 +873,13 @@ void   Response::_parseCgiUrl(size_t pos_extension) {
 	if (pos_cgi == std::string::npos)
 		return ;
 	std::string	cgi = path.substr(pos_cgi + 1, pos_end_extension);
-	// if (cgi.empty()) {
-	//     /* Error?: cgi script name empty */;
-	//     throw (NOT_FOUND);
-	// }
 	_cgiscript = cgi;
 	_cgiquery = _request->getQuery();
-	_cgiextra = "";
-//	if (pos_end_extension == std::string::npos)
-//	{
-//		//std::cout << RED << "RETURN" << RESET << NL;
-//	    return ;
-//	}
-
-	//std::cout << RED << "DEBUB" << RESET << NL;
-
-	//size_t	pos_query = path.find('?');
-	//if (pos_query != std::string::npos)
-		//_cgiquery = path.substr(pos_query + 1);
-
-	//std::string extra = path.substr(0, pos_query);
+	_cgiextra = ""; // TODO : get extra
 }
 
+/* Retrieve info from request and put them in env */
 void	Response::_fillCgiMetavariables() {
-	/* Retrieve info from request */
 	_env->addParam("SERVER_PROTOCOL", _request->getHttpProtocol());
 	_env->addParam("CONTENT_LENGTH", convertNbToString(_request->getBodySize()));
 	_env->addParam("CONTENT_TYPE", _request->getHeader("content-type"));
@@ -779,24 +889,21 @@ void	Response::_fillCgiMetavariables() {
 	_env->addParam("SCRIPT_FILENAME", _translateCgiName());
 	_env->addParam("PATH_INFO", getCgiExtra()); // TODO: parse esc char
 	_env->addParam("PATH_TRANSLATED", ""); //TODO PATH_INFO translated :
-	// PATH_TRANSLATED=ROOT/PATH_INFO
 	_env->addParam("REMOTE_ADDR", "localhost"); /* TODO: inet_hton ? Recode epoll ? */
 	_env->addParam("SERVER_PORT", convertNbToString(_request->getPort()));
 	_env->addParam("REMOTE_IDENT", ""); // optional
 
-	std::cerr << RED << "Query: " << getCgiQuery() << RESET << NL;
-	/* FROM CLIENT : */
+	//std::cerr << RED << "Query: " << getCgiQuery() << RESET << NL;
 	_env->addParam("HTTP_ACCEPT", _request->getHeader("accept"));
 	_env->addParam("HTTP_ACCEPT_LANGUAGE", _request->getHeader("accept-language"));
 	_env->addParam("HTTP_USER_AGENT", _request->getHeader("user-agent"));
-	_env->addParam("HTTP_COOKIE", _request->getHeader("cookie")); 
+	_env->addParam("HTTP_COOKIE", _request->getHeader("cookie"));
 	_env->addParam("HTTP_REFERER", _request->getHeader("referer"));
 	_env->addParam("REDIRECT_STATUS", getStatusCodeStr());
-	
+
 }
 
 std::string		Response::_translateCgiName() const {
-	// std::string     translation(_env->getEnv("PWD"));
 	std::string     translation(std::string(WEBSERV_PATH));
 	std::string		relativePath(getBuiltPath());
 
@@ -805,12 +912,6 @@ std::string		Response::_translateCgiName() const {
 	else if (relativePath[0] != '/')
 		relativePath.insert(0, "/");
 	translation += relativePath;
-	//std::cout << RED << "PATH TRANSL. : " << translation << NL;
-	//translation += _cgipath + "/";
-	//translation += getCgiName();
-	//std::cout << "PATH TRANSL. : " << translation << NL;
-	//std::cout << "buildpath : " << _builtPath << RESET << NL;
-	std::cout << GREEN<<"Translation is: "<< translation<<RESET<<NL;
 	return (translation);
 }
 
@@ -829,36 +930,12 @@ void	Response::_initHttpMethods()
 /*                                  BONUS                                     */
 /******************************************************************************/
 
-#ifdef COOKIE
-Response::Response(Block *server, Request* request, Env& env, Cookie& cookies):
-	_server(server),
-	_request(request),
-	_response(""),
-	_statusCode(_request->getStatusCode()),
-	_method(_request->getMethod()),
-	_body(""),
-	_locationPath(""),
-	_fd(request->getFd()),
-	_env(&env),
-	_cgipath(""),
-	_cookies(cookies)
-{
-	_initHttpMethods();
-}
-
 void	Response::_fillCookieHeader()
 {
-	_response += _cookies.setCookieHeader();
+	_response += _session->getCookieHeader();
 }
 
-Cookie&		Response::getCookies()
+Session*	Response::getSession() const
 {
-	return (_cookies);
+	return (_session);
 }
-
-const Cookie&	Response::getCookies() const
-{
-	return (_cookies);
-}
-
-#endif

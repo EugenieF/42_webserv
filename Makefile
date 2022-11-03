@@ -20,11 +20,12 @@ SRCS			= main.cpp \
 				MimeType.cpp \
 				HttpMethod.cpp \
 				Autoindex.cpp \
-				generateErrorPage.cpp \
 				CgiHandler.cpp \
 				Env.cpp \
+				generateHtmlPage.cpp \
 				Cookie.cpp \
-				Session.cpp
+				Session.cpp \
+				Purchase.cpp
 
 OBJS_DIR		= ./objs
 
@@ -49,7 +50,7 @@ RM				= rm -rf
 INCLUDE			= ./incs
 
 
-$(NAME):	debug $(OBJS)
+$(NAME):	$(OBJS)
 		@$(CXX) $(CXXFLAGS) $(MACRO) $(OBJS) -o $(NAME) 
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
@@ -63,13 +64,13 @@ $(OBJS_DIR)/%.o: %.cpp
 
 all:	$(NAME)
 
-debug:	
-		$(eval CXXFLAGS += $(DEBUG_MODE))
+debug:	$(eval CXXFLAGS += $(DEBUG_MODE)) all
 
 cookie:
 		$(eval CXXFLAGS += $(BONUS_MODE))
 
 bonus:		cookie re
+
 
 clean:
 		@$(RM) $(OBJS_DIR)

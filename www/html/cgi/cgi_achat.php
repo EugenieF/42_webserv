@@ -5,91 +5,56 @@
 	<head>
 		<title>Cutie webserv 😚 💖</title>
 		<meta charset="UTF-8">
+        <link href="cgi_achat.css" rel="stylesheet">
 	</head>
-    <style type="text/css">
-    body {
-    margin: 0;
-    padding: 0;
-    }
-
-    @font-face {
-    font-family: berry;
-    src: url(../fonts/Berry_Merry.otf);
-    }
-
-    @font-face {
-    font-family: peralta;
-    src: url(../fonts/Peralta-Regular.ttf);
-    }
-
-    @font-face {
-	font-family: NotoSerifKR_R;
-	src: url(../fonts/NotoSerifKR-Bold.otf)
-    }
-
-    @font-face {
-	font-family: NotoSerifKR_L;
-	src: url(../fonts/NotoSerifKR-Light.otf)
-    }
-
-    h1 {
-    color: #d71b3b;
-    font-family: peralta;
-    }
-
-    .hamster {
-    text-align: center;
-    }
-
-    .bouton {
-	margin: 20px;
-	background-color: #FF69B4;
-	color: white;
-	text-align: center;
-	font-family: berry;
-	font-size: 150%;
-	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-    }
-
-    </style>
-	<body bgcolor="#D6EFED">
-		<h1>
-			<center>Etat de votre panier 🧺</center>
-		</h1>
-		<div class="hamster">
-			<img src="../img/hamster_panier.jpg" width="600px">
+	<body class="background">
+		<div class="paint">
+			<a href="../form_gallery.html"><img src="../img/icon_paint.png" width="100px"></a>
 		</div>
+		<div class="house">
+			<a href="../index.html"><img src="../img/icon_house.png" width="100px"></a>
+		</div>
+		<div class="danse">
+			<a href="http://gcasale.free.fr/viva.htm"><img src="../img/icon_dance.gif" width="90px"></a>
+		</div>
+		<h1>
+			Etat de votre panier 🧺
+		</h1>
+		<p class="cgi">
+			avec CGI !
+		</p>
+		<!-- <div class="hamster">
+			<img src="../img/hamster_panier.jpg" width="600px">
+		</div> -->
+        <div class="informations">
         <?php
-	    	if (isset($_SESSION['name']))
-            {
-	    		if (empty($_SESSION['name']))
-                    echo "L'acheteur dont le nom est inconnu";
-                else
-                    echo $_SESSION['name'];
-                if (isset($_SESSION['hamster']))
-                {
-                    if (empty($_SESSION['hamster']))
-                        echo " n'a pas encore choisi son futur compagnon de vie";
-                    else
-                        echo ' a bien reserve '.$_SESSION['hamster'];
-                }
-	    	}
-            else
-            {
-	    		echo 'Vous etes inconnu parmi nos acheteurs!';
-	    	}
+        // if(isset($_POST['submit']))
+        // {
+        //     echo 'bonjour looooool<br>';
+        //     deleteItem($item);
+        // }
+        foreach($_SESSION['cart'] as $cart)
+        {
+                echo '<br>Votre nom : ', $cart['name'], '<br>';
+                echo 'Votre Hamster : ', $cart['hamster'], '<br>';
+                echo 'Sa Fourrure : ', $cart['color'], '<br>';
+                // echo '<form action="deleteItem()" method="post"><center><input name="submit" type="submit" value="A LA POUBELLE" class="bouton"></center></form>';
+        }
+        // function deleteItem($item)
+        // {
+        //     echo 'Bonjour<br>';
+        //     unset($_SESSION['cart'][$item]);
+        // }
         ?>
 		</div>
-			<form action="../form.html">
-				<center><input type="submit" value="Go acheter un nouvel ami !" class="bouton" /></center>
-			</form>
-            <form action="./cgi_destroy.php">
-				<center><input type="submit" value="Jeter votre hamster et reformuler une adoption" class="bouton" /></center>
-			</form>
-			<form action="../index.html">
-				<center><input type="submit" value="Retour vers la page d'accueil" class="bouton" /></center>
-			</form>
-		</div>
+		<form action="../form.html">
+			<input type="submit" value="Go acheter un nouvel ami !" class="bouton" />
+		</form>
+        <form action="./cgi_destroy.php">
+			<input type="submit" value="Jeter votre hamster et reformuler une adoption" class="bouton" />
+		</form>
+		<form action="../index.html">
+			<input type="submit" value="Retour vers la page d'accueil" class="bouton" />
+		</form>
 	</body>
 </html>
-

@@ -23,9 +23,9 @@ Request::Request():
 }
 
 Request::Request(const std::string& buffer, int clientfd):
-	_request(buffer), _fd (clientfd)
+	_request(buffer), _fd (clientfd), _raw(buffer)
 {
-	std::cout << BLUE << "Request: " << _request << RESET << std::endl;
+	// DEBUG("Request: " + _request);
 	_initVariables();
 	_initParsingFunct();
 }
@@ -43,6 +43,7 @@ void	Request::_initVariables()
 	_host = "";
 	_port = UNDEFINED_PORT;
 	_payloadSize = 0;
+	_headerIsParsed = false;
 }
 
 Request::Request(const Request &other)
@@ -71,9 +72,8 @@ Request&	Request::operator=(const Request &other)
 		_port = other.getPort();
 		_payloadSize = other.getPayloadSize();
 		_fd = other.getFd();
-		#ifdef COOKIE
-			_cookies = other.getCookies();
-		#endif
+		_raw = other.getRawRequest();
+		_cookies = other.getCookies();
 	}
 	return (*this);
 }
@@ -84,13 +84,21 @@ Request&	Request::operator=(const Request &other)
 
 t_requestStatus	Request::parseRequest()
 {
+	// displayMsg("Request: " + _request, LIGHT_BLUE);
 	try
 	{
+		if (_request.find("\r\n\r\n") == std::string::npos)
+		{
+			/* Header is incomplete */
+			return (_requestStatus);
+		}
 		if (_chunkedTransfer && _requestStatus != COMPLETE_REQUEST)
 			_decodeChunks();
 		else
 		{
-			_runParsingFunctions();
+			if (!_headerIsParsed)
+				_runParsingFunctions();
+			_parseBody();
 		}
 	}
 	catch(const t_statusCode& errorCode)
@@ -98,7 +106,6 @@ t_requestStatus	Request::parseRequest()
 		_statusCode = errorCode;
 		_requestStatus = COMPLETE_REQUEST;
 	}
-	// printRequestInfo();
 	return (_requestStatus);
 }
 
@@ -117,6 +124,7 @@ void	Request::_runParsingFunctions()
 void	Request::completeRequest(const std::string& buffer)
 {
 	_request += buffer;
+	_raw += buffer;
 }
 
 void	Request::_parseMethod()
@@ -137,6 +145,7 @@ void	Request::_parsePath()
 	size_t			pos;
 
 	_getNextWord(path, " ");
+	// std::cout << YELLOW << "Requested uri : " << path << RESET << std::endl;
 	if (path == "" || path[0] != '/')
 		throw (BAD_REQUEST);
 	if (path.length() > 2048) /* Maximum URL Length */
@@ -149,7 +158,6 @@ void	Request::_parsePath()
 		path.erase(pos);
 		if (_query.length() > 255) /* limited by the DNS */
 			throw (URI_TOO_LONG);
-		std::cerr << RED << "Query in request: " << _query << RESET << NL;
 	}
 	_path = path;
 }
@@ -216,9 +224,12 @@ void	Request::_checkHeaders()
 
 	if (!_parseHostHeader())
 		throw (BAD_REQUEST);
-	_parseExtraHeader();
+	_parseCookies();
 	if (_method != POST)
+	{
+		_headerIsParsed = true;
 		return ;
+	}
 	ite = _headers.find("transfer-encoding");
 	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos)
 		_chunkedTransfer = true;
@@ -239,61 +250,24 @@ void	Request::_checkHeaders()
 	}
 	else
 		throw (BAD_REQUEST);
-}
-
-void	Request::_parseExtraHeader()
-{
-	#ifdef COOKIE
-		_parseCookies();
-	#endif
-}
-
-void	Request::_checkSizeBody()
-{
-	listOfHeaders::const_iterator	ite;
-	size_t							sizeToCheck;
-	
-	sizeToCheck = _body.size();
-	if (sizeToCheck && _headers["content-type"] != "application/x-www-form-urlencoded")
-	{
-		if (_body.substr(_body.length() - 2) == "\r\n")
-			sizeToCheck -= 2;
-		else if (_body.substr(_body.length() - 1) == "\n")
-			sizeToCheck -= 1;
-		else
-			throw (BAD_REQUEST);
-	}
-	ite = _headers.find("content-length");
-	if (_method != POST && ite == _headers.end())
-		return ;
-	/* Check if given size is correct */
-	if (sizeToCheck != _bodySize)
-		throw (BAD_REQUEST);
+	_headerIsParsed = true;
 }
 
 void	Request::_parseBody()
 {
-	std::string		body;
 	Request::listOfHeaders::const_iterator	ite;
 
+	// std::cerr << GREEN << "Leftover request:" << NL
+	// 	<< _request << RESET << NL;
 	if (_requestStatus == COMPLETE_REQUEST)
 		return ;
 	if (_chunkedTransfer)
 		_decodeChunks();
 	else
 	{
-	//	DEBUG("before check size");
 		_body = _request;
-		// _checkSizeBody();
-		ite = _headers.find("content-type");
-		if (ite != _headers.end() && ite->second == "application/x-www-form-urlencoded")
-		{
-			// _query = _body;
-			_bodySize = 0;
-			std::cout << GREEN << "query request = " << _query << RESET << NL;
-		}
-		//DEBUG("in parse body");
-		return (_setRequestStatus(COMPLETE_REQUEST));
+		if (_body.size() == _bodySize)
+			return (_setRequestStatus(COMPLETE_REQUEST));
 	}
 }
 
@@ -304,12 +278,10 @@ void	Request::_decodeChunks()
 
 	if (!_reachedEndOfChunkedBody())
 	{
-		//DEBUG("Incomplete chunked body");
 		return (_setRequestStatus(INCOMPLETE_REQUEST));
 	}
 	while (1)
 	{
-		//DEBUG("Complete chunked body");
 		size = 0;
 		if (_getNextWord(chunkSize, "\r\n") == std::string::npos)
 			throw (BAD_REQUEST);
@@ -324,6 +296,11 @@ void	Request::_decodeChunks()
 		_bodySize += size;
 	}
 	return (_setRequestStatus(COMPLETE_REQUEST));
+}
+
+void	Request::insertUploadPath(size_t pos, const std::string& uploadPath)
+{
+	_body.insert(pos, uploadPath);
 }
 
 /******************************************************************************/
@@ -430,6 +407,11 @@ std::string		Request::getMethodStr() const {
 		return (std::string("DELETE"));
 }
 
+std::string		Request::getRawRequest() const
+{
+	return (_raw);
+}
+
 /******************************************************************************/
 /*                                  UTILS                                     */
 /******************************************************************************/
@@ -485,12 +467,6 @@ std::string		Request::_getNextWord(size_t sizeWord)
 	return (nextWord);
 }
 
-// void	Request::_requestIsInvalid(t_statusCode code)
-// {
-// 	_statusCode = code;
-// 	_requestStatus = INVALID_REQUEST;
-// }
-
 void	Request::_initParsingFunct()
 {
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseMethod);
@@ -498,7 +474,6 @@ void	Request::_initParsingFunct()
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHttpProtocol);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseHeaders);
 	_parsingFunct.insert(_parsingFunct.end(), &Request::_checkHeaders);
-	_parsingFunct.insert(_parsingFunct.end(), &Request::_parseBody);
 }
 
 /******************************************************************************/
@@ -533,13 +508,12 @@ void	Request::printRequestInfo()
 /*                                 COOKIES                                    */
 /******************************************************************************/
 
-#ifdef COOKIE
-Cookie&		Request::getCookies()
-{
-	return (_cookies);
-}
+// listOfCookies&		Request::getCookies()
+// {
+// 	return (_cookies);
+// }
 
-const Cookie&	Request::getCookies() const
+const Request::listOfCookies&	Request::getCookies() const
 {
 	return (_cookies);
 }
@@ -550,6 +524,45 @@ void	Request::_parseCookies()
 
 	ite = _headers.find("cookie");
 	if (ite != _headers.end())
-		_cookies.setCookies(ite->second);
+		_setCookies(ite->second);
 }
-#endif
+
+void	Request::_setCookies(std::string header)
+{
+	std::string		name;
+	std::string		value;
+	size_t			pos;
+
+	/* Limit Firefox = 150 cookies */
+	for (size_t nbOfCookies = 0; nbOfCookies < 150; nbOfCookies++)
+	{
+		pos = header.find("=");
+		if (pos == std::string::npos)
+			throw(BAD_REQUEST);
+		name = header.substr(0, pos);
+		header.erase(0, pos + 1);
+		pos = header.find("; ");
+		value = header.substr(0, pos);
+		header.erase(0, pos + 2);
+		_addCookie(name, value);
+		if (pos == std::string::npos)
+			return ;
+	}
+	throw (PAYLOAD_TOO_LARGE);
+}
+
+void	Request::_addCookie(const std::string& name, const std::string& value)
+{
+	_cookies.insert(_cookies.end(), Cookie(name, value));
+}
+
+bool   Request::keepAlive() const {
+	listOfHeaders::const_iterator   it;
+
+	it = _headers.find("Connection");
+	if (it != _headers.end()) {
+		if (it->second == "keep-alive")
+			return (true);
+	}
+	return (false);
+}

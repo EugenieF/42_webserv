@@ -15,8 +15,7 @@ Client::Client(serverMapNode server, int sockfd, const Env& env):
     _runningServer(server),
     _request(0),
     _response(0),
-	_env(env)
-{}
+	_env(env) {}
 
 Client::Client(Client const& other)
 {
@@ -26,7 +25,7 @@ Client::Client(Client const& other)
 Client::~Client()
 {
     clear();
-	std::cout << "client destroyed: " << getFd() << NL;
+	DEBUG("client destroyed: " + convertNbToString(getFd()));
 }
 
 Client&     Client::operator=(const Client& other)
@@ -61,28 +60,16 @@ t_requestStatus     Client::parseRequest(const std::string& buffer)
 /*                                 RESPONSE                                   */
 /******************************************************************************/
 
-#ifndef COOKIE
 void	Client::generateResponse()
 {
-	if (_response)
-		delete _response;
-	_response = new Response(_selectVirtualServer(), _request, _env);
-	_response->generateResponse();
-	// return (_response);
-}
-#else
-void	Client::generateResponse()
-{
-    Cookie*		cookies;
+	Session* session;
 
+	session = _runningServer.first->lookupSession(_request->getCookies());
 	if (_response)
 		delete _response;
-	cookies = _runningServer.first->getSessionCookies(_request->getCookies());
-	_response = new Response(_selectVirtualServer(), _request, _env, *cookies);
+	_response = new Response(_selectVirtualServer(), _request, _env, session);
 	_response->generateResponse();
-	// return (_response);
 }
-#endif
 
 bool	Client::_matchingServerName(
 	const listOfStrings& serverNames, int listeningPort, Block* currentServer)
@@ -166,5 +153,28 @@ void	Client::clear()
 	{
 		delete _response;
 		_response = NULL;
+	}
+}
+
+void	Client::displayConnectionInfos()
+{
+	std::string	responseMsg;
+
+	// std::cout << std::endl << std::endl << BLUE_B << " Connection accepted on socket " << getFd();
+	// std::cout << "            " << RESET << std::endl;
+	std::string connection = "\n Connection accepted on socket " + convertNbToString(_sockfd);
+	std::cout << std::endl;
+	displayMsg(connection, BLUE_B);
+	std::cout << LIGHT_BLUE << "   " << extractStatusLine(_request->getRawRequest()) << std::endl;
+	if (_response->getStatusCode() < 400)
+		std::cout << LIGHT_GREEN;
+	else
+		std::cout << RED;
+	std::cout << "   " << extractStatusLine(_response->getResponse()) << RESET << std::endl;
+	responseMsg = _response->getMsgToDisplay();
+	if (responseMsg != "")
+	{
+		std::cout << responseMsg;
+		std::cout << RESET << std::endl;
 	}
 }

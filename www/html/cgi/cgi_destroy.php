@@ -5,73 +5,40 @@
 	<head>
 		<title>Cutie webserv 😚 💖</title>
 		<meta charset="UTF-8">
+		<link href="cgi_destroy.css" rel="stylesheet">
 	</head>
-    <style type="text/css">
-    body {
-    margin: 0;
-    padding: 0;
-    }
-
-    @font-face {
-    font-family: berry;
-    src: url(../fonts/Berry_Merry.otf);
-    }
-
-    @font-face {
-    font-family: peralta;
-    src: url(../fonts/Peralta-Regular.ttf);
-    }
-
-    @font-face {
-	font-family: NotoSerifKR_R;
-	src: url(../fonts/NotoSerifKR-Bold.otf)
-    }
-
-    @font-face {
-	font-family: NotoSerifKR_L;
-	src: url(../fonts/NotoSerifKR-Light.otf)
-    }
-
-    h1 {
-    color: #d71b3b;
-    font-family: peralta;
-    }
-
-    .hamster {
-    text-align: center;
-    }
-
-    .bouton {
-	margin: 20px;
-	background-color: #FF69B4;
-	color: white;
-	text-align: center;
-	font-family: berry;
-	font-size: 150%;
-	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-    }
-
-    </style>
-	<body bgcolor="#D6EFED">
+	<body class="background">
+		<div class="icon">
+			<a href="cgi_achat.php"><img src="../img/icon_panier_no_cgi.png" width="100px"></a>
+		</div>
+		<div class="paint">
+			<a href="../form_gallery.html"><img src="../img/icon_paint.png" width="100px"></a>
+		</div>
+		<div class="house">
+			<a href="../index.html"><img src="../img/icon_house.png" width="100px"></a>
+		</div>
+		<div class="danse">
+			<a href="http://gcasale.free.fr/viva.htm"><img src="../img/icon_dance.gif" width="90px"></a>
+		</div>
 		<h1>
-			<center>Suppression de votre panier 💔</center>
+			Suppression de votre panier 💔
 		</h1>
 		<div class="hamster">
 			<img src="../img/hamster_trash.png" width="600px">
 		</div>
-		<div><center>
+		<div class="phrase">
         <?php
-	    	if (isset($_SESSION['name']))
+	    	if (isset($_SESSION['cart']))
             {
 				session_destroy();
-				echo "En esperant que vous avez apprecie cette experience d'achat! A bientot!";
+				echo "En esperant que vous avez apprecié cette experience d'achat! A bientôt!";
 	    	}
             else
             {
-	    		echo 'Vous etes inconnu parmi nos acheteurs pour supprimer votre panier!';
+	    		echo 'Vous êtes inconnu parmi nos acheteurs pour supprimer votre panier!';
 	    	}
         ?>
-		</center></div>
+		</div>
 			<form action="../form.html">
 				<center><input type="submit" value="Go acheter un nouvel ami !" class="bouton" /></center>
 			</form>

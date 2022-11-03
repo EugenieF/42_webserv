@@ -30,6 +30,8 @@ class   Response
 		typedef std::map<t_method, httpMethod>		listOfHttpMethodsFunct;
 		typedef Request::listOfHeaders				listOfHeaders;
 		typedef Block::listOfStrings				listOfStrings;
+		typedef Session::listOfCookies				listOfCookies;
+		typedef Session::listOfPurchases			listOfPurchases;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -48,16 +50,20 @@ class   Response
 		std::string						_uploadPath;
 
 		Env*							_env; // Shares same env than client
+		bool							_is_cgi;
 		std::string						_cgiscript;
 		std::string						_cgiextra;
 		std::string						_cgiquery;
 		std::string						_cgipath;
+		Session*						_session;
+		std::string						_msg;
+		std::vector<std::string>		_cgiFilenames;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*------    Main    ------*/
-		Response(Block* server, Request* request, Env& env);
+        Response(Block* server, Request* request, Env& env, Session* session);
         Response(const Response& other);
         ~Response();
         Response&    					operator=(const Response& other);
@@ -77,7 +83,7 @@ class   Response
 		t_statusCode					getStatusCode() const;
 		std::string						getStatusCodeStr() const;
 		t_method						getMethod() const;
-		listOfHeaders					getHeaders() const;	
+		listOfHeaders					getHeaders() const;
 		std::string						getBody() const;
 		listOfHttpMethodsFunct			getHttpMethods() const;
 		std::string						getLocationPath() const;
@@ -88,7 +94,9 @@ class   Response
 		std::string						getCgiName() const;
 		std::string						getCgiExtra() const;
 		std::string						getCgiQuery() const;
-		const Env&						getEnv() const;
+		Session*						getSession() const;
+		Env*							getEnv() const;
+		std::string						getMsgToDisplay() const;
 
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
@@ -111,15 +119,24 @@ class   Response
 		void							_writeFileContent(const std::string& path, const std::string& content);
 		void							_handleUploadFile();
 		void							_handleCgi();
-		void							_handleMultipartContent(const std::string& path, std::string content);
+		void							_handleMultipartContent(std::string body);
+		void							_handleMultipartContentCgi(std::string body);
 		std::string						_getBoundary(std::string contentType);
-		std::string						_getFilename(const std::string& content);
+		// std::string						_getField(std::string contentDisposition, const std::string& field);
+		size_t							_getField(std::string contentDisposition, const std::string& field,
+											std::string* name);
+		void							_parseContent(std::string body, const std::string& boundary);
 
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod();
+		bool							_deletePurchase(const std::string& uri);
+
+						/*-----       Query    ----*/
+		void							_parseQuery();
 
 						/*-------   Path    ------*/
 		std::string						_buildPath();
+		void							_handleSlash(std::string* path, const std::string& uri);
 		void							_handleDirectoryPath(std::string* path);
 		bool							_hasUploadPathDirective();
 		bool							_searchOfIndexPage(const listOfStrings& indexes, std::string* path);
@@ -138,7 +155,6 @@ class   Response
 		std::string						_getDateHeader();
 		std::string						_getContentTypeHeader();
 		std::string						_getConnectionHeader();
-		void							_fillExtraHeader();
 
 						/*-------   Utils    ------*/
 		bool							_requestIsValid();
@@ -153,17 +169,13 @@ class   Response
 		void							_fillCgiMetavariables();
 		std::string						_translateCgiName() const;
 
-	/***************************     BONUS     *************************/
-	#ifdef COOKIE
-	public:
-        Response(Block* server, Request* request, Env& env, Cookie& cookies);
-		Cookie&							getCookies();
-		const Cookie&					getCookies() const;
+						/*-------  Test page ------*/
+		std::string						_generateFormAcceptPage();
+		std::string						_generateFormOrderPage();
+		std::string						_generateGalleryPage();
 
-	private:
-		Cookie							_cookies;
+						/*-----  Bonus Cookies ----*/
 		void							_fillCookieHeader();
-	#endif
 };
 
 #endif

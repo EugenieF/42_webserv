@@ -52,9 +52,11 @@ void	Webserv::_setupServerMap(const listOfServers& configServers,
 	char* const* env) {
 	listOfServers::const_iterator   ite;
 
+	displayMsg("\n Configuration servers:", YELLOW_B);
 	for (ite = configServers.begin(); ite != configServers.end(); ite++)
 		_servers.insert(std::pair<Server*,
 			Block*>(new Server(*ite, env), *ite));
+	std::cout << std::endl;
 }
 
 // void	Webserv::parse(std::string configFile) {
@@ -63,7 +65,7 @@ void	Webserv::_setupServerMap(const listOfServers& configServers,
 // }
 
 void	Webserv::run() {
-	displayMsg(" 🏁 Server is launching...", LIGHT_YELLOW);
+	displayMsg(" → Webserv is running 🏁", GREY);
 	_epoll.startMonitoring(_servers);
 }
 

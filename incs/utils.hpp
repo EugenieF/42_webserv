@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 23:27:09 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/02 10:49:18 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,10 @@
 
 # define INIT_SIGNAL 0
 # define RESET_SIGNAL 1
-# define BUFSIZE 2048
+# define BUFSIZE 50000
 
 extern bool	_triggered;
+extern int	__is_child;
 
 		/*----------   Signal   ---------*/
 
@@ -51,17 +52,21 @@ std::string		trimSpacesStr(std::string *str, const char *toTrim = " \t");
 std::string		trimSpacesEndStr(std::string *str, const char *toTrim = " \t");
 std::string		readFd(int fd);
 char*			clone_str(const std::string& str);
+std::string		generateRandomString(size_t length);
+void			writeFd(int fd, const char* buf, const ssize_t len);
 
 		/*--------  File related  -------*/
 
 bool			pathIsFile(const std::string& path);
 bool			pathIsDirectory(const std::string& path);
 bool			pathIsAccessible(const std::string& path);
+std::string		generateCopyFilename(const std::string& dir, const std::string& file);
 
 		/*----------   Display  ---------*/
 
 void			DEBUG(const std::string& str);
 void			displayMsg(const std::string& msg, const char* colorCode);
+std::string 	extractStatusLine(const std::string& str);
 
 		/*------------   Time   ---------*/
 

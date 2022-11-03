@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Env.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/11 16:24:02 by etran             #+#    #+#             */
-/*   Updated: 2022/10/17 18:14:03 by etran            ###   ########.fr       */
+/*   Updated: 2022/10/31 13:48:37 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,6 @@ Env::~Env() {
 }
 
 // Getter ---------------------------------------
-
-//char* const Env::getEnv() {
-//const char* Env::getEnv() const {
-//	return (_env);
-//}
-
-///* Returns _env */
-//Env::operator char* const*() {
-//	if (!_env)
-//		_convertEnv();
-//	return (const_cast<char* const*>(_env));
-//}
 
 /* Returns _env */
 Env::operator char* const*() const {
@@ -96,10 +84,10 @@ void Env::addParam(const std::string& keyval) {
 
 void Env::display() const {
 	size_t len = _getEnvSize(_env);
-	std::cout
+	std::cerr
 			<< " ----------------------------- Env -----------------------" <<NL;
 	for (size_t i = 0; i < len; i++)
-		std::cout
+		std::cerr
 			<< "	env["<<i<<"] = "<<_env[i]<<NL;
 	std::cout << " ----------------------------- End -----------------------" <<NL;
 }

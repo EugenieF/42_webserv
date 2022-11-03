@@ -7,10 +7,7 @@
 
 #include "Block.hpp"
 #include "utils.hpp"
-
-#ifdef COOKIE
-	# include "Cookie.hpp"
-#endif
+# include "Session.hpp"
 
 # define UNDEFINED_PORT -1
 
@@ -30,6 +27,7 @@ class   Request
 		typedef void (Request::*parsingFunction)();
 		typedef std::vector<parsingFunction>		listOfParsingFunctions;
 		typedef std::map<std::string, std::string>	listOfHeaders;
+		typedef Session::listOfCookies				listOfCookies;
 
     private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -49,6 +47,9 @@ class   Request
 		size_t						_payloadSize;
 		int							_fd;
 		std::string					_query;
+		listOfCookies				_cookies;
+		std::string					_raw;
+		bool						_headerIsParsed;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -84,9 +85,14 @@ class   Request
 		int							getFd() const;
 		std::string					getMethodStr() const; // Can be replaced by global
 		std::string					getQuery() const;
+		std::string					getRawRequest() const;
+		const listOfCookies&		getCookies() const;
 
 						/*------   Display  ------*/
 		void						printRequestInfo();
+		bool						keepAlive() const;
+
+		void						insertUploadPath(size_t pos, const std::string& uploadPath);
 
 	private:
 	/**********************  PRIVATE MEMBER FUNCTIONS  ******************/
@@ -102,7 +108,6 @@ class   Request
 		void						_checkHeaders();
 		void						_parseBody();
 		bool						_parseHostHeader();
-		void						_parseExtraHeader();
 		void						_decodeChunks();
 
 						/*------   Utils  ------*/
@@ -115,16 +120,10 @@ class   Request
 		bool						_headerIsSet(const std::string& headerName);
 		void						_checkSizeBody();
 
-	/**************************     BONUS    **************************/
-	#ifdef COOKIE
-    public:
-		Cookie&						getCookies();
-		const Cookie&				getCookies() const;
-
-	private:
-		Cookie						_cookies;
+						/*------   Cookies  ------*/
 		void						_parseCookies();
-	#endif
+		void						_setCookies(std::string header);
+		void						_addCookie(const std::string& name, const std::string& value);
 };
 
 #endif

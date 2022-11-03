@@ -4,6 +4,8 @@
 # include "Server.hpp"
 # include "Parser.hpp"
 # include "Response.hpp"
+# include "utils.hpp"
+
 
 /******************************************************************************/
 /*                                CLASS CLIENT                                */
@@ -50,6 +52,7 @@ class Client
 
 						/*-------    Utils   ------*/
 		void			    	clear();
+		void					displayConnectionInfos();
 
 	private :
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
