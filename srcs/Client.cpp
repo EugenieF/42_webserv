@@ -126,6 +126,11 @@ Response*   Client::getResponse() const
     return (_response);
 }
 
+std::string		Client::getResponseStr() const
+{
+	return (_response->getResponse());
+}
+
 int	Client::getFd() const {
 	return (_sockfd);
 }
@@ -177,4 +182,9 @@ void	Client::displayConnectionInfos()
 		std::cout << responseMsg;
 		std::cout << RESET << std::endl;
 	}
+}
+
+void	Client::eraseChunkResponse(size_t size)
+{
+	_response->eraseChunkResponse(size);
 }

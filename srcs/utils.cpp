@@ -142,6 +142,7 @@ void	writeFd(int fd, const char* buf, const ssize_t len) {
 	DEBUG("Writing len expected:" + convertNbToString(len));
 	while (written_char < len) {
 		ret = write(fd, buf + written_char, len - written_char);
+		std::cout << RED << buf + written_char << RESET << NL;
 		DEBUG("  written char: " + convertNbToString(ret));
 		if (ret < 0) {
 			//DEBUG("ERROR: ret is " + convertNbToString(ret)
@@ -155,6 +156,18 @@ void	writeFd(int fd, const char* buf, const ssize_t len) {
 	}
 	DEBUG("Actual len:" + convertNbToString(written_char));
 }
+
+// ssize_t	writeFd(int fd, const char* buf, const ssize_t len) {
+// 	ssize_t		ret = 0;
+
+// 	/* TMP */
+// 	ret = write(fd, buf, len);
+// 	if (ret < 0)
+// 		throw std::runtime_error("writeFd (write) error");
+// 	// std::cerr << RED << " **Wanted write: " << len << NL
+// 	// 	<< " **Actual written: " << ret << RESET<< NL;
+// 	return (ret);
+// }
 
 std::string		generateRandomString(size_t length)
 {

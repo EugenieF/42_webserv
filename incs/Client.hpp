@@ -46,6 +46,7 @@ class Client
         serverMapNode  			getRunningServer() const;
         Request*            	getRequest() const;
         Response*           	getResponse() const;
+        std::string         	getResponseStr() const;
 		int						getFd() const;
 		const Env&				getEnv() const;
 		Env&					getEnv();
@@ -53,6 +54,7 @@ class Client
 						/*-------    Utils   ------*/
 		void			    	clear();
 		void					displayConnectionInfos();
+		void					eraseChunkResponse(size_t size);
 
 	private :
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

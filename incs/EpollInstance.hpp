@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:36:56 by etran             #+#    #+#             */
-/*   Updated: 2022/11/02 10:44:26 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/04 11:56:44 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ class EpollInstance {
 		void						_processConnections(serverMap::const_iterator it);
 		void						_handleRequest(Client* client);
 		void						_handleResponse(Client* client);
+		t_responseStatus			_writeResponse(Client* client);
 		
 		/* -- Utils -------------------------------------------------------- */
 		std::string					_readRequest(Client* client);

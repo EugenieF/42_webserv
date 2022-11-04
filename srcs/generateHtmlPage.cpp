@@ -63,8 +63,11 @@ std::string		Response::_generateFormAcceptPage()
 				<div class=\"icon\">\n\
 					<a href=\"form_order\"><img src=\"img/icon_panier_no_cgi.png\" width=\"100px\"></a>\n\
 				</div>\n\
+				<div class=\"icon_cgi\">\n\
+					<a href=\"cgi/cgi_achat.php\"><img src=\"img/icon_panier_with_cgi.png\" width=\"100px\"></a>\n\
+				</div>\n\
 				<div class=\"paint\">\n\
-					<a href=\"form_gallery.html\"><img src=\"img/icon_paint.png\" width=\"100px\"></a>\n\
+					<a href=\"form_gallery\"><img src=\"img/icon_paint.png\" width=\"100px\"></a>\n\
 				</div>\n\
 				<div class=\"house\">\n\
 					<a href=\"index.html\"><img src=\"img/icon_house.png\" width=\"100px\"></a>\n\
@@ -115,11 +118,14 @@ std::string		Response::_generateFormOrderPage()
 				<link href=\"form_order.css\" rel=\"stylesheet\">\n\
 			</head>\n\
 			<body class=\"background\">\n\
+				<div class=\"icon\">\n\
+					<a href=\"cgi/cgi_achat.php\"><img src=\"img/icon_panier_with_cgi.png\" width=\"100px\"></a>\n\
+				</div>\n\
 				<div class=\"house\">\n\
 					<a href=\"index.html\"><img src=\"img/icon_house.png\" width=\"100px\"></a>\n\
 				</div>\n\
 				<div class=\"paint\">\n\
-					<a href=\"form_gallery.html\"><img src=\"img/icon_paint.png\" width=\"100px\"></a>\n\
+					<a href=\"form_gallery\"><img src=\"img/icon_paint.png\" width=\"100px\"></a>\n\
 				</div>\n\
 				<div class=\"danse\">\n\
 					<a href=\"http://gcasale.free.fr/viva.htm\"><img src=\"img/icon_dance.gif\" width=\"90px\"></a>\n\
@@ -193,8 +199,8 @@ std::string		Response::_generateGalleryPage()
 				<div class=\"icon\">\n\
 					<a href=\"form_order\"><img src=\"img/icon_panier_no_cgi.png\" width=\"100px\"></a>\n\
 				</div>\n\
-				<div class=\"paint\">\n\
-					<a href=\"form_gallery.html\"><img src=\"img/icon_paint.png\" width=\"100px\"></a>\n\
+				<div class=\"icon_cgi\">\n\
+					<a href=\"cgi/cgi_achat.php\"><img src=\"img/icon_panier_with_cgi.png\" width=\"100px\"></a>\n\
 				</div>\n\
 				<div class=\"house\">\n\
 					<a href=\"index.html\"><img src=\"img/icon_house.png\" width=\"100px\"></a>\n\
@@ -211,7 +217,10 @@ std::string		Response::_generateGalleryPage()
 		htmlPage += \
 				"<div class=\"hamster\">\n\
 					<img src=" + *ite + " width=\"500\">\n\
-				</div>\n";
+				</div>\n\
+				<form action=\"\">\n\
+					<input type=\"submit\" value=\"Enveler cette horreur de la galerie\" class=\"bouton\" />\n\
+				</form>\n";
 	}
 
 	htmlPage += \

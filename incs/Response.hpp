@@ -22,6 +22,13 @@
 extern StatusCode	g_statusCode;
 extern MimeType		g_mimeType;
 
+typedef enum t_responseStatus
+{
+	INCOMPLETE_RESPONSE	= 0,
+	COMPLETE_RESPONSE	= 1,
+	INVALID_RESPONSE	= 2,
+}	t_responseStatus;
+
 class   Response
 {
 	public:
@@ -98,6 +105,9 @@ class   Response
 		Env*							getEnv() const;
 		std::string						getMsgToDisplay() const;
 
+						/*-------    Utils   ------*/
+		void							eraseChunkResponse(size_t size);
+
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 						/*-------   Init    ------*/
@@ -131,10 +141,10 @@ class   Response
 		void							_runDeleteMethod();
 		bool							_deletePurchase(const std::string& uri);
 
-						/*-----       Query    ----*/
+						/*-----      Query    ----*/
 		void							_parseQuery();
 
-						/*-------   Path    ------*/
+						/*-------     Path  ------*/
 		std::string						_buildPath();
 		void							_handleSlash(std::string* path, const std::string& uri);
 		void							_handleDirectoryPath(std::string* path);

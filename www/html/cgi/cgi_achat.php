@@ -8,8 +8,11 @@
         <link href="cgi_achat.css" rel="stylesheet">
 	</head>
 	<body class="background">
+		<div class="icon">
+			<a href="../form_order"><img src="../img/icon_panier_no_cgi.png" width="100px"></a>
+		</div>
 		<div class="paint">
-			<a href="../form_gallery.html"><img src="../img/icon_paint.png" width="100px"></a>
+			<a href="../form_gallery"><img src="../img/icon_paint.png" width="100px"></a>
 		</div>
 		<div class="house">
 			<a href="../index.html"><img src="../img/icon_house.png" width="100px"></a>
@@ -33,12 +36,34 @@
         //     echo 'bonjour looooool<br>';
         //     deleteItem($item);
         // }
+
+
+		// function searchInKey($string, $array)
+		// {
+		// 	foreach ($array as $key => $val)
+		// 	{
+		// 		if ($val[$key] == $string) {
+		// 			return $key;
+		// 		}
+		// 	}
+		// 	return null;
+		// }
+
         foreach($_SESSION['cart'] as $cart)
         {
-                echo '<br>Votre nom : ', $cart['name'], '<br>';
-                echo 'Votre Hamster : ', $cart['hamster'], '<br>';
-                echo 'Sa Fourrure : ', $cart['color'], '<br>';
-                // echo '<form action="deleteItem()" method="post"><center><input name="submit" type="submit" value="A LA POUBELLE" class="bouton"></center></form>';
+			// echo searchInKey($cart['name'], $cart) ? 'true' : 'false';
+			// if (searchInKey($cart['name'], $cart))
+			// {
+			// 	echo $cart['name'], '<br>';
+			// 	echo '*************************<br>';
+			// }
+			// else
+			// {
+				echo '<br>Votre nom : ', $cart['name'], '<br>';
+				echo 'Votre Hamster : ', $cart['hamster'], '<br>';
+				echo 'Sa Fourrure : ', $cart['color'], '<br>';
+			// }
+            // echo '<form action="deleteItem()" method="post"><center><input name="submit" type="submit" value="A LA POUBELLE" class="bouton"></center></form>';
         }
         // function deleteItem($item)
         // {
@@ -51,7 +76,7 @@
 			<input type="submit" value="Go acheter un nouvel ami !" class="bouton" />
 		</form>
         <form action="./cgi_destroy.php">
-			<input type="submit" value="Jeter votre hamster et reformuler une adoption" class="bouton" />
+			<input type="submit" value="Jeter votre panier et reformuler une adoption" class="bouton" />
 		</form>
 		<form action="../index.html">
 			<input type="submit" value="Retour vers la page d'accueil" class="bouton" />

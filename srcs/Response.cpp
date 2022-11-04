@@ -585,6 +585,11 @@ std::string		Response::_getConnectionHeader()
 	return (connection);
 }
 
+void	Response::_fillCookieHeader()
+{
+	_response += _session->getCookieHeader();
+}
+
 /******************************************************************************/
 /*                                  PATH                                      */
 /******************************************************************************/
@@ -717,6 +722,11 @@ bool	Response::_contentTypeIsUrlencoded()
 	return (pos != std::string::npos);
 }
 
+void	Response::eraseChunkResponse(size_t size)
+{
+	_response.erase(size);
+}
+
 /******************************************************************************/
 /*                                  SETTER                                    */
 /******************************************************************************/
@@ -824,6 +834,11 @@ std::string		Response::getMsgToDisplay() const
 	return (_msg);
 }
 
+Session*	Response::getSession() const
+{
+	return (_session);
+}
+
 /******************************************************************************/
 /*                                    CGI                                     */
 /******************************************************************************/
@@ -924,18 +939,4 @@ void	Response::_initHttpMethods()
 	_httpMethods[GET] = &Response::_runGetMethod;
 	_httpMethods[POST] = &Response::_runPostMethod;
 	_httpMethods[DELETE] = &Response::_runDeleteMethod;
-}
-
-/******************************************************************************/
-/*                                  BONUS                                     */
-/******************************************************************************/
-
-void	Response::_fillCookieHeader()
-{
-	_response += _session->getCookieHeader();
-}
-
-Session*	Response::getSession() const
-{
-	return (_session);
 }

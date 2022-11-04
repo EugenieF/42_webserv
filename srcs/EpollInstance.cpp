@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/11/03 19:40:12 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/04 12:28:46 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,3 +219,38 @@ void EpollInstance::_handleResponse(Client* client) {
 	if (!client->getRequest()->keepAlive())
 		_eraseClient(client);
 }
+
+// void EpollInstance::_handleResponse(Client* client) {
+// 	DEBUG("Response (client n." + convertNbToString(client->getFd()) + ")");
+
+// 	client->generateResponse();
+// 	if (__is_child != 0) {
+// 		_triggered = true;
+// 		return ;
+// 	}
+// 	t_responseStatus responseStatus = _writeResponse(client);
+// 	if (responseStatus == COMPLETE_RESPONSE)
+// 	{
+// 		client->displayConnectionInfos();
+// 		if (!client->getRequest()->keepAlive())
+// 			_eraseClient(client);
+// 	}
+// }
+
+// t_responseStatus	EpollInstance::_writeResponse(Client* client) {
+// 	ssize_t		written_char;
+// 	std::string	response;
+// 	char		buffer[BUFSIZE];
+
+// 	response = client->getResponseStr();
+// 	if (response.size() > BUFSIZE)
+// 	{
+// 		std::copy(response.begin(), response.begin() + BUFSIZE, buffer);
+// 		written_char = writeFd(client->getFd(), buffer, BUFSIZE);
+// 		std::cout << RED << written_char << " | " << response.size() << RESET <<NL;
+// 		client->eraseChunkResponse(written_char);
+// 		return (INCOMPLETE_RESPONSE);
+// 	}
+// 	written_char = writeFd(client->getFd(), response.c_str(), response.size());
+// 	return (COMPLETE_RESPONSE);
+// }

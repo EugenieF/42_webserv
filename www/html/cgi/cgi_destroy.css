@@ -35,26 +35,36 @@ body {
 
 .icon {
 	position: fixed;
-	right: 0;
+    right: 0;
 }
 
-.paint {
+.icon_cgi {
 	position: fixed;
 	right: 0;
 	margin-top: 120px;
 }
 
-.house {
+.paint {
 	position: fixed;
 	right: 0;
 	margin-top: 240px;
 }
 
-.danse {
+.house {
 	position: fixed;
 	right: 0;
 	margin-top: 360px;
+}
+
+.danse {
+	position: fixed;
+	right: 0;
+	margin-top: 480px;
 	margin-right: 10px;
+}
+
+.hamster {
+    text-align: center;
 }
 
 h1 {
@@ -82,6 +92,6 @@ h1 {
 	color: white;
 	text-align: center;
 	font-family: berry;
-	font-size: 200%;
+	font-size: 150%;
 	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
