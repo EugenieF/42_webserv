@@ -186,6 +186,24 @@ std::string		generateRandomString(size_t length)
 	return (randomStr);
 }
 
+void	toLowerStr(std::string* str)
+{
+	std::string::iterator ite;
+
+	for (ite = str->begin(); ite != str->end(); ite++)
+		*ite = std::tolower(*ite);
+}
+
+std::string		toLowerStr(const std::string& str)
+{
+	std::string	newStr(str);
+	std::string::iterator ite;
+
+	for (ite = newStr.begin(); ite != newStr.end(); ite++)
+		*ite = std::tolower(*ite);
+	return (newStr);
+}
+
 /******************************************************************************/
 /*                               FILE RELATED                                 */
 /******************************************************************************/

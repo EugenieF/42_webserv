@@ -225,7 +225,10 @@ void	Session::addImage(const std::string& path, const std::string& root)
 
 	imgPath = path.substr(path.find(root) + root.size());
 	if (!imageExist(imgPath))
+	{
 		_gallery.insert(_gallery.end(), imgPath);
+		std::cout << YELLOW << "IMGPATH = " << imgPath << RESET << NL;
+	}
 }
 
 void	Session::deleteImage(listOfPath::iterator ite, std::string* msg)

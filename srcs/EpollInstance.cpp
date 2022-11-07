@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/11/04 12:28:46 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/07 13:56:00 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,11 +190,11 @@ void EpollInstance::_handleRequest(Client* client) {
 	std::string		str;
 
 	str = readFd(client->getFd());
-	//std::cerr << YELLOW<< "Content [" << str.size() << "] :" << NL << str<< RESET << NL;
 	t_requestStatus requestStatus = client->parseRequest(str);
 	if (requestStatus == COMPLETE_REQUEST)
 	{
 		//std::cerr << ORANGE << " -- complete request --" << RESET << NL;
+		// std::cerr << YELLOW<< "Content :\n" << client->getRequest()->getRawRequest() << RESET << NL;
 		_editSocket(client->getFd(), EPOLLOUT);
 	} else if (requestStatus == INVALID_REQUEST)
 		_eraseClient(client);
@@ -216,8 +216,8 @@ void EpollInstance::_handleResponse(Client* client) {
 	//	throw std::runtime_error("handleResponse (write) error");
 	writeFd(client->getFd(), response.c_str(), response.size());
 	client->displayConnectionInfos();
-	if (!client->getRequest()->keepAlive())
-		_eraseClient(client);
+	//if (!client->getRequest()->keepAlive())
+	_eraseClient(client);
 }
 
 // void EpollInstance::_handleResponse(Client* client) {
@@ -234,6 +234,8 @@ void EpollInstance::_handleResponse(Client* client) {
 // 		client->displayConnectionInfos();
 // 		if (!client->getRequest()->keepAlive())
 // 			_eraseClient(client);
+// 	} else {
+// 		// editsocket(EPOLLIN);
 // 	}
 // }
 

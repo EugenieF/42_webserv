@@ -186,7 +186,7 @@ void	Request::_parseHeaders()
 		pos = _getNextWord(headerName, ":");
 		if (pos == std::string::npos)
 			break ;
-		_toLowerStr(&headerName); /* Case-insensitive */
+		toLowerStr(&headerName); /* Case-insensitive */
 		_getNextWord(headerValue, "\r\n");
 		trimSpacesStr(&headerValue); /* We retrieve spaces around the value */
 		if (_headerIsSet(headerName)) /* Check duplicate headers */
@@ -432,15 +432,6 @@ bool	Request::_reachedEndOfChunkedBody()
 void	Request::_setRequestStatus(t_requestStatus status)
 {
 	_requestStatus = status;
-}
-
-std::string		Request::_toLowerStr(std::string* str)
-{
-	std::string::iterator ite;
-
-	for (ite = str->begin(); ite != str->end(); ite++)
-		*ite = std::tolower(*ite);
-	return (*str);
 }
 
 size_t	Request::_getNextWord(std::string &word, std::string const& delimiter)

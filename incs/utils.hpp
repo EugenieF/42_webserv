@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/11/04 12:28:20 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/07 12:12:57 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,9 @@ char*			clone_str(const std::string& str);
 std::string		generateRandomString(size_t length);
 void			writeFd(int fd, const char* buf, const ssize_t len);
 // ssize_t			writeFd(int fd, const char* buf, const ssize_t len);
+void			toLowerStr(std::string* str);
+std::string		toLowerStr(const std::string& str);
+
 
 		/*--------  File related  -------*/
 

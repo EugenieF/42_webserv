@@ -176,7 +176,8 @@ void	Client::displayConnectionInfos()
 	else
 		std::cout << RED;
 	std::cout << "   " << extractStatusLine(_response->getResponse()) << RESET << std::endl;
-	responseMsg = _response->getMsgToDisplay();
+	if (_response->getStatusCode() < 400)
+		responseMsg = _response->getMsgToDisplay();
 	if (responseMsg != "")
 	{
 		std::cout << responseMsg;

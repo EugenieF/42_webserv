@@ -65,6 +65,7 @@ class   Response
 		Session*						_session;
 		std::string						_msg;
 		std::vector<std::string>		_cgiFilenames;
+		std::string						_referer;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -118,11 +119,12 @@ class   Response
 		void							_processMethod();
 		void							_fillResponseLine();
 		void							_fillHeaders();
+		void							_fillHeader(const std::string& name, const std::string& value);
 		void							_fillErrorBody();
 
 						/*------  Get Method  -----*/
 		void							_runGetMethod();
-		void							_readFileContent(const std::string& path);
+		void							_readFileContent(std::string& path);
 
 						/*------  Post Method -----*/
 		void							_runPostMethod();
@@ -145,7 +147,10 @@ class   Response
 		void							_parseQuery();
 
 						/*-------     Path  ------*/
-		std::string						_buildPath();
+		void							_buildPath();
+		void							_checkPath();
+		std::string 					_getPathDir(const std::string& path);
+		void							_parseRequestReferer();
 		void							_handleSlash(std::string* path, const std::string& uri);
 		void							_handleDirectoryPath(std::string* path);
 		bool							_hasUploadPathDirective();
@@ -178,6 +183,8 @@ class   Response
 		void							_parseCgiUrl(size_t pos);
 		void							_fillCgiMetavariables();
 		std::string						_translateCgiName() const;
+		void							_parseCgiBody();
+		size_t							_getNextWord(std::string& body, std::string &word, std::string const& delimiter);
 
 						/*-------  Test page ------*/
 		std::string						_generateFormAcceptPage();
