@@ -486,7 +486,7 @@ void	Response::_parseCgiStatusLine(size_t* pos)
 		{
 			_getNextWord(_body, value, "\r\n");
 			trimSpacesStr(&value);
-			if (g_statusCode[code] == value);
+			if (g_statusCode[code] == value)
 				setStatusCode(code);
 		}
 	}
