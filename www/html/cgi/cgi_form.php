@@ -8,6 +8,7 @@
 		<title>Cutie webserv 😚 💖</title>
 		<meta charset="UTF-8">
 		<link href="cgi_form.css" rel="stylesheet">
+		<link rel="icon" href="../img/favicon.ico">
 	</head>
 	<body class="background">
 		<div class="icon">

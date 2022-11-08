@@ -273,9 +273,9 @@ void	Parser::_parseCgiRule()
 
 	_expectNbOfArguments(2, EQUAL, SEMICOLON);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
-	if (_currentToken->getValue() != "php"	&& _currentToken->getValue() != ".php"
-		&& _currentToken->getValue() != ".py"	&& _currentToken->getValue() != "py")
-		_throwErrorParsing(_invalidValueMsg(_currentToken));
+	// if (_currentToken->getValue() != "php"	&& _currentToken->getValue() != ".php"
+	// 	&& _currentToken->getValue() != ".py"	&& _currentToken->getValue() != "py")
+	// 	_throwErrorParsing(_invalidValueMsg(_currentToken));
 	extension = _currentToken->getValue();
 	if (extension[0] && extension[0] == '.')
 		extension.erase(0, 1);

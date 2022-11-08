@@ -66,6 +66,9 @@ void	Response::_processMethod()
 	_buildPath();
 	_checkPath();
 	/* Find corresponding http method */
+
+	std::cerr << YELLOW << "builtpath: " << _builtPath << RESET << NL;
+
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 		throw(METHOD_NOT_ALLOWED);
@@ -93,6 +96,8 @@ void	Response::generateResponse()
 		catch(const t_statusCode& errorCode)
 		{
 			setStatusCode(errorCode);
+			//std::cerr<<YELLOW<<"_response so far:\n"<< _response
+			//	<< "\n====================\n"<< RESET;
 			_fillErrorBody();
 		}
 	}
@@ -103,8 +108,8 @@ void	Response::generateResponse()
 	_fillResponseLine();
 	// if (!_is_cgi)
 	_fillHeaders();
-	_response += _body + "\r\n";
-	// std::cerr << RED << _response << RESET << NL;
+	if (!_body.empty())
+		_response += _body + "\r\n" ;
 }
 
 /******************************************************************************/
@@ -204,14 +209,17 @@ void	Response::_readFileContent(std::string& path)
 	std::stringstream	fileContent;
 
 	/* Check if file is accessible */
-	// if (!pathIsAccessible(path))
-	// {
-		// std::cerr << RED << path << " | " << _referer << RESET << NL;
-		// path.erase(path.find(_referer), _referer.length());
-		// std::cerr << RED << path << RESET << NL;
-		// if (!pathIsAccessible(path))
-		// 	throw(NOT_FOUND);
-	// }
+	if (!pathIsAccessible(path))
+	{
+		//std::cerr << RED << path << " | " << _referer << RESET << NL;
+		size_t	ref_pos = path.find(_referer);
+		if (ref_pos == std::string::npos)
+			throw (NOT_FOUND);
+		path.erase(ref_pos, _referer.length());
+		//std::cerr << RED << path << RESET << NL;
+		if (!pathIsAccessible(path))
+			throw(NOT_FOUND);
+	}
 	file.open(path.c_str(), std::ifstream::in);
 	/* Check if file was successfully opened */
 	if (!file.is_open())
@@ -251,6 +259,8 @@ void	Response::_runGetMethod()
 		if (_request->getPath() == "/form_accept.html" && !_request->getQuery().empty())
 			_parseQuery();
 		_readFileContent(_builtPath);
+		if (_body.empty())
+			setStatusCode(NO_CONTENT);
 	}
 }
 
@@ -258,6 +268,7 @@ void	Response::_runGetMethod()
 /*                            MULTIPART/FORM-DATA                             */
 /******************************************************************************/
 
+/*
 std::string		Response::_getBoundary(std::string contentType)
 {
 	std::string	boundary;
@@ -284,6 +295,40 @@ std::string		Response::_getBoundary(std::string contentType)
 	}
 	boundary = "--" + boundary;
 	return (boundary);
+}
+*/
+
+// TEST VERSION
+bool		Response::_getBoundary(std::string contentType,
+		std::string& boundary)
+{
+	//std::string	boundary;
+	size_t		pos;
+	int			lastChar;
+
+	pos = contentType.find("boundary=");
+	if (pos == std::string::npos)
+	{
+		return (false);
+		//throw(BAD_REQUEST);
+	}
+	contentType.erase(0, pos + 9);
+	boundary = contentType.substr(0, contentType.find("\r\n"));
+	trimSpacesEndStr(&boundary);
+	lastChar = boundary.length() - 1;
+	if (boundary[0] == '\"' && boundary[lastChar] == '\"')
+	{
+		boundary.erase(0, 1);
+		boundary.erase(lastChar - 1);
+	}
+	if (boundary.length() > 70)
+	{
+		return (false);
+		//throw(BAD_REQUEST);
+	}
+	boundary = "--" + boundary;
+	//return (boundary);
+	return (true);
 }
 
 size_t	Response::_getField(
@@ -321,8 +366,7 @@ void	Response::_parseContent(std::string body, const std::string& boundary)
 	content = body.substr(0, body.find("\r\n" + boundary));
 	if (filename != "")
 	{
-		if (!pathIsAccessible(_uploadPath))
-			throw (NOT_FOUND);
+		_checkUploadPath();
 		/* filenamePath = _uploadPath + filename */
 		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
 			_uploadPath += "/";
@@ -356,20 +400,25 @@ void	Response::_handleMultipartContentCgi(std::string body)
 	size_t		posFilename;
 
 	posFilename = 0;
-	boundary = _getBoundary(_request->getHeader("content-type"));
+	//boundary = _getBoundary(_request->getHeader("content-type"));
+	if (!_getBoundary(_request->getHeader("content-type"), boundary)) {
+		_is_cgi = false;
+		throw (BAD_REQUEST);
+	}
 	while (body.find(boundary + "\r\n") != std::string::npos)
 	{
 		posFilename += body.find(boundary + "\r\n") + boundary.length() + 2;
 		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
 		pos = body.find("Content-Disposition:");
-		if (pos == std::string::npos)
-			throw(BAD_REQUEST);
+		if (pos == std::string::npos) {
+			_is_cgi = false;
+			throw (BAD_REQUEST);
+		}
 		contentDisposition = body.substr(pos, body.find("\r\n"));
 		posFilename += _getField(contentDisposition, "filename=\"", &filename);
 		if (filename != "")
 		{
-			if (!pathIsAccessible(_uploadPath))
-				throw (NOT_FOUND);
+			_checkUploadPath();
 			// std::cerr << ORANGE << _uploadPath << NL << filename << RESET << NL;
 			if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
 				_uploadPath += "/";
@@ -385,7 +434,9 @@ void	Response::_handleMultipartContent(std::string body)
 {
 	std::string	boundary;
 
-	boundary = _getBoundary(_request->getHeader("content-type"));
+	if (!_getBoundary(_request->getHeader("content-type"), boundary))
+		throw (BAD_REQUEST);
+	//boundary = _getBoundary(_request->getHeader("content-type"));
 	while (body.find(boundary + "\r\n") != std::string::npos)
 	{
 		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
@@ -511,7 +562,7 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 		_throwErrorMsg("An error occurred while writing '" + new_file + "'");
 	}
 	file.close();
-	_session->addImage(path, _matchingBlock->getRoot());
+	_session->addImage(new_file, _matchingBlock->getRoot());
 	_msg = "   ✅📄 File " + new_file + " was successfully uploaded";
 }
 
@@ -524,27 +575,21 @@ void	Response::_runPostMethod()
 	if (_is_cgi)
 	{
 		/* process cgi */
-		_handleMultipartContentCgi(_request->getBody());
+		if (_contentTypeIsMultipart())
+			_handleMultipartContentCgi(_request->getBody());
 		return (_handleCgi());
 	}
-	// if (_matchingBlock->getUploadPath().empty())
-	if (_uploadPath.empty())
-	{
-		// setStatusCode ??
-		return ;
-	}
 	if (_contentTypeIsUrlencoded())
-	{
-		// setStatusCode ?
 		return ;
-	}
 	if (_contentTypeIsMultipart())
 	{
 		std::cout << RED << _builtPath << RESET << NL;
 		return (_handleMultipartContent(_request->getBody()));
 	}
+	_checkUploadPath();
 	_writeFileContent(_builtPath, _request->getBody());
 }
+
 
 /******************************************************************************/
 /*                               DELETE METHOD                                */
@@ -554,6 +599,7 @@ bool	Response::_deletePurchase(const std::string& uri)
 {
 	std::string	id;
 
+	DEBUG("Delete purchase =====================================");
 	if (uri.find("/form_delete/") == 0)
 	{
 		id = uri.substr(13);
@@ -565,15 +611,45 @@ bool	Response::_deletePurchase(const std::string& uri)
 	return (false);
 }
 
+bool	Response::_deletePurchaseImage(const std::string& uri)
+{
+	Session::listOfPath::iterator	ite;
+	std::string						image_to_delete;
+	Session::listOfPath&				gallery = _session->getGallery();
+
+	//gallery = _session->getGallery();
+	//std::cout << ORANGE << "URI : " << uri << RESET << std::endl;
+	if (uri.find("/form_delete/") == 0)
+	{
+		image_to_delete = uri.substr(12);
+		std::cout << YELLOW << "ITD : " << image_to_delete << RESET << std::endl;
+		for (ite = gallery.begin(); \
+		ite != gallery.end(); \
+		ite++)
+		{
+			std::cout << RED << image_to_delete << RESET << NL;
+			std::cout << BLUE << ite->second << RESET << NL;
+			if (image_to_delete == ite->second)
+			{
+				_session->deleteImage(ite, &_msg);
+				std::cerr << GREEN << "It's done !!!" << RESET << NL;
+				return (true);
+			}
+		}
+	}
+	return (false);
+}
+
 /* Remove all current representations of the target resource. */
 void	Response::_runDeleteMethod()
 {
 	int	ret;
 
+	DEBUG("DELETE MOETHODDDDDDDDDDDDDDDDDDDDDDDDDDD");
 	if (_deletePurchase(_request->getPath()))
 		return ;
-	// else if (_deleteImage(_request->getPath()))
-	// 	return ;
+	else if (_deletePurchaseImage(_request->getPath()))
+		return ;
 	ret = std::remove(_builtPath.c_str());
 	if (ret)
 	{
@@ -661,6 +737,14 @@ void	Response::_fillCookieHeader()
 /*                                  PATH                                      */
 /******************************************************************************/
 
+void	Response::_checkUploadPath()
+{
+	if (_matchingBlock->getUploadPath().empty())
+		throw (UNAUTHORIZED);
+	if (!pathIsAccessible(_uploadPath))
+		throw (NOT_FOUND);
+}
+
 /* Example refere: http://localhost:8080/cgi/cgi_upload.py */
 
 void	Response::_parseRequestReferer()
@@ -668,14 +752,14 @@ void	Response::_parseRequestReferer()
 	std::string	correctPath;
 
 	_referer = _request->getHeader("referer");
-	if (_referer == "")
+	if (_referer.empty())
 		return ;
-	_referer = _referer.substr(0, _referer.rfind("/") + 1); /* retrieve filename*/
-	_referer = _referer.substr(_referer.find("://") + 3); /* retrieve http:// */
-	_referer = _referer.substr(_referer.find("/") + 1);	/* retrieve hostname:port */
-	if (_referer == "")
+	_referer = _referer.substr(0, _referer.rfind("/") + 1); /* remove filename*/
+	_referer = _referer.substr(_referer.find("://") + 3); /* remove http:// */
+	_referer = _referer.substr(_referer.find("/") + 1);	/* remove hostname:port */
+	if (_referer.empty())
 		return ;
-	std::cout << ORANGE << "Referer = '" << _referer << "'" << RESET << NL;
+	//std::cout << ORANGE << "Referer = '" << _referer << "'" << RESET << NL;
 }
 
 std::string		Response::_getPathDir(const std::string& path)
@@ -700,8 +784,8 @@ void	Response::_checkPath()
 		throw(NOT_FOUND);
 	/* Check if directory exists */
 	pathDir = _getPathDir(_builtPath);
-	std::cerr << YELLOW << pathDir << RESET << NL;
-	if (_builtPath == "www/html/form_delete/")
+	//std::cerr << YELLOW << pathDir << RESET << NL;
+	if (_builtPath.find("form_delete/") != std::string::npos)
 		return ;
 	if (!pathIsAccessible(pathDir))
 	{
@@ -801,6 +885,7 @@ void	Response::_buildPath()
 	if (pathIsDirectory(path))
 		_handleDirectoryPath(&path);
 	_builtPath = path;
+	//std::cerr << RED << "Build path: " << _builtPath << RESET << NL;
 }
 
 /******************************************************************************/
@@ -1026,7 +1111,6 @@ void	Response::_fillCgiMetavariables() {
 	_env->addParam("SERVER_PORT", convertNbToString(_request->getPort()));
 	_env->addParam("REMOTE_IDENT", ""); // optional
 
-	//std::cerr << RED << "Query: " << getCgiQuery() << RESET << NL;
 	_env->addParam("HTTP_ACCEPT", _request->getHeader("accept"));
 	_env->addParam("HTTP_ACCEPT_LANGUAGE", _request->getHeader("accept-language"));
 	_env->addParam("HTTP_USER_AGENT", _request->getHeader("user-agent"));

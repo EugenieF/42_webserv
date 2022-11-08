@@ -6,6 +6,7 @@
 		<title>Cutie webserv 😚 💖</title>
 		<meta charset="UTF-8">
 		<link href="cgi_destroy.css" rel="stylesheet">
+		<link rel="icon" href="../img/favicon.ico">
 	</head>
 	<body class="background">
 		<div class="icon">
@@ -46,7 +47,7 @@
 				<center><input type="submit" value="Go acheter un nouvel ami !" class="bouton" /></center>
 			</form>
 			<form action="./cgi_achat.php">
-				<center><input type="submit" value="Verifier si le panier a bien ete detruit" class="bouton" /></center>
+				<center><input type="submit" value="Vérifier si le panier a bien été détruit" class="bouton" /></center>
 			</form>
 			<form action="../index.html">
 				<center><input type="submit" value="Retour vers la page d'accueil" class="bouton" /></center>

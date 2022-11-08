@@ -51,7 +51,7 @@ INCLUDE			= ./incs
 
 
 $(NAME):	$(OBJS)
-		@$(CXX) $(CXXFLAGS) $(MACRO) $(OBJS) -o $(NAME) 
+		@$(CXX) $(CXXFLAGS) $(MACRO) $(OBJS) -o $(NAME)
 		@echo "$(CUT)$(GREEN)✔ $(NAME) compiled$(RESET)"
 
 -include $(DEP)

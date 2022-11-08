@@ -134,8 +134,8 @@ void	writeFd(int fd, const char* buf, const ssize_t len) {
 	ret = write(fd, buf, len);
 	if (ret < 0)
 		throw std::runtime_error("writeFd (write) error");
-	// std::cerr << RED << " **Wanted write: " << len << NL
-	// 	<< " **Actual written: " << ret << RESET<< NL;
+	//std::cerr << RED << " **Wanted write: " << len << NL
+	//	<< " **Actual written: " << ret << RESET<< NL;
 	return ;
 
 	/* Actual function */
@@ -240,10 +240,10 @@ std::string	generateCopyFilename(const std::string& dir, const std::string& file
 	// std::string				full_filepath_copy = dir + "/" + filename + " (1)" + extension;
 	if (*(dir.rbegin()) != '/' && *(filename.begin()) != '/')
 		filename.insert(0, "/");
-	std::string full_filepath_copy = dir + filename + " (1)" + extension;
+	std::string full_filepath_copy = dir + filename + "_1" + extension;
 	while (pathIsAccessible(full_filepath_copy)) {
 		const std::string	num = convertNbToString(++last_copy);
-		full_filepath_copy = dir + filename + " (" + num + ")" + extension;
+		full_filepath_copy = dir + filename + "_" + num + extension;
 	}
 	return (full_filepath_copy);
 }

@@ -10,6 +10,7 @@
 # include "Purchase.hpp"
 
 # include <vector>
+# include <cstdio>
 
 /******************************************************************************/
 /*                               CLASS SESSION                                */
@@ -19,9 +20,14 @@ class Session
 {
 	public:
 	/***********************      MEMBER TYPES      *********************/
-		typedef std::vector<class Cookie>		listOfCookies;
-		typedef std::vector<class Purchase>		listOfPurchases;
-		typedef std::vector<std::string>		listOfPath;
+		typedef std::vector<class Cookie>			listOfCookies;
+		typedef std::vector<class Purchase>			listOfPurchases;
+		//typedef std::vector<std::string>			listOfPath;
+
+		typedef std::pair<std::string, std::string>	pairRootImg;
+		typedef std::vector<pairRootImg>			listOfPath;
+
+
 
 	private:
 	/**********************     MEMBER VARIABLES     ********************/
@@ -48,7 +54,7 @@ class Session
 		const listOfCookies&	getCookies() const;
 		listOfPurchases&		getOrder();
 		const listOfPurchases&	getOrder() const;
-		listOfPath				getGallery();
+		listOfPath&				getGallery();
 		const listOfPath&		getGallery() const;
 		size_t					getTime() const;
 
@@ -80,6 +86,8 @@ class Session
 		std::string				_generatePurchaseId();
 		void					_addPurchaseInOrder(std::string* msg);
 		bool					_idIsUnique(const std::string& id);
+
+		void					_destroyGallery();
 };
 
 /******************************************************************************/

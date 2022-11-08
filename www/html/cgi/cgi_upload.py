@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import cgi, os
+import cgi, os, os.path
 import cgitb; cgitb.enable()
 
 # permet de recevoir la request de l'user
@@ -13,6 +13,8 @@ f = form['nude']
 if f.filename:
    # on supprimer le chemin d'accès principal
    # du nom de fichier pour éviter les problemes
+   if os.path.exists(f.filename):
+     f.filename += '1'
    fn = os.path.abspath(f.filename)
    # fn = os.path.basename(f.filename)
    # message = fn
@@ -22,9 +24,11 @@ if f.filename:
 else:
    message = 'Pas de nude :( Sadly!'
 
+# print ('Status: 201 CREATED', "\r\n")
 print ("Content-type: text/html", "\r\n\r\n")
 
-print ("""<!DOCTYPE html>
+print ("""
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Cutie webserv 😚 💖</title>
@@ -56,7 +60,7 @@ print ("""<!DOCTYPE html>
 		<div class="happy">
 			<center>Vous nous rendez tres tres heureux 😏 !</center>
 		</div>
-			<form action="../form.html">
+			<form action="../form_upload.html">
 				<center><input type="submit" value="Créer une nouvelle demande pour réveiller nos sens" class="bouton" /></center>
 			</form>
 			<form action="../index.html">

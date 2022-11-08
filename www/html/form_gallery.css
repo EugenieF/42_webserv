@@ -86,11 +86,15 @@ input::placeholder {
 	font-size: 90%;
 }
 
+.bouton_class {
+	text-align: center;
+}
+
 .bouton {
 	margin: 20px;
+	margin-bottom: 50px;
 	background-color:#32CD32;
 	color: white;
-	text-align: center;
 	font-family: berry;
 	font-size: 150%;
 	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);

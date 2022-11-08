@@ -133,7 +133,9 @@ class   Response
 		void							_handleCgi();
 		void							_handleMultipartContent(std::string body);
 		void							_handleMultipartContentCgi(std::string body);
-		std::string						_getBoundary(std::string contentType);
+		//std::string						_getBoundary(std::string contentType);
+		bool							_getBoundary(std::string contentType,
+										std::string& boundary);
 		// std::string						_getField(std::string contentDisposition, const std::string& field);
 		size_t							_getField(std::string contentDisposition, const std::string& field,
 											std::string* name);
@@ -142,6 +144,7 @@ class   Response
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod();
 		bool							_deletePurchase(const std::string& uri);
+		bool							_deletePurchaseImage(const std::string& uri);
 
 						/*-----      Query    ----*/
 		void							_parseQuery();
@@ -157,6 +160,7 @@ class   Response
 		bool							_searchOfIndexPage(const listOfStrings& indexes, std::string* path);
 		bool							_foundIndexPage(DIR* dir, const std::string& indexPage);
 		void							_generateAutoindex(const std::string& path);
+		void							_checkUploadPath();
 
 						/*-----   Redirection  ----*/
 		void							_handleRedirection();

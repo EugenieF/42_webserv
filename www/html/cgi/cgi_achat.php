@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php
 	session_start();
 ?>
@@ -6,6 +7,7 @@
 		<title>Cutie webserv 😚 💖</title>
 		<meta charset="UTF-8">
         <link href="cgi_achat.css" rel="stylesheet">
+		<link rel="icon" href="../img/favicon.ico">
 	</head>
 	<body class="background">
 		<div class="icon">
@@ -26,50 +28,14 @@
 		<p class="cgi">
 			avec CGI !
 		</p>
-		<!-- <div class="hamster">
-			<img src="../img/hamster_panier.jpg" width="600px">
-		</div> -->
         <div class="informations">
         <?php
-        // if(isset($_POST['submit']))
-        // {
-        //     echo 'bonjour looooool<br>';
-        //     deleteItem($item);
-        // }
-
-
-		// function searchInKey($string, $array)
-		// {
-		// 	foreach ($array as $key => $val)
-		// 	{
-		// 		if ($val[$key] == $string) {
-		// 			return $key;
-		// 		}
-		// 	}
-		// 	return null;
-		// }
-
-        foreach($_SESSION['cart'] as $cart)
-        {
-			// echo searchInKey($cart['name'], $cart) ? 'true' : 'false';
-			// if (searchInKey($cart['name'], $cart))
-			// {
-			// 	echo $cart['name'], '<br>';
-			// 	echo '*************************<br>';
-			// }
-			// else
-			// {
+			foreach ($_SESSION['cart'] as $cart)
+			{
 				echo '<br>Votre nom : ', $cart['name'], '<br>';
 				echo 'Votre Hamster : ', $cart['hamster'], '<br>';
 				echo 'Sa Fourrure : ', $cart['color'], '<br>';
-			// }
-            // echo '<form action="deleteItem()" method="post"><center><input name="submit" type="submit" value="A LA POUBELLE" class="bouton"></center></form>';
-        }
-        // function deleteItem($item)
-        // {
-        //     echo 'Bonjour<br>';
-        //     unset($_SESSION['cart'][$item]);
-        // }
+			}
         ?>
 		</div>
 		<form action="../form.html">

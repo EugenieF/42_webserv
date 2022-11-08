@@ -1,0 +1,179 @@
+################## TELNET ##################
+
+telnet localhost 8080
+
+============== GET ==============
+
+=== Classic GET
+
+GET /index.html HTTP/1.1
+Host: localhost
+
+✅ 200
+
+=== Bad HOST
+
+GET /index.html HTTP/1.1
+Host: prout
+
+❌ Affiche 200
+
+----------------------------------
+
+GET /index.html HTTP/1.1
+Host : prout
+
+🔎 doit afficher 400 (espace entre "Host" et ":")
+
+✅
+----------------------------------
+
+GET /index.html HTTP/1.1
+
+🔎 doit afficher 400 (no Host)
+✅
+
+----------------------------------
+
+GET /index.html HTTP/1.1
+Host: localhost
+Host: localhost
+
+🔎 doit afficher 400
+
+
+=== Bad HTTP
+
+GET /index.html HTTP/0.1
+Host: localhost
+
+✅ 505 Version Not Supported
+
+=== Bad PATH
+
+GET /prout HTTP/1.1
+Host: localhost
+
+✅ 404 Not Found
+
+=== Bad CONTENT-LENGTH
+
+GET /index.html HTTP/1.1
+Host: localhost
+Content-Length: -1
+
+🔎 doit afficher 400
+✅
+
+----------------------------------
+
+GET /index.html HTTP/1.1
+Host: localhost
+Content-Length: 100000000000000000000000
+
+🔎 doit afficher 400
+✅
+
+----------------------------------
+
+GET /index.html HTTP/1.1
+Host: localhost
+Content-Length: NOTDIGIT
+
+🔎 doit afficher 400
+✅
+
+----------------------------------
+
+GET /index.html HTTP/1.1
+Host: localhost
+Content-Length: 10000
+Transfer-Encoding: chunked
+
+🔎 doit afficher 200
+✅ 200 OK
+
+----------------------------------
+
+GET /index.html HTTP/1.1
+Host: localhost
+Content-Length: 1
+Content-Length: 0
+
+🔎 doit afficher 400
+✅ 400 Bad Request
+
+============== POST ==============
+
+=== Classic POST
+
+POST /form.html HTTP/1.1
+Host: localhost
+
+=== Bad HOST
+
+POST /index.html HTTP/1.1
+Host: prout
+
+=== Bad HTTP
+
+POST /index.html HTTP/5000
+Host: localhost
+
+=== Bad CONTENT-LENGTH
+
+POST /index.html HTTP/1.1
+Host: localhost
+Content-Length: 100000000
+
+"X" * 100000000
+
+🔎 doit afficher 2XX
+
+
+============== DELETE ==============
+
+=== Classic DELETE
+
+# Creer un fichier "truc"
+DELETE /truc HTTP/1.1
+Host: localhost
+
+✅ 204 No Content
+
+============== BAD THINGS ==============
+
+=== Bad REQUEST
+
+telnet localhost 8080
+PUT /index.html HTTP/1.1
+Host : localhost
+
+
+POST /uploads/file.txt HTTP/1.1
+Host: qw
+Transfer-Encoding: chunked
+
+
+
+
+################## CURL ##################
+
+
+=== Setup multiple servers with different hostname
+
+curl --resolve localhost:8080:127.0.0.1 http://www.exemple.com
+
+
+=== Limit the client body
+
+# changer limit size du body dans le fichier de config
+curl -X POST -H "Content-Type: plain/text" --data "LLOLOL ON SE MARRE" http://localhost:8080
+
+
+################## SIEGE ##################
+
+
+
+
+################## ETC ##################

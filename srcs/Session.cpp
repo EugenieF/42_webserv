@@ -35,7 +35,9 @@ Session&	Session::operator=(const Session& other)
 	return (*this);
 }
 
-Session::~Session() {}
+Session::~Session() {
+	_destroyGallery();
+}
 
 bool	Session::_idIsUnique(const std::string& id)
 {
@@ -97,7 +99,7 @@ const Session::listOfPurchases&		Session::getOrder() const
 	return (_order);
 }
 
-Session::listOfPath		Session::getGallery()
+Session::listOfPath&	Session::getGallery()
 {
 	return (_gallery);
 }
@@ -165,6 +167,7 @@ void	Session::completePurchase(const std::string& name, const std::string& conte
 	}
     else if (name == "color") {
         _purchase.setColor(content);
+		 
 	}
 	if (_purchase.isComplete()) {
 		_addPurchaseInOrder(msg);
@@ -175,6 +178,7 @@ bool	Session::deletePurchase(const std::string& id, std::string* msg)
 {
 	listOfPurchases::iterator	ite;
 
+	std::cerr << BLUE << "About to delete : " << id << RESET << NL;
 	for (ite = _order.begin(); ite != _order.end(); ite++)
 	{
 		if (ite->getId() == id)
@@ -213,8 +217,11 @@ bool	Session::imageExist(const std::string& path)
 
 	for (ite = _gallery.begin(); ite != _gallery.end(); ite++)
 	{
-		if (*ite == path)
+		//if (*ite == path)
+		if (ite->second == path) {
+			std::cerr << RED << "IMAGE EXIST!!!!!!! =============" << RESET << NL;
 			return (true);
+		}
 	}
 	return (false);
 }
@@ -224,19 +231,35 @@ void	Session::addImage(const std::string& path, const std::string& root)
 	std::string	imgPath;
 
 	imgPath = path.substr(path.find(root) + root.size());
-	if (!imageExist(imgPath))
-	{
-		_gallery.insert(_gallery.end(), imgPath);
-		std::cout << YELLOW << "IMGPATH = " << imgPath << RESET << NL;
+	if (!imageExist(imgPath)) {
+		//_gallery.insert(_gallery.end(), imgPath);
+		_gallery.insert(_gallery.end(), std::make_pair(root, imgPath));
+		DEBUG ("Added image: " + path);
 	}
 }
 
 void	Session::deleteImage(listOfPath::iterator ite, std::string* msg)
 {
-	if (imageExist((*ite)))
-	{
-		_gallery.erase(ite);
-		*msg = "   ❎🐹 Image " + *ite + " was successfully deleted";
+	//if (imageExist((*ite)))
+	std::cerr << YELLOW << "In delete image !!!" << RESET << NL;
+	if (!imageExist(ite->second))
+		return ;
+	std::string	path = ite->first + ite->second;
+	//*msg = "   ❎🐹 Image " + *ite + " was successfully deleted";
+	std::cerr << YELLOW << "Unlink " << path << RESET << NL;
+	*msg = "   ❎🐹 Image " + ite->second + " was successfully deleted";
+	_gallery.erase(ite);
+	std::remove(path.c_str());
+}
+
+void	Session::_destroyGallery() {
+	/* TODO? Remove gallery content at end of session */
+	for (listOfPath::iterator it = _gallery.begin(); it != _gallery.end(); it++) {
+		//DEBUG("DESTROYING: <" + *it + ">");
+		std::string	path = it->first + it->second;
+		DEBUG("DESTROYING: <" + it->second + ">");
+		std::remove(path.c_str());
+		//unlink(/*add root*/it->c_str());
 	}
 }
 

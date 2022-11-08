@@ -106,6 +106,7 @@ class   Request
 		void						_parseHttpProtocol();
 		void						_parseHeaders();
 		void						_checkHeaders();
+		void						_checkContentLength();
 		void						_parseBody();
 		bool						_parseHostHeader();
 		void						_decodeChunks();

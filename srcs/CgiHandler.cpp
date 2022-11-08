@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 16:35:16 by etran             #+#    #+#             */
-/*   Updated: 2022/11/07 11:31:51 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:30:14 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ CgiHandler::CgiHandler(Response& response) :
 	_out(-1),
 	_env(*response.getEnv()),
 	_script(response.getBuiltPath()),
-	_requestbody(response.getRequest()->getBody()) {}
+	_requestbody(response.getRequest()->getBody()) {
+		if (!pathIsAccessible(_script))
+			throw (NOT_FOUND);
+	}
 
 CgiHandler::~CgiHandler() {
 	_restore();
@@ -51,7 +54,7 @@ bool CgiHandler::getCgiOutput(std::string& output) {
 	int	pid;
 
 	DEBUG("In CGI!!");
-	// _env.display();
+	//_env.display();
 	_setupPipe();
 	pid = fork();
 	if (pid < 0) {
