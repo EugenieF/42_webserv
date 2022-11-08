@@ -470,19 +470,41 @@ size_t	Response::_getNextWord(std::string& body, std::string &word, std::string 
 	return (pos);
 }
 
+void	Response::_parseCgiStatusLine(size_t* pos)
+{
+	std::string		name;
+	std::string		value;
+	int				code;
+
+	*pos = _getNextWord(_body, name, ":");
+	if (name == "Status" || name == "status")
+	{
+		_getNextWord(_body, value, " ");
+		_getNextWord(_body, value, " ");
+		trimSpacesStr(&value); /* We retrieve spaces around the value */
+		if (convertHttpCode(value, &code))
+		{
+			_getNextWord(_body, value, "\r\n");
+			trimSpacesStr(&value);
+			if (g_statusCode[code] == value);
+				setStatusCode(code);
+		}
+	}
+}
+
 void	Response::_parseCgiBody()
 {
 	size_t			pos;
 	std::string		headerName;
 	std::string		headerValue;
 
-	// std::cerr << YELLOW << ">>" << _body << "<<" << RESET << NL;
-	pos = _body.find("\r\n\r\n");
-	if (pos == std::string::npos || pos + 1 == std::string::npos)
+	if (_body.find("\r\n\r\n") == std::string::npos
+		&& _body.find("\n\n") == std::string::npos)
 	{
 		/* _body contains no header */
 		return ;
 	}
+	_parseCgiStatusLine(&pos);
 	while (pos != std::string::npos && _body.find("\r\n"))
 	{
 		pos = _getNextWord(_body, headerName, ":");

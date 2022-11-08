@@ -188,6 +188,7 @@ class   Response
 		void							_fillCgiMetavariables();
 		std::string						_translateCgiName() const;
 		void							_parseCgiBody();
+		void							_parseCgiStatusLine(size_t* pos);
 		size_t							_getNextWord(std::string& body, std::string &word, std::string const& delimiter);
 
 						/*-------  Test page ------*/

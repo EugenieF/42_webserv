@@ -163,22 +163,27 @@ void	Client::clear()
 
 void	Client::displayConnectionInfos()
 {
+	int			statusCode;
 	std::string	responseMsg;
 
-	// std::cout << std::endl << std::endl << BLUE_B << " Connection accepted on socket " << getFd();
-	// std::cout << "            " << RESET << std::endl;
+	statusCode = _response->getStatusCode();
+	responseMsg = _response->getMsgToDisplay();
+	if (responseMsg.empty() && _response->getStatusCode() == OK)
+	{
+		std::cout << std::endl << GREY << "Connection on socket " << _sockfd << ": ";
+		std::cout << extractStatusLine(_request->getRawRequest()) << RESET << NL;
+		return ;
+	}
 	std::string connection = "\n Connection accepted on socket " + convertNbToString(_sockfd);
 	std::cout << std::endl;
 	displayMsg(connection, BLUE_B);
 	std::cout << LIGHT_BLUE << "   " << extractStatusLine(_request->getRawRequest()) << std::endl;
-	if (_response->getStatusCode() < 400)
+	if (statusCode < 400)
 		std::cout << LIGHT_GREEN;
 	else
 		std::cout << RED;
 	std::cout << "   " << extractStatusLine(_response->getResponse()) << RESET << std::endl;
-	if (_response->getStatusCode() < 400)
-		responseMsg = _response->getMsgToDisplay();
-	if (responseMsg != "")
+	if (!responseMsg.empty() && statusCode < 400)
 	{
 		std::cout << responseMsg;
 		std::cout << RESET << std::endl;
