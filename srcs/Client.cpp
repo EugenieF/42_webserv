@@ -170,7 +170,7 @@ void	Client::displayConnectionInfos()
 	responseMsg = _response->getMsgToDisplay();
 	if (responseMsg.empty() && _response->getStatusCode() == OK)
 	{
-		std::cout << std::endl << GREY << "Connection on socket " << _sockfd << ": ";
+		std::cout << std::endl << GREY << "Socket " << _sockfd << ": ";
 		std::cout << extractStatusLine(_request->getRawRequest()) << RESET << NL;
 		return ;
 	}

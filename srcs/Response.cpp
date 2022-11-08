@@ -66,9 +66,6 @@ void	Response::_processMethod()
 	_buildPath();
 	_checkPath();
 	/* Find corresponding http method */
-
-	std::cerr << YELLOW << "builtpath: " << _builtPath << RESET << NL;
-
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
 		throw(METHOD_NOT_ALLOWED);
@@ -470,25 +467,28 @@ size_t	Response::_getNextWord(std::string& body, std::string &word, std::string 
 	return (pos);
 }
 
-void	Response::_parseCgiStatusLine(size_t* pos)
+void	Response::_parseCgiStatusLine()
 {
 	std::string		name;
 	std::string		value;
 	int				code;
 
-	*pos = _getNextWord(_body, name, ":");
-	if (name == "Status" || name == "status")
+	name = _body.substr(0, _body.find(":"));
+	if (name != "Status" && name != "status")
+		return ;
+	_getNextWord(_body, name, ":");
+	_body.erase(0, _body.find_first_not_of(" "));
+	_getNextWord(_body, value, " ");
+	trimSpacesStr(&value); /* We retrieve spaces around the value */
+	std::cerr << YELLOW << value << RESET << NL;
+	if (convertHttpCode(value, &code))
 	{
-		_getNextWord(_body, value, " ");
-		_getNextWord(_body, value, " ");
-		trimSpacesStr(&value); /* We retrieve spaces around the value */
-		if (convertHttpCode(value, &code))
-		{
-			_getNextWord(_body, value, "\r\n");
-			trimSpacesStr(&value);
-			if (g_statusCode[code] == value)
-				setStatusCode(code);
-		}
+		_getNextWord(_body, value, "\r\n");
+		trimSpacesStr(&value);
+		std::cerr << YELLOW << ">" << value << "<" << RESET << NL;
+		std::cerr << ORANGE << ">" << g_statusCode[code] << "<" << RESET << NL;
+		if (g_statusCode[code] == value)
+			setStatusCode(code);
 	}
 }
 
@@ -499,12 +499,13 @@ void	Response::_parseCgiBody()
 	std::string		headerValue;
 
 	if (_body.find("\r\n\r\n") == std::string::npos
-		&& _body.find("\n\n") == std::string::npos)
+		|| _body.find("\n\n") == std::string::npos)
 	{
 		/* _body contains no header */
 		return ;
 	}
-	_parseCgiStatusLine(&pos);
+	pos = 0;
+	_parseCgiStatusLine();
 	while (pos != std::string::npos && _body.find("\r\n"))
 	{
 		pos = _getNextWord(_body, headerName, ":");

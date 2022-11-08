@@ -24,11 +24,10 @@ if f.filename:
 else:
    message = 'Pas de nude :( Sadly!'
 
-print ("Status: 201 CREATED", "\r\n")
-print ("Content-type: text/html", "\r\n\r\n")
+print ("Status: 201 Created", end="\r\n")
+print ("Content-type: text/html", end="\r\n\r\n")
 
-print ("""
-<!DOCTYPE html>
+print ("""<!DOCTYPE html>
 <html>
 	<head>
 		<title>Cutie webserv 😚 💖</title>

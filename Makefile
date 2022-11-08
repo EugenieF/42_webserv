@@ -41,7 +41,7 @@ CXXFLAGS		 = -Wall -Wextra -Werror -g3 -std=c++98 -MMD -MP -I$(INCLUDE)
 
 MACRO			= -D WEBSERV_PATH=\"$(shell pwd)\"
 
-DEBUG_MODE		= -D DISPLAY=1
+# DEBUG_MODE		= -D DISPLAY=1
 
 BONUS_MODE		= -D COOKIE=1
 
