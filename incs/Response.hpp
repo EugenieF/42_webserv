@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Response.hpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/09 19:15:58 by etran             #+#    #+#             */
+/*   Updated: 2022/11/09 19:16:00 by etran            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
@@ -21,6 +33,13 @@
 
 extern StatusCode	g_statusCode;
 extern MimeType		g_mimeType;
+
+typedef enum t_responseStatus
+{
+	INCOMPLETE_RESPONSE	= 0,
+	COMPLETE_RESPONSE	= 1,
+	INVALID_RESPONSE	= 2,
+}	t_responseStatus;
 
 class   Response
 {
@@ -50,7 +69,6 @@ class   Response
 		std::string						_uploadPath;
 
 		Env*							_env; // Shares same env than client
-		bool							_is_cgi;
 		std::string						_cgiscript;
 		std::string						_cgiextra;
 		std::string						_cgiquery;
@@ -58,6 +76,7 @@ class   Response
 		Session*						_session;
 		std::string						_msg;
 		std::vector<std::string>		_cgiFilenames;
+		std::string						_referer;
 
     public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
@@ -98,6 +117,9 @@ class   Response
 		Env*							getEnv() const;
 		std::string						getMsgToDisplay() const;
 
+						/*-------    Utils   ------*/
+		void							eraseChunkResponse(size_t size);
+
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 						/*-------   Init    ------*/
@@ -108,11 +130,12 @@ class   Response
 		void							_processMethod();
 		void							_fillResponseLine();
 		void							_fillHeaders();
+		void							_fillHeader(const std::string& name, const std::string& value);
 		void							_fillErrorBody();
 
 						/*------  Get Method  -----*/
 		void							_runGetMethod();
-		void							_readFileContent(const std::string& path);
+		void							_readFileContent(std::string& path);
 
 						/*------  Post Method -----*/
 		void							_runPostMethod();
@@ -121,7 +144,9 @@ class   Response
 		void							_handleCgi();
 		void							_handleMultipartContent(std::string body);
 		void							_handleMultipartContentCgi(std::string body);
-		std::string						_getBoundary(std::string contentType);
+		//std::string						_getBoundary(std::string contentType);
+		bool							_getBoundary(std::string contentType,
+										std::string& boundary);
 		// std::string						_getField(std::string contentDisposition, const std::string& field);
 		size_t							_getField(std::string contentDisposition, const std::string& field,
 											std::string* name);
@@ -130,18 +155,23 @@ class   Response
 						/*-----  Delete Method ----*/
 		void							_runDeleteMethod();
 		bool							_deletePurchase(const std::string& uri);
+		bool							_deletePurchaseImage(const std::string& uri);
 
-						/*-----       Query    ----*/
+						/*-----      Query    ----*/
 		void							_parseQuery();
 
-						/*-------   Path    ------*/
-		std::string						_buildPath();
+						/*-------     Path  ------*/
+		void							_buildPath();
+		void							_checkPath();
+		std::string 					_getPathDir(const std::string& path);
+		void							_parseRequestReferer();
 		void							_handleSlash(std::string* path, const std::string& uri);
 		void							_handleDirectoryPath(std::string* path);
 		bool							_hasUploadPathDirective();
 		bool							_searchOfIndexPage(const listOfStrings& indexes, std::string* path);
 		bool							_foundIndexPage(DIR* dir, const std::string& indexPage);
 		void							_generateAutoindex(const std::string& path);
+		void							_checkUploadPath();
 
 						/*-----   Redirection  ----*/
 		void							_handleRedirection();
@@ -168,6 +198,9 @@ class   Response
 		void							_parseCgiUrl(size_t pos);
 		void							_fillCgiMetavariables();
 		std::string						_translateCgiName() const;
+		void							_parseCgiBody();
+		void							_parseCgiStatusLine();
+		size_t							_getNextWord(std::string& body, std::string &word, std::string const& delimiter);
 
 						/*-------  Test page ------*/
 		std::string						_generateFormAcceptPage();

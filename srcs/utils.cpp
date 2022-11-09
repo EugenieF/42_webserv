@@ -90,29 +90,6 @@ char* clone_str(const std::string& str) {
 	return (copy);
 }
 
-/* Doesn't work with large uploads, I don't know why... */
-
-// std::string readFd(int fd) {
-// 	std::string     str;
-// 	char            buf[BUFSIZE + 1];
-// 	ssize_t         count;
-
-// 	count = read(fd, buf, BUFSIZE);
-// 	while (count) {
-// 		std::cout << GREEN << "count = " << count << GREEN << NL;
-// 		if (count < 0)
-// 			throw std::runtime_error("readFd (recv) error");
-// 		buf[count] = 0;
-// 		str.insert(str.size(), buf, count);
-// 		if (count == BUFSIZE) {
-// 			count = read(fd, buf, BUFSIZE);
-// 		} else {
-// 			break ;
-// 		}
-// 	}
-// 	return (str);
-// }
-
 std::string readFd(int fd) {
 	std::string     str;
 	char            buf[BUFSIZE + 1];
@@ -126,34 +103,13 @@ std::string readFd(int fd) {
 	return (str);
 }
 
-void	writeFd(int fd, const char* buf, const ssize_t len) {
-	ssize_t		written_char = 0;
+ssize_t	writeFd(int fd, const char* buf, const ssize_t len) {
 	ssize_t		ret = 0;
 
-	/* TMP */
 	ret = write(fd, buf, len);
 	if (ret < 0)
 		throw std::runtime_error("writeFd (write) error");
-	// std::cerr << RED << " **Wanted write: " << len << NL
-	// 	<< " **Actual written: " << ret << RESET<< NL;
-	return ;
-
-	/* Actual function */
-	DEBUG("Writing len expected:" + convertNbToString(len));
-	while (written_char < len) {
-		ret = write(fd, buf + written_char, len - written_char);
-		DEBUG("  written char: " + convertNbToString(ret));
-		if (ret < 0) {
-			//DEBUG("ERROR: ret is " + convertNbToString(ret)
-			//	+ " (left: " + convertNbToString(len-written_char)
-			//	+ ")");
-			DEBUG("ERROR: left char = "
-				+ convertNbToString(len-written_char) + ")");
-			throw std::runtime_error("writeFd (write) error");
-		}
-		written_char += ret;
-	}
-	DEBUG("Actual len:" + convertNbToString(written_char));
+	return (ret);
 }
 
 std::string		generateRandomString(size_t length)
@@ -171,6 +127,24 @@ std::string		generateRandomString(size_t length)
 		randomStr += charset.substr(pos, 1);
 	}
 	return (randomStr);
+}
+
+void	toLowerStr(std::string* str)
+{
+	std::string::iterator ite;
+
+	for (ite = str->begin(); ite != str->end(); ite++)
+		*ite = std::tolower(*ite);
+}
+
+std::string		toLowerStr(const std::string& str)
+{
+	std::string	newStr(str);
+	std::string::iterator ite;
+
+	for (ite = newStr.begin(); ite != newStr.end(); ite++)
+		*ite = std::tolower(*ite);
+	return (newStr);
 }
 
 /******************************************************************************/
@@ -199,20 +173,42 @@ bool	pathIsAccessible(const std::string& path)
 	return (!ret);
 }
 
+std::string	findLastFilename(const std::string& dir, const std::string& basename) {
+	const size_t			ext_pos = basename.rfind('.');
+	const std::string		extension = basename.substr(ext_pos);
+	std::string				filename = basename.substr(0, ext_pos);
+	int						last_copy = 1;
+
+	if (filename.empty())
+		filename = extension;
+	if (*(dir.rbegin()) != '/' && *(filename.begin()) != '/')
+		filename.insert(0, "/");
+
+	std::string				full_filepath_copy;
+	std::string				latest_copy = dir + filename + extension;
+	while (pathIsAccessible(latest_copy)) {
+		const std::string	num = convertNbToString(last_copy++);
+		full_filepath_copy = dir + filename + "_" + num + extension;
+		latest_copy = full_filepath_copy;
+	}
+	return (latest_copy);
+}
+
 std::string	generateCopyFilename(const std::string& dir, const std::string& file) {
 	const size_t			ext_pos = file.rfind('.');
 	const std::string		extension = file.substr(ext_pos);
 	std::string				filename = file.substr(0, ext_pos);
+	int						last_copy = 1;
+
 	if (filename.empty())
 		filename = extension;
-	int						last_copy = 1;
-	// std::string				full_filepath_copy = dir + "/" + filename + " (1)" + extension;
 	if (*(dir.rbegin()) != '/' && *(filename.begin()) != '/')
 		filename.insert(0, "/");
-	std::string full_filepath_copy = dir + filename + " (1)" + extension;
+
+	std::string				full_filepath_copy = dir + filename + "_1" + extension;
 	while (pathIsAccessible(full_filepath_copy)) {
 		const std::string	num = convertNbToString(++last_copy);
-		full_filepath_copy = dir + filename + " (" + num + ")" + extension;
+		full_filepath_copy = dir + filename + "_" + num + extension;
 	}
 	return (full_filepath_copy);
 }

@@ -273,9 +273,9 @@ void	Parser::_parseCgiRule()
 
 	_expectNbOfArguments(2, EQUAL, SEMICOLON);
 	_expectNextToken(VALUE, _invalidValueMsg(_currentToken + 1));
-	if (_currentToken->getValue() != "php"	&& _currentToken->getValue() != ".php"
-		&& _currentToken->getValue() != ".py"	&& _currentToken->getValue() != "py")
-		_throwErrorParsing(_invalidValueMsg(_currentToken));
+	// if (_currentToken->getValue() != "php"	&& _currentToken->getValue() != ".php"
+	// 	&& _currentToken->getValue() != ".py"	&& _currentToken->getValue() != "py")
+	// 	_throwErrorParsing(_invalidValueMsg(_currentToken));
 	extension = _currentToken->getValue();
 	if (extension[0] && extension[0] == '.')
 		extension.erase(0, 1);
@@ -336,7 +336,6 @@ void	Parser::_configureVirtualHosts()
 		{
 			if (**currentServer == **nextServer)
 			{
-				// std::cout << RED << "[**** VIRTUAL HOST ****]" << RESET << std::endl;
 				(*currentServer)->setVirtualHost(*nextServer);
 				_servers.erase(nextServer);
 				nextServer--;
@@ -413,37 +412,6 @@ void	Parser::_checkDuplicatePorts(const std::string& host, int port)
 		}
 	}
 }
-
-// void	Parser::_checkDomainNames()
-// {
-// 	std::ifstream		file;
-// 	std::stringstream	fileContent;
-// 	std::string			content;
-// 	size_t				domainNamePos;
-// 	std::string			domainName;
-
-// 	file.open("/etc/hosts", std::ifstream::in);
-// 	/* Check if file was successfully opened */
-// 	if (!file.is_open())
-// 	{
-// 		/* An error occured */
-// 		_throwErrorParsing("Can't open file '\\etc\\hosts'");
-// 	}
-// 	/* We read the content of the file */
-// 	fileContent << file.rdbuf();
-// 	content = fileContent.str();
-// 	file.close();
-// 	for (size_t pos = content.find("\n"); pos != std::string::npos; pos = content.find("\n"))
-// 	{
-// 		domainNamePos = content.find(" localhost");
-// 		if (domainNamePos != std::string::npos)
-// 		{
-// 			domainName = content.substr(0, domainNamePos);
-// 			std::cout << YELLOW << "domainName = '" << domainName << "'" << RESET << NL;
-// 		}
-// 		content.erase(0, pos + 1);
-// 	}
-// }
 
 /******************************************************************************/
 /*                                  EXPECT                                    */

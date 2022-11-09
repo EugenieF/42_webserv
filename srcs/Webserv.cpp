@@ -59,13 +59,10 @@ void	Webserv::_setupServerMap(const listOfServers& configServers,
 	std::cout << std::endl;
 }
 
-// void	Webserv::parse(std::string configFile) {
-// 	_parser.parseFile(configFile);
-// 	_setupServerMap(getConfigServers());
-// }
-
 void	Webserv::run() {
-	displayMsg(" → Webserv is running 🏁", GREY);
+	displayMsg(" → Webserv is running 🏁\n", WHITE);
+	displayMsg("Socket\tResponse\t\t  Request", GREY);
+	displayMsg("------------------------------------------------------------", GREY);
 	_epoll.startMonitoring(_servers);
 }
 

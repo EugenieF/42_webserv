@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-import cgi, os
+import cgi, os, os.path
 import cgitb; cgitb.enable()
+import sys
 
 # permet de recevoir la request de l'user
 form = cgi.FieldStorage()
@@ -9,21 +10,41 @@ form = cgi.FieldStorage()
 # on recupere le nom du fichier sense etre uploade
 f = form['nude']
 
+def append_number_to_filename(filename, number):
+	pos = filename.rfind(".")
+	tmp = filename[0 : pos :]
+	extension = filename[pos: :]
+	tmp += "_" + str(number) + extension
+	return (tmp)
+
+def generate_filename(filename):
+	index = 1
+	tmp = filename
+	while os.path.exists(tmp):
+		tmp = append_number_to_filename(filename, index)
+		index += 1
+	return (tmp)
+
 # on regarde si le fichier a bien ete uploade
 if f.filename:
-   # on supprimer le chemin d'accès principal
-   # du nom de fichier pour éviter les problemes
-   fn = os.path.abspath(f.filename)
-   # fn = os.path.basename(f.filename)
-   # message = fn
-   # wb = on ecrit et on le transforme en binaire
-   open(fn, 'wb').write(f.file.read())
-   message = 'The file "' + fn + '" was uploaded successfully'
+	# on supprimer le chemin d'accès principal
+	# du nom de fichier pour éviter les problemes
+	# if os.path.exists(f.filename):
+		# f.filename += '1'
+	fn = os.path.abspath(generate_filename(f.filename))
+	# fn = os.path.abspath(f.filename)
+	# fn = os.path.basename(f.filename)
+	# message = fn
+	# wb = on ecrit et on le transforme en binaire
+	open(fn, 'wb').write(f.file.read())
+	message = 'The file "' + fn + '" was uploaded successfully'
 else:
-   message = 'Pas de nude :( Sadly!'
+	message = 'Pas de nude :( Sadly!'
 
-print ("""
-<!DOCTYPE html>
+print ("Status: 201 Created", end="\r\n")
+print ("Content-type: text/html", end="\r\n\r\n")
+
+print ("""<!DOCTYPE html>
 <html>
 	<head>
 		<title>Cutie webserv 😚 💖</title>
@@ -55,7 +76,7 @@ print ("""
 		<div class="happy">
 			<center>Vous nous rendez tres tres heureux 😏 !</center>
 		</div>
-			<form action="../form.html">
+			<form action="../form_upload.html">
 				<center><input type="submit" value="Créer une nouvelle demande pour réveiller nos sens" class="bouton" /></center>
 			</form>
 			<form action="../index.html">

@@ -8,13 +8,17 @@
 		<title>Cutie webserv 😚 💖</title>
 		<meta charset="UTF-8">
 		<link href="cgi_form.css" rel="stylesheet">
+		<link rel="icon" href="../img/favicon.ico">
 	</head>
 	<body class="background">
 		<div class="icon">
-			<a href="cgi_achat.php"><img src="../img/icon_panier_no_cgi.png" width="100px"></a>
+			<a href="../form_order"><img src="../img/icon_panier_no_cgi.png" width="100px"></a>
+		</div>
+		<div class="icon_cgi">
+			<a href="cgi_achat.php"><img src="../img/icon_panier_with_cgi.png" width="100px"></a>
 		</div>
 		<div class="paint">
-			<a href="../form_gallery.html"><img src="../img/icon_paint.png" width="100px"></a>
+			<a href="../form_gallery"><img src="../img/icon_paint.png" width="100px"></a>
 		</div>
 		<div class="house">
 			<a href="../index.html"><img src="../img/icon_house.png" width="100px"></a>

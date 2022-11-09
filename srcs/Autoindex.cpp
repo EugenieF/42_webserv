@@ -124,7 +124,6 @@ void    Autoindex::_generateIndexPage()
 		_indexPage += _generateHtmlLink(file->d_type, std::string(file->d_name));
 	}
 	_indexPage += _generateHtmlFooter();
-	std::cout << RED << getIndexPage() << std::endl;
     closedir(directory);
 }
 

@@ -6,7 +6,7 @@
 /*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:45:14 by etran             #+#    #+#             */
-/*   Updated: 2022/09/19 17:12:13 by etran            ###   ########.fr       */
+/*   Updated: 2022/11/09 14:59:09 by etran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,10 @@ bool _triggered;
 void	_sigHandler(int sig) {
 	(void) sig;
 	_triggered = true;
+}
+
+void	_ignoreSigpipe(int sig) {
+	(void) sig;
 }
 
 void	setupSignal(int state) {
@@ -35,4 +39,14 @@ void	setupSignal(int state) {
 
 bool	getTriggeredValue() {
 	return (_triggered);
+}
+
+void	setupSigpipe(int state) {
+	void	(*oldHandler_SigPipe)(int) = 0;
+
+	if (state == INIT_SIGNAL) {
+		oldHandler_SigPipe = signal(SIGPIPE, _ignoreSigpipe);
+	} else if (state == RESET_SIGNAL) {
+		signal(SIGPIPE, oldHandler_SigPipe);
+	}
 }

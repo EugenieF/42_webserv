@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/19 16:56:38 by etran             #+#    #+#             */
-/*   Updated: 2022/11/02 10:49:18 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/09 18:05:39 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ extern int	__is_child;
 		/*----------   Signal   ---------*/
 
 void			setupSignal(int state);
+void			setupSigpipe(int state);
 bool			getTriggeredValue();
 
 		/*-------- String related -------*/
@@ -53,14 +54,20 @@ std::string		trimSpacesEndStr(std::string *str, const char *toTrim = " \t");
 std::string		readFd(int fd);
 char*			clone_str(const std::string& str);
 std::string		generateRandomString(size_t length);
-void			writeFd(int fd, const char* buf, const ssize_t len);
+ssize_t			writeFd(int fd, const char* buf, const ssize_t len);
+void			toLowerStr(std::string* str);
+std::string		toLowerStr(const std::string& str);
+
 
 		/*--------  File related  -------*/
 
 bool			pathIsFile(const std::string& path);
 bool			pathIsDirectory(const std::string& path);
 bool			pathIsAccessible(const std::string& path);
-std::string		generateCopyFilename(const std::string& dir, const std::string& file);
+std::string		generateCopyFilename(const std::string& dir,
+				const std::string& file);
+std::string		findLastFilename(const std::string& dir,
+				const std::string& basename);
 
 		/*----------   Display  ---------*/
 

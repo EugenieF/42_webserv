@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:37:04 by etran             #+#    #+#             */
-/*   Updated: 2022/11/03 19:40:12 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/09 19:33:40 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 EpollInstance::EpollInstance() :
 	_efd(-1) {
 		memset(_events, 0, sizeof(struct epoll_event) * MAX_EVENT);
-}
+	}
 
 EpollInstance::~EpollInstance() {
 	_clearClientList();
@@ -115,22 +115,22 @@ void EpollInstance::_removeSocket(int sock) {
 void EpollInstance::_addClient(serverMap::const_iterator it, int sock) {
 	TcpSocket newsocket(sock, false);
 
-       newsocket.setToReusable();
-       newsocket.unlockSocket();
-       _addSocket(sock, EPOLLIN);
-       _clientlist[sock] = new Client(*it, sock, it->first->getEnv());
+	newsocket.setToReusable();
+	newsocket.unlockSocket();
+	_addSocket(sock, EPOLLIN);
+	_clientlist[sock] = new Client(*it, sock, it->first->getEnv());
 }
 
 /* Removing the client from the server and from the client map */
 void EpollInstance::_eraseClient(Client* client) {
-       int clientfd;
+	int clientfd;
 
-       clientfd = client->getFd();
-       _removeSocket(clientfd);
-       if (close(clientfd) < 0)
-               throw std::runtime_error("_eraseClient (close) error");
-       _clientlist.erase(clientfd);
-       delete client;
+	clientfd = client->getFd();
+	_removeSocket(clientfd);
+	if (close(clientfd) < 0)
+		throw std::runtime_error("_eraseClient (close) error");
+	_clientlist.erase(clientfd);
+	delete client;
 }
 
 /* Clearing client map */
@@ -147,13 +147,13 @@ void EpollInstance::_clearClientList() {
 
 /* Finding which server triggered the EPOLLIN call */
 EpollInstance::serverMap::const_iterator
-	EpollInstance::_findServerConnection(int fd, const serverMap& serv) const {
-		for (serverMap::const_iterator it = serv.begin();
+EpollInstance::_findServerConnection(int fd, const serverMap& serv) const {
+	for (serverMap::const_iterator it = serv.begin();
 			it != serv.end(); it++) {
-			if (it->first->getSocket() == fd)
-				return (it);
-		}
-		return (serv.end());
+		if (it->first->getSocket() == fd)
+			return (it);
+	}
+	return (serv.end());
 }
 
 /* Adding server sockets to the epoll instance */
@@ -182,6 +182,7 @@ void EpollInstance::_processConnections(serverMap::const_iterator it) {
 				throw std::runtime_error("accept error");
 		}
 		_addClient(it, sock);
+		//DEBUG("Added client: " + convertNbToString(sock));
 	}
 }
 
@@ -190,32 +191,37 @@ void EpollInstance::_handleRequest(Client* client) {
 	std::string		str;
 
 	str = readFd(client->getFd());
-	//std::cerr << YELLOW<< "Content [" << str.size() << "] :" << NL << str<< RESET << NL;
 	t_requestStatus requestStatus = client->parseRequest(str);
-	if (requestStatus == COMPLETE_REQUEST)
-	{
-		//std::cerr << ORANGE << " -- complete request --" << RESET << NL;
-		_editSocket(client->getFd(), EPOLLOUT);
-	} else if (requestStatus == INVALID_REQUEST)
-		_eraseClient(client);
+	if (requestStatus == COMPLETE_REQUEST) {
+		return (_editSocket(client->getFd(), EPOLLOUT));
+	} else if (requestStatus == INCOMPLETE_REQUEST) {
+		return ;
+	}
+	_eraseClient(client);
 }
 
 void EpollInstance::_handleResponse(Client* client) {
 	DEBUG("Response (client n." + convertNbToString(client->getFd()) + ")");
-
-	std::string response;
 
 	client->generateResponse();
 	if (__is_child != 0) {
 		_triggered = true;
 		return ;
 	}
-	response = client->getResponse()->getResponse();
-	//std::cerr << RED << "Response:\n" << response << RESET << NL;
-	//if (send(client->getFd(), response.c_str(), response.size(), 0) < 0)
-	//	throw std::runtime_error("handleResponse (write) error");
-	writeFd(client->getFd(), response.c_str(), response.size());
-	client->displayConnectionInfos();
-	if (!client->getRequest()->keepAlive())
-		_eraseClient(client);
+	if (_writeResponse(client) == COMPLETE_RESPONSE)
+		return (_eraseClient(client));
+	_editSocket(client->getFd(), EPOLLOUT);
+}
+
+t_responseStatus	EpollInstance::_writeResponse(Client* client) {
+	size_t		writeCount;
+	std::string	response;
+
+	response = client->getResponseStr();
+	writeCount = writeFd(client->getFd(), response.c_str(), response.size());
+	client->completeTotalSent(writeCount);
+	if (client->responseSentIsComplete())
+		return (COMPLETE_RESPONSE);
+	client->eraseResponsePart(writeCount);
+	return (INCOMPLETE_RESPONSE);
 }

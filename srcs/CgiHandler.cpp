@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 16:35:16 by etran             #+#    #+#             */
-/*   Updated: 2022/11/03 19:43:46 by efrancon         ###   ########.fr       */
+/*   Updated: 2022/11/09 19:34:08 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,15 @@ CgiHandler::CgiHandler(Response& response) :
 	_out(-1),
 	_env(*response.getEnv()),
 	_script(response.getBuiltPath()),
-	_requestbody(response.getRequest()->getBody()) {}
+	_requestbody(response.getRequest()->getBody()) {
+		if (!pathIsAccessible(_script))
+			throw (NOT_FOUND);
+		setupSigpipe(INIT_SIGNAL);
+	}
 
 CgiHandler::~CgiHandler() {
 	_restore();
+	setupSigpipe(RESET_SIGNAL);
 	DEBUG("Leaving CGI!!");
 }
 
@@ -51,13 +56,15 @@ bool CgiHandler::getCgiOutput(std::string& output) {
 	int	pid;
 
 	DEBUG("In CGI!!");
-	// _env.display();
+	//_env.display();
 	_setupPipe();
 	pid = fork();
 	if (pid < 0) {
 		throw RuntimeError("cgihandler getCgiOutput (fork) error");
 	} else if (pid == 0) {
 		/* Child */
+		DEBUG("Child forked");
+		usleep(900);
 		_execute();
 		__is_child = 1;
 		return (true);
@@ -66,7 +73,6 @@ bool CgiHandler::getCgiOutput(std::string& output) {
 		if (_waitForChild(pid)) {
 			output = readFd(_fd_out[0]);
 			close(_fd_out[0]);
-			// std::cerr << RED << "OUTPUT :\n" << output << RESET << NL;
 			return (true);
 		} else {
 			close(_fd_out[0]);
@@ -161,17 +167,6 @@ void CgiHandler::_setupPipe() {
 		throw RuntimeError("cgihandler getCgiOutput (pipe) error");
 	if (pipe(_fd_out) < 0)
 		throw RuntimeError("cgihandler getCgiOutput (pipe) error");
-
-	/*
-	if (fcntl(_fd_in[0], F_SETFL, O_NONBLOCK))
-		throw RuntimeError("cgihandler _setPipeNoBlock (fcntl) error");
-	if (fcntl(_fd_in[1], F_SETFL, O_NONBLOCK))
-		throw RuntimeError("cgihandler _setPipeNoBlock (fcntl) error");
-	if (fcntl(_fd_out[0], F_SETFL, O_NONBLOCK))
-		throw RuntimeError("cgihandler _setPipeNoBlock (fcntl) error");
-	if (fcntl(_fd_out[1], F_SETFL, O_NONBLOCK))
-		throw RuntimeError("cgihandler _setPipeNoBlock (fcntl) error");
-	*/
 }
 
 /* Close unused pipe ends */
@@ -190,26 +185,3 @@ void CgiHandler::_writeToStdin() {
 	if (close(_fd_in[1]) < 0)
 		throw RuntimeError("cgihandler _writeToStdin (close) error");
 }
-
-// void CgiHandler::_writeToStdin() {
-// 	_setupParentIo();
-
-// 	std::string		body(_requestbody);
-// 	std::string		chunk;
-// 	int				count;
-
-// 	while (body.size() > BUFSIZE)
-// 	{
-// 		chunk = body.substr(0, BUFSIZE);
-// 		count = write(_fd_in[1], chunk.c_str(), chunk.size());
-// 		// std::cout << RED << "Count = " << count << " | " << chunk.size() << RESET << NL;
-// 		if (count < 0)
-// 			throw RuntimeError("cgihandler _writeToStdin (write) error");
-// 		body.erase(0, BUFSIZE);
-// 		chunk.clear();
-// 	}
-// 	if (write(_fd_in[1], body.c_str(), body.size()) < 0)
-// 		throw RuntimeError("cgihandler _writeToStdin (write) error");
-// 	if (close(_fd_in[1]) < 0)
-// 		throw RuntimeError("cgihandler _writeToStdin (close) error");
-// }

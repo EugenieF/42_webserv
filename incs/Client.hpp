@@ -26,8 +26,11 @@ class Client
         Request*            	_request;
         Response*           	_response;
 		Env						_env;
+		size_t					_toSend;
+		size_t					_totalSent;
+		std::string				_responseStr;
 
-    public:
+	public:
 	/**********************  PUBLIC MEMBER FUNCTIONS  *******************/
 
 						/*-------    Main    ------*/
@@ -49,10 +52,17 @@ class Client
 		int						getFd() const;
 		const Env&				getEnv() const;
 		Env&					getEnv();
+		size_t					getTotalSent() const;
+		size_t					getToSend() const;
+        std::string         	getResponseStr() const;
 
 						/*-------    Utils   ------*/
 		void			    	clear();
 		void					displayConnectionInfos();
+		void					eraseResponsePart(size_t size);
+		void					setResponseSent(bool value);
+		void					completeTotalSent(size_t count);
+		bool					responseSentIsComplete() const;
 
 	private :
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/

@@ -35,21 +35,27 @@ body {
 	src: url(fonts/Laila-Medium.ttf);
 }
 
-.house {
+.icon {
 	position: fixed;
 	right: 0;
 }
 
-.paint {
+.house {
 	position: fixed;
 	right: 0;
 	margin-top: 120px;
 }
 
-.danse {
+.paint {
 	position: fixed;
 	right: 0;
 	margin-top: 240px;
+}
+
+.danse {
+	position: fixed;
+	right: 0;
+	margin-top: 360px;
 	margin-right: 10px;
 }
 
@@ -71,20 +77,19 @@ h1 {
 }
 
 .name {
-	margin-left: 150px;
+	margin-left: 175px;
 	font-family: laila;
 }
 
 .hamster {
-	margin-left: 150px;
+	margin-left: 175px;
 	font-family: laila;
 }
 
 .color {
-	margin-left: 150px;
+	margin-left: 175px;
 	font-family: laila;
 }
-
 
 .requete {
 	margin-top: 50px;
@@ -100,7 +105,7 @@ h1 {
 }
 
 .bouton {
-	margin: 20px;
+	margin: 10px;
 	margin-left: 150px;
 	background-color: red;
 	color: white;

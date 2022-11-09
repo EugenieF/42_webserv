@@ -6,7 +6,7 @@
 /*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 10:51:59 by etran             #+#    #+#             */
-/*   Updated: 2022/10/19 17:49:49 by etran            ###   ########.fr       */
+/*   Updated: 2022/11/09 19:20:17 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 
 # define NL '\n'
 
-// # define DEBUG(x) std::cout << " ### Debug ### : " << x << NL
 # define PRINT(x) std::cerr << " ### Debug ### : " << x << NL
 
 #endif

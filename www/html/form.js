@@ -25,7 +25,7 @@ function uploadData() {
     .then( (response) => {
         console.log(response);
         document.body.innerHTML = response;
-        document.body.style.backgroundColor = "#FFF8BC";
+        window.location.href.reload();
     })
     .catch ( error => console.log(error))
 }

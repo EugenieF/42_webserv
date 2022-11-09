@@ -366,7 +366,6 @@ void	Block::_deleteLocations()
 {
 	for (_currentLocation = _locations.begin(); _currentLocation != _locations.end(); _currentLocation++)
 	{
-		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
 		delete (_currentLocation->second);
 	}
 }
@@ -409,7 +408,6 @@ void	Block::_deleteVirtualHosts()
 
 	for (ite = _virtualHosts.begin(); ite != _virtualHosts.end(); ite++)
 	{
-		// std::cout << ORANGE << " xxx Delete a location xxx" << RESET << std::endl;
 		delete (*ite);
 	}
 }
@@ -445,7 +443,6 @@ Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPa
 
 	pos = path.find("/", 1);
 	prefix = path.substr(0, pos);
-	// std::cout << BLUE << "Request uri : " << path << " | prefix : " << prefix << RESET << std::endl;
 	_currentLocation = _locations.find(prefix);
 	if (_currentLocation != _locations.end())
 	{
@@ -497,8 +494,6 @@ void	Block::displayBlockDirectives(t_context context)
 	std::cout << indent << "‣ Body limit: " << getClientBodyLimit() << std::endl;
 	std::cout << indent << "‣ Upload path: " << getUploadPath() << std::endl;
 	std::cout << indent << "‣ Redirection: " << getRedirectCode() << " " << getRedirectUri() << std::endl;
-	// std::cout << indent << "‣ Cgi: " << getCgiExt() << " " << getCgiPath() << std::endl;
-	// std::cout << "  ‣ Error page: " << getErrorCode() << " " << getErrorPage() << std::endl;
 }
 
 void	Block::displayListOfStrings(const listOfStrings& list)

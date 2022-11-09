@@ -145,7 +145,6 @@ void	Request::_parsePath()
 	size_t			pos;
 
 	_getNextWord(path, " ");
-	// std::cout << YELLOW << "Requested uri : " << path << RESET << std::endl;
 	if (path == "" || path[0] != '/')
 		throw (BAD_REQUEST);
 	if (path.length() > 2048) /* Maximum URL Length */
@@ -186,7 +185,7 @@ void	Request::_parseHeaders()
 		pos = _getNextWord(headerName, ":");
 		if (pos == std::string::npos)
 			break ;
-		_toLowerStr(&headerName); /* Case-insensitive */
+		toLowerStr(&headerName); /* Case-insensitive */
 		_getNextWord(headerValue, "\r\n");
 		trimSpacesStr(&headerValue); /* We retrieve spaces around the value */
 		if (_headerIsSet(headerName)) /* Check duplicate headers */
@@ -216,15 +215,36 @@ bool	Request::_parseHostHeader()
 	return (true);
 }
 
+void	Request::_checkContentLength()
+{
+	std::string	contentLength;
+	size_t		size;
+
+	if (_headers.find("content-length") == _headers.end())
+		return ;
+	contentLength = _headers["content-length"];
+	if (contentLength.find_first_not_of("0123456789") != std::string::npos)
+		throw (BAD_REQUEST);
+	if (contentLength == "0")
+	{
+		_bodySize = 0;
+		return ;
+	}
+	size = std::strtoul(contentLength.c_str(), NULL, 10);
+	if (!size || size == ULONG_MAX)
+		throw (BAD_REQUEST);
+	_bodySize = size;
+}
+
 void	Request::_checkHeaders()
 {
 	Request::listOfHeaders::const_iterator	ite;
 	std::string								contentLength;
-	size_t									size;
 
 	if (!_parseHostHeader())
 		throw (BAD_REQUEST);
 	_parseCookies();
+	_checkContentLength();
 	if (_method != POST)
 	{
 		_headerIsParsed = true;
@@ -233,22 +253,7 @@ void	Request::_checkHeaders()
 	ite = _headers.find("transfer-encoding");
 	if (ite != _headers.end() && ite->second.find("chunked") != std::string::npos)
 		_chunkedTransfer = true;
-	else if (_headers.find("content-length") != _headers.end())
-	{
-		contentLength = _headers["content-length"];
-		if (contentLength.find_first_not_of("0123456789") != std::string::npos)
-			throw (BAD_REQUEST);
-		if (contentLength == "0")
-		{
-			_bodySize = 0;
-			return ;
-		}
-		size = std::strtoul(contentLength.c_str(), NULL, 10);
-		if (!size || size == ULONG_MAX)
-			throw (BAD_REQUEST);
-		_bodySize = size;
-	}
-	else
+	else if (_headers.find("content-length") == _headers.end())
 		throw (BAD_REQUEST);
 	_headerIsParsed = true;
 }
@@ -257,8 +262,6 @@ void	Request::_parseBody()
 {
 	Request::listOfHeaders::const_iterator	ite;
 
-	// std::cerr << GREEN << "Leftover request:" << NL
-	// 	<< _request << RESET << NL;
 	if (_requestStatus == COMPLETE_REQUEST)
 		return ;
 	if (_chunkedTransfer)
@@ -275,6 +278,7 @@ void	Request::_decodeChunks()
 {
 	std::string		chunkSize;
 	long			size;
+	// size_t			pos;
 
 	if (!_reachedEndOfChunkedBody())
 	{
@@ -287,11 +291,15 @@ void	Request::_decodeChunks()
 			throw (BAD_REQUEST);
 		if (chunkSize.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
 			throw (BAD_REQUEST);
+		std::cerr << "'" << BLUE << chunkSize << "'" << RESET << NL;
 		if (chunkSize == "0")
 			break ;
 		size = std::strtol(chunkSize.c_str(), NULL, 16);
 		if (!size || size == LONG_MAX || size == LONG_MIN)
+		{
+			std::cerr << "'" << RED << chunkSize << "'" << RESET << NL;
 			throw (BAD_REQUEST);
+		}
 		_body += _getNextWord(size);
 		_bodySize += size;
 	}
@@ -434,15 +442,6 @@ void	Request::_setRequestStatus(t_requestStatus status)
 	_requestStatus = status;
 }
 
-std::string		Request::_toLowerStr(std::string* str)
-{
-	std::string::iterator ite;
-
-	for (ite = str->begin(); ite != str->end(); ite++)
-		*ite = std::tolower(*ite);
-	return (*str);
-}
-
 size_t	Request::_getNextWord(std::string &word, std::string const& delimiter)
 {
 	size_t	pos;
@@ -464,6 +463,7 @@ std::string		Request::_getNextWord(size_t sizeWord)
 	nextWord = _request.substr(0, sizeWord);
 	_request.erase(0, sizeWord + 2);
 	_payloadSize += sizeWord + 2;
+	std::cerr << "'" << GREEN << nextWord << "'" << RESET << NL;
 	return (nextWord);
 }
 

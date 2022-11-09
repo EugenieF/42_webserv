@@ -35,7 +35,9 @@ Session&	Session::operator=(const Session& other)
 	return (*this);
 }
 
-Session::~Session() {}
+Session::~Session() {
+	_destroyGallery();
+}
 
 bool	Session::_idIsUnique(const std::string& id)
 {
@@ -97,7 +99,7 @@ const Session::listOfPurchases&		Session::getOrder() const
 	return (_order);
 }
 
-Session::listOfPath		Session::getGallery()
+Session::listOfPath&	Session::getGallery()
 {
 	return (_gallery);
 }
@@ -165,6 +167,7 @@ void	Session::completePurchase(const std::string& name, const std::string& conte
 	}
     else if (name == "color") {
         _purchase.setColor(content);
+		 
 	}
 	if (_purchase.isComplete()) {
 		_addPurchaseInOrder(msg);
@@ -213,8 +216,10 @@ bool	Session::imageExist(const std::string& path)
 
 	for (ite = _gallery.begin(); ite != _gallery.end(); ite++)
 	{
-		if (*ite == path)
+		if (ite->second == path) {
+			DEBUG("Image exist");
 			return (true);
+		}
 	}
 	return (false);
 }
@@ -224,16 +229,29 @@ void	Session::addImage(const std::string& path, const std::string& root)
 	std::string	imgPath;
 
 	imgPath = path.substr(path.find(root) + root.size());
-	if (!imageExist(imgPath))
-		_gallery.insert(_gallery.end(), imgPath);
+	if (!imageExist(imgPath)) {
+		_gallery.insert(_gallery.end(), std::make_pair(root, imgPath));
+		DEBUG ("Added image: " + path);
+	}
 }
 
 void	Session::deleteImage(listOfPath::iterator ite, std::string* msg)
 {
-	if (imageExist((*ite)))
-	{
-		_gallery.erase(ite);
-		*msg = "   ❎🐹 Image " + *ite + " was successfully deleted";
+	std::cerr << YELLOW << "In delete image !!!" << RESET << NL;
+	if (!imageExist(ite->second))
+		return ;
+	std::string	path = ite->first + ite->second;
+	*msg = "   ❎🐹 Image '" + ite->second + "' was successfully deleted";
+	_gallery.erase(ite);
+	std::remove(path.c_str());
+}
+
+void	Session::_destroyGallery() {
+	/* Remove gallery content at end of session */
+	for (listOfPath::iterator it = _gallery.begin(); it != _gallery.end(); it++) {
+		std::string	path = it->first + it->second;
+		DEBUG("DESTROYING: <" + it->second + ">");
+		std::remove(path.c_str());
 	}
 }
 
@@ -278,7 +296,6 @@ Session*	SessionHandler::_newSession()
 	std::string		newId;
 	Session*		newSession;
 
-	// std::cout << YELLOW << "******* new session *******" << RESET << NL;
 	newId = _generateSessionId();
 	newSession = new Session(newId);
 	_sessions.insert(_sessions.end(), newSession);
@@ -293,7 +310,6 @@ std::string		SessionHandler::_generateSessionId()
 	sessionId = generateRandomString(SESSION_ID_LENGTH);
 	while (_findSessionIte(sessionId) != _sessions.end())
 		sessionId = generateRandomString(SESSION_ID_LENGTH);
-	//DEBUG("SESSION ID = " + sessionId);
 	return (sessionId);
 }
 
@@ -348,7 +364,6 @@ Session*	SessionHandler::lookupSession(const listOfCookies& requestCookies)
 
 	session = _findSession(requestCookies);
 	session->fillCookies(requestCookies);
-	// session->displayCookies();
 	return (session);
 }
 

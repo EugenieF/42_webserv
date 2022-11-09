@@ -15,7 +15,9 @@ Client::Client(serverMapNode server, int sockfd, const Env& env):
     _runningServer(server),
     _request(0),
     _response(0),
-	_env(env) {}
+	_env(env),
+	_toSend(0),
+	_totalSent(0) {}
 
 Client::Client(Client const& other)
 {
@@ -36,6 +38,10 @@ Client&     Client::operator=(const Client& other)
         _runningServer = other.getRunningServer();
         _request = other.getRequest();
         _response = other.getResponse();
+		_env = other.getEnv();
+		_toSend = other.getToSend();
+		_totalSent = other.getTotalSent();
+		_responseStr = other.getResponseStr();
     }
     return (*this);
 }
@@ -64,11 +70,16 @@ void	Client::generateResponse()
 {
 	Session* session;
 
+	if (!_responseStr.empty())
+		return ;
 	session = _runningServer.first->lookupSession(_request->getCookies());
-	if (_response)
-		delete _response;
 	_response = new Response(_selectVirtualServer(), _request, _env, session);
 	_response->generateResponse();
+	_responseStr = _response->getResponse();
+	_toSend = _responseStr.size();
+	displayConnectionInfos();
+	delete _response;
+	_response = NULL;
 }
 
 bool	Client::_matchingServerName(
@@ -138,6 +149,21 @@ Env&	Client::getEnv() {
 	return (_env);
 }
 
+std::string		Client::getResponseStr() const
+{
+	return (_responseStr);
+}
+
+size_t	Client::getTotalSent() const
+{
+	return (_totalSent);
+}
+
+size_t	Client::getToSend() const
+{
+	return (_toSend);
+}
+
 /******************************************************************************/
 /*                                   UTILS                                    */
 /******************************************************************************/
@@ -158,23 +184,45 @@ void	Client::clear()
 
 void	Client::displayConnectionInfos()
 {
+	int			statusCode;
 	std::string	responseMsg;
 
-	// std::cout << std::endl << std::endl << BLUE_B << " Connection accepted on socket " << getFd();
-	// std::cout << "            " << RESET << std::endl;
+	statusCode = _response->getStatusCode();
+	responseMsg = _response->getMsgToDisplay();
+	if (responseMsg.empty() && _response->getStatusCode() == OK)
+	{
+		std::cout << GREY << "  [" << _sockfd << "]\t[200 OK]   [";
+		std::cout << extractStatusLine(_request->getRawRequest()) << "]";
+		std::cout << RESET << std::endl;
+		return ;
+	}
 	std::string connection = "\n Connection accepted on socket " + convertNbToString(_sockfd);
 	std::cout << std::endl;
 	displayMsg(connection, BLUE_B);
-	std::cout << LIGHT_BLUE << "   " << extractStatusLine(_request->getRawRequest()) << std::endl;
-	if (_response->getStatusCode() < 400)
+	std::cout << LIGHT_BLUE << "   > " << extractStatusLine(_request->getRawRequest()) << std::endl;
+	if (statusCode < 400)
 		std::cout << LIGHT_GREEN;
 	else
 		std::cout << RED;
-	std::cout << "   " << extractStatusLine(_response->getResponse()) << RESET << std::endl;
-	responseMsg = _response->getMsgToDisplay();
-	if (responseMsg != "")
+	std::cout << "   < " << extractStatusLine(_responseStr) << std::endl;
+	if (!responseMsg.empty() && statusCode < 400)
 	{
-		std::cout << responseMsg;
-		std::cout << RESET << std::endl;
+		std::cout << WHITE << responseMsg << std::endl;
 	}
+	std::cout << RESET << std::endl;
+}
+
+void	Client::eraseResponsePart(size_t size)
+{
+	_responseStr.erase(0, size);
+}
+
+bool	Client::responseSentIsComplete() const
+{
+	return (_totalSent == _toSend);
+}
+
+void	Client::completeTotalSent(size_t count)
+{
+	_totalSent += count;
 }
