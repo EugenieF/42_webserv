@@ -30,11 +30,14 @@
 		</p>
         <div class="informations">
         <?php
-			foreach ($_SESSION['cart'] as $cart)
+			if (isset($_SESSION['cart']))
 			{
-				echo '<br>Votre Nom : ', $cart['name'], '<br>';
-				echo 'Votre Hamster : ', $cart['hamster'], '<br>';
-				echo 'Sa Fourrure : ', $cart['color'], '<br>';
+				foreach ($_SESSION['cart'] as $cart)
+				{
+					echo '<br>Votre Nom : ', $cart['name'], '<br>';
+					echo 'Votre Hamster : ', $cart['hamster'], '<br>';
+					echo 'Sa Fourrure : ', $cart['color'], '<br>';
+				}
 			}
         ?>
 		</div>

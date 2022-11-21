@@ -237,7 +237,6 @@ void	Session::addImage(const std::string& path, const std::string& root)
 
 void	Session::deleteImage(listOfPath::iterator ite, std::string* msg)
 {
-	std::cerr << YELLOW << "In delete image !!!" << RESET << NL;
 	if (!imageExist(ite->second))
 		return ;
 	std::string	path = ite->first + ite->second;

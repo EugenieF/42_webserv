@@ -449,6 +449,15 @@ Block*		Block::getMatchingBlock(const std::string& path, std::string* locationPa
 		*locationPath = _currentLocation->first;
 		return (_currentLocation->second);
 	}
+	if (path[0] == '/')
+	{
+		_currentLocation = _locations.find("/");
+		if (_currentLocation != _locations.end())
+		{
+			*locationPath = _currentLocation->first;
+			return (_currentLocation->second);
+		}
+	}
 	return (this);
 }
 

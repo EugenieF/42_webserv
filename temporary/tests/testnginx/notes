@@ -1,0 +1,70 @@
+
+Webserv notes
+
+==================================================
+## block directive:
+
+server {
+	# this is a block directive
+}
+==================================================
+## simple directive:
+
+directive option; # this is simple directive
+==================================================
+## context:
+
+http {
+	server {
+	}
+} # block inside block -> outer block is context
+==================================================
+## local block
+
+# Indicates location match:
+location <optional_modifier> <location_match> {
+}
+
+# optional_modifier can be:
+none	: location is interpreted as prefix match of URI
+=		: block matches if URI matches the location given
+~		: case sensitive expression match
+~*		: location block interpreted as case insensitive match
+^~		: ???
+
+# examples:
+	# Works for URIs like /site, /site/page/file.html, /site/file.html
+	# It will keep on searching for better matches though
+	**************************
+	location /site {
+	}
+	**************************
+	
+	# Works only for /page
+	**************************
+	location = /page {
+	}
+	**************************
+	
+	# Works for stuff like /blue.png but not /RED.JPEG
+	**************************
+	location ~ \.(jpe?g|png|gif|ico)$ {
+	}
+	**************************
+	
+	# Works for /blue.png AND /RED.JPEG
+	**************************
+	location ~* \.(jpe?g|png|gif|ico)$ {
+	}
+	**************************
+	
+	# Will consider this the best match for such expression
+	**************************
+	location ^~ /site {
+	}
+	**************************
+
+
+==================================================
+
+==================================================

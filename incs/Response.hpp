@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: efrancon <efrancon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 19:15:58 by etran             #+#    #+#             */
-/*   Updated: 2022/11/09 19:16:00 by etran            ###   ########.fr       */
+/*   Updated: 2022/11/09 23:23:30 by efrancon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@
 # include <fstream>
 
 # include <dirent.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <unistd.h>
 
 # define WEBSERV_VERSION	"Cutie Webserv 1.0"
 
@@ -117,9 +120,6 @@ class   Response
 		Env*							getEnv() const;
 		std::string						getMsgToDisplay() const;
 
-						/*-------    Utils   ------*/
-		void							eraseChunkResponse(size_t size);
-
 	private:
 	/*********************  PRIVATE MEMBER FUNCTIONS  *******************/
 						/*-------   Init    ------*/
@@ -192,6 +192,7 @@ class   Response
 		bool							_contentTypeIsMultipart();
 		bool							_contentTypeIsUrlencoded();
 		bool							_isCgi(const std::string& path);
+		void							_checkSizeFile(const std::string& path);
 
 						/*-------    Cgi     ------*/
 		size_t							_parsePosCgiExtension(std::string path);

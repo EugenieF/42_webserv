@@ -262,6 +262,8 @@ void	Parser::_parseMaxBodySizeRule()
 	_expectNbOfArguments(1, EQUAL, SEMICOLON);
 	_expectNextToken(NUMBER, _invalidValueMsg(_currentToken + 1));
 	maxSize = atol(_currentToken->getValue().c_str());
+	if (maxSize > DEFAULT_CLIENT_BODY_LIMIT)
+		_throwErrorParsing("client_max_body_size too large");
 	_currentBlock->setClientBodyLimit(maxSize);
 }
 

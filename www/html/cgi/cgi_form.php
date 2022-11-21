@@ -34,30 +34,33 @@
 		</div>
 		<div class="inscription">
 		<?php
-			switch($_SERVER['REQUEST_METHOD'])
+			if (isset($_SERVER['REQUEST_METHOD']))
 			{
-				case 'GET':
-					$_SESSION['cart'][] = array(
-						'name' => $_GET['name'],
-						'hamster' => $_GET['hamster'],
-						'color' => $_GET['color']
-					);
-					echo 'Votre nom : '.$_GET["name"].'<br>';
-					echo 'Le nom de votre futur hamster : '.$_GET["hamster"].'<br>';
-					echo 'Vous avez choisi sa couleur magnifique qui est le '.$_GET["color"].'<br>';
-					break;
-				case 'POST':
-					$_SESSION['cart'][] = array(
-						'name' => $_POST['name'],
-						'hamster' => $_POST['hamster'],
-						'color' => $_POST['color']
-					);
-					echo 'Votre nom : '.$_POST["name"].'<br>';
-					echo 'Le nom de votre futur hamster : '.$_POST["hamster"].'<br>';
-					echo 'Vous avez choisi sa couleur magnifique qui est le '.$_POST["color"].'<br>';
-					break;
-				default:
-					echo "Il faut un minimum d'infos pour obtenir votre petit bebou!\n";
+				switch($_SERVER['REQUEST_METHOD'])
+				{
+					case 'GET':
+						$_SESSION['cart'][] = array(
+							'name' => $_GET['name'],
+							'hamster' => $_GET['hamster'],
+							'color' => $_GET['color']
+						);
+						echo 'Votre nom : '.$_GET["name"].'<br>';
+						echo 'Le nom de votre futur hamster : '.$_GET["hamster"].'<br>';
+						echo 'Vous avez choisi sa couleur magnifique qui est le '.$_GET["color"].'<br>';
+						break;
+					case 'POST':
+						$_SESSION['cart'][] = array(
+							'name' => $_POST['name'],
+							'hamster' => $_POST['hamster'],
+							'color' => $_POST['color']
+						);
+						echo 'Votre nom : '.$_POST["name"].'<br>';
+						echo 'Le nom de votre futur hamster : '.$_POST["hamster"].'<br>';
+						echo 'Vous avez choisi sa couleur magnifique qui est le '.$_POST["color"].'<br>';
+						break;
+					default:
+						echo "Il faut un minimum d'infos pour obtenir votre petit bebou!\n";
+				}
 			}
 		?>
 		</div>

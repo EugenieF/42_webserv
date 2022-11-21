@@ -1,22 +1,21 @@
-# include "debug.hpp"
-# include "Response.hpp"
+#include "debug.hpp"
+#include "Response.hpp"
 
 /******************************************************************************/
 /*                                   MAIN                                     */
 /******************************************************************************/
 
-Response::Response(Block *server, Request* request, Env& env, Session* session):
-	_server(server),
-	_request(request),
-	_response(""),
-	_statusCode(_request->getStatusCode()),
-	_method(_request->getMethod()),
-	_body(""),
-	_locationPath(""),
-	_fd(request->getFd()),
-	_env(&env),
-	_cgipath(""),
-	_session(session)
+Response::Response(Block *server, Request *request, Env &env, Session *session) : _server(server),
+																				  _request(request),
+																				  _response(""),
+																				  _statusCode(_request->getStatusCode()),
+																				  _method(_request->getMethod()),
+																				  _body(""),
+																				  _locationPath(""),
+																				  _fd(request->getFd()),
+																				  _env(&env),
+																				  _cgipath(""),
+																				  _session(session)
 {
 	_initHttpMethods();
 }
@@ -28,7 +27,7 @@ Response::Response(const Response &other)
 
 Response::~Response() {}
 
-Response&	Response::operator=(const Response &other)
+Response &Response::operator=(const Response &other)
 {
 	if (this != &other)
 	{
@@ -54,9 +53,9 @@ Response&	Response::operator=(const Response &other)
 /*                                 GENERATE                                   */
 /******************************************************************************/
 
-void	Response::_processMethod()
+void Response::_processMethod()
 {
-	listOfHttpMethodsFunct::const_iterator	ite;
+	listOfHttpMethodsFunct::const_iterator ite;
 
 	/* Check method validity */
 	if (!_matchingBlock->isAllowedMethod(_method))
@@ -64,6 +63,7 @@ void	Response::_processMethod()
 	_parseRequestReferer();
 	_buildPath();
 	_checkPath();
+	DEBUG("_uiltpath = " + _builtPath);
 	/* Find corresponding http method */
 	ite = _httpMethods.find(_method);
 	if (ite == _httpMethods.end())
@@ -76,10 +76,10 @@ void	Response::_processMethod()
 	(this->*ite->second)();
 }
 
-void	Response::generateResponse()
+void Response::generateResponse()
 {
 	/* Generate CGI here */
-	std::string	errorPage;
+	std::string errorPage;
 
 	_matchingBlock = _server->getMatchingBlock(_request->getPath(), &_locationPath);
 	if (_requestIsValid()) /* Handle valid request */
@@ -89,7 +89,7 @@ void	Response::generateResponse()
 			_checkBodyLimit();
 			_processMethod();
 		}
-		catch(const t_statusCode& errorCode)
+		catch (const t_statusCode &errorCode)
 		{
 			setStatusCode(errorCode);
 			_fillErrorBody();
@@ -102,57 +102,51 @@ void	Response::generateResponse()
 	_fillResponseLine();
 	_fillHeaders();
 	if (!_body.empty())
-		_response += _body + "\r\n" ;
+		_response += _body + "\r\n";
 }
 
 /******************************************************************************/
 /*                              FILL RESPONSE                                 */
 /******************************************************************************/
 
-void	Response::_fillErrorBody()
+void Response::_fillErrorBody()
 {
-	std::string		errorFile;
+	std::string errorFile;
 
 	try
 	{
 		errorFile = _matchingBlock->getErrorPage(_statusCode);
 		_readFileContent(errorFile);
 	}
-	catch(const t_statusCode& errorCode)
+	catch (const t_statusCode &errorCode)
 	{
 
 		_body = _generateErrorPage();
-
 	}
 }
 
-void	Response::_fillResponseLine()
+void Response::_fillResponseLine()
 {
-	_response = "HTTP/1.1 "
-		+ getStatusCodeStr() + " "
-		+ g_statusCode[_statusCode]
-		+ "\r\n";
+	_response = "HTTP/1.1 " + getStatusCodeStr() + " " + g_statusCode[_statusCode] + "\r\n";
 }
 
-
-void	Response::_fillHeader(const std::string& name, const std::string& value)
+void Response::_fillHeader(const std::string &name, const std::string &value)
 {
-	std::string				lowerName(name);
-	listOfHeaders::iterator	ite;
+	std::string lowerName(name);
+	listOfHeaders::iterator ite;
 
 	toLowerStr(&lowerName);
 	for (ite = _headers.begin(); ite != _headers.end(); ite++)
 	{
 		if (toLowerStr(ite->first) == lowerName)
-			return ;
+			return;
 	}
 	_headers[name] = value;
-
 }
 
-void	Response::_fillHeaders()
+void Response::_fillHeaders()
 {
-	Response::listOfHeaders::const_iterator	ite;
+	Response::listOfHeaders::const_iterator ite;
 
 	_fillHeader("Server", WEBSERV_VERSION);
 	_fillHeader("Content-Type", _getContentTypeHeader());
@@ -171,12 +165,12 @@ void	Response::_fillHeaders()
 /*                               GET METHOD                                   */
 /******************************************************************************/
 
-void   Response::_parseQuery()
+void Response::_parseQuery()
 {
-	std::string     query;
-	std::string     name;
-	std::string     content;
-	size_t          pos;
+	std::string query;
+	std::string name;
+	std::string content;
+	size_t pos;
 
 	pos = 0;
 	query = _request->getQuery();
@@ -192,27 +186,29 @@ void   Response::_parseQuery()
 	}
 }
 
-void	Response::_handleRedirection()
+void Response::_handleRedirection()
 {
 	setStatusCode(_matchingBlock->getRedirectCode());
 	_headers["Location"] = _matchingBlock->getRedirectUri();
 }
 
-void	Response::_readFileContent(std::string& path)
+void Response::_readFileContent(std::string &path)
 {
-	std::ifstream		file;
-	std::stringstream	fileContent;
+	std::ifstream file;
+	std::stringstream fileContent;
 
 	/* Check if file is accessible */
 	if (!pathIsAccessible(path))
 	{
-		size_t	ref_pos = path.find(_referer);
+		size_t ref_pos = path.find(_referer);
 		if (ref_pos == std::string::npos)
-			throw (NOT_FOUND);
+			throw(NOT_FOUND);
 		path.erase(ref_pos, _referer.length());
 		if (!pathIsAccessible(path))
 			throw(NOT_FOUND);
 	}
+	if (pathIsDirectory(path))
+		return;
 	file.open(path.c_str(), std::ifstream::in);
 	/* Check if file was successfully opened */
 	if (!file.is_open())
@@ -227,28 +223,28 @@ void	Response::_readFileContent(std::string& path)
 }
 
 /*  GET method : "Transfer a current representation of the target resource." */
-void	Response::_runGetMethod()
+void Response::_runGetMethod()
 {
 	if (_isCgi(_builtPath))
 	{
 		/* process cgi */
 		return (_handleCgi());
 	}
-	if (_request->getPath() == "/form_order")
+	if (CUTIE && _request->getPath() == "/form_order")
 	{
 		_body = _generateFormOrderPage();
 		_headers["Content-Type"] = g_mimeType[".html"];
-		return ;
+		return;
 	}
-	if (_request->getPath() == "/form_gallery")
+	if (CUTIE && _request->getPath() == "/form_gallery")
 	{
 		_body = _generateGalleryPage();
 		_headers["Content-Type"] = g_mimeType[".html"];
-		return ;
+		return;
 	}
 	if (_body.empty()) /* If there is no autoindex */
 	{
-		if (_request->getPath() == "/form_accept.html" && !_request->getQuery().empty())
+		if (CUTIE && _request->getPath().find("/form_accept.html") != std::string::npos && !_request->getQuery().empty())
 			_parseQuery();
 		_readFileContent(_builtPath);
 		if (_body.empty())
@@ -260,11 +256,11 @@ void	Response::_runGetMethod()
 /*                            MULTIPART/FORM-DATA                             */
 /******************************************************************************/
 
-bool		Response::_getBoundary(std::string contentType,
-		std::string& boundary)
+bool Response::_getBoundary(std::string contentType,
+							std::string &boundary)
 {
-	size_t		pos;
-	int			lastChar;
+	size_t pos;
+	int lastChar;
 
 	pos = contentType.find("boundary=");
 	if (pos == std::string::npos)
@@ -284,10 +280,10 @@ bool		Response::_getBoundary(std::string contentType,
 	return (true);
 }
 
-size_t	Response::_getField(
-	std::string contentDisposition, const std::string& field, std::string* name)
+size_t Response::_getField(
+	std::string contentDisposition, const std::string &field, std::string *name)
 {
-	size_t	pos;
+	size_t pos;
 
 	pos = contentDisposition.find(field);
 	if (pos == std::string::npos)
@@ -301,13 +297,13 @@ size_t	Response::_getField(
 	return (pos);
 }
 
-void	Response::_parseContent(std::string body, const std::string& boundary)
+void Response::_parseContent(std::string body, const std::string &boundary)
 {
-	size_t		pos;
-	std::string	contentDisposition;
-	std::string	filename;
-	std::string	name;
-	std::string	content;
+	size_t pos;
+	std::string contentDisposition;
+	std::string filename;
+	std::string name;
+	std::string content;
 
 	pos = body.find("Content-Disposition:");
 	if (pos == std::string::npos)
@@ -319,7 +315,7 @@ void	Response::_parseContent(std::string body, const std::string& boundary)
 	content = body.substr(0, body.find("\r\n" + boundary));
 	if (filename != "")
 	{
-		DEBUG ("PARSE CONTENT ");
+		DEBUG("PARSE CONTENT ");
 		_checkUploadPath();
 		/* filenamePath = _uploadPath + filename */
 		if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
@@ -345,59 +341,58 @@ bytes of pdf file
 ...
 */
 
-void	Response::_handleMultipartContentCgi(std::string body)
+void Response::_handleMultipartContentCgi(std::string body)
 {
-	std::string	boundary;
-	std::string	filename;
-	std::string	contentDisposition;
-	size_t		pos;
-	size_t		posFilename;
+	std::string boundary;
+	std::string filename;
+	std::string contentDisposition;
+	size_t pos;
+	size_t posFilename;
 
 	posFilename = 0;
 	if (!_getBoundary(_request->getHeader("content-type"), boundary))
-		throw (BAD_REQUEST);
+		throw(BAD_REQUEST);
 	while (body.find(boundary + "\r\n") != std::string::npos)
 	{
 		posFilename += body.find(boundary + "\r\n") + boundary.length() + 2;
 		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
 		pos = body.find("Content-Disposition:");
 		if (pos == std::string::npos)
-			throw (BAD_REQUEST);
+			throw(BAD_REQUEST);
 		contentDisposition = body.substr(pos, body.find("\r\n"));
 		posFilename += _getField(contentDisposition, "filename=\"", &filename);
 		if (filename != "")
 		{
-			DEBUG ("CGI LEL");
+			DEBUG("CGI LEL");
 			_checkUploadPath();
 			if (_uploadPath[_uploadPath.length() - 1] != '/' && filename[0] != '/')
 				_uploadPath += "/";
 			_request->insertUploadPath(posFilename, _uploadPath);
 			filename = findLastFilename(_uploadPath, filename);
 			_cgiFilenames.insert(_cgiFilenames.begin(), filename);
-			_msg += "\n   ✅📄 File '" + filename
-				+ "' has been successfully uploaded with CGI";
+			_msg += "\n   ✅📄 File '" + filename + "' has been successfully uploaded with CGI";
 		}
 	}
 }
 
-void	Response::_handleMultipartContent(std::string body)
+void Response::_handleMultipartContent(std::string body)
 {
-	std::string	boundary;
+	std::string boundary;
 
 	if (!_getBoundary(_request->getHeader("content-type"), boundary))
-		throw (BAD_REQUEST);
-	//boundary = _getBoundary(_request->getHeader("content-type"));
+		throw(BAD_REQUEST);
+	// boundary = _getBoundary(_request->getHeader("content-type"));
 	while (body.find(boundary + "\r\n") != std::string::npos)
 	{
 		body.erase(0, body.find(boundary + "\r\n") + boundary.length() + 2);
 		_parseContent(body, boundary);
 	}
-	if (_request->getPath() == "/form_accept")
+	if (CUTIE && _request->getPath() == "/form_accept")
 	{
 		_body = _generateFormAcceptPage();
 		_headers["Content-Type"] = g_mimeType[".html"];
 	}
-	else if (_request->getPath() == "/form_upload")
+	else if (CUTIE && _request->getPath() == "/form_upload")
 	{
 		_body = "OK";
 	}
@@ -407,10 +402,10 @@ void	Response::_handleMultipartContent(std::string body)
 /*                                   CGI                                      */
 /******************************************************************************/
 
-size_t	Response::_getNextWord(std::string& body, std::string &word, std::string const& delimiter)
+size_t Response::_getNextWord(std::string &body, std::string &word, std::string const &delimiter)
 {
-	size_t	pos;
-	size_t	totalSize;
+	size_t pos;
+	size_t totalSize;
 
 	pos = body.find(delimiter);
 	std::string nextWord(body, 0, pos);
@@ -420,15 +415,15 @@ size_t	Response::_getNextWord(std::string& body, std::string &word, std::string 
 	return (pos);
 }
 
-void	Response::_parseCgiStatusLine()
+void Response::_parseCgiStatusLine()
 {
-	std::string		name;
-	std::string		value;
-	int				code;
+	std::string name;
+	std::string value;
+	int code;
 
 	name = _body.substr(0, _body.find(":"));
 	if (name != "Status" && name != "status")
-		return ;
+		return;
 	_getNextWord(_body, name, ":");
 	_body.erase(0, _body.find_first_not_of(" "));
 	_getNextWord(_body, value, " ");
@@ -442,17 +437,16 @@ void	Response::_parseCgiStatusLine()
 	}
 }
 
-void	Response::_parseCgiBody()
+void Response::_parseCgiBody()
 {
-	size_t			pos;
-	std::string		headerName;
-	std::string		headerValue;
+	size_t pos;
+	std::string headerName;
+	std::string headerValue;
 
-	if (_body.find("\r\n\r\n") == std::string::npos
-		&& _body.find("\n\n") == std::string::npos)
+	if (_body.find("\r\n\r\n") == std::string::npos && _body.find("\n\n") == std::string::npos)
 	{
 		/* _body contains no header */
-		return ;
+		return;
 	}
 	pos = 0;
 	_parseCgiStatusLine();
@@ -460,7 +454,7 @@ void	Response::_parseCgiBody()
 	{
 		pos = _getNextWord(_body, headerName, ":");
 		if (pos == std::string::npos)
-			break ;
+			break;
 		_getNextWord(_body, headerValue, "\r\n");
 		trimSpacesStr(&headerValue); /* We retrieve spaces around the value */
 		_fillHeader(headerName, headerValue);
@@ -468,15 +462,15 @@ void	Response::_parseCgiBody()
 	_getNextWord(_body, headerName, "\r\n");
 }
 
-void	Response::_handleCgi()
+void Response::_handleCgi()
 {
 	std::vector<std::string>::const_iterator ite;
 
 	_fillCgiMetavariables();
 
-	CgiHandler	cgi(*this);
+	CgiHandler cgi(*this);
 	if (!cgi.getCgiOutput(_body))
-		throw (INTERNAL_SERVER_ERROR);
+		throw(INTERNAL_SERVER_ERROR);
 	_parseCgiBody();
 	DEBUG("Parsed body =======");
 	_msg.insert(0, "   ✅🎉 CGI '" + _builtPath + "' has been successfully executed");
@@ -492,23 +486,28 @@ void	Response::_handleCgi()
 /*                               POST METHOD                                  */
 /******************************************************************************/
 
-void	Response::_writeFileContent(const std::string& path, const std::string& content)
+void Response::_writeFileContent(const std::string &path, const std::string &content)
 {
-	std::ofstream	file;
-	std::string		pathDir;
-	std::string		filename;
-	std::string		new_file;
-	size_t			separator;
+	std::ofstream file;
+	std::string pathDir;
+	std::string filename;
+	std::string new_file;
+	size_t separator;
 
 	separator = path.rfind("/");
 	pathDir = path.substr(0, separator + 1);
 	/* Check if directory exists */
 	filename = path.substr(separator + 1);
-	if (filename.empty()) { /* Case: no input file */
-		throw (BAD_REQUEST);
-	} else if (pathIsAccessible(path)) { /* Case: file already exists */
+	if (filename.empty())
+	{ /* Case: no input file */
+		throw(BAD_REQUEST);
+	}
+	else if (pathIsAccessible(path))
+	{ /* Case: file already exists */
 		new_file = generateCopyFilename(pathDir, filename);
-	} else { /* Case: file doesn't exist */
+	}
+	else
+	{ /* Case: file doesn't exist */
 		new_file = path;
 	}
 	setStatusCode(CREATED);
@@ -533,9 +532,9 @@ void	Response::_writeFileContent(const std::string& path, const std::string& con
 }
 
 /* Perform resource-specific processing on the request payload. */
-void	Response::_runPostMethod()
+void Response::_runPostMethod()
 {
-	std::ofstream		ofs;
+	std::ofstream ofs;
 
 	if (_isCgi(_builtPath))
 	{
@@ -545,47 +544,46 @@ void	Response::_runPostMethod()
 		return (_handleCgi());
 	}
 	if (_contentTypeIsUrlencoded())
-		return ;
+		return;
 	if (_contentTypeIsMultipart())
 		return (_handleMultipartContent(_request->getBody()));
-	DEBUG ("LOL");
+	DEBUG("LOL");
 	_checkUploadPath();
 	_writeFileContent(_builtPath, _request->getBody());
 }
-
 
 /******************************************************************************/
 /*                               DELETE METHOD                                */
 /******************************************************************************/
 
-bool	Response::_deletePurchase(const std::string& uri)
+bool Response::_deletePurchase(const std::string &uri)
 {
-	std::string	id;
+	std::string id;
 
-	DEBUG("Delete purchase =====================================");
-	if (uri.find("/form_delete/") == 0)
+	if (CUTIE && uri.find("/form_delete/") == 0)
 	{
 		id = uri.substr(13);
 		if (_session->deletePurchase(id, &_msg))
 		{
+			DEBUG("Delete purchase");
 			return (true);
 		}
 	}
 	return (false);
 }
 
-bool	Response::_deletePurchaseImage(const std::string& uri)
+bool Response::_deletePurchaseImage(const std::string &uri)
 {
-	Session::listOfPath::iterator	ite;
-	std::string						image_to_delete;
-	Session::listOfPath&				gallery = _session->getGallery();
+	Session::listOfPath::iterator ite;
+	std::string image_to_delete;
+	Session::listOfPath &gallery = _session->getGallery();
 
-	if (uri.find("/form_delete/") == 0)
+	if (CUTIE && uri.find("/form_delete/") == 0)
 	{
 		image_to_delete = uri.substr(12);
-		for (ite = gallery.begin(); \
-		ite != gallery.end(); \
-		ite++)
+		for (ite = gallery.begin();
+			 ite != gallery.end();
+			 ite++)
 		{
 			if (image_to_delete == ite->second)
 			{
@@ -598,22 +596,22 @@ bool	Response::_deletePurchaseImage(const std::string& uri)
 }
 
 /* Remove all current representations of the target resource. */
-void	Response::_runDeleteMethod()
+void Response::_runDeleteMethod()
 {
-	int	ret;
+	int ret;
 
 	DEBUG("DELETE METHOD");
 	if (_deletePurchase(_request->getPath()))
-		return ;
+		return;
 	else if (_deletePurchaseImage(_request->getPath()))
-		return ;
+		return;
 	ret = std::remove(_builtPath.c_str());
 	if (ret)
 	{
 		/* Error case */
-		throw (_findErrorCode());
+		throw(_findErrorCode());
 	}
- 	/* Successfull case */
+	/* Successfull case */
 	setStatusCode(NO_CONTENT);
 	_msg = "   ❎📄 Resource " + _builtPath + " was successfully deleted";
 }
@@ -622,19 +620,19 @@ void	Response::_runDeleteMethod()
 /*                                  ERROR                                     */
 /******************************************************************************/
 
-void	Response::_throwErrorMsg(t_statusCode errorCode, const std::string& message)
+void Response::_throwErrorMsg(t_statusCode errorCode, const std::string &message)
 {
 	std::cerr << RED << "Webserv error: " << message << RESET << std::endl;
 	throw(errorCode);
 }
 
-void	Response::_throwErrorMsg(const std::string& message)
+void Response::_throwErrorMsg(const std::string &message)
 {
 	std::cerr << RED << "Webserv error: " << message << RESET << std::endl;
 	throw(INTERNAL_SERVER_ERROR);
 }
 
-t_statusCode	Response::_findErrorCode()
+t_statusCode Response::_findErrorCode()
 {
 	if (errno == ENOENT || errno == ENOTDIR)
 		return (NOT_FOUND);
@@ -647,10 +645,10 @@ t_statusCode	Response::_findErrorCode()
 /*                                 HEADERS                                    */
 /******************************************************************************/
 
-std::string		Response::_getContentTypeHeader()
+std::string Response::_getContentTypeHeader()
 {
-	size_t			pos;
-	std::string		typeExtension;
+	size_t pos;
+	std::string typeExtension;
 
 	/* Check if request is valid */
 	if (_statusCode >= 400)
@@ -669,11 +667,11 @@ std::string		Response::_getContentTypeHeader()
 /* The keep-alive directive indicates that the client wants the HTTP Connection
 to persist and remain open after the current transaction is complete.
 This is the default setting for HTTP/1.1 requests. */
-std::string		Response::_getConnectionHeader()
+std::string Response::_getConnectionHeader()
 {
-	std::string						connection;
-	listOfHeaders::const_iterator	connectionHeader;
-	listOfHeaders					requestHeaders;
+	std::string connection;
+	listOfHeaders::const_iterator connectionHeader;
+	listOfHeaders requestHeaders;
 
 	if (!_request)
 		return ("close");
@@ -685,7 +683,7 @@ std::string		Response::_getConnectionHeader()
 	return (connection);
 }
 
-void	Response::_fillCookieHeader()
+void Response::_fillCookieHeader()
 {
 	_response += _session->getCookieHeader();
 }
@@ -694,85 +692,92 @@ void	Response::_fillCookieHeader()
 /*                                  PATH                                      */
 /******************************************************************************/
 
-void	Response::_checkUploadPath()
+void Response::_checkUploadPath()
 {
 	if (_matchingBlock->getUploadPath().empty())
-		throw (UNAUTHORIZED);
+		throw(UNAUTHORIZED);
 	if (!pathIsAccessible(_uploadPath))
 		throw(NOT_FOUND);
 }
 
 /* Example refere: http://localhost:8080/cgi/cgi_upload.py */
 
-void	Response::_parseRequestReferer()
+void Response::_parseRequestReferer()
 {
-	std::string	correctPath;
+	std::string correctPath;
 
 	_referer = _request->getHeader("referer");
 	if (_referer.empty())
-		return ;
+		return;
 	_referer = _referer.substr(0, _referer.rfind("/") + 1); /* remove filename*/
-	_referer = _referer.substr(_referer.find("://") + 3); /* remove http:// */
-	_referer = _referer.substr(_referer.find("/") + 1);	/* remove hostname:port */
+	_referer = _referer.substr(_referer.find("://") + 3);	/* remove http:// */
+	_referer = _referer.substr(_referer.find("/") + 1);		/* remove hostname:port */
 	if (_referer.empty())
-		return ;
+		return;
 }
 
-std::string		Response::_getPathDir(const std::string& path)
+std::string Response::_getPathDir(const std::string &path)
 {
-	std::string	pathDir;
-	size_t		separator;
+	std::string pathDir;
+	size_t separator;
 
 	separator = path.rfind("/");
 	pathDir = path.substr(0, separator + 1);
 	return (pathDir);
 }
 
-void	Response::_checkPath()
+void Response::_checkPath()
 {
-	std::string		pathDir;
+	std::string pathDir;
+	size_t posReferer;
 
 	if (_builtPath.empty())
 		throw(NOT_FOUND);
 	/* Check if directory exists */
 	pathDir = _getPathDir(_builtPath);
-	if (_builtPath.find("form_delete/") != std::string::npos)
-		return ;
+	if (CUTIE && (_builtPath.find("form_delete") != std::string::npos || _builtPath.find("form_gallery") != std::string::npos || _builtPath.find("form_order") != std::string::npos || _builtPath.find("form_accept") != std::string::npos || _builtPath.find("form_upload") != std::string::npos))
+		return;
 	if (!pathIsAccessible(pathDir))
 	{
 		/* We retrieve the referer */
-		_builtPath.erase(_builtPath.find(_referer), _referer.length());
+		posReferer = _builtPath.find(_referer);
+		if (posReferer != std::string::npos)
+			_builtPath.erase(posReferer, _referer.length());
 		pathDir = _getPathDir(_builtPath);
 		if (!pathIsAccessible(pathDir))
 			throw(NOT_FOUND);
 	}
 }
 
-void	Response::_generateAutoindex(const std::string& path)
+void Response::_generateAutoindex(const std::string &path)
 {
-	Autoindex	autoindex(path);
+	Autoindex autoindex(path);
 
 	_body = autoindex.getIndexPage();
 	_headers["Content-Type"] = g_mimeType[".html"];
 }
 
-bool	Response::_foundIndexPage(DIR* dir, const std::string& indexPage)
+bool Response::_foundIndexPage(DIR *dir, const std::string &indexPage)
 {
-	struct dirent*	diread;
+	struct dirent *diread;
+	int ret;
 
+	ret = false;
+	rewinddir(dir); /* Reset beginning directory */
 	while ((diread = readdir(dir)))
 	{
-		if (diread->d_name == indexPage)
-			return (true);
+		std::string name = diread->d_name;
+		if (name == indexPage)
+			ret = true;
 	}
-	return (false);
+	return (ret);
 }
 
-bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* path)
+bool Response::_searchOfIndexPage(const listOfStrings &indexes, std::string *path)
 {
-	listOfStrings::const_iterator	currentIndex;
-	DIR*							dir;
-	bool							foundIndexPage;
+	listOfStrings::const_iterator currentIndex;
+	DIR *dir;
+	bool foundIndexPage;
 
 	foundIndexPage = false;
 	dir = opendir(path->c_str());
@@ -784,7 +789,7 @@ bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* pat
 		{
 			*path += *currentIndex;
 			foundIndexPage = true;
-			break ;
+			break;
 		}
 	}
 	closedir(dir);
@@ -792,10 +797,10 @@ bool	Response::_searchOfIndexPage(const listOfStrings& indexes, std::string* pat
 }
 
 /* Directory case */
-void	Response::_handleDirectoryPath(std::string* path)
+void Response::_handleDirectoryPath(std::string *path)
 {
 	if (*(path->rbegin()) == '/' && _searchOfIndexPage(_matchingBlock->getIndexes(), path))
-		return ;
+		return;
 	if (*(path->rbegin()) != '/')
 		*path += "/";
 	if (_matchingBlock->getAutoindex())
@@ -805,7 +810,7 @@ void	Response::_handleDirectoryPath(std::string* path)
 	}
 }
 
-void	Response::_handleSlash(std::string* path, const std::string& uri)
+void Response::_handleSlash(std::string *path, const std::string &uri)
 {
 	if (*(path->rbegin()) == '/' && *(uri.begin()) == '/')
 		path->erase(path->length() - 1);
@@ -817,10 +822,10 @@ void	Response::_handleSlash(std::string* path, const std::string& uri)
 
 /* If a request ends with a slash, NGINX treats it as a request
 for a directory and tries to find an index file in the directory. */
-void	Response::_buildPath()
+void Response::_buildPath()
 {
-	std::string		path;
-	std::string		uri;
+	std::string path;
+	std::string uri;
 
 	uri = _request->getPath();
 	if (_locationPath != "")
@@ -841,24 +846,23 @@ void	Response::_buildPath()
 /*                                  UTILS                                     */
 /******************************************************************************/
 
-bool	Response::_hasUploadPathDirective()
+bool Response::_hasUploadPathDirective()
 {
-	return ((_method == POST || _method == DELETE)
-		&& !_matchingBlock->getUploadPath().empty());
+	return ((_method == POST || _method == DELETE) && !_matchingBlock->getUploadPath().empty());
 }
 
-bool	Response::_requestIsValid()
+bool Response::_requestIsValid()
 {
 	return (_request && _request->getStatusCode() < 400);
 }
 
-void	Response::_checkBodyLimit()
+void Response::_checkBodyLimit()
 {
 	if (_request->getBodySize() >= _matchingBlock->getClientBodyLimit())
 		throw(PAYLOAD_TOO_LARGE);
 }
 
-bool	Response::_contentTypeIsMultipart()
+bool Response::_contentTypeIsMultipart()
 {
 	size_t pos;
 
@@ -866,7 +870,7 @@ bool	Response::_contentTypeIsMultipart()
 	return (pos != std::string::npos);
 }
 
-bool	Response::_contentTypeIsUrlencoded()
+bool Response::_contentTypeIsUrlencoded()
 {
 	size_t pos;
 
@@ -874,22 +878,27 @@ bool	Response::_contentTypeIsUrlencoded()
 	return (pos != std::string::npos);
 }
 
-void	Response::eraseChunkResponse(size_t size)
+void Response::_checkSizeFile(const std::string &path)
 {
-	_response.erase(0, size);
-	// _response.erase(_response.begin(), _response.begin() + size);
+	struct stat fileInfos;
+
+	if (stat(path.c_str(), &fileInfos) == 0 && (fileInfos.st_mode & S_IFREG))
+	{
+		if (fileInfos.st_size > 10000000)
+			throw(UNAUTHORIZED);
+	}
 }
 
 /******************************************************************************/
 /*                                  SETTER                                    */
 /******************************************************************************/
 
-void	Response::setStatusCode(t_statusCode status)
+void Response::setStatusCode(t_statusCode status)
 {
 	_statusCode = status;
 }
 
-void	Response::setStatusCode(int status)
+void Response::setStatusCode(int status)
 {
 	_statusCode = (t_statusCode)status;
 }
@@ -898,96 +907,102 @@ void	Response::setStatusCode(int status)
 /*                                  GETTER                                    */
 /******************************************************************************/
 
-Block*		Response::getServer() const
+Block *Response::getServer() const
 {
 	return (_server);
 }
 
-Block*		Response::getMatchingBlock() const
+Block *Response::getMatchingBlock() const
 {
 	return (_matchingBlock);
 }
 
-Request*	Response::getRequest() const
+Request *Response::getRequest() const
 {
 	return (_request);
 }
 
-std::string		Response::getResponse() const
+std::string Response::getResponse() const
 {
 	return (_response);
 }
 
-t_statusCode	Response::getStatusCode() const
+t_statusCode Response::getStatusCode() const
 {
 	return (_statusCode);
 }
 
-std::string		Response::getStatusCodeStr() const
+std::string Response::getStatusCodeStr() const
 {
 	return (convertNbToString(_statusCode));
 }
 
-t_method	Response::getMethod() const
+t_method Response::getMethod() const
 {
 	return (_method);
 }
 
-Response::listOfHeaders	Response::getHeaders() const
+Response::listOfHeaders Response::getHeaders() const
 {
 	return (_headers);
 }
 
-std::string		Response::getBody() const
+std::string Response::getBody() const
 {
 	return (_body);
 }
 
-Response::listOfHttpMethodsFunct	Response::getHttpMethods() const
+Response::listOfHttpMethodsFunct Response::getHttpMethods() const
 {
 	return (_httpMethods);
 }
 
-std::string		Response::getLocationPath() const
+std::string Response::getLocationPath() const
 {
 	return (_locationPath);
 }
 
-int		Response::getFd() const {
+int Response::getFd() const
+{
 	return (_fd);
 }
 
-std::string		Response::getCgiProgram() const {
+std::string Response::getCgiProgram() const
+{
 	return (_cgipath);
 }
 
-std::string		Response::getCgiName() const {
+std::string Response::getCgiName() const
+{
 	return (_cgiscript);
 }
 
-std::string		Response::getCgiExtra() const {
+std::string Response::getCgiExtra() const
+{
 	return (_cgiextra);
 }
 
-std::string		Response::getCgiQuery() const {
+std::string Response::getCgiQuery() const
+{
 	return (_cgiquery);
 }
 
-Env*		Response::getEnv() const {
+Env *Response::getEnv() const
+{
 	return (_env);
 }
 
-std::string		Response::getBuiltPath() const
+std::string Response::getBuiltPath() const
 {
 	return (_builtPath);
 }
 
-std::string		Response::getMsgToDisplay() const
+std::string Response::getMsgToDisplay() const
 {
 	return (_msg);
 }
 
-Session*	Response::getSession() const
+Session *Response::getSession() const
 {
 	return (_session);
 }
@@ -997,10 +1012,10 @@ Session*	Response::getSession() const
 /******************************************************************************/
 
 /* Check if we need to call cgi */
-bool	Response::_isCgi(const std::string& path)
+bool Response::_isCgi(const std::string &path)
 {
-	std::string		extension;
-	size_t			pos;
+	std::string extension;
+	size_t pos;
 
 	if (_matchingBlock->getCgi().empty())
 		return (false);
@@ -1013,38 +1028,42 @@ bool	Response::_isCgi(const std::string& path)
 	return (false);
 }
 
-size_t	Response::_parsePosCgiExtension(std::string path) {
+size_t Response::_parsePosCgiExtension(std::string path)
+{
 
-	std::string		extension;
-	size_t			pos;
+	std::string extension;
+	size_t pos;
 
-	for (pos = path.find("."); pos != std::string::npos; pos = path.find(".")) {
+	for (pos = path.find("."); pos != std::string::npos; pos = path.find("."))
+	{
 		extension = path.substr(pos + 1, path.find("/"));
 		if (_matchingBlock->findCgi(extension) != "")
 		{
 			_cgipath = _matchingBlock->findCgi(extension);
-			break ;
+			break;
 		}
 		path.erase(0, extension.length() + 1);
 	}
 	return (pos);
 }
 
-void   Response::_parseCgiUrl(size_t pos_extension) {
-	std::string		path = _request->getPath();
+void Response::_parseCgiUrl(size_t pos_extension)
+{
+	std::string path = _request->getPath();
 
-	size_t		pos_end_extension = path.find('/', pos_extension);
-	size_t		pos_cgi = path.find_last_of('/', pos_extension);
+	size_t pos_end_extension = path.find('/', pos_extension);
+	size_t pos_cgi = path.find_last_of('/', pos_extension);
 	if (pos_cgi == std::string::npos)
-		return ;
-	std::string	cgi = path.substr(pos_cgi + 1, pos_end_extension);
+		return;
+	std::string cgi = path.substr(pos_cgi + 1, pos_end_extension);
 	_cgiscript = cgi;
 	_cgiquery = _request->getQuery();
 	_cgiextra = "";
 }
 
 /* Retrieve info from request and put them in env */
-void	Response::_fillCgiMetavariables() {
+void Response::_fillCgiMetavariables()
+{
 	_env->addParam("SERVER_PROTOCOL", _request->getHttpProtocol());
 	_env->addParam("CONTENT_LENGTH", convertNbToString(_request->getBodySize()));
 	_env->addParam("CONTENT_TYPE", _request->getHeader("content-type"));
@@ -1052,7 +1071,7 @@ void	Response::_fillCgiMetavariables() {
 	_env->addParam("QUERY_STRING", getCgiQuery());
 	_env->addParam("SCRIPT_NAME", _request->getPath());
 	_env->addParam("SCRIPT_FILENAME", _translateCgiName());
-	_env->addParam("PATH_INFO", getCgiExtra()); 
+	_env->addParam("PATH_INFO", getCgiExtra());
 	_env->addParam("PATH_TRANSLATED", "");
 	_env->addParam("REMOTE_ADDR", "localhost");
 	_env->addParam("SERVER_PORT", convertNbToString(_request->getPort()));
@@ -1064,12 +1083,12 @@ void	Response::_fillCgiMetavariables() {
 	_env->addParam("HTTP_COOKIE", _request->getHeader("cookie"));
 	_env->addParam("HTTP_REFERER", _request->getHeader("referer"));
 	_env->addParam("REDIRECT_STATUS", getStatusCodeStr());
-
 }
 
-std::string		Response::_translateCgiName() const {
-	std::string     translation(std::string(WEBSERV_PATH));
-	std::string		relativePath(getBuiltPath());
+std::string Response::_translateCgiName() const
+{
+	std::string translation(std::string(WEBSERV_PATH));
+	std::string relativePath(getBuiltPath());
 
 	if (relativePath[0] == '.')
 		relativePath.erase(0, 1);
@@ -1083,7 +1102,7 @@ std::string		Response::_translateCgiName() const {
 /*                                   INIT                                     */
 /******************************************************************************/
 
-void	Response::_initHttpMethods()
+void Response::_initHttpMethods()
 {
 	_httpMethods[GET] = &Response::_runGetMethod;
 	_httpMethods[POST] = &Response::_runPostMethod;

@@ -13,7 +13,7 @@
 
 extern HttpMethod	g_httpMethod;
 
-# define DEFAULT_CLIENT_BODY_LIMIT 1000000
+# define DEFAULT_CLIENT_BODY_LIMIT 10000000
 # define DEFAULT_ROOT "/"
 
 /******************************************************************************/

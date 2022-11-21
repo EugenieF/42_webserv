@@ -1,0 +1,72 @@
+strong /* full balise */
+{
+	color: blue;
+}
+
+.first /* class a changer */
+{
+	color: red;
+	font-size: 1.4em;
+}
+
+#donc /* id a changer */
+{
+	color:green;
+	font-family: arial, serif;
+	font-style: italic;
+	font-weight: bold;
+}
+
+/* =========== Selectors =========== 
+
+# universal: every beacon will be changed 
+	*
+	{
+	}
+
+# multiple: selected beacons are changed
+	h3, em
+	{
+	}
+
+# inclusion: every beacon (right) inside another (left) are changed
+	h3 em
+	{
+	}
+ex: <h3><em>This text is changed</em> and this one isn't</h3>
+
+# following: beacon following another will be changed
+	h3 + em
+	{
+	}
+ex: <h3>This text is normal</h3><em>This one is changed</em>
+
+# attribute: beacon that has an attribute
+General:
+	a[title]
+	{
+	}
+ex: <a href="www.example.com" title="some title">Styled link</a>
+Specific:
+	a[title="link"]
+	{
+	}
+ex: <a href="www.example.com" title="link">Styled link</a>
+Contains:
+	a[title*="link"]
+	{
+	}
+ex: <a href="www.example.com" title="some title with link">Styled link</a>
+
+*/
+
+/* =========== Formating  ===========
+
+# font-size
+Absolute:
+	font-size: 13px;
+Relative:
+	font-size: small;
+	font-size: 1.13em;
+
+*/

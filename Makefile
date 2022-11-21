@@ -37,11 +37,17 @@ DEP				= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.d))
 
 CXX				= c++
 
-CXXFLAGS		 = -Wall -Wextra -Werror -g3 -std=c++98 -MMD -MP -I$(INCLUDE)
+ifndef cutie
+	CUTIE_MODE		= -D CUTIE=1
+else
+	CUTIE_MODE		= -D CUTIE=0
+endif
+
+CXXFLAGS		 = -Wall -Wextra -Werror -g3 $(CUTIE_MODE) -std=c++98 -MMD -MP -I$(INCLUDE) 
 
 MACRO			= -D WEBSERV_PATH=\"$(shell pwd)\"
 
-DEBUG_MODE		= -D DISPLAY=1
+# DEBUG_MODE		= -D DISPLAY=1
 
 BONUS_MODE		= -D COOKIE=1
 
@@ -186,8 +192,8 @@ fclean:		clean
 
 re:			fclean all
 
-test:  all
-			valgrind -s --track-fds=yes --leak-check=full ./$(NAME)
+test: fclean all
+	valgrind -s --track-fds=yes --leak-check=full ./$(NAME)
 
 .PHONY:		all clean fclean re
 
